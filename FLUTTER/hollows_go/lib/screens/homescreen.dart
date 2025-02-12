@@ -7,7 +7,7 @@ class HomeScreen extends StatelessWidget {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', false);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => LoginScreen()),
+        MaterialPageRoute(builder: (_) => PreHomeScreen()),
       );
     }
 

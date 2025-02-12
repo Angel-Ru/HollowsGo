@@ -7,8 +7,8 @@ class PreHomeScreen extends StatelessWidget {
       backgroundColor: Color(0xFFEAE4F2), // Color lila claro de fondo
       body: GestureDetector(
         onTap: () {
-          // Aquí puedes navegar a la siguiente pantalla
-          print("Navegar a la siguiente pantalla");
+          Provider.of<LoginProvider>(context, listen: false).checkLogin(
+              context); // Mostrar el diálogo de login al tocar la pantalla
         },
         child: Stack(
           children: [
