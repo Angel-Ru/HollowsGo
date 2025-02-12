@@ -1,1 +1,1 @@
-GET http://api-hollowsgo-e5eccyddhxc6fqda.spaincentral-01.azurewebsites.net:3000/usuaris
+GET https://api-hollowsgo-e5eccyddhxc6fqda.spaincentral-01.azurewebsites.net/:3000/usuaris
