@@ -4,15 +4,15 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-  "start": "node server.js > logs/server.log 2>&1",
-  "dev": "nodemon server.js > logs/server.log 2>&1"
-},
+    "start": "node server.js > logs/server.log 2>&1",
+    "dev": "nodemon server.js > logs/server.log 2>&1"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "express": "^4.21.2",
     "mssql": "^11.0.1",
