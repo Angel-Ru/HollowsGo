@@ -37,9 +37,22 @@ async function connectDB() {
     return poolPromise;
 }
 
-const port = process.env.PORT || 3001;
-// Iniciar servidor
-app.listen(port, () => console.log('🚀 Servidor iniciat al port 3000'));
+const winston = require('winston');
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new winston.transports.File({ filename: 'combined.log' }),
+        new winston.transports.Console()
+    ]
+});
+
+// Usa el logger en tu aplicación
+logger.info('Servidor iniciando...');
+app.listen(port, () => {
+    logger.info(`🚀 Servidor iniciat al port ${port}`);
+});
 
 
 // ------------------- MÈTODES GET -------------------
