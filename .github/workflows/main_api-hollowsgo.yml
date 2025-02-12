@@ -16,6 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Cambiar al directorio donde está tu API (la carpeta /API)
+      - name: Change directory to /API
+        run: cd API  # Cambia al directorio donde está tu código de la API
+
       - name: Set up Node.js version
         uses: actions/setup-node@v4
         with:
@@ -31,7 +35,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: ./API  # Asegúrate de que el archivo esté disponible en el directorio correcto
 
   deploy:
     runs-on: ubuntu-latest
@@ -53,4 +57,4 @@ jobs:
           app-name: 'API-HOLLOWSGO'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0173322BA5304E199FC3112D5700ECE2 }}
-          package: ./API
+          package: ./API  # Ruta a tu carpeta API para el despliegue
