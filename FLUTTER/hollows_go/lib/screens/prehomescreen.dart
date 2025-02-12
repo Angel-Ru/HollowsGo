@@ -20,7 +20,7 @@ class PreHomeScreen extends StatelessWidget {
         onTap: () {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(builder: (context) => LoginScreen()),
           );
         },
         child: Stack(
