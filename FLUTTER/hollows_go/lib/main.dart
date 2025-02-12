@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LoginProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Hollows Go',
         theme: ThemeData(
           primarySwatch: Colors.blue,

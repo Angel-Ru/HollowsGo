@@ -1,12 +1,13 @@
 import 'package:hollows_go/imports.dart';
 
 class ImageSelectionPage extends StatelessWidget {
-  // Llista amb les rutes de les imatges locals, cal dir que també han d'estar especificades al pub
+  // Lista con las rutas de las imágenes locales
   final List<String> imagePaths = [
     'lib/images/chad.png',
     'lib/images/kon.png',
     'lib/images/kenpachi.png',
     'lib/images/grimmjaw.png',
+    'lib/images/komamura_goty.jpg',
   ];
 
   final Function(String) onImageSelected;
@@ -23,7 +24,7 @@ class ImageSelectionPage extends StatelessWidget {
       body: GridView.builder(
         padding: const EdgeInsets.all(8.0),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, // Tres columnes per distribuir les imatges
+          crossAxisCount: 3, // Tres columnas para distribuir las imágenes
           crossAxisSpacing: 10.0,
           mainAxisSpacing: 10.0,
         ),
@@ -32,7 +33,8 @@ class ImageSelectionPage extends StatelessWidget {
           return GestureDetector(
             onTap: () {
               onImageSelected(imagePaths[index]);
-              Navigator.pop(context); // Tanca la pàgina al seleccionar l'imatge
+              Navigator.pop(
+                  context); // Cierra la página al seleccionar la imagen
             },
             child: Container(
               decoration: BoxDecoration(
@@ -40,11 +42,10 @@ class ImageSelectionPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
               ),
               clipBehavior: Clip
-                  .antiAlias, // Això el que fa es fer que l'imatge tengui els cantons redons
+                  .antiAlias, // Hace que la imagen tenga los bordes redondeados
               child: Image.asset(
                 imagePaths[index],
-                fit: BoxFit
-                    .cover, // M'ajusta l'imatge al contenidor ja que sinò les imatges eren de diferents mides i no me quedaven igual
+                fit: BoxFit.cover, // Ajusta la imagen al contenedor
               ),
             ),
           );

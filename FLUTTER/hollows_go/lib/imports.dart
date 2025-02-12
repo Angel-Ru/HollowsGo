@@ -3,6 +3,7 @@ export '/screens/loginscreen.dart';
 export '/screens/imageselectionpage.dart';
 export '/screens/prehomescreen.dart';
 export '/providers/loginprovider.dart';
+export '/providers/blinkingtextprovider.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';

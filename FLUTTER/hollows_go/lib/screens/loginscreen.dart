@@ -9,7 +9,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-  String _imagePath = 'lib/images/kon.png';
+  String _imagePath =
+      'lib/images/perfil_predeterminat.jpg'; // Imagen predeterminada
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('profileImagePath', _imagePath);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => HomeScreen()),
       );
