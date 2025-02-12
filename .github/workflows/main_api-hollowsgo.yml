@@ -22,7 +22,6 @@ jobs:
       # Instalar dependencias, construir y probar dentro del directorio 'API'
       - name: npm install, build, and test
         run: |
-          cd API
           npm install
           npm run build --if-present
           npm run test --if-present
@@ -53,4 +52,4 @@ jobs:
           app-name: 'API-HOLLOWSGO'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0173322BA5304E199FC3112D5700ECE2 }}
-          package: .  # Ruta correcta del paquete para el despliegue
+          package: . 
