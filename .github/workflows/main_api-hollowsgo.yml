@@ -53,4 +53,4 @@ jobs:
           app-name: 'API-HOLLOWSGO'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0173322BA5304E199FC3112D5700ECE2 }}
-          package: .
+          package: ./API
