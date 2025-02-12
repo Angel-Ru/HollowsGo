@@ -4,9 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
+  "start": "node server.js > logs/server.log 2>&1",
+  "dev": "nodemon server.js > logs/server.log 2>&1"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
