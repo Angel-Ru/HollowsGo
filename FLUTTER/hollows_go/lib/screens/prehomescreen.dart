@@ -18,10 +18,8 @@ class PreHomeScreen extends StatelessWidget {
       backgroundColor: Color(0xFFEAE4F2), // Color lila claro de fondo
       body: GestureDetector(
         onTap: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
-          );
+          _showLoginDialog(
+              context); // Mostrar el diálogo de login al tocar la pantalla
         },
         child: Stack(
           children: [
@@ -89,6 +87,16 @@ class PreHomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return LoginScreen(); // Mostrar el LoginScreen como un diálogo
+      },
     );
   }
 }
