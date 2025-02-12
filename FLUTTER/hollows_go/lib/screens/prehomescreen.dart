@@ -1,37 +1,88 @@
 import 'package:hollows_go/imports.dart';
 
 class PreHomeScreen extends StatelessWidget {
+  final List<String> imagePaths = [
+    'lib/images/koncapitan.png',
+    'lib/images/konepico.png',
+    'lib/images/konlike.png',
+    'lib/images/konbrillitos.png',
+    'lib/images/konrap.png',
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final random = Random();
+    final randomImage = random.nextInt(imagePaths.length);
+
     return Scaffold(
       backgroundColor: Color(0xFFEAE4F2), // Color lila claro de fondo
       body: GestureDetector(
         onTap: () {
-          // Aquí puedes navegar a la siguiente pantalla
-          print("Navegar a la siguiente pantalla");
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
         },
         child: Stack(
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Image.asset("lib/images/skull_border.png", fit: BoxFit.cover),
+                Container(
+                  height: 40,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 10,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 39,
+                        height: 39,
+                        child: Image.asset(
+                          "lib/images/skull_border.png",
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 Spacer(),
-                Image.asset("lib/images/kon.png", width: 200),
-                Spacer(),
-                Text("TAP ANYWHERE TO ENTER",
+                Container(
+                  height: 200,
+                  child: Image.asset(
+                    imagePaths[randomImage],
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 70),
+                Text("CLICA A ON SIGUI PER COMENÇAR",
                     style:
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                SizedBox(height: 20),
-                Image.asset("lib/images/skull_border.png", fit: BoxFit.cover),
+                SizedBox(height: 150),
+                Container(
+                  height: 40,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 10,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        width: 39,
+                        height: 39,
+                        child: Image.asset(
+                          "lib/images/skull_border.png",
+                          fit: BoxFit.cover,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 100),
-                  Image.asset("lib/images/nom_aplicacio.png", width: 250),
+                  SizedBox(height: 150),
+                  Image.asset("lib/images/nom_aplicacio.png", width: 300),
                 ],
               ),
             ),
