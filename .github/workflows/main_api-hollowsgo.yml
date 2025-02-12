@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: ./API  # Asegúrate de que el código de la API esté en esta ruta
+          path: .  # Asegúrate de que el código de la API esté en esta ruta
 
   deploy:
     runs-on: ubuntu-latest
@@ -53,4 +53,4 @@ jobs:
           app-name: 'API-HOLLOWSGO'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0173322BA5304E199FC3112D5700ECE2 }}
-          package: ./API  # Ruta correcta del paquete para el despliegue
+          package: .  # Ruta correcta del paquete para el despliegue
