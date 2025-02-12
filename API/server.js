@@ -37,8 +37,9 @@ async function connectDB() {
     return poolPromise;
 }
 
+const port = process.env.PORT || 3000;
 // Iniciar servidor
-app.listen(3000, () => console.log('🚀 Servidor iniciat al port 3000'));
+app.listen(port, () => console.log('🚀 Servidor iniciat al port 3000'));
 
 
 // ------------------- MÈTODES GET -------------------
