@@ -28,7 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+        MaterialPageRoute(builder: (_) => Mapscreen()),
       );
     }
   }

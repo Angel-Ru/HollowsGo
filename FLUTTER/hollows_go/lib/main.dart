@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
         home: PreHomeScreen(),
         routes: {
           '/home': (context) => HomeScreen(),
+          '/map': (context) => Mapscreen(),
         },
       ),
     );
