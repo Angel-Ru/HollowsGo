@@ -16,6 +16,7 @@ class PreHomeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Color(0xFFEAE4F2), // Color lila claro de fondo
+      resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
           _showLoginDialog(
