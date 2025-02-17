@@ -3,6 +3,7 @@ export '/screens/loginscreen.dart';
 export '/screens/imageselectionpage.dart';
 export '/screens/prehomescreen.dart';
 export '/screens/tendascreen.dart';
+import '/screens/bibliotecascreen.dart';
 export '/providers/loginprovider.dart';
 export '/providers/blinkingtextprovider.dart';
 export '/providers/ui_provider.dart';
