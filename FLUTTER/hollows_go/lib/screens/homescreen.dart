@@ -6,9 +6,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ValueNotifier<int> _selectedIndex = ValueNotifier<int>(0);
   String _imagePath =
-      'lib/images/perfil_predeterminat.jpg'; // Imagen predeterminada
+      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imagen predeterminada
   final String _coinImagePath =
       'lib/images/kan_moneda.png'; // Ruta de la imagen de la moneda
   final int _coinCount = 0; // Número de monedas
@@ -53,12 +52,29 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _imagePath = prefs.getString('profileImagePath') ??
-          'lib/images/perfil_predeterminat.jpg';
+          'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
     });
+  }
+
+  Widget _getSelectedScreen(int selectedIndex) {
+    switch (selectedIndex) {
+      case 0:
+        return Center(child: Text('Welcome to the Home Screen!'));
+      case 1:
+        return Center(child: Text('Mapa Screen'));
+      case 2:
+        return TendaScreen();
+      case 3:
+        return Center(child: Text('Biblioteca Screen'));
+      default:
+        return Center(child: Text('Welcome to the Home Screen!'));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final uiProvider = Provider.of<UIProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -128,39 +144,31 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: Center(
-        child: Text('Welcome to the Home Screen!'),
-      ),
-      bottomNavigationBar: ValueListenableBuilder<int>(
-        valueListenable: _selectedIndex,
-        builder: (context, selectedIndex, child) {
-          return BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Principal',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.directions_run),
-                label: 'Mapa',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_bag),
-                label: 'Tenda',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.apps),
-                label: 'Biblioteca',
-              ),
-            ],
-            currentIndex: selectedIndex,
-            selectedItemColor: Colors.blue,
-            unselectedItemColor: Colors.grey,
-            onTap: (index) {
-              _selectedIndex.value = index;
-              // Handle navigation to different menus based on the selected index
-            },
-          );
+      body: _getSelectedScreen(uiProvider.selectedMenuOpt),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Principal',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.directions_run),
+            label: 'Mapa',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: 'Tenda',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.apps),
+            label: 'Biblioteca',
+          ),
+        ],
+        currentIndex: uiProvider.selectedMenuOpt,
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        onTap: (index) {
+          uiProvider.selectedMenuOpt = index;
         },
       ),
     );

@@ -3,11 +3,11 @@ import 'package:hollows_go/imports.dart';
 class ImageSelectionPage extends StatelessWidget {
   // Lista con las rutas de las imágenes locales
   final List<String> imagePaths = [
-    'lib/images/chad.png',
-    'lib/images/kon.png',
-    'lib/images/kenpachi.png',
-    'lib/images/grimmjaw.png',
-    'lib/images/komamura_goty.jpg',
+    'lib/images/perfil_predeterminat/chad.png',
+    'lib/images/perfil_predeterminat/kon.png',
+    'lib/images/perfil_predeterminat/kenpachi.png',
+    'lib/images/perfil_predeterminat/grimmjaw.png',
+    'lib/images/perfil_predeterminat/komamura_goty.jpg',
   ];
 
   final Function(String) onImageSelected;

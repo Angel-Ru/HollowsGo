@@ -2,11 +2,11 @@ import 'package:hollows_go/imports.dart';
 
 class PreHomeScreen extends StatelessWidget {
   final List<String> imagePaths = [
-    'lib/images/koncapitan.png',
-    'lib/images/konepico.png',
-    'lib/images/konlike.png',
-    'lib/images/konbrillitos.png',
-    'lib/images/konrap.png',
+    'lib/images/prehomescreen_imatges/koncapitan.png',
+    'lib/images/prehomescreen_imatges/konepico.png',
+    'lib/images/prehomescreen_imatges/konlike.png',
+    'lib/images/prehomescreen_imatges/konbrillitos.png',
+    'lib/images/prehomescreen_imatges/konrap.png',
   ];
 
   @override
@@ -37,7 +37,7 @@ class PreHomeScreen extends StatelessWidget {
                         width: 39,
                         height: 39,
                         child: Image.asset(
-                          "lib/images/skull_border.png",
+                          "lib/images/prehomescreen_imatges/skull_border.png",
                           fit: BoxFit.cover,
                         ),
                       );
@@ -67,7 +67,7 @@ class PreHomeScreen extends StatelessWidget {
                         width: 39,
                         height: 39,
                         child: Image.asset(
-                          "lib/images/skull_border.png",
+                          "lib/images/prehomescreen_imatges/skull_border.png",
                           fit: BoxFit.cover,
                         ),
                       );
@@ -81,7 +81,9 @@ class PreHomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 150),
-                  Image.asset("lib/images/nom_aplicacio.png", width: 300),
+                  Image.asset(
+                      "lib/images/prehomescreen_imatges/nom_aplicacio.png",
+                      width: 300),
                 ],
               ),
             ),
