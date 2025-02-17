@@ -1,3 +1,5 @@
+import 'package:hollows_go/screens/mapscreen.dart';
+
 import 'imports.dart';
 
 void main() {
