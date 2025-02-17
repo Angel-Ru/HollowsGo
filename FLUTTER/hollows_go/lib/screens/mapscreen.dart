@@ -1,7 +1,4 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart'; // Paquete para obtener la ubicación
+import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
   const Mapscreen({Key? key}) : super(key: key);
@@ -12,21 +9,18 @@ class Mapscreen extends StatefulWidget {
 
 class _MapaScreenState extends State<Mapscreen> {
   final Completer<GoogleMapController> _controller = Completer();
-  MapType _currentMapType = MapType.normal; // Tipo de mapa predeterminado
-  LatLng _currentLocation =
-      const LatLng(39.6084042, 2.8639693); // Ubicación inicial (Mallorca)
-  bool _isLoading = true; // Para mostrar un indicador de carga
+  MapType _currentMapType = MapType.normal;
+  LatLng _currentLocation = const LatLng(39.6084042, 2.8639693);
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation(); // Obtener la ubicación actual al iniciar la pantalla
+    _getCurrentLocation();
   }
 
-  // Método para obtener la ubicación actual
   Future<void> _getCurrentLocation() async {
     try {
-      // Verifica si los permisos de ubicación están habilitados
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw 'Los servicios de ubicación están desactivados.';
@@ -44,12 +38,10 @@ class _MapaScreenState extends State<Mapscreen> {
         throw 'Permisos de ubicación denegados permanentemente.';
       }
 
-      // Obtiene la ubicación actual
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      // Actualiza la ubicación en el estado
       setState(() {
         _currentLocation = LatLng(position.latitude, position.longitude);
         _isLoading = false;
@@ -80,37 +72,13 @@ class _MapaScreenState extends State<Mapscreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mapa'),
-        backgroundColor: Colors.blueGrey,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.location_searching_sharp),
-            onPressed: () async {
-              final GoogleMapController controller = await _controller.future;
-              controller.animateCamera(
-                CameraUpdate.newCameraPosition(
-                  CameraPosition(
-                    target: _currentLocation,
-                    zoom: 15,
-                    tilt: 50,
-                    bearing: 0,
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator()) // Indicador de carga
+          ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
                 GoogleMap(
-                  myLocationEnabled: true, // Muestra la ubicación del usuario
-                  myLocationButtonEnabled:
-                      true, // Botón para centrar en la ubicación
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
                   mapType: _currentMapType,
                   markers: markers,
                   initialCameraPosition: _puntInicial,
@@ -122,7 +90,7 @@ class _MapaScreenState extends State<Mapscreen> {
                   bottom: 25,
                   right: 330,
                   child: FloatingActionButton(
-                    backgroundColor: Colors.blueGrey,
+                    backgroundColor: Colors.deepPurple,
                     child: const Icon(
                       Icons.layers,
                       color: Colors.white,

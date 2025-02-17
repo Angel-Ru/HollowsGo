@@ -9,7 +9,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-  String _imagePath = 'lib/images/kon.png';
 
   @override
   void initState() {
@@ -19,7 +18,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool('isLoggedIn') ?? false) {}
+    if (prefs.getBool('isLoggedIn') ?? false) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+      );
+    }
   }
 
   Future<void> _login() async {
@@ -28,24 +31,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => Mapscreen()),
+        MaterialPageRoute(builder: (_) => HomeScreen()),
       );
     }
-  }
-
-  Future<void> _pickImage() async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ImageSelectionPage(
-          onImageSelected: (String imagePath) {
-            setState(() {
-              _imagePath = imagePath;
-            });
-          },
-        ),
-      ),
-    );
   }
 
   @override
@@ -54,35 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
       title: Text('Inicia sessió'),
       content: Container(
         width: 300, // Establece el ancho deseado
-        height: 400, // Establece la altura deseada
+        height: 200, // Establece la altura deseada
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  image: DecorationImage(
-                    image: AssetImage(_imagePath),
-                    fit: BoxFit.cover,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text('Pitja la imatge per canviar-la'),
             const SizedBox(height: 32),
             Expanded(
               child: SingleChildScrollView(
