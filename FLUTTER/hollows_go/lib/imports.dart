@@ -12,3 +12,6 @@ export 'package:file_picker/file_picker.dart';
 export 'package:provider/provider.dart';
 
 export 'dart:math';
+
+export 'package:google_maps_flutter/google_maps_flutter.dart';
+export 'dart:async';
