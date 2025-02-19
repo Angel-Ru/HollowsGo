@@ -97,6 +97,8 @@ class _MapaScreenState extends State<Mapscreen> {
                   initialCameraPosition: _puntInicial,
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
+                    controller.setMapStyle(
+                        '[{"featureType":"poi","stylers":[{"visibility":"off"}]}]');
                   },
                 ),
                 Positioned(
