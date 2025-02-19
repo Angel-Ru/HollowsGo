@@ -1,5 +1,4 @@
 import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/screens/bibliotecascreen.dart';
 import 'package:hollows_go/screens/mapscreen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -71,10 +70,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   int _dialogIndex = 0;
   final List<String> _dialogues = [
-    "Hola, sóc l'Urahara, i sigues benvingut a la tenda!",
-    "Aquí podràs fer les diverses tirades al gatxa.",
-    "Tens prou diners per una tirada?",
-    "Em vaig a fer una becadeta...",
+    "Benvingut a HollowGo!",
+    "Getsuga... Tenshō!!",
+    "Sóc un shinigami substitut, com que no saps què és?",
+    "Si tens alguna pregunta, no dubtis en preguntar-me!",
   ];
 
   final List<String> _ichigoImages = [
