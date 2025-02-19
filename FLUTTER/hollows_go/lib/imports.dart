@@ -14,6 +14,8 @@ export 'package:file_picker/file_picker.dart';
 export 'package:provider/provider.dart';
 export 'package:geolocator/geolocator.dart';
 export 'package:google_maps_flutter/google_maps_flutter.dart';
+export 'package:flutter/services.dart';
 
 export 'dart:math';
 export 'dart:async';
+export 'dart:typed_data';
