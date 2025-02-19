@@ -62,15 +62,6 @@ class _MapaScreenState extends State<Mapscreen> {
       tilt: 50,
     );
 
-    Set<Marker> markers = <Marker>{};
-    markers.add(
-      Marker(
-        markerId: const MarkerId('current_location'),
-        position: _currentLocation,
-        infoWindow: const InfoWindow(title: 'Tu ubicación'),
-      ),
-    );
-
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -80,7 +71,6 @@ class _MapaScreenState extends State<Mapscreen> {
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
                   mapType: _currentMapType,
-                  markers: markers,
                   initialCameraPosition: _puntInicial,
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
