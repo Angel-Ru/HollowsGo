@@ -51,76 +51,88 @@ class _TendaScreenState extends State<TendaScreen> {
         automaticallyImplyLeading: false, // Deshabilitar la flecha de retroceso
         title: null, // Quitar el título
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
+      body: Stack(
+        children: [
+          // Imagen de fondo
+          Positioned.fill(
+            child: Image.asset(
+              'lib/images/tenda_urahara.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Contenido de la pantalla
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                GestureDetector(
-                  onTap: _nextDialogue,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage(_currentImage),
-                    backgroundColor: Color.fromARGB(255, 151, 250, 173),
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _nextDialogue,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(243, 194, 194, 194),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(8),
-                              topRight: Radius.circular(8),
-                            ),
-                          ),
-                          child: Text(
-                            'Kisuke Urahara',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color.fromARGB(212, 238, 238, 238),
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(8),
-                              bottomRight: Radius.circular(8),
-                            ),
-                          ),
-                          child: Text(
-                            _dialogues[_dialogIndex],
-                            style: TextStyle(
-                              fontSize: 14, // Tamaño de letra reducido
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    GestureDetector(
+                      onTap: _nextDialogue,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage(_currentImage),
+                        backgroundColor: Color.fromARGB(255, 151, 250, 173),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _nextDialogue,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(243, 194, 194, 194),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                'Kisuke Urahara',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(212, 238, 238, 238),
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                _dialogues[_dialogIndex],
+                                style: TextStyle(
+                                  fontSize: 14, // Tamaño de letra reducido
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                SizedBox(height: 16),
               ],
             ),
-            SizedBox(height: 16),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
