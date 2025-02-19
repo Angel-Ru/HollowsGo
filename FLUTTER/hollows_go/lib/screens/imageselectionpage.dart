@@ -127,11 +127,13 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage(_currentImage),
-                    backgroundColor: Color.fromARGB(255, 245, 181, 234),
-                  ),
+                  GestureDetector(
+                      onTap: _nextDialogue,
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundImage: AssetImage(_currentImage),
+                        backgroundColor: Color.fromARGB(255, 245, 181, 234),
+                      )),
                   SizedBox(width: 16),
                   Expanded(
                     child: GestureDetector(
