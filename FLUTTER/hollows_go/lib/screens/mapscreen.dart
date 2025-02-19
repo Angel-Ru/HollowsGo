@@ -23,19 +23,19 @@ class _MapaScreenState extends State<Mapscreen> {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw 'Los servicios de ubicación están desactivados.';
+        throw "Els serveis d'ubicació estan desactivats.";
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw 'Permisos de ubicación denegados.';
+          throw "Permisos d'ubicació denegats.";
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        throw 'Permisos de ubicación denegados permanentemente.';
+        throw "Permisos d'ubicació denegats permanentment.";
       }
 
       Position position = await Geolocator.getCurrentPosition(
@@ -47,7 +47,7 @@ class _MapaScreenState extends State<Mapscreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print("Error obteniendo la ubicación: $e");
+      print("Error obtenint l'ubicació: $e");
       setState(() {
         _isLoading = false;
       });
