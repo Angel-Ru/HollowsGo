@@ -94,14 +94,31 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () =>
-              Navigator.of(context).pop(false), // Return false on cancel
-          child: Text('Cancel·la'),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () =>
+                  Navigator.of(context).pop(false), // Return false on cancel
+              child: Text('Cancel·la'),
+            ),
+            ElevatedButton(
+              onPressed: _login,
+              child: Text('Inicia sessió'),
+            ),
+          ],
         ),
-        ElevatedButton(
-          onPressed: _login,
-          child: Text('Inicia sessió'),
+        Center(
+          child: TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the login dialog
+              showDialog(
+                context: context,
+                builder: (context) => RegisterDialog(),
+              );
+            },
+            child: Text("Registra't"),
+          ),
         ),
       ],
     );

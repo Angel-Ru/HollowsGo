@@ -23,7 +23,9 @@ class MyApp extends StatelessWidget {
         home: PreHomeScreen(),
         routes: {
           '/home': (context) => HomeScreen(),
-          '/map': (context) => Mapscreen(),
+          '/map': (context) => Mapscreen(
+                profileImagePath: '',
+              ),
         },
       ),
     );

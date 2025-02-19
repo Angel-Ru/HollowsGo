@@ -1,7 +1,9 @@
 import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
-  const Mapscreen({Key? key}) : super(key: key);
+  final String profileImagePath;
+
+  const Mapscreen({Key? key, required this.profileImagePath}) : super(key: key);
 
   @override
   _MapaScreenState createState() => _MapaScreenState();
@@ -12,6 +14,7 @@ class _MapaScreenState extends State<Mapscreen> {
   MapType _currentMapType = MapType.normal;
   LatLng _currentLocation = const LatLng(39.6084042, 2.8639693);
   bool _isLoading = true;
+  Set<Marker> _markers = {};
 
   @override
   void initState() {
@@ -23,35 +26,49 @@ class _MapaScreenState extends State<Mapscreen> {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        throw 'Los servicios de ubicación están desactivados.';
+        throw "Els serveis d'ubicació estan desactivats.";
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          throw 'Permisos de ubicación denegados.';
+          throw "Permisos d'ubicació denegats.";
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        throw 'Permisos de ubicación denegados permanentemente.';
+        throw "Permisos d'ubicació denegats permanentment.";
       }
 
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      setState(() {
+      setState(() async {
         _currentLocation = LatLng(position.latitude, position.longitude);
         _isLoading = false;
+        _markers.add(
+          Marker(
+            markerId: const MarkerId('currentLocation'),
+            position: _currentLocation,
+            infoWindow: const InfoWindow(title: 'Ubicació actual'),
+            icon: BitmapDescriptor.fromBytes(
+                await _getMarkerIcon(widget.profileImagePath)),
+          ),
+        );
       });
     } catch (e) {
-      print("Error obteniendo la ubicación: $e");
+      print("Error obtenint l'ubicació: $e");
       setState(() {
         _isLoading = false;
       });
     }
+  }
+
+  Future<Uint8List> _getMarkerIcon(String imagePath) async {
+    ByteData byteData = await rootBundle.load(imagePath);
+    return byteData.buffer.asUint8List();
   }
 
   @override
@@ -62,15 +79,6 @@ class _MapaScreenState extends State<Mapscreen> {
       tilt: 50,
     );
 
-    Set<Marker> markers = <Marker>{};
-    markers.add(
-      Marker(
-        markerId: const MarkerId('current_location'),
-        position: _currentLocation,
-        infoWindow: const InfoWindow(title: 'Tu ubicación'),
-      ),
-    );
-
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -79,11 +87,13 @@ class _MapaScreenState extends State<Mapscreen> {
                 GoogleMap(
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
+                  markers: _markers,
                   mapType: _currentMapType,
-                  markers: markers,
                   initialCameraPosition: _puntInicial,
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
+                    controller.setMapStyle(
+                        '[{"featureType":"poi","stylers":[{"visibility":"off"}]}]');
                   },
                 ),
                 Positioned(
