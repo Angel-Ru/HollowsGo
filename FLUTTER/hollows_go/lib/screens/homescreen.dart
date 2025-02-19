@@ -1,5 +1,5 @@
 import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/screens/mapscreen.dart';
+import 'package:hollows_go/screens/bibliotecascreen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -62,11 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return Center(child: Text('Welcome to the Home Screen!'));
       case 1:
-        return Mapscreen();
+        return Center(child: Text('Mapa Screen'));
       case 2:
         return TendaScreen();
       case 3:
-        return Center(child: Text('Biblioteca Screen'));
+        return BibliotecaScreen();
       default:
         return Center(child: Text('Welcome to the Home Screen!'));
     }

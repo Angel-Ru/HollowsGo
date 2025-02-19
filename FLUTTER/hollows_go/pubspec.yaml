@@ -41,6 +41,7 @@ dependencies:
   geolocator: ^13.0.2
   geocoding: ^3.0.0
   animated_text_kit: ^4.2.3
+  audioplayers: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,9 @@ flutter:
     - lib/images/perfil_predeterminat/
     - lib/images/prehomescreen_imatges/
     - lib/images/urahara_character/
+    - lib/images/mayuri_character/
+    - lib/images/kyoraku_character/
+    - lib/images/music/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

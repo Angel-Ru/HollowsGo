@@ -23,17 +23,24 @@ class _TendaScreenState extends State<TendaScreen> {
   ];
 
   late String _currentImage;
+  late String _previousImage;
 
   @override
   void initState() {
     super.initState();
     _currentImage = _uraharaImages[0];
+    _previousImage = _currentImage;
   }
 
   void _nextDialogue() {
     setState(() {
       _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
-      _currentImage = _uraharaImages[Random().nextInt(_uraharaImages.length)];
+      String newImage;
+      do {
+        newImage = _uraharaImages[Random().nextInt(_uraharaImages.length)];
+      } while (newImage == _currentImage);
+      _previousImage = _currentImage;
+      _currentImage = newImage;
     });
   }
 

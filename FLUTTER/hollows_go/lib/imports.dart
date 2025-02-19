@@ -3,7 +3,7 @@ export '/screens/loginscreen.dart';
 export '/screens/imageselectionpage.dart';
 export '/screens/prehomescreen.dart';
 export '/screens/tendascreen.dart';
-
+import '/screens/bibliotecascreen.dart';
 export '/providers/loginprovider.dart';
 export '/providers/blinkingtextprovider.dart';
 export '/providers/ui_provider.dart';
@@ -14,7 +14,3 @@ export 'package:file_picker/file_picker.dart';
 export 'package:provider/provider.dart';
 
 export 'dart:math';
-
-export 'package:geolocator/geolocator.dart';
-export 'package:google_maps_flutter/google_maps_flutter.dart';
-export 'dart:async';
