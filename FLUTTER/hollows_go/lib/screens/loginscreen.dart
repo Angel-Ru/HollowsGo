@@ -1,3 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../imports.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -9,6 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -26,14 +31,55 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    if (_usernameController.text.isNotEmpty &&
-        _passwordController.text.isNotEmpty) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-      );
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      _showSnackBar("Tots els camps són obligatoris");
+      return;
     }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final url = Uri.parse('http://192.168.228.168:3000/usuaris/login');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      'email': username,
+      'contrassenya': password,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('userEmail', username);
+
+        _showSnackBar("Inici de sessió correcte");
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => HomeScreen()),
+        );
+      } else {
+        _showSnackBar(data['message'] ?? "Error desconegut");
+      }
+    } catch (e) {
+      _showSnackBar("Error de connexió: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -41,54 +87,45 @@ class _LoginScreenState extends State<LoginScreen> {
     return AlertDialog(
       title: Text('Inicia sessió'),
       content: Container(
-        width: 300, // Establece el ancho deseado
-        height: 200, // Establece la altura deseada
+        width: 300,
+        height: 200,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 32),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        labelText: 'Nom',
-                        prefixIcon: const Icon(Icons.person_outline),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Constasenya',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      obscureText: !_isPasswordVisible,
-                    ),
-                  ],
+            TextField(
+              controller: _usernameController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                prefixIcon: const Icon(Icons.person_outline),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Contrassenya',
+                prefixIcon: const Icon(Icons.lock_outline),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility_off
+                        : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              obscureText: !_isPasswordVisible,
             ),
           ],
         ),
@@ -98,20 +135,21 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(false), // Return false on cancel
+              onPressed: () => Navigator.of(context).pop(false),
               child: Text('Cancel·la'),
             ),
             ElevatedButton(
-              onPressed: _login,
-              child: Text('Inicia sessió'),
+              onPressed: _isLoading ? null : _login,
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text('Inicia sessió'),
             ),
           ],
         ),
         Center(
           child: TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // Close the login dialog
+              Navigator.of(context).pop();
               showDialog(
                 context: context,
                 builder: (context) => RegisterDialog(),

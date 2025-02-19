@@ -1,2 +1,7 @@
-GET https://api-hollowsgo-e5eccyddhxc6fqda.spaincentral-01.azurewebsites.net/api/usuaris
+POST localhost:3000/usuaris/login
+content-type: application/json
 
+{
+    "email": "ywachmipapi@gmail.com",
+    "contrassenya": "123456"
+}
