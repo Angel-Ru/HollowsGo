@@ -1,37 +1,31 @@
 import '../imports.dart';
 
-class LoginScreen extends StatefulWidget {
+class RegisterDialog extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _RegisterDialogState createState() => _RegisterDialogState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterDialogState extends State<RegisterDialog> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
   @override
-  void initState() {
-    super.initState();
-    _checkLogin();
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
-  Future<void> _checkLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool('isLoggedIn') ?? false) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-      );
-    }
-  }
-
-  Future<void> _login() async {
+  Future<void> _register() async {
     if (_usernameController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+      await prefs.setBool('isRegistered', true);
+      Navigator.of(context).pop(); // Close the register dialog
+      showDialog(
+        context: context,
+        builder: (context) => LoginScreen(),
       );
     }
   }
@@ -39,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Inicia sessió'),
+      title: Text('Registra\'t'),
       content: Container(
         width: 300, // Establece el ancho deseado
         height: 200, // Establece la altura deseada
@@ -94,40 +88,16 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton(
-              onPressed: () =>
-                  Navigator.of(context).pop(false), // Return false on cancel
-              child: Text('Cancel·la'),
-            ),
-            ElevatedButton(
-              onPressed: _login,
-              child: Text('Inicia sessió'),
-            ),
-          ],
+        TextButton(
+          onPressed: () =>
+              Navigator.of(context).pop(false), // Return false on cancel
+          child: Text('Cancel·la'),
         ),
-        Center(
-          child: TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the login dialog
-              showDialog(
-                context: context,
-                builder: (context) => RegisterDialog(),
-              );
-            },
-            child: Text("Registra't"),
-          ),
+        ElevatedButton(
+          onPressed: _register,
+          child: Text('Registra\'t'),
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 }

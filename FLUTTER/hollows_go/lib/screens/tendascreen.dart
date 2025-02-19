@@ -59,10 +59,14 @@ class _TendaScreenState extends State<TendaScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                CircleAvatar(
+                GestureDetector(
+                  onTap: _nextDialogue,
+                  child: CircleAvatar(
                     radius: 50,
                     backgroundImage: AssetImage(_currentImage),
-                    backgroundColor: Color.fromARGB(255, 151, 250, 173)),
+                    backgroundColor: Color.fromARGB(255, 151, 250, 173),
+                  ),
+                ),
                 SizedBox(width: 16),
                 Expanded(
                   child: GestureDetector(
