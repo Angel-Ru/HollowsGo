@@ -1,3 +1,5 @@
+import 'package:hollows_go/screens/mapscreen.dart';
+
 import 'imports.dart';
 
 void main() {
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
         home: PreHomeScreen(),
         routes: {
           '/home': (context) => HomeScreen(),
+          '/map': (context) => Mapscreen(),
         },
       ),
     );
