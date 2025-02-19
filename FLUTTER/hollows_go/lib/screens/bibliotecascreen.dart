@@ -66,10 +66,14 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                CircleAvatar(
+                GestureDetector(
+                  onTap: _nextDialogue,
+                  child: CircleAvatar(
                     radius: 50,
                     backgroundImage: AssetImage(_currentImage),
-                    backgroundColor: Color.fromARGB(255, 194, 149, 229)),
+                    backgroundColor: Color.fromARGB(255, 194, 149, 229),
+                  ),
+                ),
                 SizedBox(width: 16),
                 Expanded(
                   child: GestureDetector(
@@ -109,7 +113,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           child: Text(
                             _dialogues[_dialogIndex],
                             style: TextStyle(
-                              fontSize: 14, // Tamaño de letra reducido
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                             textAlign: TextAlign.center,

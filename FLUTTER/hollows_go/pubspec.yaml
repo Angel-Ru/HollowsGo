@@ -41,7 +41,6 @@ dependencies:
   geolocator: ^13.0.2
   geocoding: ^3.0.0
   animated_text_kit: ^4.2.3
-  audioplayers: ^6.1.2
 
 dev_dependencies:
   flutter_test:
