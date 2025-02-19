@@ -1,7 +1,14 @@
+import 'dart:typed_data';
+import 'dart:ui';
+
+import 'package:flutter/services.dart';
+
 import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
-  const Mapscreen({Key? key}) : super(key: key);
+  final String profileImagePath;
+
+  const Mapscreen({Key? key, required this.profileImagePath}) : super(key: key);
 
   @override
   _MapaScreenState createState() => _MapaScreenState();
@@ -12,6 +19,7 @@ class _MapaScreenState extends State<Mapscreen> {
   MapType _currentMapType = MapType.normal;
   LatLng _currentLocation = const LatLng(39.6084042, 2.8639693);
   bool _isLoading = true;
+  Set<Marker> _markers = {};
 
   @override
   void initState() {
@@ -42,9 +50,18 @@ class _MapaScreenState extends State<Mapscreen> {
         desiredAccuracy: LocationAccuracy.high,
       );
 
-      setState(() {
+      setState(() async {
         _currentLocation = LatLng(position.latitude, position.longitude);
         _isLoading = false;
+        _markers.add(
+          Marker(
+            markerId: const MarkerId('currentLocation'),
+            position: _currentLocation,
+            infoWindow: const InfoWindow(title: 'Ubicació actual'),
+            icon: BitmapDescriptor.fromBytes(
+                await _getMarkerIcon(widget.profileImagePath)),
+          ),
+        );
       });
     } catch (e) {
       print("Error obtenint l'ubicació: $e");
@@ -52,6 +69,11 @@ class _MapaScreenState extends State<Mapscreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<Uint8List> _getMarkerIcon(String imagePath) async {
+    ByteData byteData = await rootBundle.load(imagePath);
+    return byteData.buffer.asUint8List();
   }
 
   @override
@@ -70,6 +92,7 @@ class _MapaScreenState extends State<Mapscreen> {
                 GoogleMap(
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
+                  markers: _markers,
                   mapType: _currentMapType,
                   initialCameraPosition: _puntInicial,
                   onMapCreated: (GoogleMapController controller) {
@@ -99,4 +122,3 @@ class _MapaScreenState extends State<Mapscreen> {
     );
   }
 }
-// comentari pq n'albert se faci ses dents netes amb es penis d'en Maqrok
