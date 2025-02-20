@@ -1,5 +1,4 @@
 import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/screens/bibliotecascreen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -112,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text('Canviar imatge de perfil'),
                         ],
                       ),
-                      onTap: () {},
+                      onTap: () => _pickImage(context),
                     ),
                     const PopupMenuDivider(),
                     PopupMenuItem(
