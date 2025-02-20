@@ -1,5 +1,5 @@
 const sql = require('mssql');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 const express = require('express');
 
@@ -27,32 +27,18 @@ let poolPromise;
 async function connectDB() {
     if (!poolPromise) {
         poolPromise = sql.connect(dbConfig).then(pool => {
-            console.log('✅ Connexió a la base de dades establerta');
+            console.log('Connexió a la base de dades establerta');
             return pool;
         }).catch(err => {
-            console.error('❌ Error en la connexió a la base de dades:', err);
+            console.error('Error en la connexió a la base de dades:', err);
             throw err;
         });
     }
     return poolPromise;
 }
 
-const winston = require('winston');
-
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-        new winston.transports.File({ filename: 'combined.log' }),
-        new winston.transports.Console()
-    ]
-});
-
-// Usa el logger en tu aplicación
-logger.info('Servidor iniciando...');
-app.listen(port, () => {
-    logger.info(`🚀 Servidor iniciat al port ${port}`);
-});
+// Iniciar servidor
+app.listen(3000, () => console.log('Servidor iniciat al port 3000'));
 
 
 // ------------------- MÈTODES GET -------------------
@@ -157,8 +143,246 @@ app.get('/personatges/usuari/:id', async (req, res) => {
     }
 });
 
-// ------------------- MÈTODES DELETE -------------------
+//Obtenir totes les skins d'un personatge
+app.get('/skins/:id', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query(`
+                SELECT s.* 
+                FROM SKINS s
+                JOIN PERSONATGES p ON s.personatge_id = p.id
+                WHERE p.id = @id
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat skins per a aquest personatge');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
 
+//Obtenir totes les skins d'un personatge d'un usuari
+app.get('/skins/usuari/:id', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query(`
+                SELECT s.* 
+                FROM SKINS s
+                JOIN PERSONATGES p ON s.personatge_id = p.id
+                JOIN BIBLIOTECA b ON p.id = b.personatge_id
+                JOIN USUARIS u ON b.user_id = u.id
+                WHERE u.id = @id
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat skins per a aquest usuari');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir una skin d'un personatge d'un usuari per id
+app.get('/skins/usuari/:id/:skin_id', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .input('skin_id', sql.Int, req.params.skin_id)
+            .query(`
+                SELECT s.* 
+                FROM SKINS s
+                JOIN PERSONATGES p ON s.personatge_id = p.id
+                JOIN BIBLIOTECA b ON p.id = b.personatge_id
+                JOIN USUARIS u ON b.user_id = u.id
+                WHERE u.id = @id AND s.id = @skin_id
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la skin per a aquest usuari');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+//Obtenir una skin d'un personatge d'un usuari per nom
+app.get('/skins/usuari/:id/nom/:nom', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .input('nom', sql.VarChar(50), req.params.nom)
+            .query(`
+                SELECT s.* 
+                FROM SKINS s
+                JOIN PERSONATGES p ON s.personatge_id = p.id
+                JOIN BIBLIOTECA b ON p.id = b.personatge_id
+                JOIN USUARIS u ON b.user_id = u.id
+                WHERE u.id = @id AND s.nom = @nom
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la skin per a aquest usuari');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir totes les armes d'una skin
+app.get('/armes/:id', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query(`
+                SELECT a.* 
+                FROM ARMES a
+                JOIN SKINS s ON a.skin_id = s.id
+                WHERE s.id = @id
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat armes per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir totes les armes d'una skin per nom
+app.get('/armes/nom/:nom', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('nom', sql.VarChar(50), req.params.nom)
+            .query(`
+                SELECT a.* 
+                FROM ARMES a
+                JOIN SKINS s ON a.skin_id = s.id
+                WHERE s.nom = @nom
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat armes per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir una arma d'una skin per id
+app.get('/armes/:id/:arma_id', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .input('arma_id', sql.Int, req.params.arma_id)
+            .query(`
+                SELECT a.* 
+                FROM ARMES a
+                JOIN SKINS s ON a.skin_id = s.id
+                WHERE s.id = @id AND a.id = @arma_id
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'arma per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir una arma per nom d'una skin per nom
+app.get('/armes/nom/:nom/:arma_nom', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('nom', sql.VarChar(50), req.params.nom)
+            .input('arma_nom', sql.VarChar(50), req.params.arma_nom)
+            .query(`
+                SELECT a.* 
+                FROM ARMES a
+                JOIN SKINS s ON a.skin_id = s.id
+                WHERE s.nom = @nom AND a.nom = @arma_nom
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'arma per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir la habilitat llegendaria d'una skin per id
+app.get('/habilitats/:id', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query(`
+                SELECT h.* 
+                FROM HABILITATS h
+                JOIN SKINS s ON h.skin_id = s.id
+                WHERE s.id = @id
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir la habilitat llegendaria d'una skin per nom
+app.get('/habilitats/nom/:nom', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('nom', sql.VarChar(50), req.params.nom)
+            .query(`
+                SELECT h.* 
+                FROM HABILITATS h
+                JOIN SKINS s on h.skin_id = s.id
+                WHERE s.nom = @nom
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir l'atac d'una skin per id
+app.get('/atacs/:id', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query(`
+                SELECT a.* 
+                FROM ATACS a
+                JOIN SKINS s ON a.skin_id = s.id
+                WHERE s.id = @id
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'atac per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+//Obtenir l'atac d'una skin per nom
+app.get('/atacs/nom/:nom', async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('nom', sql.VarChar(50), req.params.nom)
+            .query(`
+                SELECT a.* 
+                FROM ATACS a
+                JOIN SKINS s ON a.skin_id = s.id
+                WHERE s.nom = @nom
+            `);
+        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'atac per a aquesta skin');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+});
+
+
+
+// ------------------- MÈTODES DELETE -------------------
 // Eliminar un usuari per ID
 app.delete('/usuaris/:id', async (req, res) => {
     try {
