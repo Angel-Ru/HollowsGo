@@ -112,20 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text('Canviar imatge de perfil'),
                         ],
                       ),
-                      onTap: () => _pickImage(context),
-                    ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Icon(Icons.settings),
-                          SizedBox(width: 8),
-                          Text('Configuració'),
-                        ],
-                      ),
-                      onTap: () {
-                        // FALTA IMPLEMENTAR CONFIGURACIÓ
-                      },
+                      onTap: () {},
                     ),
                     const PopupMenuDivider(),
                     PopupMenuItem(
