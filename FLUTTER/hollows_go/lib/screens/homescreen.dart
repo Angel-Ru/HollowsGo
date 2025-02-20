@@ -163,7 +163,92 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: _getSelectedScreen(uiProvider.selectedMenuOpt),
+      body: Stack(
+        children: [
+          // Imagen de fondo
+          Positioned.fill(
+            child: Image.asset(
+              'lib/images/homescreen_image.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          _getSelectedScreen(uiProvider.selectedMenuOpt),
+          if (uiProvider.selectedMenuOpt == 0)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: _nextDialogue,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: AssetImage(_currentImage),
+                          backgroundColor: Color.fromARGB(255, 239, 178, 24),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _nextDialogue,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(243, 194, 194, 194),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    topRight: Radius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Kurosaki Ichigo',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(211, 247, 160, 39),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  _dialogues[_dialogIndex],
+                                  style: TextStyle(
+                                    fontSize: 14, // Tamaño de letra reducido
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
