@@ -8,8 +8,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _imagePath = 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imagen predeterminada
-  final String _coinImagePath = 'lib/images/kan_moneda.png'; // Ruta de la imagen de la moneda
+  String _imagePath =
+      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imagen predeterminada
+  final String _coinImagePath =
+      'lib/images/kan_moneda.png'; // Ruta de la imagen de la moneda
   int _coinCount = 0; // Número de monedas
   String _username = 'Usuario'; // Nombre del usuario (valor por defecto)
 
@@ -27,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
 
     // Limpiar todas las preferencias
-    await prefs.clear(); 
+    await prefs.clear();
 
     // Redirigir al PreHomeScreen o pantalla de inicio
     Navigator.of(context).pushReplacement(
@@ -62,7 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       // Si no hay imagen guardada, usamos la imagen predeterminada
-      _imagePath = prefs.getString('profileImagePath') ?? 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
+      _imagePath = prefs.getString('profileImagePath') ??
+          'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
     });
   }
 
@@ -70,8 +73,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _coinCount = prefs.getInt('userPunts') ?? 0; // Obtener los puntos almacenados
-      _username = prefs.getString('userName') ?? 'Usuario'; // Obtener el nombre del usuario
+      _coinCount =
+          prefs.getInt('userPunts') ?? 0; // Obtener los puntos almacenados
+      _username = prefs.getString('userName') ??
+          'Usuario'; // Obtener el nombre del usuario
     });
   }
 
@@ -81,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return Center(child: Text('Welcome to the Home Screen!'));
       case 1:
-        return Mapscreen(profileImagePath: _imagePath);
+      // return Mapscreen(profileImagePath: _imagePath);
       case 2:
         return TendaScreen();
       case 3:
@@ -116,7 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(_username), // Mostrar el nombre del usuario
                 SizedBox(width: 8),
                 PopupMenuButton(
-                  offset: Offset(0, 50), // Ajusta la posición del menú desplegable
+                  offset:
+                      Offset(0, 50), // Ajusta la posición del menú desplegable
                   icon: CircleAvatar(
                     radius: 20,
                     backgroundImage: AssetImage(_imagePath),

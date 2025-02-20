@@ -21,12 +21,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: PreHomeScreen(),
-        routes: {
-          '/home': (context) => HomeScreen(),
-          '/map': (context) => Mapscreen(
-                profileImagePath: '',
-              ),
-        },
+        routes: {'/home': (context) => HomeScreen()},
       ),
     );
   }
