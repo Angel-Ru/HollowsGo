@@ -57,7 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('userEmail', username);
+        
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('userEmail', data['user']['email']);
+        await prefs.setString('userName', data['user']['nom']);
+        await prefs.setInt('userPunts', data['user']['punts_emmagatzemats']);
+        await prefs.setInt('userTipo', data['user']['tipo']);
 
         _showSnackBar("Inici de sessió correcte");
 

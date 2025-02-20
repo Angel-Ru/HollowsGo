@@ -8,11 +8,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _imagePath =
-      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imagen predeterminada
-  final String _coinImagePath =
-      'lib/images/kan_moneda.png'; // Ruta de la imagen de la moneda
-  final int _coinCount = 0; // Número de monedas
+  String _imagePath = 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imagen predeterminada
+  final String _coinImagePath = 'lib/images/kan_moneda.png'; // Ruta de la imagen de la moneda
+  int _coinCount = 0; // Número de monedas
+  String _username = 'Usuario'; // Nombre del usuario (valor por defecto)
 
   get imageperfil => _imagePath;
 
@@ -20,16 +19,23 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadProfileImage();
+    _loadUserData(); // Cargar los datos del usuario desde SharedPreferences
   }
 
+  // Método de logout que elimina todas las preferencias
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
+
+    // Limpiar todas las preferencias
+    await prefs.clear(); 
+
+    // Redirigir al PreHomeScreen o pantalla de inicio
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => PreHomeScreen()),
     );
   }
 
+  // Método para elegir una nueva imagen de perfil
   Future<void> _pickImage(BuildContext context) async {
     await Navigator.push(
       context,
@@ -45,21 +51,31 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ).then((imagePath) async {
       if (imagePath != null) {
-        // Actualiza la imagen de perfil
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('profileImagePath', _imagePath);
       }
     });
   }
 
+  // Cargar la imagen de perfil desde las preferencias compartidas
   Future<void> _loadProfileImage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _imagePath = prefs.getString('profileImagePath') ??
-          'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
+      // Si no hay imagen guardada, usamos la imagen predeterminada
+      _imagePath = prefs.getString('profileImagePath') ?? 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
     });
   }
 
+  // Cargar los datos del usuario desde SharedPreferences (nombre y puntos)
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _coinCount = prefs.getInt('userPunts') ?? 0; // Obtener los puntos almacenados
+      _username = prefs.getString('userName') ?? 'Usuario'; // Obtener el nombre del usuario
+    });
+  }
+
+  // Método para determinar qué pantalla mostrar según el índice seleccionado
   Widget _getSelectedScreen(int selectedIndex) {
     switch (selectedIndex) {
       case 0:
@@ -92,16 +108,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundImage: AssetImage(_coinImagePath),
                 ),
                 SizedBox(width: 8),
-                Text('$_coinCount'),
+                Text('$_coinCount'), // Mostrar los puntos obtenidos
               ],
             ),
             Row(
               children: [
-                Text('Perfil'),
+                Text(_username), // Mostrar el nombre del usuario
                 SizedBox(width: 8),
                 PopupMenuButton(
-                  offset:
-                      Offset(0, 50), // Ajusta la posición del menú desplegable
+                  offset: Offset(0, 50), // Ajusta la posición del menú desplegable
                   icon: CircleAvatar(
                     radius: 20,
                     backgroundImage: AssetImage(_imagePath),
