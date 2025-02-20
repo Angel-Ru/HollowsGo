@@ -1,6 +1,7 @@
 import 'package:hollows_go/imports.dart';
-import 'dart:convert'; // Para convertir la respuesta JSON
-import 'package:http/http.dart' as http; // Para hacer peticiones HTTP
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:math';
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -26,8 +27,8 @@ class _TendaScreenState extends State<TendaScreen> {
 
   late String _currentImage;
   late String _previousImage;
-  bool _isLoading = false;  // Para controlar el estado de carga
-  bool _imageLoaded = false;  // Para controlar cuando la imagen está cargada
+  bool _isLoading = false;
+  bool _imageLoaded = false;
 
   @override
   void initState() {
@@ -50,24 +51,24 @@ class _TendaScreenState extends State<TendaScreen> {
 
   Future<void> _gachaPull() async {
     final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail'); // Suponemos que el email está guardado como 'email'
+    final email = prefs.getString('userEmail');
 
     if (email == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('No se pudo obtener el correo del usuario!'),
+        content: Text("No se ha pogut obtenir el correu de l'usuari!"),
       ));
       return;
     }
 
     setState(() {
-      _isLoading = true; // Activamos la carga
+      _isLoading = true;
     });
 
     try {
       final response = await http.post(
         Uri.parse('http://192.168.2.197:3000/skins/gacha'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email}), // Enviamos el correo en el cuerpo de la petición
+        body: json.encode({'email': email}),
       );
 
       if (response.statusCode == 200) {
@@ -75,12 +76,11 @@ class _TendaScreenState extends State<TendaScreen> {
         final skin = data['skin'];
         final remainingCoins = data['remainingCoins'];
 
-        // Cargamos la imagen de la skin antes de mostrar el dialog
         _loadImage(skin['imatge'], skin);
 
-        // Mostrar la información de la tirada al usuario
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Has obtenido la skin: ${skin['nom']}! Monedas restantes: $remainingCoins'),
+          content: Text(
+              'Has obtingut la skin: ${skin['nom']}! Monedes restants: $remainingCoins'),
         ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -89,16 +89,15 @@ class _TendaScreenState extends State<TendaScreen> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Error en la tirada de gacha: $e'),
+        content: Text('Error amb la tirada de gacha: $e'),
       ));
     } finally {
       setState(() {
-        _isLoading = false; // Desactivamos la carga
+        _isLoading = false;
       });
     }
   }
 
-  // Función para cargar la imagen antes de mostrar el diálogo
   void _loadImage(String imageUrl, Map<String, dynamic> skin) {
     final image = NetworkImage(imageUrl);
     final ImageStream stream = image.resolve(ImageConfiguration.empty);
@@ -106,10 +105,9 @@ class _TendaScreenState extends State<TendaScreen> {
     stream.addListener(
       ImageStreamListener((ImageInfo info, bool sync) {
         setState(() {
-          _imageLoaded = true; // Marcamos la imagen como cargada
+          _imageLoaded = true;
         });
 
-        // Mostrar el diálogo cuando la imagen esté cargada
         if (_imageLoaded) {
           _showSkinDialog(skin);
         }
@@ -117,7 +115,6 @@ class _TendaScreenState extends State<TendaScreen> {
     );
   }
 
-  // Función para mostrar el diálogo con la imagen y el texto de la skin obtenida
   void _showSkinDialog(Map<String, dynamic> skin) {
     showDialog(
       context: context,
@@ -127,8 +124,8 @@ class _TendaScreenState extends State<TendaScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Aquí cargamos la imagen de la skin
-              Image.network(skin['imatge'], width: 100, height: 100, fit: BoxFit.cover),
+              Image.network(skin['imatge'],
+                  width: 100, height: 100, fit: BoxFit.cover),
               SizedBox(height: 10),
               Text(
                 'Skin: ${skin['nom']}',
@@ -139,9 +136,9 @@ class _TendaScreenState extends State<TendaScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Cerrar el diálogo
+                Navigator.of(context).pop();
               },
-              child: Text('Cerrar'),
+              child: Text('Tancar'),
             ),
           ],
         );
@@ -152,10 +149,7 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: null,
-      ),
+      appBar: AppBar(automaticallyImplyLeading: false, title: null),
       body: Stack(
         children: [
           Positioned.fill(
@@ -164,16 +158,86 @@ class _TendaScreenState extends State<TendaScreen> {
               fit: BoxFit.cover,
             ),
           ),
+
+          /// **Banner y Botón juntos**
+          Positioned(
+            top: 50,
+            left: MediaQuery.of(context).size.width * 0.15,
+            right: MediaQuery.of(context).size.width * 0.15,
+            child: Column(
+              children: [
+                /// **Banner**
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                        color: Colors.grey[700]!.withOpacity(0.8), width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        blurRadius: 6,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.asset(
+                      'lib/images/banner_gacha/banner.png',
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      height: MediaQuery.of(context).size.width * 0.38,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 10),
+
+                /// **Botón Tirar Gacha**
+                ElevatedButton(
+                  onPressed: _gachaPull,
+                  child: Text(
+                    'Tirar Gacha',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      foreground: Paint()
+                        ..color = Color(0xFFFF6A13)
+                        ..style = PaintingStyle.stroke, // Contorno amarillo
+                      shadows: [
+                        Shadow(
+                          offset: Offset(1.5, 1.5),
+                          blurRadius: 3.0,
+                          color: Colors.black.withOpacity(0.7),
+                        ),
+                      ],
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Color(0xFFF8B400), // Rojo oscuro para el fondo
+                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                          color: Colors.black, width: 2), // Borde negro
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                SizedBox(height: 20),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: _gachaPull, // Cuando se hace clic en el botón, ejecutamos la función _gachaPull
+                      onTap: _nextDialogue,
                       child: CircleAvatar(
                         radius: 50,
                         backgroundImage: AssetImage(_currentImage),
@@ -191,7 +255,7 @@ class _TendaScreenState extends State<TendaScreen> {
                               padding: EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: const Color.fromARGB(243, 194, 194, 194),
+                                color: Color.fromARGB(243, 194, 194, 194),
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(8),
                                   topRight: Radius.circular(8),
@@ -210,7 +274,7 @@ class _TendaScreenState extends State<TendaScreen> {
                             Container(
                               padding: EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: const Color.fromARGB(212, 238, 238, 238),
+                                color: Color.fromARGB(212, 238, 238, 238),
                                 borderRadius: BorderRadius.only(
                                   bottomLeft: Radius.circular(8),
                                   bottomRight: Radius.circular(8),
@@ -232,11 +296,7 @@ class _TendaScreenState extends State<TendaScreen> {
                   ],
                 ),
                 SizedBox(height: 16),
-                // Si está cargando, mostramos el indicador de carga
-                if (_isLoading)
-                  Center(
-                    child: CircularProgressIndicator(), // Indicador de carga
-                  ),
+                if (_isLoading) Center(child: CircularProgressIndicator()),
               ],
             ),
           ),
