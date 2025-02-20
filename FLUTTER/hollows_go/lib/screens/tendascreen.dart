@@ -1,4 +1,6 @@
 import 'package:hollows_go/imports.dart';
+import 'dart:convert'; // Per convertir la resposta JSON
+import 'package:http/http.dart' as http; // Per fer peticions HTTP
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -9,7 +11,7 @@ class _TendaScreenState extends State<TendaScreen> {
   int _dialogIndex = 0;
   final List<String> _dialogues = [
     "Hola, sóc l'Urahara, i sigues benvingut a la tenda!",
-    "Aquí podràs fer les diverses tirades al gatxa.",
+    "Aquí podràs fer les diverses tirades al gacha.",
     "Tens prou diners per una tirada?",
     "Em vaig a fer una becadeta...",
   ];
@@ -44,23 +46,62 @@ class _TendaScreenState extends State<TendaScreen> {
     });
   }
 
+  Future<void> _gachaPull() async {
+    // Obtenir el correu de les SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('userEmail'); // Suposem que l'email està emmagatzemat com 'email'
+
+    if (email == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('No es pot obtenir el correu de l\'usuari!'),
+      ));
+      return;
+    }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.2.197:3000/skins/gacha'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email}), // Enviem l'email en el cos de la petició
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final skin = data['skin'];
+        final remainingCoins = data['remainingCoins'];
+
+        // Mostrar la informació de la tirada al usuari
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Has obtingut la skin: ${skin['nom']}! Monedes restants: $remainingCoins'),
+        ));
+      } else {
+        // Si no té prou monedes o altres errors
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Error: ${response.body}'),
+        ));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error en la tirada de gacha: $e'),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, // Deshabilitar la flecha de retroceso
-        title: null, // Quitar el título
+        automaticallyImplyLeading: false,
+        title: null,
       ),
       body: Stack(
         children: [
-          // Imagen de fondo
           Positioned.fill(
             child: Image.asset(
               'lib/images/tenda_urahara.jpg',
               fit: BoxFit.cover,
             ),
           ),
-          // Contenido de la pantalla
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -70,7 +111,7 @@ class _TendaScreenState extends State<TendaScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: _nextDialogue,
+                      onTap: _gachaPull, // Quan es clica el botó, s'executa la funció _gachaPull
                       child: CircleAvatar(
                         radius: 50,
                         backgroundImage: AssetImage(_currentImage),
@@ -116,7 +157,7 @@ class _TendaScreenState extends State<TendaScreen> {
                               child: Text(
                                 _dialogues[_dialogIndex],
                                 style: TextStyle(
-                                  fontSize: 14, // Tamaño de letra reducido
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 textAlign: TextAlign.center,
