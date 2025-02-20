@@ -1,6 +1,6 @@
 import 'package:hollows_go/imports.dart';
-import 'dart:convert'; // Per convertir la resposta JSON
-import 'package:http/http.dart' as http; // Per fer peticions HTTP
+import 'dart:convert'; // Para convertir la respuesta JSON
+import 'package:http/http.dart' as http; // Para hacer peticiones HTTP
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -26,6 +26,8 @@ class _TendaScreenState extends State<TendaScreen> {
 
   late String _currentImage;
   late String _previousImage;
+  bool _isLoading = false;  // Para controlar el estado de carga
+  bool _imageLoaded = false;  // Para controlar cuando la imagen está cargada
 
   @override
   void initState() {
@@ -47,22 +49,25 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   Future<void> _gachaPull() async {
-    // Obtenir el correu de les SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail'); // Suposem que l'email està emmagatzemat com 'email'
+    final email = prefs.getString('userEmail'); // Suponemos que el email está guardado como 'email'
 
     if (email == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('No es pot obtenir el correu de l\'usuari!'),
+        content: Text('No se pudo obtener el correo del usuario!'),
       ));
       return;
     }
+
+    setState(() {
+      _isLoading = true; // Activamos la carga
+    });
 
     try {
       final response = await http.post(
         Uri.parse('http://192.168.2.197:3000/skins/gacha'),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': email}), // Enviem l'email en el cos de la petició
+        body: json.encode({'email': email}), // Enviamos el correo en el cuerpo de la petición
       );
 
       if (response.statusCode == 200) {
@@ -70,12 +75,14 @@ class _TendaScreenState extends State<TendaScreen> {
         final skin = data['skin'];
         final remainingCoins = data['remainingCoins'];
 
-        // Mostrar la informació de la tirada al usuari
+        // Cargamos la imagen de la skin antes de mostrar el dialog
+        _loadImage(skin['imatge'], skin);
+
+        // Mostrar la información de la tirada al usuario
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Has obtingut la skin: ${skin['nom']}! Monedes restants: $remainingCoins'),
+          content: Text('Has obtenido la skin: ${skin['nom']}! Monedas restantes: $remainingCoins'),
         ));
       } else {
-        // Si no té prou monedes o altres errors
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Error: ${response.body}'),
         ));
@@ -84,7 +91,62 @@ class _TendaScreenState extends State<TendaScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Error en la tirada de gacha: $e'),
       ));
+    } finally {
+      setState(() {
+        _isLoading = false; // Desactivamos la carga
+      });
     }
+  }
+
+  // Función para cargar la imagen antes de mostrar el diálogo
+  void _loadImage(String imageUrl, Map<String, dynamic> skin) {
+    final image = NetworkImage(imageUrl);
+    final ImageStream stream = image.resolve(ImageConfiguration.empty);
+
+    stream.addListener(
+      ImageStreamListener((ImageInfo info, bool sync) {
+        setState(() {
+          _imageLoaded = true; // Marcamos la imagen como cargada
+        });
+
+        // Mostrar el diálogo cuando la imagen esté cargada
+        if (_imageLoaded) {
+          _showSkinDialog(skin);
+        }
+      }),
+    );
+  }
+
+  // Función para mostrar el diálogo con la imagen y el texto de la skin obtenida
+  void _showSkinDialog(Map<String, dynamic> skin) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Has obtenido una nueva skin!'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Aquí cargamos la imagen de la skin
+              Image.network(skin['imatge'], width: 100, height: 100, fit: BoxFit.cover),
+              SizedBox(height: 10),
+              Text(
+                'Skin: ${skin['nom']}',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              child: Text('Cerrar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -111,7 +173,7 @@ class _TendaScreenState extends State<TendaScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: _gachaPull, // Quan es clica el botó, s'executa la funció _gachaPull
+                      onTap: _gachaPull, // Cuando se hace clic en el botón, ejecutamos la función _gachaPull
                       child: CircleAvatar(
                         radius: 50,
                         backgroundImage: AssetImage(_currentImage),
@@ -170,6 +232,11 @@ class _TendaScreenState extends State<TendaScreen> {
                   ],
                 ),
                 SizedBox(height: 16),
+                // Si está cargando, mostramos el indicador de carga
+                if (_isLoading)
+                  Center(
+                    child: CircularProgressIndicator(), // Indicador de carga
+                  ),
               ],
             ),
           ),
