@@ -1,11 +1,7 @@
-import 'dart:ui';
-
-import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/providers/dialeg_provider.dart';
 import 'package:hollows_go/providers/user_provider.dart';
 import 'package:hollows_go/screens/mapscreen.dart';
-import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -23,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadProfileImage();
 
+    // Inicializar el UserProvider
     // Inicializar el UserProvider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -88,88 +85,75 @@ class _HomeScreenState extends State<HomeScreen> {
     final uiProvider = Provider.of<UIProvider>(context);
 
     return Scaffold(
-      extendBodyBehindAppBar: true, // Extiende el cuerpo detrás del AppBar
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60), // Altura del AppBar
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaX: 10, sigmaY: 10), // Efecto de desenfoque
-            child: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.white
-                  .withOpacity(0.5), // Fondo blanco semi-transparente
-              elevation: 0, // Sin sombra
-              title: Consumer<UserProvider>(
-                builder: (context, userProvider, child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundImage: AssetImage(_coinImagePath),
-                          ),
-                          SizedBox(width: 8),
-                          Text('${userProvider.coinCount}'),
-                        ],
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: AssetImage(_coinImagePath),
+                    ),
+                    SizedBox(width: 8),
+                    Text('${userProvider.coinCount}'),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text(userProvider.username),
+                    SizedBox(width: 8),
+                    PopupMenuButton(
+                      offset: Offset(0, 50),
+                      icon: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: AssetImage(_imagePath),
                       ),
-                      Row(
-                        children: [
-                          Text(userProvider.username),
-                          SizedBox(width: 8),
-                          PopupMenuButton(
-                            offset: Offset(0, 50),
-                            icon: CircleAvatar(
-                              radius: 20,
-                              backgroundImage: AssetImage(_imagePath),
-                            ),
-                            itemBuilder: (context) => <PopupMenuEntry>[
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.image),
-                                    SizedBox(width: 8),
-                                    Text('Canviar imatge de perfil'),
-                                  ],
-                                ),
-                                onTap: () => _pickImage(context),
-                              ),
-                              const PopupMenuDivider(),
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.settings),
-                                    SizedBox(width: 8),
-                                    Text('Configuració'),
-                                  ],
-                                ),
-                                onTap: () {
-                                  // Implementar configuració
-                                },
-                              ),
-                              const PopupMenuDivider(),
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.logout),
-                                    SizedBox(width: 8),
-                                    Text('Surt'),
-                                  ],
-                                ),
-                                onTap: () => _logout(),
-                              ),
+                      itemBuilder: (context) => <PopupMenuEntry>[
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(Icons.image),
+                              SizedBox(width: 8),
+                              Text('Canviar imatge de perfil'),
                             ],
                           ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
+                          onTap: () => _pickImage(context),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(Icons.settings),
+                              SizedBox(width: 8),
+                              Text('Configuració'),
+                            ],
+                          ),
+                          onTap: () {
+                            // Implementar configuració
+                          },
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(Icons.logout),
+                              SizedBox(width: 8),
+                              Text('Surt'),
+                            ],
+                          ),
+                          onTap: () => _logout(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
         ),
       ),
       body: Stack(
@@ -275,8 +259,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.transparent, // BottomNavigationBar translúcido
-        elevation: 0, // Sin sombra
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
