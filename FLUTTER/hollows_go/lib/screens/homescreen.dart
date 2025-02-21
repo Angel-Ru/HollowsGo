@@ -1,4 +1,5 @@
 import 'package:hollows_go/imports.dart';
+import 'package:hollows_go/providers/dialeg_provider.dart';
 import 'package:hollows_go/providers/user_provider.dart';
 import 'package:hollows_go/screens/mapscreen.dart';
 
@@ -7,70 +8,61 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> 
-{
-
-  String _imagePath =
-      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; 
-  final String _coinImagePath =
-      'lib/images/kan_moneda.png';
+class _HomeScreenState extends State<HomeScreen> {
+  String _imagePath = 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
+  final String _coinImagePath = 'lib/images/kan_moneda.png';
   Timer? _timer;
-  int _dialogIndex = 0;
-  final List<String> _dialogues = [
-    "Benvingut a HollowsGo!",
-    "Getsuga... Tenshō!!",
-    "Sóc un shinigami substitut, com que no saps què és?",
-    "Si tens alguna pregunta, no dubtis en preguntar-me!",
-  ];
 
-  final List<String> _ichigoImages = [
-    'lib/images/ichigo_character/ichigo_1.png',
-    'lib/images/ichigo_character/ichigo_2.png',
-    'lib/images/ichigo_character/ichigo_3.png',
-    'lib/images/ichigo_character/ichigo_4.png',
-    'lib/images/ichigo_character/ichigo_5.png',
-  ];
+ @override
+void initState() {
+  super.initState();
+  _loadProfileImage();
 
-  
+  // Inicializar el DialogueProvider al cargar la pantalla
+  Future.microtask(() {
+    final dialogueProvider = Provider.of<DialogueProvider>(context, listen: false);
+    dialogueProvider.setDialogueData(
+      [
+        "Benvingut a HollowsGo!",
+        "Getsuga... Tenshō!!",
+        "Sóc un shinigami substitut, com que no saps què és?",
+        "Si tens alguna pregunta, no dubtis en preguntar-me!",
+      ],
+      [
+        'lib/images/ichigo_character/ichigo_1.png',
+        'lib/images/ichigo_character/ichigo_2.png',
+        'lib/images/ichigo_character/ichigo_3.png',
+        'lib/images/ichigo_character/ichigo_4.png',
+        'lib/images/ichigo_character/ichigo_5.png',
+      ],
+    );
+  });
 
-  late String _currentImage;
-
-  void _nextDialogue() {
-    setState(() {
-      _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
-      _currentImage = (_ichigoImages..shuffle()).first;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileImage();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
+  // Inicializar el UserProvider
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.fetchUserPoints();
+    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
       userProvider.fetchUserPoints();
-      _timer = Timer.periodic(Duration(seconds: 5), (timer) {
-        userProvider.fetchUserPoints();
-      });
     });
-
-    _currentImage = _ichigoImages[0];
-  }
+  });
+}
 
   @override
   void dispose() {
-    _timer?.cancel(); 
+    _timer?.cancel();
     super.dispose();
   }
 
   Future<void> _loadProfileImage() async {
-    final prefs = await SharedPreferences.getInstance();
+  final prefs = await SharedPreferences.getInstance();
+  final imagePath = prefs.getString('profileImagePath');
+  if (imagePath != null && imagePath.isNotEmpty) {
     setState(() {
-      _imagePath = prefs.getString('profileImagePath') ??
-          'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
+      _imagePath = imagePath;
     });
   }
+}
 
   Widget _getSelectedScreen(int selectedIndex) {
     switch (selectedIndex) {
@@ -179,75 +171,76 @@ class _HomeScreenState extends State<HomeScreen>
           if (uiProvider.selectedMenuOpt == 0)
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+              child: Consumer<DialogueProvider>(
+                builder: (context, dialogueProvider, child) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      GestureDetector(
-                        onTap: _nextDialogue,
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage: AssetImage(_currentImage),
-                          backgroundColor: Color.fromARGB(255, 239, 178, 24),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: _nextDialogue,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(243, 194, 194, 194),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(8),
-                                    topRight: Radius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  'Kurosaki Ichigo',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(211, 247, 160, 39),
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft: Radius.circular(8),
-                                    bottomRight: Radius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  _dialogues[_dialogIndex],
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ],
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: dialogueProvider.nextDialogue,
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundImage: AssetImage(dialogueProvider.currentImage),
+                              backgroundColor: Color.fromARGB(255, 239, 178, 24),
+                            ),
                           ),
-                        ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: dialogueProvider.nextDialogue,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(243, 194, 194, 194),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(8),
+                                        topRight: Radius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Kurosaki Ichigo',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.orange,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(211, 247, 160, 39),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(8),
+                                        bottomRight: Radius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      dialogueProvider.currentDialogue,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      SizedBox(height: 16),
                     ],
-                  ),
-                  SizedBox(height: 16),
-                ],
+                  );
+                },
               ),
             ),
           _getSelectedScreen(uiProvider.selectedMenuOpt),
@@ -276,6 +269,45 @@ class _HomeScreenState extends State<HomeScreen>
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
+          final dialogueProvider = Provider.of<DialogueProvider>(context, listen: false);
+
+          if (index == 0) {
+            // HomeScreen
+            dialogueProvider.setDialogueData(
+              [
+                "Benvingut a HollowsGo!",
+                "Getsuga... Tenshō!!",
+                "Sóc un shinigami substitut, com que no saps què és?",
+                "Si tens alguna pregunta, no dubtis en preguntar-me!",
+              ],
+              [
+                'lib/images/ichigo_character/ichigo_1.png',
+                'lib/images/ichigo_character/ichigo_2.png',
+                'lib/images/ichigo_character/ichigo_3.png',
+                'lib/images/ichigo_character/ichigo_4.png',
+                'lib/images/ichigo_character/ichigo_5.png',
+              ],
+            );
+          } else if (index == 2) {
+            // TendaScreen
+            dialogueProvider.setDialogueData(
+              [
+                "Hola, sóc l'Urahara, i sigues benvingut a la tenda!",
+                "Aquí podràs fer les diverses tirades al gacha.",
+                "Tens prou diners per una tirada?",
+                "Em vaig a fer una becadeta...",
+              ],
+              [
+                'lib/images/urahara_character/urahara_1.png',
+                'lib/images/urahara_character/urahara_2.png',
+                'lib/images/urahara_character/urahara_3.png',
+                'lib/images/urahara_character/urahara_4.png',
+                'lib/images/urahara_character/urahara_5.png',
+              ],
+            );
+          }
+
+          // Update the selected menu option
           uiProvider.selectedMenuOpt = index;
         },
       ),
