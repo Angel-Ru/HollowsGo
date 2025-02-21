@@ -126,6 +126,15 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               ],
             ),
             SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CombatScreen()),
+                );
+              },
+              child: Text('Ir a CombatScreen'),
+            ),
           ],
         ),
       ),

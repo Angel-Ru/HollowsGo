@@ -5,6 +5,7 @@ export '/screens/prehomescreen.dart';
 export '/screens/tendascreen.dart';
 export '/screens/bibliotecascreen.dart';
 export '/screens/registerdialog.dart';
+export '/screens/combatscreen.dart';
 export '/providers/loginprovider.dart';
 export '/providers/blinkingtextprovider.dart';
 export '/providers/ui_provider.dart';
