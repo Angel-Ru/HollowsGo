@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class BibliotecaScreen extends StatefulWidget {
@@ -75,7 +77,24 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, title: null),
+      extendBodyBehindAppBar: true, // Extiende el cuerpo detrás del AppBar
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0), // Altura del AppBar
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+                sigmaX: 10, sigmaY: 10), // Efecto de desenfoque
+            child: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white
+                  .withOpacity(0.5), // Fondo blanco semi-transparente
+              elevation: 0, // Sin sombra
+              title: null, // No hay título en el AppBar
+            ),
+          ),
+        ),
+      ),
+
       body: Stack(
         children: [
           // Fondo de pantalla que cubre toda la pantalla
@@ -99,6 +118,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
+                  SizedBox(height: 100),
                   // Contenedor de personaje con diálogo
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

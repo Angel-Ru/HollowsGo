@@ -1,11 +1,6 @@
-import 'package:chewie/chewie.dart';
-import 'package:flutter/material.dart';
-import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/providers/dialeg_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
+import 'dart:ui';
+import '../imports.dart';
 import 'package:http/http.dart' as http;
-import 'package:video_player/video_player.dart';
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -25,7 +20,8 @@ class _TendaScreenState extends State<TendaScreen> {
 
   void _initializeVideoController() {
     _videoController = VideoPlayerController.network('');
-    _chewieController = ChewieController(videoPlayerController: _videoController);
+    _chewieController =
+        ChewieController(videoPlayerController: _videoController);
   }
 
   @override
@@ -90,7 +86,8 @@ class _TendaScreenState extends State<TendaScreen> {
 
   Future<void> _showVideoPopup(Map<String, dynamic> skin) async {
     try {
-      _videoController = VideoPlayerController.asset('lib/videos/animacion_gacha.mp4');
+      _videoController =
+          VideoPlayerController.asset('lib/videos/animacion_gacha.mp4');
       await _videoController.initialize();
 
       _chewieController = ChewieController(
@@ -102,7 +99,8 @@ class _TendaScreenState extends State<TendaScreen> {
       );
 
       _videoController.addListener(() {
-        if (_videoController.value.position >= _videoController.value.duration) {
+        if (_videoController.value.position >=
+            _videoController.value.duration) {
           Navigator.of(context).pop();
           _showSkinDialog(skin);
         }
@@ -147,7 +145,8 @@ class _TendaScreenState extends State<TendaScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.network(skin['imatge'], width: 100, height: 100, fit: BoxFit.cover),
+              Image.network(skin['imatge'],
+                  width: 100, height: 100, fit: BoxFit.cover),
               SizedBox(height: 10),
               Text(
                 'Skin: ${skin['nom']}',
@@ -171,7 +170,23 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false, title: null),
+      extendBodyBehindAppBar: true, // Extiende el cuerpo detrás del AppBar
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(0), // Altura del AppBar
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+                sigmaX: 10, sigmaY: 10), // Efecto de desenfoque
+            child: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white
+                  .withOpacity(0.5), // Fondo blanco semi-transparente
+              elevation: 0, // Sin sombra
+              title: null, // No hay título en el AppBar
+            ),
+          ),
+        ),
+      ),
       body: Stack(
         children: [
           Positioned.fill(
@@ -181,7 +196,7 @@ class _TendaScreenState extends State<TendaScreen> {
             ),
           ),
           Positioned(
-            top: 50,
+            top: 150,
             left: MediaQuery.of(context).size.width * 0.15,
             right: MediaQuery.of(context).size.width * 0.15,
             child: Column(
@@ -189,7 +204,8 @@ class _TendaScreenState extends State<TendaScreen> {
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: Colors.grey[700]!.withOpacity(0.8), width: 3),
+                    border: Border.all(
+                        color: Colors.grey[700]!.withOpacity(0.8), width: 3),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.5),
@@ -255,7 +271,8 @@ class _TendaScreenState extends State<TendaScreen> {
                           onTap: dialogueProvider.nextDialogue,
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundImage: AssetImage(dialogueProvider.currentImage),
+                            backgroundImage:
+                                AssetImage(dialogueProvider.currentImage),
                             backgroundColor: Color.fromARGB(255, 151, 250, 173),
                           ),
                         ),
@@ -267,7 +284,8 @@ class _TendaScreenState extends State<TendaScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
                                     color: Color.fromARGB(243, 194, 194, 194),
                                     borderRadius: BorderRadius.only(
