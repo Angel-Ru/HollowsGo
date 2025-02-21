@@ -1,3 +1,4 @@
+import 'package:hollows_go/providers/user_provider.dart';
 import 'package:hollows_go/screens/mapscreen.dart';
 
 import 'imports.dart';
@@ -13,6 +14,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => UIProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -1,5 +1,5 @@
 import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/screens/bibliotecascreen.dart';
+import 'package:hollows_go/providers/user_provider.dart';
 import 'package:hollows_go/screens/mapscreen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -8,78 +8,68 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _imagePath = 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imagen predeterminada
-  final String _coinImagePath = 'lib/images/kan_moneda.png'; // Ruta de la imagen de la moneda
-  int _coinCount = 0; // Número de monedas
-  String _username = 'Usuario'; // Nombre del usuario (valor por defecto)
+  String _imagePath =
+      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imatge per defecte
+  final String _coinImagePath =
+      'lib/images/kan_moneda.png'; // Ruta imatge moneda
+  Timer? _timer;
+  int _dialogIndex = 0;
+  final List<String> _dialogues = [
+    "Benvingut a HollowsGo!",
+    "Getsuga... Tenshō!!",
+    "Sóc un shinigami substitut, com que no saps què és?",
+    "Si tens alguna pregunta, no dubtis en preguntar-me!",
+  ];
 
-  get imageperfil => _imagePath;
+  final List<String> _ichigoImages = [
+    'lib/images/ichigo_character/ichigo_1.png',
+    'lib/images/ichigo_character/ichigo_2.png',
+    'lib/images/ichigo_character/ichigo_3.png',
+    'lib/images/ichigo_character/ichigo_4.png',
+    'lib/images/ichigo_character/ichigo_5.png',
+  ];
+
+  late String _currentImage;
+
+  void _nextDialogue() {
+    setState(() {
+      _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
+      _currentImage = (_ichigoImages..shuffle()).first;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _loadProfileImage();
-    _loadUserData(); // Cargar los datos del usuario desde SharedPreferences
-  }
 
-  // Método de logout que elimina todas las preferencias
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Limpiar todas las preferencias
-    await prefs.clear(); 
-
-    // Redirigir al PreHomeScreen o pantalla de inicio
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => PreHomeScreen()),
-    );
-  }
-
-  // Método para elegir una nueva imagen de perfil
-  Future<void> _pickImage(BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ImageSelectionPage(
-          onImageSelected: (String imagePath) {
-            setState(() {
-              _imagePath = imagePath;
-            });
-            Navigator.of(context).pop(imagePath);
-          },
-        ),
-      ),
-    ).then((imagePath) async {
-      if (imagePath != null) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('profileImagePath', _imagePath);
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.fetchUserPoints(); // Carrega inicial de punts
+      _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+        userProvider.fetchUserPoints(); // Actualitza cada 5 segons
+      });
     });
+
+    _currentImage = _ichigoImages[0];
   }
 
-  // Cargar la imagen de perfil desde las preferencias compartidas
+  @override
+  void dispose() {
+    _timer?.cancel(); // Para el timer quan es tanca la pantalla
+    super.dispose();
+  }
+
   Future<void> _loadProfileImage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      // Si no hay imagen guardada, usamos la imagen predeterminada
-      _imagePath = prefs.getString('profileImagePath') ?? 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
+      _imagePath = prefs.getString('profileImagePath') ??
+          'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
     });
   }
 
-  // Cargar los datos del usuario desde SharedPreferences (nombre y puntos)
-  Future<void> _loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _coinCount = prefs.getInt('userPunts') ?? 0; // Obtener los puntos almacenados
-      _username = prefs.getString('userName') ?? 'Usuario'; // Obtener el nombre del usuario
-    });
-  }
-
-  // Método para determinar qué pantalla mostrar según el índice seleccionado
   Widget _getSelectedScreen(int selectedIndex) {
     switch (selectedIndex) {
-      case 0:
-        return Center(child: Text('Welcome to the Home Screen!'));
       case 1:
         return Mapscreen(profileImagePath: _imagePath);
       case 2:
@@ -87,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 3:
         return BibliotecaScreen();
       default:
-        return Center(child: Text('Welcome to the Home Screen!'));
+        return Center(child: Text(''));
     }
   }
 
@@ -98,72 +88,167 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
+        title: Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: AssetImage(_coinImagePath),
+                Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundImage: AssetImage(_coinImagePath),
+                    ),
+                    SizedBox(width: 8),
+                    Text('${userProvider.coinCount}'),
+                  ],
                 ),
-                SizedBox(width: 8),
-                Text('$_coinCount'), // Mostrar los puntos obtenidos
-              ],
-            ),
-            Row(
-              children: [
-                Text(_username), // Mostrar el nombre del usuario
-                SizedBox(width: 8),
-                PopupMenuButton(
-                  offset: Offset(0, 50), // Ajusta la posición del menú desplegable
-                  icon: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: AssetImage(_imagePath),
-                  ),
-                  itemBuilder: (context) => <PopupMenuEntry>[
-                    PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Icon(Icons.image),
-                          SizedBox(width: 8),
-                          Text('Canviar imatge de perfil'),
-                        ],
+                Row(
+                  children: [
+                    Text(userProvider.username),
+                    SizedBox(width: 8),
+                    PopupMenuButton(
+                      offset: Offset(0, 50),
+                      icon: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: AssetImage(_imagePath),
                       ),
-                      onTap: () => _pickImage(context),
-                    ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Icon(Icons.settings),
-                          SizedBox(width: 8),
-                          Text('Configuració'),
-                        ],
-                      ),
-                      onTap: () {
-                        // FALTA IMPLEMENTAR CONFIGURACIÓ
-                      },
-                    ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      child: Row(
-                        children: [
-                          Icon(Icons.logout),
-                          SizedBox(width: 8),
-                          Text('Surt'),
-                        ],
-                      ),
-                      onTap: () => _logout(),
+                      itemBuilder: (context) => <PopupMenuEntry>[
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(Icons.image),
+                              SizedBox(width: 8),
+                              Text('Canviar imatge de perfil'),
+                            ],
+                          ),
+                          onTap: () => _pickImage(context),
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(Icons.settings),
+                              SizedBox(width: 8),
+                              Text('Configuració'),
+                            ],
+                          ),
+                          onTap: () {
+                            // Implementar configuració
+                          },
+                        ),
+                        const PopupMenuDivider(),
+                        PopupMenuItem(
+                          child: Row(
+                            children: [
+                              Icon(Icons.logout),
+                              SizedBox(width: 8),
+                              Text('Surt'),
+                            ],
+                          ),
+                          onTap: () => _logout(),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ],
-            ),
-          ],
+            );
+          },
         ),
       ),
-      body: _getSelectedScreen(uiProvider.selectedMenuOpt),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'lib/images/homescreen_image.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Center(
+            child: Image.asset(
+              'lib/images/bleach-rukia.gif',
+              width: 200,
+              height: 200,
+            ),
+          ),
+          if (uiProvider.selectedMenuOpt == 0)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: _nextDialogue,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundImage: AssetImage(_currentImage),
+                          backgroundColor: Color.fromARGB(255, 239, 178, 24),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _nextDialogue,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(243, 194, 194, 194),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                    topRight: Radius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Kurosaki Ichigo',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.orange,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(211, 247, 160, 39),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  ),
+                                ),
+                                child: Text(
+                                  _dialogues[_dialogIndex],
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            ),
+          _getSelectedScreen(uiProvider.selectedMenuOpt),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -190,6 +275,35 @@ class _HomeScreenState extends State<HomeScreen> {
           uiProvider.selectedMenuOpt = index;
         },
       ),
+    );
+  }
+
+  Future<void> _pickImage(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageSelectionPage(
+          onImageSelected: (String imagePath) {
+            setState(() {
+              _imagePath = imagePath;
+            });
+            Navigator.of(context).pop(imagePath);
+          },
+        ),
+      ),
+    ).then((imagePath) async {
+      if (imagePath != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('profileImagePath', _imagePath);
+      }
+    });
+  }
+
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => PreHomeScreen()),
     );
   }
 }
