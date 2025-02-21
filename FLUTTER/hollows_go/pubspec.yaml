@@ -47,9 +47,9 @@ dev_dependencies:
     sdk: flutter
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
-  image_path: "lib/images/logo.png"
+  image_path: "lib/images/icono.png"
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -80,6 +80,7 @@ flutter:
     - lib/images/kyoraku_character/
     - lib/images/music/
     - lib/images/ichigo_character/
+    - lib/images/bleach-rukia.gif
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see

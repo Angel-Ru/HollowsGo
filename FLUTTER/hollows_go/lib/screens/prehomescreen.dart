@@ -19,8 +19,8 @@ class PreHomeScreen extends StatelessWidget {
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
-          _showLoginDialog(
-              context); // Mostrar el diálogo de login al tocar la pantalla
+          /*_showLoginDialog(
+              context); // Mostrar el diálogo de login al tocar la pantalla*/
         },
         child: Stack(
           children: [

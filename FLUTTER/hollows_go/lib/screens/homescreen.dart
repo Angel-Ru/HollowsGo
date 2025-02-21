@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _getSelectedScreen(int selectedIndex) {
     switch (selectedIndex) {
       case 0:
-        return Center(child: Text('Welcome to the Home Screen!'));
+        return Center();
       case 1:
         return Mapscreen(profileImagePath: _imagePath);
       case 2:
@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 3:
         return BibliotecaScreen();
       default:
-        return Center(child: Text('Welcome to the Home Screen!'));
+        return Center();
     }
   }
 
@@ -209,6 +209,13 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset(
               'lib/images/homescreen_image.png',
               fit: BoxFit.cover,
+            ),
+          ),
+          Center(
+            child: Image.asset(
+              'lib/images/bleach-rukia.gif',
+              width: 200,
+              height: 200,
             ),
           ),
           _getSelectedScreen(uiProvider.selectedMenuOpt),
