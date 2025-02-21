@@ -31,7 +31,7 @@ class UserProvider with ChangeNotifier {
 
       if (nomUsuari == null) return; // Si no hi ha usuari, no fem res
 
-      final url = Uri.parse('http://192.168.228.168:3000/usuaris/punts/$nomUsuari');
+      final url = Uri.parse('http://192.168.2.197:3000/usuaris/punts/$nomUsuari');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
