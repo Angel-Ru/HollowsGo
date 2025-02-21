@@ -7,11 +7,13 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> 
+{
+
   String _imagePath =
-      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imatge per defecte
+      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; 
   final String _coinImagePath =
-      'lib/images/kan_moneda.png'; // Ruta imatge moneda
+      'lib/images/kan_moneda.png';
   Timer? _timer;
   int _dialogIndex = 0;
   final List<String> _dialogues = [
@@ -29,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
     'lib/images/ichigo_character/ichigo_5.png',
   ];
 
+  
+
   late String _currentImage;
 
   void _nextDialogue() {
@@ -45,9 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.fetchUserPoints(); // Carrega inicial de punts
+      userProvider.fetchUserPoints();
       _timer = Timer.periodic(Duration(seconds: 5), (timer) {
-        userProvider.fetchUserPoints(); // Actualitza cada 5 segons
+        userProvider.fetchUserPoints();
       });
     });
 
@@ -56,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // Para el timer quan es tanca la pantalla
+    _timer?.cancel(); 
     super.dispose();
   }
 

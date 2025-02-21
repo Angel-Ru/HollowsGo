@@ -1,7 +1,10 @@
-import 'package:hollows_go/imports.dart';
+import 'package:chewie/chewie.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:math';
+import 'package:video_player/video_player.dart';
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -30,11 +33,27 @@ class _TendaScreenState extends State<TendaScreen> {
   bool _isLoading = false;
   bool _imageLoaded = false;
 
+  late VideoPlayerController _videoController;
+  late ChewieController _chewieController;
+
   @override
   void initState() {
     super.initState();
     _currentImage = _uraharaImages[0];
     _previousImage = _currentImage;
+    _videoController = VideoPlayerController.network('');
+  _chewieController = ChewieController(videoPlayerController: _videoController);
+  }
+
+  @override
+  void dispose() {
+    if (_videoController.value.isInitialized) {
+      _videoController.dispose();
+    }
+    if (_chewieController.videoPlayerController.value.isInitialized) {
+      _chewieController.dispose();
+    }
+    super.dispose();
   }
 
   void _nextDialogue() {
@@ -103,16 +122,79 @@ class _TendaScreenState extends State<TendaScreen> {
     final ImageStream stream = image.resolve(ImageConfiguration.empty);
 
     stream.addListener(
-      ImageStreamListener((ImageInfo info, bool sync) {
+      ImageStreamListener((ImageInfo info, bool sync) async {
         setState(() {
           _imageLoaded = true;
         });
 
         if (_imageLoaded) {
-          _showSkinDialog(skin);
+          // Primero se muestra el video
+          await _showVideoPopup(skin);
         }
       }),
     );
+  }
+
+  Future<void> _showVideoPopup(Map<String, dynamic> skin) async {
+    try {
+      // Inicialitzem el controlador del vídeo
+      _videoController =
+          VideoPlayerController.asset('lib/videos/animacion_gacha.mp4');
+
+      // Esperem a que el vídeo s'inicialitzi correctament
+      await _videoController.initialize();
+
+      // Configurem ChewieController
+      _chewieController = ChewieController(
+        videoPlayerController: _videoController,
+        autoPlay: true, // Reprodueix automàticament
+        looping: false, // No repeteix el vídeo
+        allowFullScreen: false, // Desactiva la pantalla completa
+        showControls: false, // Amaga els controls (opcional)
+      );
+
+      // Listener per tancar el diàleg quan el vídeo acabi
+      _videoController.addListener(() {
+        if (_videoController.value.position >=
+            _videoController.value.duration) {
+          Navigator.of(context).pop(); // Tanca el diàleg del vídeo quan acaba
+          _showSkinDialog(skin); // Mostra el diàleg de la skin
+        }
+      });
+
+      // Mostrem el popup amb el vídeo i el fons opac
+      await showDialog(
+        context: context,
+        barrierDismissible:
+            false, // No permet que el popup es tanqui tocant fora
+        builder: (BuildContext context) {
+          return Stack(
+            children: [
+              // Fons opac
+              ModalBarrier(
+                color: Colors.black.withOpacity(0.7), // Fons semitransparent
+                dismissible: false, // No es pot tancar tocant el fons
+              ),
+              // Diàleg amb el vídeo
+              Center(
+                child: Dialog(
+                  backgroundColor: Colors.transparent,
+                  child: AspectRatio(
+                    aspectRatio:
+                        16 / 9, // Aspecte rectangular (més ample que alt)
+                    child: Chewie(controller: _chewieController),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Error al reproduir el vídeo: $e'),
+      ));
+    }
   }
 
   void _showSkinDialog(Map<String, dynamic> skin) {
