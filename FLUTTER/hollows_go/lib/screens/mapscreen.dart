@@ -128,7 +128,12 @@ class _MapaScreenState extends State<Mapscreen> {
             position: randomPoint,
             infoWindow: InfoWindow(title: 'Punt Aleatori $i'),
             icon: BitmapDescriptor.fromBytes(iconBytes),
-            //onTap: () => CombatScreen(),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => CombatScreen()),
+              );
+            },
           ),
         );
       } catch (e) {
