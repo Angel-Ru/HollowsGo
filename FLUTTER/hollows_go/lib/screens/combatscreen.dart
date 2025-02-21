@@ -6,27 +6,25 @@ class CombatScreen extends StatefulWidget {
 }
 
 class _CombatScreenState extends State<CombatScreen> {
-  // SALUT TOTAL DES PERSONATGE
-  double aliatHealth = 1000.0; // Salud de Ichigo
-  double enemicHealth = 1000.0; // Salud de Aizen
+  // Mondedes
+  int punts = 100;
+  double aliatHealth = 1000.0;
+  double enemicHealth = 1000.0;
 
-  // QUANTITAT DE MAL
-  int aliatDamage = 50; // Daño de Ichigo
-  int enemicDamage = 50; // Daño de Aizen
+  int aliatDamage = 50;
+  int enemicDamage = 50;
 
-  //NOM PERSONATGES
   String AllyName = "Ichigo Kurosaki";
   String EnemyName = "Sosuke Aizen";
   String backgroundImage = 'lib/images/combat_proves/fondo_combat_1.png';
 
-  //TORNS I COPS DE MAL
   bool isEnemyTurn = false;
   bool isEnemyHit = false;
   bool isAllyHit = false;
 
-  //NOM TECNICA ALIAT
+  bool isAttackInProgress = false; // Nueva variable para bloquear el ataque
   String techniqueName =
-      "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)"; // Nombre de la técnica
+      "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)";
 
   @override
   void initState() {
@@ -44,10 +42,10 @@ class _CombatScreenState extends State<CombatScreen> {
   }
 
   void _attack() {
-    if (!isEnemyTurn) {
+    if (!isEnemyTurn && !isAttackInProgress) {
       setState(() {
+        isAttackInProgress = true; // Bloquea el botón durante el ataque
         isEnemyHit = true;
-        // Restamos el daño fijo de Aizen
         enemicHealth -= aliatDamage;
         if (enemicHealth < 0) enemicHealth = 0;
       });
@@ -65,7 +63,6 @@ class _CombatScreenState extends State<CombatScreen> {
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
         isAllyHit = true;
-        // Restamos el daño fijo de Ichigo
         aliatHealth -= enemicDamage;
         if (aliatHealth < 0) aliatHealth = 0;
       });
@@ -73,6 +70,7 @@ class _CombatScreenState extends State<CombatScreen> {
         setState(() {
           isAllyHit = false;
           isEnemyTurn = false;
+          isAttackInProgress = false; // Permite el siguiente ataque
         });
       });
 
@@ -98,7 +96,7 @@ class _CombatScreenState extends State<CombatScreen> {
               backgroundImage: AssetImage('lib/images/kan_moneda.png'),
             ),
             SizedBox(height: 10),
-            Text("+500",
+            Text("+$punts",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ],
         ),
@@ -260,7 +258,9 @@ class _CombatScreenState extends State<CombatScreen> {
                           ),
                           SizedBox(height: 20),
                           ElevatedButton(
-                            onPressed: isEnemyTurn ? null : _attack,
+                            onPressed: isEnemyTurn || isAttackInProgress
+                                ? null
+                                : _attack,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange,
                               padding: EdgeInsets.symmetric(
