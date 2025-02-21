@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: PreHomeScreen(),
+        home: HomeScreen(),
         routes: {
           '/home': (context) => HomeScreen(),
           '/map': (context) => Mapscreen(
