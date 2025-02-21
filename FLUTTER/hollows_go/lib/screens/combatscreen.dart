@@ -34,7 +34,7 @@ class _CombatScreenState extends State<CombatScreen> {
 
   void _setRandomBackground() {
     final random = Random();
-    int randomIndex = random.nextInt(4) + 1;
+    int randomIndex = random.nextInt(5) + 1;
     setState(() {
       backgroundImage =
           'lib/images/combat_proves/fondo_combat_$randomIndex.png';
