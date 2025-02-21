@@ -248,8 +248,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                           _switchValue = value;
                                         });
                                       },
-                                      activeColor: Colors.yellowAccent,
-                                      inactiveTrackColor: Colors.grey,
+                                      activeColor: Colors.grey,
+                                      inactiveTrackColor: Colors.yellowAccent,
                                     ),
                                   ],
                                 ),
