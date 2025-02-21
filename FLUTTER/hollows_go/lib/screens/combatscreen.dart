@@ -1,5 +1,4 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:hollows_go/imports.dart';
 
 class CombatScreen extends StatefulWidget {
   @override
@@ -7,13 +6,27 @@ class CombatScreen extends StatefulWidget {
 }
 
 class _CombatScreenState extends State<CombatScreen> {
-  double aliatHealth = 1.0; // Salud actual de Ichigo (valor entre 0 y 1)
-  double enemicHealth = 1.0; // Salud actual de Aizen (valor entre 0 y 1)
+  // SALUT TOTAL DES PERSONATGE
+  double aliatHealth = 1000.0; // Salud de Ichigo
+  double enemicHealth = 1000.0; // Salud de Aizen
 
-  int aliatHPMX = 1000; // Vida máxima de Ichigo
-  int enemicHP = 1000; // Vida máxima de Aizen
+  // QUANTITAT DE MAL
+  int aliatDamage = 50; // Daño de Ichigo
+  int enemicDamage = 50; // Daño de Aizen
 
-  late String backgroundImage;
+  //NOM PERSONATGES
+  String AllyName = "Ichigo Kurosaki";
+  String EnemyName = "Sosuke Aizen";
+  String backgroundImage = 'lib/images/combat_proves/fondo_combat_1.png';
+
+  //TORNS I COPS DE MAL
+  bool isEnemyTurn = false;
+  bool isEnemyHit = false;
+  bool isAllyHit = false;
+
+  //NOM TECNICA ALIAT
+  String techniqueName =
+      "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)"; // Nombre de la técnica
 
   @override
   void initState() {
@@ -24,7 +37,113 @@ class _CombatScreenState extends State<CombatScreen> {
   void _setRandomBackground() {
     final random = Random();
     int randomIndex = random.nextInt(4) + 1;
-    backgroundImage = 'lib/images/combat_proves/fondo_combat_$randomIndex.png';
+    setState(() {
+      backgroundImage =
+          'lib/images/combat_proves/fondo_combat_$randomIndex.png';
+    });
+  }
+
+  void _attack() {
+    if (!isEnemyTurn) {
+      setState(() {
+        isEnemyHit = true;
+        // Restamos el daño fijo de Aizen
+        enemicHealth -= aliatDamage;
+        if (enemicHealth < 0) enemicHealth = 0;
+      });
+      Future.delayed(Duration(milliseconds: 300), () {
+        setState(() {
+          isEnemyHit = false;
+          isEnemyTurn = true;
+        });
+        _enemyAttack();
+      });
+    }
+  }
+
+  void _enemyAttack() {
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        isAllyHit = true;
+        // Restamos el daño fijo de Ichigo
+        aliatHealth -= enemicDamage;
+        if (aliatHealth < 0) aliatHealth = 0;
+      });
+      Future.delayed(Duration(milliseconds: 500), () {
+        setState(() {
+          isAllyHit = false;
+          isEnemyTurn = false;
+        });
+      });
+
+      // Comprobamos si el combate ha terminado
+      if (enemicHealth <= 0) {
+        _showVictoryDialog();
+      } else if (aliatHealth <= 0) {
+        _showDefeatDialog();
+      }
+    });
+  }
+
+  void _showVictoryDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Has guanyat"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('lib/images/kan_moneda.png'),
+            ),
+            SizedBox(height: 10),
+            Text("+500",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            },
+            child: Text("Continuar"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDefeatDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Has perdut"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('lib/images/kon_plorant.png'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            },
+            child: Text("Continuar"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -38,6 +157,22 @@ class _CombatScreenState extends State<CombatScreen> {
               fit: BoxFit.cover,
             ),
           ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isEnemyTurn ? Colors.red : Colors.green,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                isEnemyTurn ? "Torn: $EnemyName" : "Torn: $AllyName",
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -45,10 +180,14 @@ class _CombatScreenState extends State<CombatScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'lib/images/combat_proves/aizen_combat.png',
-                      height: 300,
-                      width: 300,
+                    AnimatedOpacity(
+                      duration: Duration(milliseconds: 300),
+                      opacity: isEnemyHit ? 0.5 : 1.0,
+                      child: Image.asset(
+                        'lib/images/combat_proves/aizen_combat.png',
+                        height: 300,
+                        width: 300,
+                      ),
                     ),
                     SizedBox(height: 8),
                     Container(
@@ -62,7 +201,7 @@ class _CombatScreenState extends State<CombatScreen> {
                         children: [
                           Flexible(
                             child: Text(
-                              "Dondodochakka",
+                              "$EnemyName",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -73,7 +212,7 @@ class _CombatScreenState extends State<CombatScreen> {
                             ),
                           ),
                           SizedBox(width: 10),
-                          _buildHealthBar(enemicHealth, enemicHP),
+                          _buildHealthBar(enemicHealth, 1000),
                         ],
                       ),
                     ),
@@ -83,10 +222,14 @@ class _CombatScreenState extends State<CombatScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      'lib/images/combat_proves/bleach_combat.png',
-                      height: 250,
-                      width: 250,
+                    AnimatedOpacity(
+                      duration: Duration(milliseconds: 300),
+                      opacity: isAllyHit ? 0.5 : 1.0,
+                      child: Image.asset(
+                        'lib/images/combat_proves/bleach_combat.png',
+                        height: 250,
+                        width: 250,
+                      ),
                     ),
                     SizedBox(height: 8),
                     Container(
@@ -99,13 +242,13 @@ class _CombatScreenState extends State<CombatScreen> {
                         children: [
                           Row(
                             children: [
-                              _buildHealthBar(aliatHealth, aliatHPMX),
+                              _buildHealthBar(aliatHealth, 1000),
                               SizedBox(width: 10),
                               Flexible(
                                 child: Text(
-                                  "Ichigo",
+                                  "$AllyName",
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
@@ -117,34 +260,42 @@ class _CombatScreenState extends State<CombatScreen> {
                           ),
                           SizedBox(height: 20),
                           ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                if (enemicHealth > 0) {
-                                  enemicHealth -= 100 / enemicHP;
-                                  if (enemicHealth < 0) {
-                                    enemicHealth = 0;
-                                  }
-                                }
-                              });
-                            },
+                            onPressed: isEnemyTurn ? null : _attack,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange,
                               padding: EdgeInsets.symmetric(
-                                  horizontal: 80, vertical: 12),
+                                  horizontal: 30, vertical: 10),
                               textStyle: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text("LUCHAR", style: TextStyle(fontSize: 18)),
+                                Text("LLUITA", style: TextStyle(fontSize: 18)),
+                                SizedBox(height: 4),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    techniqueName,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    softWrap: false,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
                                 SizedBox(height: 4),
                                 Text(
-                                  "Bankai Getsuga Tensho",
+                                  "(MAL: $aliatDamage)",
                                   style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
                                 ),
                               ],
                             ),
@@ -162,11 +313,11 @@ class _CombatScreenState extends State<CombatScreen> {
     );
   }
 
-  Widget _buildHealthBar(double health, int hp) {
-    Color barColor = Colors.green;
-    if (health < 0.6) barColor = Colors.orange;
-    if (health < 0.2) barColor = Colors.red;
-
+  Widget _buildHealthBar(double health, int maxHealth) {
+    double healthPercentage = health / maxHealth;
+    Color barColor = healthPercentage < 0.2
+        ? Colors.red
+        : (healthPercentage < 0.6 ? Colors.orange : Colors.green);
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -175,57 +326,28 @@ class _CombatScreenState extends State<CombatScreen> {
             width: 200,
             height: 24,
             decoration: BoxDecoration(
-              color: Colors.grey.shade700,
-              borderRadius: BorderRadius.circular(10),
-            ),
+                color: Colors.grey.shade700,
+                borderRadius: BorderRadius.circular(10)),
           ),
         ),
         Positioned(
           left: 0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0, end: health),
-              duration: Duration(milliseconds: 500),
-              builder: (context, value, child) {
-                return Container(
-                  width: 200 * value,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: barColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                );
-              },
+            child: Container(
+              width: 200 * healthPercentage,
+              height: 24,
+              decoration: BoxDecoration(
+                  color: barColor, borderRadius: BorderRadius.circular(10)),
             ),
           ),
         ),
         Positioned(
-          child: Container(
-            width: 200,
-            height: 24,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black, width: 2),
-            ),
-          ),
-        ),
-        Positioned(
-          child: Text(
-            "${(health * hp).toInt()}/$hp",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              shadows: [
-                Shadow(
-                  blurRadius: 2,
-                  color: Colors.black,
-                  offset: Offset(1, 1),
-                ),
-              ],
-            ),
-          ),
+          child: Text("${health.toInt()}/$maxHealth",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold)),
         ),
       ],
     );
