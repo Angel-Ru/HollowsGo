@@ -318,30 +318,37 @@ class _CombatScreenState extends State<CombatScreen> {
     Color barColor = healthPercentage < 0.2
         ? Colors.red
         : (healthPercentage < 0.6 ? Colors.orange : Colors.green);
+
     return Stack(
       alignment: Alignment.center,
       children: [
+        // Contenedor del borde negro, colocado por encima
         Positioned(
           child: Container(
             width: 200,
             height: 24,
             decoration: BoxDecoration(
-                color: Colors.grey.shade700,
-                borderRadius: BorderRadius.circular(10)),
+              color: Colors.grey.shade700,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.black, width: 2), // Borde negro
+            ),
           ),
         ),
+        // Barra de vida dentro del contenedor, comenzando desde la derecha
         Positioned(
-          left: 0,
+          left: 0, // Posicionamos la barra a la izquierda
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Container(
-              width: 200 * healthPercentage,
-              height: 24,
+              width: 200 *
+                  healthPercentage, // Ancho ajustado según el porcentaje de vida
+              height: 24, // Alto de la barra de vida
               decoration: BoxDecoration(
                   color: barColor, borderRadius: BorderRadius.circular(10)),
             ),
           ),
         ),
+        // Texto con la cantidad de vida
         Positioned(
           child: Text("${health.toInt()}/$maxHealth",
               style: TextStyle(
