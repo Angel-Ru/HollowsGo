@@ -126,7 +126,7 @@ class _MapaScreenState extends State<Mapscreen> {
           Marker(
             markerId: MarkerId('random_$i'),
             position: randomPoint,
-            infoWindow: InfoWindow(title: 'Punto Aleatorio $i'),
+            infoWindow: InfoWindow(title: 'Punt Aleatori $i'),
             icon: BitmapDescriptor.fromBytes(iconBytes),
             //onTap: () => CombatScreen(),
           ),
