@@ -79,6 +79,7 @@ flutter:
     - lib/images/mayuri_character/
     - lib/images/kyoraku_character/
     - lib/images/music/
+    - lib/images/hollows/
     - lib/images/banner_gacha/banner.png
     - lib/images/ichigo_character/
     - lib/images/bleach-rukia.gif
