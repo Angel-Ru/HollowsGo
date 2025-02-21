@@ -125,7 +125,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
           ],
         ),
       ),

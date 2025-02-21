@@ -81,9 +81,11 @@ flutter:
     - lib/images/mayuri_character/
     - lib/images/kyoraku_character/
     - lib/images/music/
+    - lib/images/hollows/
     - lib/images/banner_gacha/banner.png
     - lib/images/ichigo_character/
     - lib/images/bleach-rukia.gif
+    - lib/images/combat_proves/
     - lib/videos/animacion_gacha.mp4
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
