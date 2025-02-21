@@ -38,37 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  int _dialogIndex = 0;
-  final List<String> _dialogues = [
-    "Benvingut a HollowsGo!",
-    "Getsuga... Tenshō!!",
-    "Sóc un shinigami substitut, com que no saps què és?",
-    "Si tens alguna pregunta, no dubtis en preguntar-me!",
-  ];
-
-  final List<String> _ichigoImages = [
-    'lib/images/ichigo_character/ichigo_1.png',
-    'lib/images/ichigo_character/ichigo_2.png',
-    'lib/images/ichigo_character/ichigo_3.png',
-    'lib/images/ichigo_character/ichigo_4.png',
-    'lib/images/ichigo_character/ichigo_5.png',
-  ];
-
-  late String _currentImage;
-  late String _previousImage;
-
-  void _nextDialogue() {
-    setState(() {
-      _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
-      String newImage;
-      do {
-        newImage = _ichigoImages[Random().nextInt(_ichigoImages.length)];
-      } while (newImage == _currentImage);
-      _previousImage = _currentImage;
-      _currentImage = newImage;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -280,7 +249,6 @@ class _HomeScreenState extends State<HomeScreen> {
           _getSelectedScreen(uiProvider.selectedMenuOpt),
         ],
       ),
-      body: _getSelectedScreen(uiProvider.selectedMenuOpt),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
