@@ -9,44 +9,45 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _imagePath = 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
+  String _imagePath =
+      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
   final String _coinImagePath = 'lib/images/kan_moneda.png';
   Timer? _timer;
 
- @override
-void initState() {
-  super.initState();
-  _loadProfileImage();
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileImage();
 
-  // Inicializar el DialogueProvider al cargar la pantalla
-  Future.microtask(() {
-    final dialogueProvider = Provider.of<DialogueProvider>(context, listen: false);
-    dialogueProvider.setDialogueData(
-      [
-        "Benvingut a HollowsGo!",
-        "Getsuga... Tenshō!!",
-        "Sóc un shinigami substitut, com que no saps què és?",
-        "Si tens alguna pregunta, no dubtis en preguntar-me!",
-      ],
-      [
-        'lib/images/ichigo_character/ichigo_1.png',
-        'lib/images/ichigo_character/ichigo_2.png',
-        'lib/images/ichigo_character/ichigo_3.png',
-        'lib/images/ichigo_character/ichigo_4.png',
-        'lib/images/ichigo_character/ichigo_5.png',
-      ],
-    );
-  });
-
-  // Inicializar el UserProvider
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.fetchUserPoints();
-    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    // Inicializar el UserProvider
+    // Inicializar el UserProvider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.fetchUserPoints();
+      _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+        userProvider.fetchUserPoints();
+      });
+
+      // Mover la llamada a setDialogueData() fuera de initState() para evitar el error
+      final dialogueProvider =
+          Provider.of<DialogueProvider>(context, listen: false);
+      dialogueProvider.setDialogueData(
+        [
+          "Benvingut a HollowsGo!",
+          "Getsuga... Tenshō!!",
+          "Sóc un shinigami substitut, com que no saps què és?",
+          "Si tens alguna pregunta, no dubtis en preguntar-me!",
+        ],
+        [
+          'lib/images/ichigo_character/ichigo_1.png',
+          'lib/images/ichigo_character/ichigo_2.png',
+          'lib/images/ichigo_character/ichigo_3.png',
+          'lib/images/ichigo_character/ichigo_4.png',
+          'lib/images/ichigo_character/ichigo_5.png',
+        ],
+      );
     });
-  });
-}
+  }
 
   @override
   void dispose() {
@@ -55,14 +56,16 @@ void initState() {
   }
 
   Future<void> _loadProfileImage() async {
-  final prefs = await SharedPreferences.getInstance();
-  final imagePath = prefs.getString('profileImagePath');
-  if (imagePath != null && imagePath.isNotEmpty) {
+    final prefs = await SharedPreferences.getInstance();
+    final imagePath = prefs.getString('profileImagePath');
+
+    // Establir la ruta de la imatge per defecte si no es troba una ruta vàlida
     setState(() {
-      _imagePath = imagePath;
+      _imagePath = (imagePath != null && imagePath.isNotEmpty)
+          ? imagePath
+          : 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imatge per defecte
     });
   }
-}
 
   Widget _getSelectedScreen(int selectedIndex) {
     switch (selectedIndex) {
@@ -183,8 +186,14 @@ void initState() {
                             onTap: dialogueProvider.nextDialogue,
                             child: CircleAvatar(
                               radius: 50,
-                              backgroundImage: AssetImage(dialogueProvider.currentImage),
-                              backgroundColor: Color.fromARGB(255, 239, 178, 24),
+                              backgroundImage:
+                                  AssetImage(dialogueProvider.currentImage),
+                              onBackgroundImageError: (exception, stackTrace) {
+                                print(
+                                    "L'imatge no se ha pogut carregar encara");
+                              },
+                              backgroundColor:
+                                  Color.fromARGB(255, 239, 178, 24),
                             ),
                           ),
                           SizedBox(width: 16),
@@ -195,9 +204,11 @@ void initState() {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(243, 194, 194, 194),
+                                      color: const Color.fromARGB(
+                                          243, 194, 194, 194),
                                       borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(8),
                                         topRight: Radius.circular(8),
@@ -216,7 +227,8 @@ void initState() {
                                   Container(
                                     padding: EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: const Color.fromARGB(211, 247, 160, 39),
+                                      color: const Color.fromARGB(
+                                          211, 247, 160, 39),
                                       borderRadius: BorderRadius.only(
                                         bottomLeft: Radius.circular(8),
                                         bottomRight: Radius.circular(8),
@@ -269,7 +281,8 @@ void initState() {
         selectedItemColor: Colors.blue,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
-          final dialogueProvider = Provider.of<DialogueProvider>(context, listen: false);
+          final dialogueProvider =
+              Provider.of<DialogueProvider>(context, listen: false);
 
           if (index == 0) {
             // HomeScreen
