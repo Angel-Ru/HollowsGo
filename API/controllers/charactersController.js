@@ -1,7 +1,26 @@
 const { connectDB, sql } = require('../config/dbConfig');
 
-// Obtenir tots els personatges
-exports.getAllCharacters = async (req, res) => {
+/**
+ * @swagger
+ * tags:
+ *   name: Personatges
+ *   description: Endpoints per gestionar personatges
+ */
+
+/**
+ * @swagger
+ * /personatges:
+ *   get:
+ *     summary: Obtenir tots els personatges
+ *     description: Retorna una llista de tots els personatges registrats a la base de dades.
+ *     tags: [Personatges]
+ *     responses:
+ *       200:
+ *         description: Llista de personatges
+ *       500:
+ *         description: Error en la consulta
+ */
+exports.getPersonatges = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request().query('SELECT * FROM PERSONATGES');
@@ -12,8 +31,27 @@ exports.getAllCharacters = async (req, res) => {
     }
 };
 
-// Obtenir un personatge per ID
-exports.getCharacterById = async (req, res) => {
+/**
+ * @swagger
+ * /personatges/{id}:
+ *   get:
+ *     summary: Obtenir un personatge per ID
+ *     description: Retorna les dades d'un personatge específic mitjançant el seu ID.
+ *     tags: [Personatges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del personatge
+ *     responses:
+ *       200:
+ *         description: Dades del personatge
+ *       500:
+ *         description: Error en la consulta
+ */
+exports.getPersonatgeId = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request()
@@ -26,8 +64,27 @@ exports.getCharacterById = async (req, res) => {
     }
 };
 
-// Obtenir un personatge per nom
-exports.getCharacterByName = async (req, res) => {
+/**
+ * @swagger
+ * /personatges/nom/{nom}:
+ *   get:
+ *     summary: Obtenir un personatge per nom
+ *     description: Retorna les dades d'un personatge específic mitjançant el seu nom.
+ *     tags: [Personatges]
+ *     parameters:
+ *       - in: path
+ *         name: nom
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Nom del personatge
+ *     responses:
+ *       200:
+ *         description: Dades del personatge
+ *       500:
+ *         description: Error en la consulta
+ */
+exports.getPersonatgeNom = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request()
@@ -40,8 +97,33 @@ exports.getCharacterByName = async (req, res) => {
     }
 };
 
-// Crear un nou personatge
-exports.createCharacter = async (req, res) => {
+/**
+ * @swagger
+ * /personatges:
+ *   post:
+ *     summary: Crear un nou personatge
+ *     description: Afegeix un nou personatge a la base de dades.
+ *     tags: [Personatges]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nom:
+ *                 type: string
+ *               vida_base:
+ *                 type: integer
+ *               mal_base:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Personatge afegit correctament
+ *       500:
+ *         description: Error en inserir el personatge
+ */
+exports.crearPersonatge = async (req, res) => {
     try {
         const { nom, vida_base, mal_base } = req.body;
         const pool = await connectDB();
@@ -57,8 +139,29 @@ exports.createCharacter = async (req, res) => {
     }
 };
 
-// Eliminar un personatge per ID
-exports.deleteCharacterById = async (req, res) => {
+/**
+ * @swagger
+ * /personatges/{id}:
+ *   delete:
+ *     summary: Eliminar un personatge per ID
+ *     description: Elimina un personatge de la base de dades mitjançant el seu ID.
+ *     tags: [Personatges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del personatge a eliminar
+ *     responses:
+ *       200:
+ *         description: Personatge eliminat correctament
+ *       404:
+ *         description: Personatge no trobat
+ *       500:
+ *         description: Error en eliminar el personatge
+ */
+exports.borrarPersonatgeId = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request()
@@ -74,7 +177,85 @@ exports.deleteCharacterById = async (req, res) => {
         console.error(err);
         res.status(500).send('Error en eliminar el personatge');
     }
-
-
 };
 
+/**
+ * @swagger
+ * /personatges/enemics/{nom}/punts:
+ *   post:
+ *     summary: Obtenir els punts que dona un enemic i sumar-los als punts de l'usuari
+ *     description: Aquest endpoint obté els punts que dona un enemic específic (mitjançant el seu nom) i suma aquests punts als punts emmagatzemats de l'usuari. Només retorna els punts que dona l'enemic.
+ *     tags: [Personatges]
+ *     parameters:
+ *       - in: path
+ *         name: nom
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Nom de l'enemic
+ *       - in: body
+ *         name: usuari
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             email:
+ *               type: string
+ *               description: Email de l'usuari al qual se li sumaran els punts
+ *     responses:
+ *       200:
+ *         description: Punts que dona l'enemic
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 punts_enemic:
+ *                   type: integer
+ *                   description: Punts que dona l'enemic
+ *       404:
+ *         description: Enemic no trobat o usuari no trobat
+ *       500:
+ *         description: Error en el servidor
+ */
+exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
+    try {
+        const { nom } = req.params; // Nom de l'enemic
+        const { email } = req.body; // Email de l'usuari
+
+        // 1. Obtenir els punts que dona l'enemic
+        const pool = await connectDB();
+        const resultEnemic = await pool.request()
+            .input('nom', sql.VarChar(50), nom)
+            .query('SELECT punts_donats FROM ENEMICS WHERE nom = @nom');
+
+        if (resultEnemic.recordset.length === 0) {
+            return res.status(404).send('Enemic no trobat');
+        }
+
+        const puntsEnemic = resultEnemic.recordset[0].punts_donats; // Punts que dona l'enemic
+
+        // 2. Verificar si l'usuari existeix
+        const resultUsuari = await pool.request()
+            .input('email', sql.VarChar(50), email)
+            .query('SELECT id FROM USUARIS WHERE email = @email');
+
+        if (resultUsuari.recordset.length === 0) {
+            return res.status(404).send('Usuari no trobat');
+        }
+
+        const usuari_id = resultUsuari.recordset[0].id; // ID de l'usuari
+
+        // 3. Sumar els punts de l'enemic als punts emmagatzemats de l'usuari
+        await pool.request()
+            .input('usuari_id', sql.Int, usuari_id)
+            .input('punts', sql.Int, puntsEnemic)
+            .query('UPDATE USUARIS SET punts_emmagatzemats = punts_emmagatzemats + @punts WHERE id = @usuari_id');
+
+        // 4. Retornar només els punts que dona l'enemic
+        res.status(200).json({ punts_enemic: puntsEnemic });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en el servidor');
+    }
+};

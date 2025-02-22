@@ -1,5 +1,4 @@
 import '../imports.dart';
-import 'package:audioplayers/audioplayers.dart';  // Importa audioplayers
 
 class PreHomeScreen extends StatefulWidget {
   @override
@@ -21,17 +20,9 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   late ScrollController _scrollControllerTop;
   late ScrollController _scrollControllerBottom;
 
-  late AudioPlayer _audioPlayer;  // Declaración del reproductor de audio
-
   @override
   void initState() {
     super.initState();
-
-    // Inicializa el reproductor de audio
-    _audioPlayer = AudioPlayer();
-
-    // Reproducir la música cuando se inicie la pantalla
-    _playMusic();
 
     // Configura el AnimationController para la animación de opacidad
     _controller = AnimationController(
@@ -57,19 +48,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     // Inicia el movimiento automático de las calaveras
     _startAutoScroll(_scrollControllerTop);
     _startAutoScroll(_scrollControllerBottom);
-  }
-
-  // Reproduce la música
-  void _playMusic() async {
-    try {
-      // Reproduce la música desde el archivo
-      await _audioPlayer.play(AssetSource('Numer_One.mp3'));
-      _audioPlayer.setReleaseMode(ReleaseMode.loop);  
-
-      print("La música se está reproduciendo correctamente.");
-    } catch (e) {
-      print("Error al reproducir la música: $e");
-    }
   }
 
   void _startAutoScroll(ScrollController scrollController) {
@@ -99,7 +77,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
   @override
   void dispose() {
-    _audioPlayer.stop(); // Detiene la música al salir de la pantalla
     _controller.dispose();
     _scrollControllerTop.dispose();
     _scrollControllerBottom.dispose();
@@ -116,7 +93,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
-          _audioPlayer.stop(); 
           _showLoginDialog(
               context); // Mostrar el diálogo de login al tocar la pantalla
         },

@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('http://192.168.2.197:3000/usuaris/login');
+    final url = Uri.parse('http://192.168.1.28:3000/usuaris/login');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'email': username,
@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
-        
+
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('userEmail', data['user']['email']);
         await prefs.setString('userName', data['user']['nom']);

@@ -1,4 +1,4 @@
-import 'package:hollows_go/imports.dart';
+import '../imports.dart';
 
 class CombatScreen extends StatefulWidget {
   @override
@@ -6,30 +6,58 @@ class CombatScreen extends StatefulWidget {
 }
 
 class _CombatScreenState extends State<CombatScreen> {
-  // Mondedes
+  late VideoPlayerController _videoController;
+  late ChewieController _chewieController;
+  bool _isVideoPlaying = true;
+
+  // Variables para el combate
   int punts = 100;
   double aliatHealth = 1000.0;
   double enemicHealth = 1000.0;
-
   int aliatDamage = 50;
   int enemicDamage = 50;
-
   String AllyName = "Ichigo Kurosaki";
   String EnemyName = "Sosuke Aizen";
   String backgroundImage = 'lib/images/combat_proves/fondo_combat_1.png';
-
   bool isEnemyTurn = false;
   bool isEnemyHit = false;
   bool isAllyHit = false;
-
-  bool isAttackInProgress = false; // Nueva variable para bloquear el ataque
+  bool isAttackInProgress = false;
   String techniqueName =
       "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)";
 
   @override
   void initState() {
     super.initState();
+    _initializeVideoPlayer();
     _setRandomBackground();
+  }
+
+  void _initializeVideoPlayer() {
+    _videoController =
+        VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
+          ..initialize().then((_) {
+            if (mounted) {
+              setState(() {});
+              _videoController.play();
+            }
+          });
+
+    _chewieController = ChewieController(
+      videoPlayerController: _videoController,
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: false,
+      showControls: false,
+    );
+
+    _videoController.addListener(() {
+      if (_videoController.value.position >= _videoController.value.duration) {
+        setState(() {
+          _isVideoPlaying = false;
+        });
+      }
+    });
   }
 
   void _setRandomBackground() {
@@ -41,10 +69,17 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _videoController.dispose();
+    _chewieController.dispose();
+    super.dispose();
+  }
+
   void _attack() {
     if (!isEnemyTurn && !isAttackInProgress) {
       setState(() {
-        isAttackInProgress = true; // Bloquea el botón durante el ataque
+        isAttackInProgress = true;
         isEnemyHit = true;
         enemicHealth -= aliatDamage;
         if (enemicHealth < 0) enemicHealth = 0;
@@ -70,11 +105,10 @@ class _CombatScreenState extends State<CombatScreen> {
         setState(() {
           isAllyHit = false;
           isEnemyTurn = false;
-          isAttackInProgress = false; // Permite el siguiente ataque
+          isAttackInProgress = false;
         });
       });
 
-      // Comprobamos si el combate ha terminado
       if (enemicHealth <= 0) {
         _showVictoryDialog();
       } else if (aliatHealth <= 0) {
@@ -147,154 +181,169 @@ class _CombatScreenState extends State<CombatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              backgroundImage,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned(
-            top: 20,
-            left: 20,
-            child: Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isEnemyTurn ? Colors.red : Colors.green,
-                borderRadius: BorderRadius.circular(10),
+      body: _isVideoPlaying
+          ? Container(
+              color: Colors.black, // Fondo negro
+              child: Center(
+                child: _videoController.value.isInitialized
+                    ? Chewie(controller: _chewieController)
+                    : CircularProgressIndicator(),
               ),
-              child: Text(
-                isEnemyTurn ? "Torn: $EnemyName" : "Torn: $AllyName",
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
+            )
+          : Stack(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 300),
-                      opacity: isEnemyHit ? 0.5 : 1.0,
-                      child: Image.asset(
-                        'lib/images/combat_proves/aizen_combat.png',
-                        height: 300,
-                        width: 300,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              "$EnemyName",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: true,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          _buildHealthBar(enemicHealth, 1000),
-                        ],
-                      ),
-                    ),
-                  ],
+                Positioned.fill(
+                  child: Image.asset(
+                    backgroundImage,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                Spacer(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 300),
-                      opacity: isAllyHit ? 0.5 : 1.0,
-                      child: Image.asset(
-                        'lib/images/combat_proves/bleach_combat.png',
-                        height: 250,
-                        width: 250,
-                      ),
+                Positioned(
+                  top: 20,
+                  left: 20,
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: isEnemyTurn ? Colors.red : Colors.green,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    SizedBox(height: 8),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
+                    child: Text(
+                      isEnemyTurn ? "Torn: $EnemyName" : "Torn: $AllyName",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Row(
-                            children: [
-                              _buildHealthBar(aliatHealth, 1000),
-                              SizedBox(width: 10),
-                              Flexible(
-                                child: Text(
-                                  "$AllyName",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: isEnemyTurn || isAttackInProgress
-                                ? null
-                                : _attack,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 10),
-                              textStyle: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
+                          AnimatedOpacity(
+                            duration: Duration(milliseconds: 300),
+                            opacity: isEnemyHit ? 0.5 : 1.0,
+                            child: Image.asset(
+                              'lib/images/combat_proves/aizen_combat.png',
+                              height: 300,
+                              width: 300,
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text("LLUITA", style: TextStyle(fontSize: 18)),
-                                SizedBox(height: 4),
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
+                                Flexible(
                                   child: Text(
-                                    techniqueName,
+                                    "$EnemyName",
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
                                     overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    textAlign: TextAlign.center,
+                                    softWrap: true,
                                   ),
                                 ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "(MAL: $aliatDamage)",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
+                                SizedBox(width: 10),
+                                _buildHealthBar(enemicHealth, 1000),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          AnimatedOpacity(
+                            duration: Duration(milliseconds: 300),
+                            opacity: isAllyHit ? 0.5 : 1.0,
+                            child: Image.asset(
+                              'lib/images/combat_proves/bleach_combat.png',
+                              height: 250,
+                              width: 250,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    _buildHealthBar(aliatHealth, 1000),
+                                    SizedBox(width: 10),
+                                    Flexible(
+                                      child: Text(
+                                        "$AllyName",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        softWrap: true,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: isEnemyTurn || isAttackInProgress
+                                      ? null
+                                      : _attack,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 10),
+                                    textStyle: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text("LLUITA",
+                                          style: TextStyle(fontSize: 18)),
+                                      SizedBox(height: 4),
+                                      FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          techniqueName,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          softWrap: false,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        "(MAL: $aliatDamage)",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
@@ -302,14 +351,11 @@ class _CombatScreenState extends State<CombatScreen> {
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -322,39 +368,36 @@ class _CombatScreenState extends State<CombatScreen> {
     return Stack(
       alignment: Alignment.center,
       children: [
-        // Contenedor del borde negro, colocado por encima
-        Positioned(
-          child: Container(
-            width: 200,
-            height: 24,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade700,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.black, width: 2), // Borde negro
-            ),
+        Container(
+          width: 200,
+          height: 24,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade700,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.black, width: 2),
           ),
         ),
-        // Barra de vida dentro del contenedor, comenzando desde la derecha
         Positioned(
-          left: 0, // Posicionamos la barra a la izquierda
+          left: 0,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Container(
-              width: 200 *
-                  healthPercentage, // Ancho ajustado según el porcentaje de vida
-              height: 24, // Alto de la barra de vida
+              width: 200 * healthPercentage,
+              height: 24,
               decoration: BoxDecoration(
-                  color: barColor, borderRadius: BorderRadius.circular(10)),
+                color: barColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
-        // Texto con la cantidad de vida
-        Positioned(
-          child: Text("${health.toInt()}/$maxHealth",
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold)),
+        Text(
+          "${health.toInt()}/$maxHealth",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
