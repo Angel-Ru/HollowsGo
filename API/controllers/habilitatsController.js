@@ -2,8 +2,17 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
+ * tags:
+ *   name: Habilitats
+ *   description: Operacions relacionades amb les habilitats llegendàries
+ */
+
+
+/**
+ * @swagger
  * /skins/{id}/habilitats:
  *   get:
+ *     tags: [Habilitats]
  *     summary: Obtenir la habilitat llegendària d'una skin per ID
  *     description: Retorna la habilitat llegendària associada a una skin específica mitjançant el seu ID.
  *     parameters:
@@ -43,6 +52,7 @@ exports.getHabilitatId = async (req, res) => {
  * @swagger
  * /skins/{nom}/habilitats:
  *   get:
+ *     tags: [Habilitats]
  *     summary: Obtenir la habilitat llegendària d'una skin per nom
  *     description: Retorna la habilitat llegendària associada a una skin específica mitjançant el seu nom.
  *     parameters:
@@ -82,6 +92,7 @@ exports.getHabilitatSkinNom = async (req, res) => {
  * @swagger
  * /habilitats:
  *   post:
+ *     tags: [Habilitats]
  *     summary: Crear una nova habilitat
  *     description: Afegeix una nova habilitat a la base de dades.
  *     requestBody:
@@ -129,6 +140,7 @@ exports.crearHabilitat = async (req, res) => {
  * @swagger
  * /habilitats/{id}:
  *   delete:
+ *     tags: [Habilitats]
  *     summary: Eliminar una habilitat per ID
  *     description: Elimina una habilitat de la base de dades mitjançant el seu ID.
  *     parameters:

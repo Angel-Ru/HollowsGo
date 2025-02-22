@@ -19,23 +19,21 @@ app.use(bodyParser.json());
 const swaggerOptions = {
     swaggerDefinition: {
         info: {
-            title: 'API del Joc',
+            title: 'API-REST HOLLWOS GO',
             version: '1.0.0',
-            description: 'Documentació de l\'API per gestionar personatges, skins, armes, habilitats i usuaris del joc.',
+            description: "Documentació de l'API per gestionar personatges, skins, armes, habilitats i usuaris de l'aplicació HollowsGo.",
         },
         servers: [
             {
-                url: 'http://localhost:3000', // URL del teu servidor
+                url: 'http://localhost:3000',
             },
         ],
     },
-    apis: [ '../controllers/*.js'], // Ruta als arxius de les rutes i els controladors
+    apis: [ '../controllers/*.js'],
 };
 
-// Generar la documentació de Swagger
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-// Ruta per mostrar la documentació interactiva de Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Importer les rutes
@@ -47,7 +45,7 @@ const atacsRoutes = require('../routes/atacsRoutes');
 const userRoutes = require('../routes/userRoutes');
 
 
-// Utilitzar les rutes
+
 app.use('/personatges', characterRoutes);// Ruta para personajes
 app.use('/skins', skinRoutes);             // Ruta para skins
 app.use('/armes', armesRoutes);             // Ruta para armas
@@ -56,10 +54,10 @@ app.use('/atacs', atacsRoutes);             // Ruta para ataques
 app.use('/usuaris', userRoutes);            // Ruta para usuarios
 
 
-// Configurar el port en el que treballa el servidor
+
 const port = process.env.PORT || 3000;
 
-// Iniciar el servidor al port especificat
+
 app.listen(port, () => {
     console.log(`Servidor escoltant al port: ${port}`);
 });

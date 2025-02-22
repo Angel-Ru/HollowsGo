@@ -1,10 +1,19 @@
 const { connectDB, sql } = require('../config/dbConfig');
 const bcrypt = require('bcrypt');
 
+
+/**
+ * @swagger
+ * tags:
+ *   name: Usuaris
+ *   description: Operacions relacionades amb els usuaris de la base de dades
+ */
+
 /**
  * @swagger
  * /usuaris:
  *   get:
+ *     tags: [Usuaris]
  *     summary: Obtenir tots els usuaris
  *     description: Retorna una llista de tots els usuaris registrats a la base de dades.
  *     responses:
@@ -28,6 +37,7 @@ exports.getUsuaris = async (req, res) => {
  * @swagger
  * /usuaris/{id}:
  *   get:
+ *     tags: [Usuaris]
  *     summary: Obtenir un usuari per ID
  *     description: Retorna les dades d'un usuari específic mitjançant el seu ID.
  *     parameters:
@@ -60,6 +70,7 @@ exports.getUsuariPerId = async (req, res) => {
  * @swagger
  * /usuaris/{nom}/punts:
  *   get:
+ *     tags: [Usuaris]
  *     summary: Obtenir els punts d'un usuari per nom
  *     description: Retorna els punts emmagatzemats d'un usuari específic mitjançant el seu nom.
  *     parameters:
@@ -103,6 +114,7 @@ exports.getPuntsUsuari = async (req, res) => {
  * @swagger
  * /usuaris/normal:
  *   post:
+ *     tags: [Usuaris]
  *     summary: Crear un usuari normal
  *     description: Afegeix un nou usuari de tipus normal (tipo = 0) a la base de dades.
  *     requestBody:
@@ -179,6 +191,7 @@ exports.crearUsuariNormal = async (req, res) => {
  * @swagger
  * /usuaris/{id}:
  *   delete:
+ *     tags: [Usuaris]
  *     summary: Eliminar un usuari per ID
  *     description: Elimina un usuari de la base de dades mitjançant el seu ID.
  *     parameters:
@@ -211,6 +224,7 @@ exports.borrarUsuari = async (req, res) => {
  * @swagger
  * /usuaris/admin:
  *   post:
+ *     tags: [Usuaris]
  *     summary: Crear un usuari administrador
  *     description: Afegeix un nou usuari de tipus administrador (tipo = 1) a la base de dades. Només accessible per administradors.
  *     requestBody:
@@ -264,6 +278,7 @@ exports.crearUsuariAdmin = async (req, res) => {
  * @swagger
  * /login:
  *   post:
+ *     tags: [Usuaris]
  *     summary: Iniciar sessió
  *     description: Permet a un usuari iniciar sessió amb el seu correu electrònic i contrasenya.
  *     requestBody:

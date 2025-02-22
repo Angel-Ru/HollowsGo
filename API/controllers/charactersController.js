@@ -2,10 +2,18 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
+ * tags:
+ *   name: Personatges
+ *   description: Endpoints per gestionar personatges
+ */
+
+/**
+ * @swagger
  * /personatges:
  *   get:
  *     summary: Obtenir tots els personatges
  *     description: Retorna una llista de tots els personatges registrats a la base de dades.
+ *     tags: [Personatges]
  *     responses:
  *       200:
  *         description: Llista de personatges
@@ -29,6 +37,7 @@ exports.getPersonatges = async (req, res) => {
  *   get:
  *     summary: Obtenir un personatge per ID
  *     description: Retorna les dades d'un personatge específic mitjançant el seu ID.
+ *     tags: [Personatges]
  *     parameters:
  *       - in: path
  *         name: id
@@ -61,6 +70,7 @@ exports.getPersonatgeId = async (req, res) => {
  *   get:
  *     summary: Obtenir un personatge per nom
  *     description: Retorna les dades d'un personatge específic mitjançant el seu nom.
+ *     tags: [Personatges]
  *     parameters:
  *       - in: path
  *         name: nom
@@ -93,6 +103,7 @@ exports.getPersonatgeNom = async (req, res) => {
  *   post:
  *     summary: Crear un nou personatge
  *     description: Afegeix un nou personatge a la base de dades.
+ *     tags: [Personatges]
  *     requestBody:
  *       required: true
  *       content:
@@ -134,6 +145,7 @@ exports.crearPersonatge = async (req, res) => {
  *   delete:
  *     summary: Eliminar un personatge per ID
  *     description: Elimina un personatge de la base de dades mitjançant el seu ID.
+ *     tags: [Personatges]
  *     parameters:
  *       - in: path
  *         name: id
@@ -173,6 +185,7 @@ exports.borrarPersonatgeId = async (req, res) => {
  *   post:
  *     summary: Obtenir els punts que dona un enemic i sumar-los als punts de l'usuari
  *     description: Aquest endpoint obté els punts que dona un enemic específic (mitjançant el seu nom) i suma aquests punts als punts emmagatzemats de l'usuari. Només retorna els punts que dona l'enemic.
+ *     tags: [Personatges]
  *     parameters:
  *       - in: path
  *         name: nom

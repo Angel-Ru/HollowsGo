@@ -1,2 +1,7 @@
-GET http://192.168.228.168:3000/usuaris/punts/grimmjow
+DELETE localhost:3000/skins/165
+content-type: application/json
+
+{
+    "email": "angelrubiooliver@paucasesnovescifp.cat"
+}
 

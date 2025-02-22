@@ -2,8 +2,17 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
+ * tags:
+ *   name: Skins
+ *   description: Operacions relacionades amb les skins dels personatges
+ */
+
+
+/**
+ * @swagger
  * /skins/{id}:
  *   get:
+ *     tags: [Skins]
  *     summary: Obtenir totes les skins d'un personatge
  *     description: Aquesta API retorna totes les skins d'un personatge basat en l'ID del personatge.
  *     parameters:
@@ -54,6 +63,7 @@ exports.getSkinsPersonatge = async (req, res) => {
  * @swagger
  * /skins/user/{id}:
  *   get:
+ *     tags: [Skins]
  *     summary: Obtenir totes les skins d'un personatge d'un usuari
  *     description: Aquesta API retorna totes les skins d'un personatge que un usuari ha obtingut.
  *     parameters:
@@ -101,6 +111,7 @@ exports.getSkinsUsuari = async (req, res) => {
  * @swagger
  * /skin/user/{id}/{skin_id}:
  *   get:
+ *     tags: [Skins]
  *     summary: Obtenir una skin específica d'un personatge per ID d'usuari
  *     description: Aquesta API retorna una skin específica d'un personatge per un usuari determinat mitjançant els seus IDs.
  *     parameters:
@@ -153,6 +164,7 @@ exports.getSkinUsuariPerId = async (req, res) => {
  * @swagger
  * /skin/user/{id}/{nom}:
  *   get:
+ *     tags: [Skins]
  *     summary: Obtenir una skin per nom d'un personatge per usuari
  *     description: Aquesta API permet obtenir una skin per nom per un usuari i personatge determinat.
  *     parameters:
@@ -205,6 +217,7 @@ exports.getSkinPerNomUsuariPerId = async (req, res) => {
  * @swagger
  * /skins:
  *   post:
+ *     tags: [Skins]
  *     summary: Crear una nova skin
  *     description: Aquesta API permet afegir una nova skin a la base de dades.
  *     requestBody:
@@ -249,7 +262,8 @@ exports.crearSkin = async (req, res) => {
  * @swagger
  * /skins/{id}:
  *   delete:
- *     summary: Eliminar una skin per ID
+ *     tags: [Skins]
+ *     summary: Eliminar una skin per ID i eliminar-la de la biblioteca dels usuaris
  *     description: Aquesta API elimina una skin de la base de dades per ID.
  *     parameters:
  *       - name: id
@@ -269,25 +283,43 @@ exports.crearSkin = async (req, res) => {
 exports.borrarSkinId = async (req, res) => {
     try {
         const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
+        const skinId = req.params.id;
+
+        const deleteResult = await pool.request()
+            .input('id', sql.Int, skinId)
             .query('DELETE FROM SKINS WHERE id = @id');
 
-        if (result.rowsAffected[0] === 0) {
+        if (deleteResult.rowsAffected[0] === 0) {
             return res.status(404).send('Skin no trobada');
         }
 
-        res.send('Skin eliminada correctament');
+        await pool.request()
+            .input('skinId', sql.VarChar, skinId)
+            .query(`
+                UPDATE BIBLIOTECA
+                SET skin_ids = REPLACE(
+                    REPLACE(
+                        REPLACE(skin_ids, ',' + @skinId, ''), 
+                        @skinId + ',', ''
+                    ), 
+                    @skinId, ''
+                )
+                WHERE skin_ids LIKE '%' + @skinId + '%';
+            `);
+
+        res.send('Skin eliminada correctament i BIBLIOTECA actualitzada');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en eliminar la skin');
     }
 };
 
+
 /**
  * @swagger
  * /gacha:
  *   post:
+ *     tags: [Skins]
  *     summary: Realitzar una tirada de gacha per un usuari
  *     description: Aquest mètode permet a un usuari realitzar una tirada aleatòria de gacha per obtenir una skin, però només si té prou monedes.
  *     requestBody:

@@ -14,4 +14,10 @@ router.get('/:id/:arma_id', armesController.getArmaSkinId);
 // Obtenir una arma per nom d'una skin per nom
 router.get('/nom/:nom/:arma_nom', armesController.getArmaSkinNom);
 
+// Crear una arma per a una skin
+router.post('/', armesController.crearArma);
+
+// Borrar arma per id
+router.delete('/:id', armesController.borrarArmaPerId);
+
 module.exports = router;

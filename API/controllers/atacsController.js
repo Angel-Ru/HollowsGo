@@ -2,10 +2,18 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
+ * tags:
+ *   name: Atacs
+ *   description: Endpoints per gestionar atacs
+ */
+
+/**
+ * @swagger
  * /skins/{id}/atacs:
  *   get:
  *     summary: Obtenir l'atac d'una skin per ID
  *     description: Retorna l'atac associat a una skin específica mitjançant el seu ID.
+ *     tags: [Atacs]
  *     parameters:
  *       - in: path
  *         name: id
@@ -45,6 +53,7 @@ exports.getAtacSkinPerId = async (req, res) => {
  *   get:
  *     summary: Obtenir l'atac d'una skin per nom
  *     description: Retorna l'atac associat a una skin específica mitjançant el seu nom.
+ *     tags: [Atacs]
  *     parameters:
  *       - in: path
  *         name: nom
@@ -84,6 +93,7 @@ exports.getAtacSkinPerNom = async (req, res) => {
  *   post:
  *     summary: Crear un nou atac
  *     description: Afegeix un nou atac a la base de dades.
+ *     tags: [Atacs]
  *     requestBody:
  *       required: true
  *       content:
@@ -131,6 +141,7 @@ exports.crearAtac = async (req, res) => {
  *   delete:
  *     summary: Eliminar un atac per ID
  *     description: Elimina un atac de la base de dades mitjançant el seu ID.
+ *     tags: [Atacs]
  *     parameters:
  *       - in: path
  *         name: id

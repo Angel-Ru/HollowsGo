@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const skinsController = require('../controllers/skinsController');
+const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifica que esta ruta sea correcta
 
 // Ruta per obtenir totes les skins d'un personatge
 router.get('/:id', skinsController.getSkinsPersonatge);
@@ -16,5 +17,13 @@ router.get('/usuari/:id/nom/:nom', skinsController.getSkinPerNomUsuariPerId);
 
 // Ruta per a la tirada de gacha
 router.post('/gacha', skinsController.gachaTirada);  // Eliminat el :userId i ara rebem l'email en el cos de la petició
+
+
+//Ruta per crear una skin
+router.post('/', verificacioUsuari.verifyAdminDB, skinsController.crearSkin);
+
+//Ruta per borrar una skin
+router.delete('/:id', verificacioUsuari.verifyAdminDB, skinsController.borrarSkinId);
+
 
 module.exports = router;

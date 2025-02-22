@@ -2,8 +2,16 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
+ * tags:
+ *   name: Armes
+ *   description: Operacions relacionades amb les armes
+ */
+
+/**
+ * @swagger
  * /skins/{id}/armes:
  *   get:
+ *     tags: [Armes]
  *     summary: Obtenir totes les armes d'una skin per ID
  *     description: Retorna totes les armes associades a una skin específica mitjançant el seu ID.
  *     parameters:
@@ -43,6 +51,7 @@ exports.getArmesPerSkinId = async (req, res) => {
  * @swagger
  * /skins/{nom}/armes:
  *   get:
+ *     tags: [Armes]
  *     summary: Obtenir totes les armes d'una skin per nom
  *     description: Retorna totes les armes associades a una skin específica mitjançant el seu nom.
  *     parameters:
@@ -82,6 +91,7 @@ exports.getArmesPerSkinNom = async (req, res) => {
  * @swagger
  * /skins/{id}/armes/{arma_id}:
  *   get:
+ *     tags: [Armes]
  *     summary: Obtenir una arma d'una skin per ID
  *     description: Retorna una arma específica d'una skin mitjançant els IDs de la skin i de l'arma.
  *     parameters:
@@ -128,6 +138,7 @@ exports.getArmaSkinId = async (req, res) => {
  * @swagger
  * /skins/{nom}/armes/{arma_nom}:
  *   get:
+ *     tags: [Armes]
  *     summary: Obtenir una arma per nom d'una skin per nom
  *     description: Retorna una arma específica d'una skin mitjançant els noms de la skin i de l'arma.
  *     parameters:
@@ -174,6 +185,7 @@ exports.getArmaSkinNom = async (req, res) => {
  * @swagger
  * /armes:
  *   post:
+ *     tags: [Armes]
  *     summary: Crear una nova arma
  *     description: Afegeix una nova arma a la base de dades.
  *     requestBody:
@@ -221,6 +233,7 @@ exports.crearArma = async (req, res) => {
  * @swagger
  * /armes/{id}:
  *   delete:
+ *     tags: [Armes]
  *     summary: Eliminar una arma per ID
  *     description: Elimina una arma de la base de dades mitjançant el seu ID.
  *     parameters:

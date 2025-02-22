@@ -19,4 +19,7 @@ router.post('/', verificacioUsuari.verifyAdminDB, characterController.crearPerso
 //Obtenir els punts d'un enemic per nom i sumar-los a l'usuari a traves del correu
 router.post('/enemics/:nom/punts', characterController.obtenirPuntsEnemicISumarAUsuari);
 
+//Borrar un personatge per ID
+router.delete('/:id', verificacioUsuari.verifyAdminDB, characterController.borrarPersonatgeId);
+
 module.exports = router;
