@@ -1,4 +1,5 @@
 import '../imports.dart';
+import '../providers/skins_enemics_personatges.dart';
 
 class CombatScreen extends StatefulWidget {
   @override
@@ -137,6 +138,9 @@ class _CombatScreenState extends State<CombatScreen> {
         actions: [
           TextButton(
             onPressed: () {
+              // Actualitzar punts després del combat guanyat
+              Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false)
+                  .fetchUserPoints();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => HomeScreen()),
