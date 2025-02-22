@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';  // Importar la librería fluttertoast
+import 'package:fluttertoast/fluttertoast.dart'; // Importar la librería fluttertoast
 import '../imports.dart';
 
 class RegisterDialog extends StatefulWidget {
@@ -36,8 +36,9 @@ class _RegisterDialogState extends State<RegisterDialog> {
   void _showToast(String message) {
     Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_SHORT,  // Puedes usar LONG para que dure más tiempo
-      gravity: ToastGravity.BOTTOM,     // Ubicación en la pantalla
+      toastLength:
+          Toast.LENGTH_SHORT, // Puedes usar LONG para que dure más tiempo
+      gravity: ToastGravity.BOTTOM, // Ubicación en la pantalla
       timeInSecForIosWeb: 1,
       backgroundColor: Colors.black,
       textColor: Colors.white,
@@ -83,7 +84,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('http://192.168.2.197:3000/usuaris/');
+    final url = Uri.parse('http://192.168.1.28:3000/usuaris/');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       "nom": username,
@@ -165,7 +166,9 @@ class _RegisterDialogState extends State<RegisterDialog> {
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                    _isPasswordVisible
+                        ? Icons.visibility_off
+                        : Icons.visibility,
                   ),
                   onPressed: () {
                     setState(() {

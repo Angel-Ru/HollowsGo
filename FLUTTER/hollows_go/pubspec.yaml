@@ -85,6 +85,7 @@ flutter:
     - lib/images/ichigo_character/
     - lib/images/bleach-rukia.gif
     - lib/images/combat_proves/
+    - lib/images/nel_character/
     - lib/videos/animacion_gacha.mp4
     - assets/Numer_One.mp3
   # An image asset can refer to one or more resolution-specific "variants", see

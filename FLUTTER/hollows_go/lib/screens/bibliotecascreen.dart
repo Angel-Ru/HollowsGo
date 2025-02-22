@@ -144,7 +144,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                             image: DecorationImage(
                               image: AssetImage(
                                 _switchValue
-                                    ? 'lib/images/urahara_character/urahara.png' // Urahara para aliados
+                                    ? 'lib/images/nel_character/nel_1.png' // Urahara para aliados
                                     : 'lib/images/mayuri_character/mayuri_1.png', // Mayuri para enemigos
                               ),
                               fit: BoxFit.cover,
@@ -179,7 +179,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 ),
                                 child: Text(
                                   _switchValue
-                                      ? 'Urahara Kisuke' // Nombre de personaje para aliados
+                                      ? 'Nelliel Tu Odelschwanck' // Nombre de personaje para aliados
                                       : 'Mayuri Kurotsuchi', // Nombre de personaje para enemigos
                                   style: TextStyle(
                                     fontSize: 12,

@@ -31,12 +31,13 @@ class UserProvider with ChangeNotifier {
 
       if (nomUsuari == null) return; // Si no hi ha usuari, no fem res
 
-      final url = Uri.parse('http://192.168.2.197:3000/usuaris/punts/$nomUsuari');
+      final url =
+          Uri.parse('http://192.168.1.28:3000/usuaris/punts/$nomUsuari');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        
+
         if (data.isNotEmpty) {
           int newCoinCount = data[0]['punts_emmagatzemats'];
           _coinCount = newCoinCount;
