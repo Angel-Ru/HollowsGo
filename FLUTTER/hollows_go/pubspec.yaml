@@ -88,6 +88,8 @@ flutter:
     - lib/images/nel_character/
     - lib/videos/animacion_gacha.mp4
     - assets/Numer_One.mp3
+    - lib/videos/animacion_gacha.mp4
+    - lib/videos/animacion_combate.mp4
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see
