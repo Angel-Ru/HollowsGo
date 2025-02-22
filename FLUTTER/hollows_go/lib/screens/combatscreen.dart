@@ -118,40 +118,47 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
-  void _showVictoryDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Has guanyat"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('lib/images/kan_moneda.png'),
-            ),
-            SizedBox(height: 10),
-            Text("+$punts",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Actualitzar punts després del combat guanyat
-              Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false)
-                  .fetchUserPoints();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
-            },
-            child: Text("Continuar"),
+  void _showVictoryDialog() async {
+  // Obtenir el Provider
+  final provider = Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
+
+  // Actualitzar els punts de l'enemic abans de mostrar el diàleg
+  await provider.fetchUserPoints();
+
+  // Mostrar el diàleg amb els punts de l'enemic
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text("Has guanyat"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: AssetImage('lib/images/kan_moneda.png'),
+          ),
+          SizedBox(height: 10),
+          Text(
+            "+${provider.coinEnemies}", // Mostra els punts de l'enemic
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
       ),
-    );
-  }
+      actions: [
+        TextButton(
+          onPressed: () {
+            // Navegar a la pantalla d'inici
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+          },
+          child: Text("Continuar"),
+        ),
+      ],
+    ),
+  );
+}
 
   void _showDefeatDialog() {
     showDialog(
