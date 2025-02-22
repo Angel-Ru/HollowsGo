@@ -84,6 +84,13 @@ class _CombatScreenState extends State<CombatScreen> {
         enemicHealth -= aliatDamage;
         if (enemicHealth < 0) enemicHealth = 0;
       });
+
+      // Verificar si el enemigo ha sido derrotado
+      if (enemicHealth <= 0) {
+        _showVictoryDialog();
+        return; // Terminar el combate
+      }
+
       Future.delayed(Duration(milliseconds: 300), () {
         setState(() {
           isEnemyHit = false;
@@ -95,57 +102,62 @@ class _CombatScreenState extends State<CombatScreen> {
   }
 
   void _enemyAttack() {
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        isAllyHit = true;
-        aliatHealth -= enemicDamage;
-        if (aliatHealth < 0) aliatHealth = 0;
-      });
-      Future.delayed(Duration(milliseconds: 500), () {
-        setState(() {
-          isAllyHit = false;
-          isEnemyTurn = false;
-          isAttackInProgress = false;
-        });
-      });
+    setState(() {
+      isAllyHit = true;
+      aliatHealth -= enemicDamage;
+      if (aliatHealth < 0) aliatHealth = 0;
+    });
 
-      if (enemicHealth <= 0) {
-        _showVictoryDialog();
-      } else if (aliatHealth <= 0) {
-        _showDefeatDialog();
-      }
+    // Verificar si el jugador ha sido derrotado
+    if (aliatHealth <= 0) {
+      _showDefeatDialog();
+      return; // Terminar el combate
+    }
+
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        isAllyHit = false;
+        isEnemyTurn = false;
+        isAttackInProgress = false;
+      });
     });
   }
 
   void _showVictoryDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Has guanyat"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('lib/images/kan_moneda.png'),
-            ),
-            SizedBox(height: 10),
-            Text("+$punts",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomeScreen()),
-              );
-            },
-            child: Text("Continuar"),
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Has guanyat"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('lib/images/kan_moneda.png'),
+              ),
+              SizedBox(height: 10),
+              Text("+$punts",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Use the context from the Builder to access the provider
+                Provider.of<Skins_Enemics_Personatges_Provider>(context,
+                        listen: false)
+                    .fetchUserPoints();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              },
+              child: Text("Continuar"),
+            ),
+          ],
+        );
+      },
     );
   }
 

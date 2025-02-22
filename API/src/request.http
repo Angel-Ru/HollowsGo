@@ -1,7 +1,7 @@
-DELETE localhost:3000/skins/165
+POST http://192.168.1.28:3000/personatges/enemics/Gin/punts/
 content-type: application/json
 
 {
-    "email": "angelrubiooliver@paucasesnovescifp.cat"
+    "email": "miquelsanso@paucasesnovescifp.cat"
 }
 
