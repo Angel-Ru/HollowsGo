@@ -1,7 +1,7 @@
-POST localhost:3000/usuaris/login
+DELETE localhost:3000/skins/165
 content-type: application/json
 
 {
-    "email": "ywachmipapi@gmail.com",
-    "contrassenya": "123456"
+    "email": "angelrubiooliver@paucasesnovescifp.cat"
 }
+

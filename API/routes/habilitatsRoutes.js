@@ -1,11 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const habilitatsController = require('../controllers/habilitatsController');
+const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifica que esta ruta sea correcta
 
 // Obtenir la habilitat llegendaria d'una skin per id
-router.get('/:id', habilitatsController.getLegendaryAbilityBySkinId);
+router.get('/:id', habilitatsController.getHabilitatId);
 
 // Obtenir la habilitat llegendaria d'una skin per nom
-router.get('/nom/:nom', habilitatsController.getLegendaryAbilityBySkinName);
+router.get('/nom/:nom', habilitatsController.getHabilitatSkinNom);
+
+//Crear una nova habilitat
+router.post('/', verificacioUsuari.verifyAdminDB, habilitatsController.crearHabilitat);
+
+//Eliminar una habilitat per id
+router.delete('/:id', verificacioUsuari.verifyAdminDB, habilitatsController.borrarHabilitatId);
 
 module.exports = router;

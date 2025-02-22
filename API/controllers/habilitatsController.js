@@ -1,15 +1,44 @@
 const { connectDB, sql } = require('../config/dbConfig');
 
-// Obtenir la habilitat llegendaria d'una skin per id
-exports.getLegendaryAbilityBySkinId = async (req, res) => {
+/**
+ * @swagger
+ * tags:
+ *   name: Habilitats
+ *   description: Operacions relacionades amb les habilitats llegendàries
+ */
+
+
+/**
+ * @swagger
+ * /skins/{id}/habilitats:
+ *   get:
+ *     tags: [Habilitats]
+ *     summary: Obtenir la habilitat llegendària d'una skin per ID
+ *     description: Retorna la habilitat llegendària associada a una skin específica mitjançant el seu ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la skin
+ *     responses:
+ *       200:
+ *         description: Detalls de la habilitat de la skin
+ *       404:
+ *         description: No s'ha trobat la habilitat per a aquesta skin
+ *       500:
+ *         description: Error en la consulta
+ */
+exports.getHabilitatId = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request()
             .input('id', sql.Int, req.params.id)
             .query(`
-                SELECT h.* 
+                SELECT h.*
                 FROM HABILITATS h
-                JOIN SKINS s ON h.skin_id = s.id
+                         JOIN SKINS s ON h.skin_id = s.id
                 WHERE s.id = @id
             `);
         res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
@@ -19,16 +48,37 @@ exports.getLegendaryAbilityBySkinId = async (req, res) => {
     }
 };
 
-// Obtenir la habilitat llegendaria d'una skin per nom
-exports.getLegendaryAbilityBySkinName = async (req, res) => {
+/**
+ * @swagger
+ * /skins/{nom}/habilitats:
+ *   get:
+ *     tags: [Habilitats]
+ *     summary: Obtenir la habilitat llegendària d'una skin per nom
+ *     description: Retorna la habilitat llegendària associada a una skin específica mitjançant el seu nom.
+ *     parameters:
+ *       - in: path
+ *         name: nom
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Nom de la skin
+ *     responses:
+ *       200:
+ *         description: Detalls de la habilitat de la skin
+ *       404:
+ *         description: No s'ha trobat la habilitat per a aquesta skin
+ *       500:
+ *         description: Error en la consulta
+ */
+exports.getHabilitatSkinNom = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request()
             .input('nom', sql.VarChar(50), req.params.nom)
             .query(`
-                SELECT h.* 
+                SELECT h.*
                 FROM HABILITATS h
-                JOIN SKINS s on h.skin_id = s.id
+                         JOIN SKINS s ON h.skin_id = s.id
                 WHERE s.nom = @nom
             `);
         res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
@@ -38,8 +88,35 @@ exports.getLegendaryAbilityBySkinName = async (req, res) => {
     }
 };
 
-// Crear una nova habilitat
-exports.createAbility = async (req, res) => {
+/**
+ * @swagger
+ * /habilitats:
+ *   post:
+ *     tags: [Habilitats]
+ *     summary: Crear una nova habilitat
+ *     description: Afegeix una nova habilitat a la base de dades.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nom:
+ *                 type: string
+ *               descripcio:
+ *                 type: string
+ *               tipus:
+ *                 type: string
+ *               skin_id:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Habilitat afegida correctament
+ *       500:
+ *         description: Error en inserir l'habilitat
+ */
+exports.crearHabilitat = async (req, res) => {
     try {
         const { nom, descripcio, tipus, skin_id } = req.body;
         const pool = await connectDB();
@@ -59,8 +136,29 @@ exports.createAbility = async (req, res) => {
     }
 };
 
-// Eliminar una habilitat per ID
-exports.deleteAbilityById = async (req, res) => {
+/**
+ * @swagger
+ * /habilitats/{id}:
+ *   delete:
+ *     tags: [Habilitats]
+ *     summary: Eliminar una habilitat per ID
+ *     description: Elimina una habilitat de la base de dades mitjançant el seu ID.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de l'habilitat a eliminar
+ *     responses:
+ *       200:
+ *         description: Habilitat eliminada correctament
+ *       404:
+ *         description: Habilitat no trobada
+ *       500:
+ *         description: Error en eliminar l'habilitat
+ */
+exports.borrarHabilitatId = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request()
