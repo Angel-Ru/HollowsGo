@@ -81,6 +81,8 @@ flutter:
     - lib/images/urahara_character/
     - lib/images/mayuri_character/
     - lib/images/kyoraku_character/
+    - lib/images/nel_character/
+    - lib/images/combat_proves/
     - lib/images/music/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
