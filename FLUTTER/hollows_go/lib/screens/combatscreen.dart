@@ -182,10 +182,13 @@ class _CombatScreenState extends State<CombatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isVideoPlaying
-          ? Center(
-              child: _videoController.value.isInitialized
-                  ? Chewie(controller: _chewieController)
-                  : CircularProgressIndicator(),
+          ? Container(
+              color: Colors.black, // Fondo negro
+              child: Center(
+                child: _videoController.value.isInitialized
+                    ? Chewie(controller: _chewieController)
+                    : CircularProgressIndicator(),
+              ),
             )
           : Stack(
               children: [
@@ -363,7 +366,7 @@ class _CombatScreenState extends State<CombatScreen> {
         : (healthPercentage < 0.6 ? Colors.orange : Colors.green);
 
     return Stack(
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.center,
       children: [
         Container(
           width: 200,
@@ -374,14 +377,17 @@ class _CombatScreenState extends State<CombatScreen> {
             border: Border.all(color: Colors.black, width: 2),
           ),
         ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            width: 200 * healthPercentage,
-            height: 24,
-            decoration: BoxDecoration(
-              color: barColor,
-              borderRadius: BorderRadius.circular(10),
+        Positioned(
+          left: 0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 200 * healthPercentage,
+              height: 24,
+              decoration: BoxDecoration(
+                color: barColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
