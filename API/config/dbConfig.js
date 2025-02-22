@@ -3,7 +3,7 @@ const sql = require('mssql');
 const dbConfig = {
     server: 'hollowsho.database.windows.net',
     user: 'angel',
-    password: 'Tofolana2004',
+    password: 'CalaClara21.',
     database: 'hollowsgo',
     options: {
         encrypt: true,

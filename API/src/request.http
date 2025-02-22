@@ -1,7 +1,2 @@
-POST localhost:3000/usuaris/login
-content-type: application/json
+GET http://192.168.228.168:3000/usuaris/punts/grimmjow
 
-{
-    "email": "ywachmipapi@gmail.com",
-    "contrassenya": "123456"
-}

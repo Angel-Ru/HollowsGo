@@ -98,8 +98,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
       if (response.statusCode == 201) {
         final user = responseData['user'];
 
-        await _clearPreferences(); // Limpiar SharedPreferences antes de guardar nuevas
-
+        await _clearPreferences();
+        
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('userEmail', user['email']);

@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
 
 // Middleware para utilitzar CORS y dades en format JSON.
 // CORS permet que el servidor accepti sol·licituds de dominis diferents al del servidor,
@@ -11,6 +13,30 @@ const bodyParser = require('body-parser');
 // recursos a altres orígens.
 app.use(cors());
 app.use(bodyParser.json());
+
+
+// Configurar les opcions de Swagger
+const swaggerOptions = {
+    swaggerDefinition: {
+        info: {
+            title: 'API del Joc',
+            version: '1.0.0',
+            description: 'Documentació de l\'API per gestionar personatges, skins, armes, habilitats i usuaris del joc.',
+        },
+        servers: [
+            {
+                url: 'http://localhost:3000', // URL del teu servidor
+            },
+        ],
+    },
+    apis: [ '../controllers/*.js'], // Ruta als arxius de les rutes i els controladors
+};
+
+// Generar la documentació de Swagger
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+// Ruta per mostrar la documentació interactiva de Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Importer les rutes
 const characterRoutes = require('../routes/characterRoutes');

@@ -1,22 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const { getUsers, getUserById, createUser, deleteUser, createUserType0, createUserAdminProtegit, login} = require('../controllers/usersController');
-const { verifyAdmin } = require('../middlewares/verificacioUsuari');  // Importem el middleware de verificació d'administrador
+const userController = require('../controllers/usersController');
+
+const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifica que esta ruta sea correcta
 
 // Ruta per obtenir tots els usuaris (accessible per a tots)
-router.get('/', getUsers);
+router.get('/', userController.getUsuaris);
 
 // Ruta per obtenir un usuari per ID (accessible per a tots)
-router.get('/:id', getUserById);
+router.get('/:id', userController.getUsuariPerId);
 
-// Ruta per crear un nou usuari (només accessible per a administradors)
-router.post('/', createUserType0);
 
-router.post('/login', login);
+// Ruta per obtenir els punts d'un usuari per nom (accessible per a tots)
+router.get('/punts/:nom', userController.getPuntsUsuari);
 
-router.post('/admin', createUserAdminProtegit);
+// Ruta per crear un usuari de tipus 0 (usuari normal) (accessible per a tots)
+router.post('/', userController.crearUsuariNormal);
+
+// Ruta per fer login (accessible per a tots)
+router.post('/login', userController.login);
+
+// Ruta per crear un usuari de tipus 1 (usuari administrador) (només accessible per a administradors)
+router.post('/admin/', verificacioUsuari.verifyAdminDB, userController.crearUsuariAdmin);
 
 // Ruta per eliminar un usuari per ID (només accessible per a administradors)
-router.delete('/:id', deleteUser);
+router.delete('/:id', verificacioUsuari.verifyAdminDB, userController.borrarUsuari);
 
 module.exports = router;
