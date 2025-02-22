@@ -1,6 +1,5 @@
 import '../imports.dart';
 import 'dart:ui' as ui;
-import 'dart:math';
 
 class Mapscreen extends StatefulWidget {
   final String profileImagePath;
@@ -17,7 +16,7 @@ class _MapaScreenState extends State<Mapscreen> {
   LatLng _currentLocation = const LatLng(39.6084042, 2.8639693);
   bool _isLoading = true;
   Set<Marker> _markers = {};
-  final double _radiusInMeters = 100; // Radio en metros
+  final double _radiusInMeters = 250; // Radio en metros
 
   final List<String> imagePaths = [
     'lib/images/hollows/grandfisher.png', // Asegúrate de poner las rutas correctas de las imágenes

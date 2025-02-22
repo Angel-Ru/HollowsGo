@@ -17,6 +17,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UIProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DialogueProvider()),
+        ChangeNotifierProvider(
+            create: (_) => Skins_Enemics_Personatges_Provider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

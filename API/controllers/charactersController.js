@@ -225,9 +225,16 @@ exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
 
         // 1. Obtenir els punts que dona l'enemic
         const pool = await connectDB();
+
+        // Primer, obtenir l'ID de l'enemic a través del nom de la taula PERSONATGES
         const resultEnemic = await pool.request()
             .input('nom', sql.VarChar(50), nom)
-            .query('SELECT punts_donats FROM ENEMICS WHERE nom = @nom');
+            .query(`
+                SELECT e.punts_donats 
+                FROM ENEMICS e
+                INNER JOIN PERSONATGES p ON e.personatge_id = p.id
+                WHERE p.nom = @nom
+            `);
 
         if (resultEnemic.recordset.length === 0) {
             return res.status(404).send('Enemic no trobat');
@@ -258,4 +265,4 @@ exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
         console.error(err);
         res.status(500).send('Error en el servidor');
     }
-};
+}
