@@ -23,19 +23,26 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   ];
 
   final List<String> _dialoguesAliats = [
-    "Salutacions, amic.",
-    "T'he estat esperant. Benvingut a la nostra biblioteca d'aliats.",
-    "Aquí trobareu tot el coneixement necessari per a la nostra causa.",
-    "Preparat per a l'aprenentatge i la col·laboració?",
-    "Estem aquí per ajudar-nos mútuament a créixer.",
-    "Tens alguna pregunta, company?",
-    "El nostre arxiu és vast, però estic segur que trobaràs el que cerques.",
-    "Junts, podem aconseguir tot el que desitgem.",
+    "Hola, sóc la Nel.",
+    "On es l'Ichigo, tinc por!",
+    "El Pesche el Dondochakka i el Bawabawa son els germans de la Nel",
+    "Per què tots aquí tenen una cara tan enfadada?",
+    "Ai ai ai... la Nel no vol estar aquí...",
+    "Aquest lloc fa molta por...",
+    "Ichigo, vine a buscar la Nel, si us plau...",
   ];
+
+  final List<String> _mayuriImages = List.generate(
+      8, (index) => 'lib/images/mayuri_character/mayuri_${index + 1}.png');
+  final List<String> _nelImages = List.generate(
+      4, (index) => 'lib/images/nel_character/nel_${index + 1}.png');
+
+  int _mayuriImageIndex = 0;
+  int _nelImageIndex = 0;
 
   final List<Map<String, dynamic>> _charactersEnemigos = [
     {
-      "name": "Mayuri Kurotsuchi",
+      "name": "PENIS BLANC",
       "skins": [
         {
           "image": "lib/images/combat_proves/bleach_combat.png",
@@ -58,7 +65,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
   final List<Map<String, dynamic>> _charactersAliats = [
     {
-      "name": "Urahara Kisuke",
+      "name": "PENIS NEGRE",
       "skins": [
         {
           "image": "lib/images/combat_proves/bleach_combat.png",
@@ -94,7 +101,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
           ),
         ),
       ),
-
       body: Stack(
         children: [
           // Fondo de pantalla que cubre toda la pantalla
@@ -118,7 +124,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  SizedBox(height: 100),
                   // Contenedor de personaje con diálogo
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,6 +135,13 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 (_switchValue
                                     ? _dialoguesAliats.length
                                     : _dialoguesEnemigos.length);
+                            if (_switchValue) {
+                              _nelImageIndex =
+                                  (_nelImageIndex + 1) % _nelImages.length;
+                            } else {
+                              _mayuriImageIndex = (_mayuriImageIndex + 1) %
+                                  _mayuriImages.length;
+                            }
                           });
                         },
                         child: Container(
@@ -144,8 +156,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                             image: DecorationImage(
                               image: AssetImage(
                                 _switchValue
-                                    ? 'lib/images/nel_character/nel_1.png' // Urahara para aliados
-                                    : 'lib/images/mayuri_character/mayuri_1.png', // Mayuri para enemigos
+                                    ? _nelImages[
+                                        _nelImageIndex] // Nel para aliados
+                                    : _mayuriImages[
+                                        _mayuriImageIndex], // Mayuri para enemigos
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -161,6 +175,13 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                   (_switchValue
                                       ? _dialoguesAliats.length
                                       : _dialoguesEnemigos.length);
+                              if (_switchValue) {
+                                _nelImageIndex =
+                                    (_nelImageIndex + 1) % _nelImages.length;
+                              } else {
+                                _mayuriImageIndex = (_mayuriImageIndex + 1) %
+                                    _mayuriImages.length;
+                              }
                             });
                           },
                           child: Column(
@@ -179,7 +200,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 ),
                                 child: Text(
                                   _switchValue
-                                      ? 'Nelliel Tu Odelschwanck' // Nombre de personaje para aliados
+                                      ? 'Nel' // Nombre de personaje para aliados
                                       : 'Mayuri Kurotsuchi', // Nombre de personaje para enemigos
                                   style: TextStyle(
                                     fontSize: 12,
@@ -248,8 +269,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                           _switchValue = value;
                                         });
                                       },
-                                      activeColor: Colors.grey,
-                                      inactiveTrackColor: Colors.yellowAccent,
+                                      activeColor: Colors.yellowAccent,
+                                      inactiveTrackColor: Colors.grey,
                                     ),
                                   ],
                                 ),

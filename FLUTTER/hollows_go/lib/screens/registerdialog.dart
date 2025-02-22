@@ -84,7 +84,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('http://192.168.1.28:3000/usuaris/');
+    final url = Uri.parse('http://192.168.2.197:3000/usuaris/');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       "nom": username,
