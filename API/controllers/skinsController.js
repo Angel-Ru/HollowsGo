@@ -49,7 +49,7 @@ exports.getSkinsPersonatge = async (req, res) => {
             .query(`
                 SELECT s.*
                 FROM SKINS s
-                         JOIN PERSONATGES p ON s.personatge_id = p.id
+                         JOIN PERSONATGES p ON s.personatge = p.id
                 WHERE p.id = @id
             `);
         res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat skins per a aquest personatge');
@@ -398,11 +398,9 @@ exports.gachaTirada = async (req, res) => {
             .query(`
                 SELECT *
                 FROM SKINS s
-                WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM ENEMICS e
-                    WHERE e.personatge_id = s.personatge
-                )
+                WHERE NOT EXISTS (SELECT 1
+                                  FROM ENEMICS e
+                                  WHERE e.personatge_id = s.personatge)
             `);
 
         if (availableSkins.recordset.length === 0) {
@@ -446,7 +444,8 @@ exports.gachaTirada = async (req, res) => {
                 .query(`
                     UPDATE BIBLIOTECA
                     SET skin_ids = @updatedSkinIds
-                    WHERE user_id = @userId AND personatge_id = @personatgeId
+                    WHERE user_id = @userId
+                      AND personatge_id = @personatgeId
                 `);
         }
 
@@ -460,6 +459,68 @@ exports.gachaTirada = async (req, res) => {
         console.error(err);
         res.status(500).send('Error en la tirada de gacha');
     }
+}
+
+exports.seleccionarSkinAleatoria = async (req, res) => {
+    try {
+        const pool = await connectDB(); // Connexió a la base de dades
+
+        // 1. Obtenir totes les skins disponibles per als enemics
+        const resultSkins = await pool.request()
+            .query(`
+                SELECT s.id, s.nom, s.categoria, s.imatge, e.punts_donats, s.personatge,
+                       p.nom AS nom_personatge, p.vida_base AS vida_personatge
+                FROM SKINS s
+                         INNER JOIN PERSONATGES p ON s.personatge = p.id
+                         INNER JOIN ENEMICS e ON e.personatge_id = p.id
+            `);
+
+        if (resultSkins.recordset.length === 0) {
+            return res.status(404).send('No hi ha skins disponibles per als enemics');
+        }
+
+        const skinsDisponibles = resultSkins.recordset; // Llista de skins disponibles
+
+        // 2. Seleccionar una skin aleatòria
+        const skinAleatoria = skinsDisponibles[Math.floor(Math.random() * skinsDisponibles.length)];
+
+        // 3. Obtenir el mal base del personatge
+        const resultMalBase = await pool.request()
+            .input('personatge_id', sql.Int, skinAleatoria.personatge)
+            .query(`
+                SELECT mal_base
+                FROM PERSONATGES
+                WHERE id = @personatge_id
+            `);
+
+        if (resultMalBase.recordset.length === 0) {
+            return res.status(404).send('Personatge no trobat');
+        }
+
+        const malBase = resultMalBase.recordset[0].mal_base; // Mal base del personatge
+
+        // 4. Calcular el mal total (només mal_base, ja que no hi ha armes)
+        const malTotal = malBase;
+
+        // 5. Retornar les dades de la skin, el mal total i la vida del personatge
+        res.status(200).json({
+            skin: {
+                id: skinAleatoria.id,
+                nom: skinAleatoria.nom,
+                categoria: skinAleatoria.categoria,
+                imatge: skinAleatoria.imatge,
+                punts_donats: skinAleatoria.punts_donats, // Punts que dona l'enemic
+                mal_total: malTotal,
+                personatge_nom: skinAleatoria.nom_personatge, // Nom del personatge associat
+                vida: skinAleatoria.vida_personatge // Vida del personatge associat
+            },
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en el servidor');
+    }
+
+
 
 };
 
