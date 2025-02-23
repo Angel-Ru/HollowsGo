@@ -1,7 +1,2 @@
-DELETE localhost:3000/skins/165
-content-type: application/json
-
-{
-    "email": "angelrubiooliver@paucasesnovescifp.cat"
-}
+GET localhost:3000/skins/enemic/
 

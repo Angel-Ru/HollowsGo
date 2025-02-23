@@ -327,3 +327,64 @@ exports.login = async (req, res) => {
         res.status(500).json({ message: "Error en el servidor" });
     }
 };
+
+exports.crearUsuariNormalToken = async (req, res) => {
+    try {
+        const { nom, email, contrassenya } = req.body;
+
+        if (!nom || !email || !contrassenya) {
+            return res.status(400).send('Tots els camps són obligatoris.');
+        }
+
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('email', sql.VarChar(50), email)
+            .input('nom', sql.VarChar(50), nom)
+            .query('SELECT COUNT(*) AS count FROM USUARIS WHERE email = @email OR nom = @nom');
+
+        if (result.recordset[0].count > 0) {
+            return res.status(400).send("El correu electrònic o el nom d'usuari ja està registrat.");
+        }
+
+        const punts_emmagatzemats = 100;
+        const tipo = 0;
+        const hashedPassword = await bcrypt.hash(contrassenya, 10);
+
+        const insertResult = await pool.request()
+            .input('nom', sql.VarChar(50), nom)
+            .input('email', sql.VarChar(50), email)
+            .input('contrassenya', sql.VarChar(255), hashedPassword)
+            .input('punts_emmagatzemats', sql.Int, punts_emmagatzemats)
+            .input('tipo', sql.TinyInt, tipo)
+            .query(`
+                INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo)
+                OUTPUT INSERTED.id
+                VALUES (@nom, @email, @contrassenya, @punts_emmagatzemats, @tipo)
+            `);
+
+        const newUserId = insertResult.recordset[0].id;
+
+        // Generar el token JWT sense expiració
+        const token = jwt.sign(
+            { id: newUserId, tipo: tipo }, // Dades incloses al token
+            process.env.JWT_SECRET // Clau secreta (sense expiresIn)
+        );
+
+        const newUser = {
+            id: newUserId,
+            nom: nom,
+            email: email,
+            punts_emmagatzemats: punts_emmagatzemats,
+            tipo: tipo
+        };
+
+
+        res.status(201).json({
+            user: newUser,
+            token: token
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error al crear l'usuari");
+    }
+};
