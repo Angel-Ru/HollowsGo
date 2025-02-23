@@ -84,7 +84,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('http://192.168.2.197:3000/usuaris/');
+    final url = Uri.parse('http://192.168.1.28:3000/usuaris/');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       "nom": username,
@@ -100,7 +100,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
         final user = responseData['user'];
 
         await _clearPreferences();
-        
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('userEmail', user['email']);

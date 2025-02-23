@@ -15,7 +15,8 @@ class Skins_Enemics_Personatges_Provider with ChangeNotifier {
   int get coinCount => _coinCount;
   int get coinEnemies => _coinEnemies; // Getter per als punts de l'enemic
   String get username => _username;
-  SkinClass? get selectedSkin => _selectedSkin; // Getter per a la skin seleccionada
+  SkinClass? get selectedSkin =>
+      _selectedSkin; // Getter per a la skin seleccionada
 
   Skins_Enemics_Personatges_Provider() {
     _loadUserData();
@@ -30,55 +31,57 @@ class Skins_Enemics_Personatges_Provider with ChangeNotifier {
   }
 
   // Seleccionar una skin aleatòria
-Future<void> selectRandomSkin() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    String? userEmail = prefs.getString('userEmail'); 
+  Future<void> selectRandomSkin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? userEmail = prefs.getString('userEmail');
 
-    if (userEmail == null) return; 
+      if (userEmail == null) return;
 
-   
-    final url = Uri.parse('http://192.168.2.197:3000/skins/enemic/');
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
+      final url = Uri.parse('http://192.168.1.28:3000/skins/enemic/');
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
 
-    if (response.statusCode == 200) {
-      
-      Skin skin = skinFromJson(response.body);
-      
-      _selectedSkin = skin.skin;
-      notifyListeners(); 
-    } else {
-      print('Error en la resposta: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        Skin skin = skinFromJson(response.body);
+
+        _selectedSkin = skin.skin;
+        notifyListeners();
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error en selectRandomSkin: $error');
     }
-  } catch (error) {
-    print('Error en selectRandomSkin: $error');
   }
-}
 
-void updateEnemyHealth(int newHealth) {
-  if (selectedSkin != null) {
-    // Comprovar si l'enemic canviat té una nova skin
-    selectedSkin!.currentHealth = max(newHealth, 0);  // S'assegura que la salut no sigui negativa
-    notifyListeners();
+  void updateEnemyHealth(int newHealth) {
+    if (selectedSkin != null) {
+      // Comprovar si l'enemic canviat té una nova skin
+      selectedSkin!.currentHealth =
+          max(newHealth, 0); // S'assegura que la salut no sigui negativa
+      notifyListeners();
+    }
   }
-}
 
   // Obtenir els punts de l'enemic basant-se en la skin seleccionada
   Future<void> fetchEnemyPoints() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? userEmail = prefs.getString('userEmail'); // Obtenir el correu guardat
+      String? userEmail =
+          prefs.getString('userEmail'); // Obtenir el correu guardat
 
-      if (userEmail == null || _selectedSkin == null) return; // Si no hi ha correu o skin seleccionada, no fem res
+      if (userEmail == null || _selectedSkin == null)
+        return; // Si no hi ha correu o skin seleccionada, no fem res
 
       // Obtenir el nom de la skin seleccionada
-      String skinName = _selectedSkin!.nom;
+      String skinName = _selectedSkin!.personatgeNom;
 
       // Endpoint per obtenir els punts de l'enemic basant-se en la skin seleccionada
-      final url = Uri.parse('http://192.168.2.197:3000/personatges/enemics/$skinName/punts');
+      final url = Uri.parse(
+          'http://192.168.1.28:3000/personatges/enemics/$skinName/punts');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
