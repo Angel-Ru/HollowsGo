@@ -2,6 +2,14 @@ import 'dart:ui';
 import '../imports.dart';
 import 'package:http/http.dart' as http;
 
+/*
+Aquesta és la classe TendaScreen. En aquesta classe es crea la pantalla de la tenda de l'aplicació.
+En aquesta pantalla es mostra un banner de gacha i un botó per fer una tirada del gacha, la qual costa 100 monedes.
+Quan l'usuari fa una tirada de gacha, es fa una petició HTTP a un servidor per obtenir una nova skin.
+Després de la tirada, es mostra un vídeo d'animació i un diàleg amb la informació de la nova skin obtinguda.
+La classe també gestiona la reproducció del vídeo d'animació utilitzant els controladors VideoPlayerController i ChewieController.
+*/
+
 class TendaScreen extends StatefulWidget {
   @override
   _TendaScreenState createState() => _TendaScreenState();
@@ -38,6 +46,7 @@ class _TendaScreenState extends State<TendaScreen> {
   Future<void> _gachaPull() async {
     final prefs = await SharedPreferences.getInstance();
     final email = prefs.getString('userEmail');
+    final token = prefs.getString('token'); // Obtenir el token JWT
 
     if (email == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -53,7 +62,9 @@ class _TendaScreenState extends State<TendaScreen> {
     try {
       final response = await http.post(
         Uri.parse('http://192.168.2.197:3000/skins/gacha'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+        },
         body: json.encode({'email': email}),
       );
 
@@ -63,11 +74,6 @@ class _TendaScreenState extends State<TendaScreen> {
         final remainingCoins = data['remainingCoins'];
 
         await _showVideoPopup(skin);
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Has obtingut la skin: ${skin['nom']}! Monedes restants: $remainingCoins'),
-        ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Error: ${response.body}'),
@@ -141,25 +147,71 @@ class _TendaScreenState extends State<TendaScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Has obtingut una nueva skin!'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Center(
+            child: Text(
+              '🎉 Nova Skin Obtinguda! 🎉',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.orangeAccent,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.network(skin['imatge'],
-                  width: 100, height: 100, fit: BoxFit.cover),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.network(
+                  skin['imatge'],
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
               SizedBox(height: 10),
               Text(
-                'Skin: ${skin['nom']}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'Has desbloquejat la skin:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 5),
+              Text(
+                skin['nom'],
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
           actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Tancar'),
+            Center(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Acceptar',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         );
@@ -170,19 +222,17 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // Extiende el cuerpo detrás del AppBar
+      extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0), // Altura del AppBar
+        preferredSize: Size.fromHeight(0),
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaX: 10, sigmaY: 10), // Efecto de desenfoque
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white
-                  .withOpacity(0.5), // Fondo blanco semi-transparente
-              elevation: 0, // Sin sombra
-              title: null, // No hay título en el AppBar
+              backgroundColor: Colors.white.withOpacity(0.5),
+              elevation: 0,
+              title: null,
             ),
           ),
         ),

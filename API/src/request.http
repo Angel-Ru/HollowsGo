@@ -1,2 +1,2 @@
-GET http://192.168.2.197:3000/skins/biblioteca/60
-
+GET http://localhost:3000/usuaris/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjAsInRpcG8iOjAsImlhdCI6MTc0MDQzNzM5NX0.UhIZ5umQAmIVN787FhIfEzN8Kz-SHckTR5zSHIwlhhM

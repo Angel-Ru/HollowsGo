@@ -58,7 +58,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
     return password.length >= 6;
   }
 
-  Future<void> _register() async {
+   Future<void> _register() async {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -98,9 +98,10 @@ class _RegisterDialogState extends State<RegisterDialog> {
 
       if (response.statusCode == 201) {
         final user = responseData['user'];
+        final token = responseData['token']; // Obtenir el token JWT
 
         await _clearPreferences();
-        
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('userEmail', user['email']);
@@ -108,7 +109,10 @@ class _RegisterDialogState extends State<RegisterDialog> {
         await prefs.setInt('userPunts', user['punts_emmagatzemats']);
         await prefs.setInt('userTipo', user['tipo']);
 
-        _showToast("Te has registrat correctament");
+        // Guardar el token JWT
+        await prefs.setString('token', token); // Aquí es guarda el token
+
+        _showToast("T'has registrat correctament");
 
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -125,6 +129,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

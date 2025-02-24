@@ -1,5 +1,6 @@
 const { connectDB, sql } = require("../config/dbConfig");
-
+const jwt = require("jsonwebtoken");
+require('dotenv').config({ path: '../.env' });
 /**
  * @swagger
  * tags:
@@ -36,7 +37,7 @@ const { connectDB, sql } = require("../config/dbConfig");
  *         description: Error en la verificació del usuari.
  */
 exports.verifyAdminDB = async (req, res, next) => {
-    const { email } = req.body;
+    const {email} = req.body;
 
     if (!email) {
         return res.status(400).send('Es requereix email per verificar.');
@@ -59,5 +60,26 @@ exports.verifyAdminDB = async (req, res, next) => {
         console.error(error);
         res.status(500).send("Error al verificar l'usuari.");
     }
+}
+
+exports.verifyToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(403).json({message: 'Token no proporcionat'});
+    }
+
+    const token = authHeader.split(' ')[1]; // 🔥 Agafa només el token sense "Bearer "
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(401).json({message: 'Token invàlid o expirat'});
+        }
+
+        req.userId = decoded.id;
+        req.userTipo = decoded.tipo;
+        next();
+    });
+
 
 };

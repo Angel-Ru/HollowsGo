@@ -1,6 +1,7 @@
 const { connectDB, sql } = require('../config/dbConfig');
 const bcrypt = require('bcrypt');
-
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 /**
  * @swagger
@@ -300,6 +301,7 @@ exports.crearUsuariAdmin = async (req, res) => {
  *       500:
  *         description: Error en el servidor
  */
+
 exports.login = async (req, res) => {
     try {
         const { email, contrassenya } = req.body;
@@ -320,7 +322,13 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: "Contrasenya incorrecta" });
         }
 
-        res.status(200).json({ message: 'Login correcte', user });
+        // Generar el token JWT
+        const token = jwt.sign(
+            { id: user.id, tipo: user.tipo },
+            process.env.JWT_SECRET
+        );
+
+        res.status(200).json({ message: 'Login correcte', user, token });
 
     } catch (err) {
         console.error(err);
@@ -366,8 +374,8 @@ exports.crearUsuariNormalToken = async (req, res) => {
 
         // Generar el token JWT sense expiració
         const token = jwt.sign(
-            { id: newUserId, tipo: tipo }, // Dades incloses al token
-            process.env.JWT_SECRET // Clau secreta (sense expiresIn)
+            { id: newUserId, tipo: tipo },
+            process.env.JWT_SECRET
         );
 
         const newUser = {

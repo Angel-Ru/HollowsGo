@@ -1,0 +1,7 @@
+POST localhost:3000/usuaris/login
+Content-Type: application/json
+
+{
+    "email": "mandibulagorda@gmail.com",
+    "contrassenya": "123456"
+}

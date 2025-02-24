@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+require('dotenv').config({ path: '../.env' });
 
 // Middleware para utilitzar CORS y dades en format JSON.
 // CORS permet que el servidor accepti sol·licituds de dominis diferents al del servidor,

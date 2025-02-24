@@ -31,56 +31,62 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
+  final username = _usernameController.text.trim();
+  final password = _passwordController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      _showSnackBar("Tots els camps són obligatoris");
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final url = Uri.parse('http://192.168.2.197:3000/usuaris/login');
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      'email': username,
-      'contrassenya': password,
-    });
-
-    try {
-      final response = await http.post(url, headers: headers, body: body);
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setInt('userId', data['user']['id']);
-        await prefs.setString('userEmail', data['user']['email']);
-        await prefs.setString('userName', data['user']['nom']);
-        await prefs.setInt('userPunts', data['user']['punts_emmagatzemats']);
-        await prefs.setInt('userTipo', data['user']['tipo']);
-
-        _showSnackBar("Inici de sessió correcte");
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomeScreen()),
-        );
-      } else {
-        _showSnackBar(data['message'] ?? "Error desconegut");
-      }
-    } catch (e) {
-      _showSnackBar("Error de connexió: $e");
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+  if (username.isEmpty || password.isEmpty) {
+    _showSnackBar("Tots els camps són obligatoris");
+    return;
   }
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  final url = Uri.parse('http://192.168.2.197:3000/usuaris/login');
+  final headers = {'Content-Type': 'application/json'};
+  final body = jsonEncode({
+    'email': username,
+    'contrassenya': password,
+  });
+
+  try {
+    final response = await http.post(url, headers: headers, body: body);
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      final prefs = await SharedPreferences.getInstance();
+
+      // Guardar l'estat de login i les dades de l'usuari
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setInt('userId', data['user']['id']);
+      await prefs.setString('userEmail', data['user']['email']);
+      await prefs.setString('userName', data['user']['nom']);
+      await prefs.setInt('userPunts', data['user']['punts_emmagatzemats']);
+      await prefs.setInt('userTipo', data['user']['tipo']);
+
+      // Imprimir el token per consola
+      print("Token rebut: ${data['token']}");
+
+      // Guardar el token
+      await prefs.setString('token', data['token']);
+
+      _showSnackBar("Inici de sessió correcte");
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+      );
+    } else {
+      _showSnackBar(data['message'] ?? "Error desconegut");
+    }
+  } catch (e) {
+    _showSnackBar("Error de connexió: $e");
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
+  }
+}
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

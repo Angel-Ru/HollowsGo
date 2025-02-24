@@ -25,32 +25,36 @@ class UserProvider with ChangeNotifier {
 
   // Obtenir punts des de l'API
   Future<void> fetchUserPoints() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? nomUsuari = prefs.getString('userName'); // Obtenir el nom guardat
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    String? nomUsuari = prefs.getString('userName'); // Obtenir el nom guardat
+    String? token = prefs.getString('token'); // Obtenir el token JWT
 
-      if (nomUsuari == null) return; // Si no hi ha usuari, no fem res
+    if (nomUsuari == null || token == null) return; // Si no hi ha usuari o token, no fem res
 
-      final url =
-          Uri.parse('http://192.168.2.197:3000/usuaris/punts/$nomUsuari');
-      final response = await http.get(url);
+    final url = Uri.parse('http://192.168.2.197:3000/usuaris/punts/$nomUsuari');
+    final headers = {
+      'Authorization': 'Bearer $token', // Incloure el token a la capçalera
+    };
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+    final response = await http.get(url, headers: headers);
 
-        if (data.isNotEmpty) {
-          int newCoinCount = data[0]['punts_emmagatzemats'];
-          _coinCount = newCoinCount;
-          await prefs.setInt('userPunts', newCoinCount);
-          notifyListeners();
-        }
-      } else {
-        print('Error en la resposta: ${response.statusCode}');
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      if (data.isNotEmpty) {
+        int newCoinCount = data[0]['punts_emmagatzemats'];
+        _coinCount = newCoinCount;
+        await prefs.setInt('userPunts', newCoinCount);
+        notifyListeners();
       }
-    } catch (error) {
-      print('Error a fetchUserPoints: $error');
+    } else {
+      print('Error en la resposta: ${response.statusCode}');
     }
+  } catch (error) {
+    print('Error a fetchUserPoints: $error');
   }
+}
 
   // Forçar l'actualització de punts manualment
   void refreshPoints() {

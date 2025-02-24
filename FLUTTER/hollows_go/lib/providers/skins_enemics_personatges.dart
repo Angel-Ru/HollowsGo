@@ -32,8 +32,6 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   Skin? get selectedSkin => _selectedSkin;
   Skin? get selectedSkinAliat => _selectedSkinAliat;
 
-  
-
   SkinsEnemicsPersonatgesProvider() {
     _loadUserData();
   }
@@ -46,70 +44,78 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  
   void setSelectedSkinAliat(Skin skin) {
     _selectedSkinAliat = skin;
     notifyListeners();
   }
 
- 
   // Seleccionar una skin aleatòria
-Future<void> selectRandomSkin() async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    String? userEmail = prefs.getString(_userEmailKey);
+  Future<void> selectRandomSkin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token'); // Obtenir el token
 
-    if (userEmail == null) return;
-
-    final url = Uri.parse('$_baseUrl/skins/enemic/');
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-
-      // Extreure l'objecte "skin" del JSON
-      if (data.containsKey("skin")) {
-        final Map<String, dynamic> skinData = data["skin"];
-        _selectedSkin = Skin.fromJson(skinData); 
-        notifyListeners();
-      } else {
-        print('Error: No s\'ha trobat la clau "skin" en la resposta');
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
       }
-    } else {
-      print('Error en la resposta: ${response.statusCode}');
+
+      final url = Uri.parse('$_baseUrl/skins/enemic/');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Incloure el token
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        // Extreure l'objecte "skin" del JSON
+        if (data.containsKey("skin")) {
+          final Map<String, dynamic> skinData = data["skin"];
+          _selectedSkin = Skin.fromJson(skinData);
+          notifyListeners();
+        } else {
+          print('Error: No s\'ha trobat la clau "skin" en la resposta');
+        }
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error en selectRandomSkin: $error');
     }
-  } catch (error) {
-    print('Error en selectRandomSkin: $error');
   }
-}
 
   void updateEnemyHealth(int newHealth) {
-  if (_selectedSkin != null) {
-    _selectedSkin!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
-    notifyListeners();
-  } else {
-    print('Error: No s\'ha seleccionat cap skin');
+    if (_selectedSkin != null) {
+      _selectedSkin!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
+      notifyListeners();
+    } else {
+      print('Error: No s\'ha seleccionat cap skin');
+    }
   }
-}
-void updateAllyHealth(int newHealth) {
-  if (_selectedSkinAliat != null) {
-    _selectedSkinAliat!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
-    notifyListeners();
-  } else {
-    print('Error: No s\'ha seleccionat cap skin d\'aliat');
+
+  void updateAllyHealth(int newHealth) {
+    if (_selectedSkinAliat != null) {
+      _selectedSkinAliat!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
+      notifyListeners();
+    } else {
+      print('Error: No s\'ha seleccionat cap skin d\'aliat');
+    }
   }
-}
 
   // Obtenir els punts de l'enemic basant-se en la skin seleccionada
   Future<void> fetchEnemyPoints() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? userEmail = prefs.getString(_userEmailKey);
+      String? token = prefs.getString('token'); // Obtenir el token
 
-      if (userEmail == null || _selectedSkin == null) return;
+      if (token == null || _selectedSkin == null) {
+        print("No s'ha trobat cap token o skin seleccionada.");
+        return;
+      }
 
       // Obtenir el nom de la skin seleccionada
       String? skinName = _selectedSkin!.personatgeNom;
@@ -117,8 +123,11 @@ void updateAllyHealth(int newHealth) {
       final url = Uri.parse('$_baseUrl/personatges/enemics/$skinName/punts');
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({'email': userEmail}),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Incloure el token
+        },
+        body: json.encode({'email': prefs.getString(_userEmailKey)}),
       );
 
       if (response.statusCode == 200) {
@@ -137,51 +146,73 @@ void updateAllyHealth(int newHealth) {
 
   // Obtenir personatges amb les seves skins
   Future<void> fetchPersonatgesAmbSkins(String userId) async {
-  try {
-    final url = Uri.parse('$_baseUrl/skins/biblioteca/$userId');
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token'); // Obtenir el token
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-
-      // Netegem les llistes abans d'afegir noves dades
-      _personatges.clear();
-      _skins.clear();
-
-      for (var item in data) {
-        // Creem el personatge
-        final personatge = Personatge.fromJson(item['personatge']);
-
-        // Afegim les skins del personatge
-        if (item.containsKey('skins') && item['skins'] is List) {
-          for (var skinJson in item['skins']) {
-            personatge.skins.add(Skin.fromJson(skinJson));
-          }
-        }
-
-        // Afegim el personatge a la llista
-        _personatges.add(personatge);
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
       }
 
-      notifyListeners();
-    } else {
-      print('Error en la resposta: ${response.statusCode}');
-    }
-  } catch (error) {
-    print('Error en fetchPersonatgesAmbSkins: $error');
-  }
-}
+      final url = Uri.parse('$_baseUrl/skins/biblioteca/$userId');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Incloure el token
+        },
+      );
 
- // Carregar personatges enemics amb les seves skins
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        // Netegem les llistes abans d'afegir noves dades
+        _personatges.clear();
+        _skins.clear();
+
+        for (var item in data) {
+          // Creem el personatge
+          final personatge = Personatge.fromJson(item['personatge']);
+
+          // Afegim les skins del personatge
+          if (item.containsKey('skins') && item['skins'] is List) {
+            for (var skinJson in item['skins']) {
+              personatge.skins.add(Skin.fromJson(skinJson));
+            }
+          }
+
+          // Afegim el personatge a la llista
+          _personatges.add(personatge);
+        }
+
+        notifyListeners();
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error en fetchPersonatgesAmbSkins: $error');
+    }
+  }
+
+  // Carregar personatges enemics amb les seves skins
   Future<void> fetchPersonatgesEnemicsAmbSkins() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token'); // Obtenir el token
+
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
+      }
+
       final url = Uri.parse('$_baseUrl/skins/enemic/personatges');
       final response = await http.get(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Incloure el token
+        },
       );
 
       if (response.statusCode == 200) {

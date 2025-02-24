@@ -5,21 +5,21 @@ const characterController = require('../controllers/charactersController'); // V
 
 
 // Obtenir tots els personatges
-router.get('/', characterController.getPersonatges);
+router.get('/', verificacioUsuari.verifyToken,characterController.getPersonatges);
 
 // Obtenir un personatge per ID
-router.get('/:id', characterController.getPersonatgeId);
+router.get('/:id', verificacioUsuari.verifyToken,characterController.getPersonatgeId);
 
 // Obtenir un personatge per nom
-router.get('/nom/:nom', characterController.getPersonatgeNom);
+router.get('/nom/:nom', verificacioUsuari.verifyToken,characterController.getPersonatgeNom);
 
 // Afegir un nou personatge(només per admins)
-router.post('/', verificacioUsuari.verifyAdminDB, characterController.crearPersonatge);
+router.post('/', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, characterController.crearPersonatge);
 
 //Obtenir els punts d'un enemic per nom i sumar-los a l'usuari a traves del correu
-router.post('/enemics/:nom/punts', characterController.obtenirPuntsEnemicISumarAUsuari);
+router.post('/enemics/:nom/punts', verificacioUsuari.verifyToken,characterController.obtenirPuntsEnemicISumarAUsuari);
 
 //Borrar un personatge per ID
-router.delete('/:id', verificacioUsuari.verifyAdminDB, characterController.borrarPersonatgeId);
+router.delete('/:id', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, characterController.borrarPersonatgeId);
 
 module.exports = router;
