@@ -20,7 +20,7 @@ class _CombatScreenState extends State<CombatScreen> {
   int punts = 100;
   double aliatHealth = 1000.0;
   double enemicHealth = 1000.0;
-  int aliatDamage = 500;
+  int aliatDamage = 300;
   int enemicDamage = 50; // S'actualitzarà amb el malTotal de la skin
   String AllyName = "Ichigo Kurosaki";
   String EnemyName =
@@ -273,7 +273,7 @@ class _CombatScreenState extends State<CombatScreen> {
                               width: 300,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 1),
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -316,7 +316,7 @@ class _CombatScreenState extends State<CombatScreen> {
                               width: 250,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 0),
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(

@@ -52,7 +52,7 @@ class _TendaScreenState extends State<TendaScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.28:3000/skins/gacha'),
+        Uri.parse('http://172.20.10.2:3000/skins/gacha'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({'email': email}),
       );
