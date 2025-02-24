@@ -29,7 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   animated_text_kit: ^4.2.3
-  audioplayers: ^6.2.0
+  #audioplayers: ^6.2.0
   chewie: ^1.10.0
   cupertino_icons: ^1.0.8
   file_picker: ^8.3.3
@@ -82,12 +82,11 @@ flutter:
     - lib/images/mayuri_character/
     - lib/images/kyoraku_character/
     - lib/images/nel_character/
+    - lib/images/rukia_character/
     - lib/images/combat_proves/
-    - lib/images/music/
     - lib/images/hollows/
     - lib/images/banner_gacha/banner.png
     - lib/images/ichigo_character/
-    - lib/images/bleach-rukia.gif
     - lib/images/combat_proves/
     - lib/videos/animacion_gacha.mp4
     - lib/videos/animacion_combate.mp4

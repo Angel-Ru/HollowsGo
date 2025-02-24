@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
-import 'dart:math';
 import '../imports.dart';
-import '../providers/skins_enemics_personatges.dart';
+
+/*
+A la combatScreen es crea la pantalla de combat. En aquesta pantalla es realitza el combat entre el personatge i l'enemic.
+Es pot accedir a ella des de la pantalla de mapa, quan l'usuari toca un Hollow.
+En aquesta pantalla es mostren les dades del combat, com la salut del personatge i de l'enemic, el nom del personatge i de l'enemic, la imatge del personatge i de l'enemic, etc.
+Té els fons de combat aleatoris.
+*/
 
 class CombatScreen extends StatefulWidget {
   @override
@@ -28,7 +29,8 @@ class _CombatScreenState extends State<CombatScreen> {
   bool isEnemyHit = false;
   bool isAllyHit = false;
   bool isAttackInProgress = false;
-  String techniqueName = "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)";
+  String techniqueName =
+      "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)";
 
   @override
   void initState() {
@@ -38,15 +40,15 @@ class _CombatScreenState extends State<CombatScreen> {
     _selectRandomSkin(); // Cridar el mètode per seleccionar una skin aleatòria
   }
 
-  // Inicialitzar el reproductor de vídeo
   void _initializeVideoPlayer() {
-    _videoController = VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {});
-          _videoController.play();
-        }
-      });
+    _videoController =
+        VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
+          ..initialize().then((_) {
+            if (mounted) {
+              setState(() {});
+              _videoController.play();
+            }
+          });
 
     _chewieController = ChewieController(
       videoPlayerController: _videoController,
@@ -65,16 +67,15 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
-  // Establir un fons aleatori
   void _setRandomBackground() {
     final random = Random();
     int randomIndex = random.nextInt(5) + 1;
     setState(() {
-      backgroundImage = 'lib/images/combat_proves/fondo_combat_$randomIndex.png';
+      backgroundImage =
+          'lib/images/combat_proves/fondo_combat_$randomIndex.png';
     });
   }
 
-  // Seleccionar una skin aleatòria
   void _selectRandomSkin() {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     provider.selectRandomSkin(); // Cridar el mètode del Provider
@@ -159,7 +160,7 @@ class _CombatScreenState extends State<CombatScreen> {
             ),
             SizedBox(height: 10),
             Text(
-              "+${provider.coinEnemies}", // Mostra els punts de l'enemic
+              "+${provider.coinEnemies}",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
@@ -179,7 +180,6 @@ class _CombatScreenState extends State<CombatScreen> {
     );
   }
 
-  // Diàleg de derrota
   void _showDefeatDialog() {
     showDialog(
       context: context,
@@ -228,7 +228,7 @@ class _CombatScreenState extends State<CombatScreen> {
     return Scaffold(
       body: _isVideoPlaying
           ? Container(
-              color: Colors.black, // Fondo negro
+              color: Colors.black,
               child: Center(
                 child: _videoController.value.isInitialized
                     ? Chewie(controller: _chewieController)
@@ -359,7 +359,8 @@ class _CombatScreenState extends State<CombatScreen> {
                                   ),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text("LLUITA",
                                           style: TextStyle(fontSize: 18)),

@@ -1,5 +1,11 @@
 import '../imports.dart';
 
+/*
+En aquesta classe es crea la pantalla de benvinguda de l'aplicació.
+En aquesta pantalla mostren diferents animacions i unes imatges aleatòries d'en Kon.
+Quan es toca la pantalla, es mostra el diàleg de login, en el qual et pots registrar o iniciar sessió.
+*/
+
 class PreHomeScreen extends StatefulWidget {
   @override
   _PreHomeScreenState createState() => _PreHomeScreenState();
@@ -24,13 +30,11 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   void initState() {
     super.initState();
 
-    // Configura el AnimationController para la animación de opacidad
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1000),
     );
 
-    // Configura la animación de opacidad
     _opacityAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -38,40 +42,33 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       ),
     );
 
-    // Repite la animación indefinidamente
     _controller.repeat(reverse: true);
 
-    // Configura los ScrollController para el movimiento de las calaveras
     _scrollControllerTop = ScrollController();
     _scrollControllerBottom = ScrollController();
 
-    // Inicia el movimiento automático de las calaveras
     _startAutoScroll(_scrollControllerTop);
     _startAutoScroll(_scrollControllerBottom);
   }
 
   void _startAutoScroll(ScrollController scrollController) {
     Future.doWhile(() async {
-      await Future.delayed(
-          Duration(milliseconds: 20)); // Velocidad del desplazamiento
+      await Future.delayed(Duration(milliseconds: 20));
       if (scrollController.hasClients) {
         double maxScroll = scrollController.position.maxScrollExtent;
         double currentScroll = scrollController.position.pixels;
 
         if (currentScroll >= maxScroll) {
-          // Reinicia el desplazamiento al inicio
           scrollController.jumpTo(0);
         } else {
-          // Desplaza hacia la derecha
           scrollController.animateTo(
-            currentScroll + 15, // Incremento del desplazamiento
-            duration:
-                Duration(milliseconds: 100), // Duración del desplazamiento
+            currentScroll + 15,
+            duration: Duration(milliseconds: 100),
             curve: Curves.linear,
           );
         }
       }
-      return true; // Repite indefinidamente
+      return true;
     });
   }
 
@@ -89,25 +86,23 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     final randomImage = random.nextInt(imagePaths.length);
 
     return Scaffold(
-      backgroundColor: Color(0xFFEAE4F2), // Color lila claro de fondo
+      backgroundColor: Color(0xFFEAE4F2),
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
-          _showLoginDialog(
-              context); // Mostrar el diálogo de login al tocar la pantalla
+          _showLoginDialog(context);
         },
         child: Stack(
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Lista horizontal de calaveras en la parte superior
                 Container(
                   height: 40,
                   child: ListView.builder(
                     controller: _scrollControllerTop,
                     scrollDirection: Axis.horizontal,
-                    itemCount: 100, // Número grande para simular infinito
+                    itemCount: 100,
                     itemBuilder: (context, index) {
                       return Container(
                         width: 39,
@@ -120,8 +115,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                     },
                   ),
                 ),
-                Spacer(), // Espacio flexible entre los widgets
-                // Imagen aleatoria
+                Spacer(),
                 Container(
                   height: 200,
                   child: Image.asset(
@@ -129,8 +123,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                     fit: BoxFit.cover,
                   ),
                 ),
-                SizedBox(height: 70), // Espacio fijo
-                // Texto con animación de latido
+                SizedBox(height: 70),
                 AnimatedBuilder(
                   animation: _opacityAnimation,
                   builder: (context, child) {
@@ -146,14 +139,13 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                     );
                   },
                 ),
-                SizedBox(height: 150), // Espacio fijo
-                // Lista horizontal de calaveras en la parte inferior
+                SizedBox(height: 150),
                 Container(
                   height: 40,
                   child: ListView.builder(
                     controller: _scrollControllerBottom,
                     scrollDirection: Axis.horizontal,
-                    itemCount: 100, // Número grande para simular infinito
+                    itemCount: 100,
                     itemBuilder: (context, index) {
                       return Container(
                         width: 39,
@@ -168,7 +160,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 ),
               ],
             ),
-            // Imagen centrada en la pantalla
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -192,7 +183,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return LoginScreen(); // Mostrar el LoginScreen como un diálogo
+        return LoginScreen();
       },
     );
   }

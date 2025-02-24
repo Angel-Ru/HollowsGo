@@ -1,11 +1,15 @@
 import 'dart:ui';
+import '../imports.dart';
 
-import 'package:flutter/material.dart';
-import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/providers/dialeg_provider.dart';
-import 'package:hollows_go/providers/user_provider.dart';
-import 'package:hollows_go/screens/mapscreen.dart';
-import 'package:provider/provider.dart';
+/*
+Aquesta és la classe HomeScreen. En aquesta classe es crea la pantalla principal de l'aplicació.
+En aquesta pantalla es mostren diferents diàlegs de personatges de Bleach.
+La classe també permet canviar la imatge de perfil i mostrar el nombre de monedes que té l'usuari a través d'un AppBar.
+En aquesta pantalla també es mostren els diferents menús de l'aplicació, a on hi han la pantalla del mapa, la de la tenda i la de la biblioteca de personatjes i enemics.
+A la pantalla trobam que hi han dos diàlegs diferents, un de n'Ichigo i un de na Rukia.
+El de n'Ichigo usa el provider de DialogueProvider per a mostrar les imatges i els diàlegs de n'Ichigo.
+Els diàlegs de na Rukia en canvi estàn gestionats d'una manera diferent, amb una llista per a les frases i una altre llista per a les imatges.
+*/
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -17,13 +21,26 @@ class _HomeScreenState extends State<HomeScreen> {
       'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
   final String _coinImagePath = 'lib/images/kan_moneda.png';
   Timer? _timer;
+  int _dialogIndex = 0;
+  final List<String> _dialoguesrukia = [
+    "Si baixes la guardia, et podries trobar amb un Hollow.",
+    "No et fies de ningú, ni tan sols de mi. Sóc un Shinigami.",
+    "La lluna esta hermosa aquesta nit, no creus?",
+    "En Chappy el conillet es molt més bonic que tu",
+    "Si tens algun problema, no dubtis en demanar ajuda.",
+    "Recorda que el gachapon costa 100 monedes.",
+  ];
+
+  final List<String> _rukiaImages = List.generate(
+      8, (index) => 'lib/images/rukia_character/rukia_${index + 1}.png');
+
+  int _rukiaImageIndex = 0;
 
   @override
   void initState() {
     super.initState();
     _loadProfileImage();
 
-    // Inicializar el UserProvider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.fetchUserPoints();
@@ -31,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
         userProvider.fetchUserPoints();
       });
 
-      // Mover la llamada a setDialogueData() fuera de initState() para evitar el error
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
       dialogueProvider.setDialogueData(
@@ -62,11 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final imagePath = prefs.getString('profileImagePath');
 
-    // Establir la ruta de la imatge per defecte si no es troba una ruta vàlida
     setState(() {
       _imagePath = (imagePath != null && imagePath.isNotEmpty)
           ? imagePath
-          : 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imatge per defecte
+          : 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
     });
   }
 
@@ -88,18 +103,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final uiProvider = Provider.of<UIProvider>(context);
 
     return Scaffold(
-      extendBodyBehindAppBar: true, // Extiende el cuerpo detrás del AppBar
+      extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60), // Altura del AppBar
+        preferredSize: Size.fromHeight(60),
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaX: 10, sigmaY: 10), // Efecto de desenfoque
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white
-                  .withOpacity(0.5), // Fondo blanco semi-transparente
-              elevation: 0, // Sin sombra
+              backgroundColor: Colors.white.withOpacity(0.5),
+              elevation: 0,
               title: Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
                   return Row( 
@@ -140,19 +153,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               PopupMenuItem(
                                 child: Row(
                                   children: [
-                                    Icon(Icons.settings),
-                                    SizedBox(width: 8),
-                                    Text('Configuració'),
-                                  ],
-                                ),
-                                onTap: () {
-                                  // Implementar configuració
-                                },
-                              ),
-                              const PopupMenuDivider(),
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
                                     Icon(Icons.logout),
                                     SizedBox(width: 8),
                                     Text('Surt'),
@@ -181,10 +181,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Center(
-            child: Image.asset(
-              'lib/images/bleach-rukia.gif',
-              width: 200,
-              height: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 250),
+                Image.asset(
+                  "lib/images/prehomescreen_imatges/nom_aplicacio.png",
+                  width: 300,
+                ),
+              ],
             ),
           ),
           if (uiProvider.selectedMenuOpt == 0)
@@ -266,6 +271,89 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       SizedBox(height: 16),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _dialogIndex = (_dialogIndex + 1) %
+                                      _dialoguesrukia.length;
+                                  _rukiaImageIndex = (_rukiaImageIndex + 1) %
+                                      _rukiaImages.length;
+                                });
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(
+                                          243, 194, 194, 194),
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(8),
+                                        topRight: Radius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'Kuchiki Rukia',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blueAccent,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blueAccent.withOpacity(0.8),
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(8),
+                                        bottomRight: Radius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      _dialoguesrukia[_dialogIndex],
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 16),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _dialogIndex =
+                                    (_dialogIndex + 1) % _dialoguesrukia.length;
+                                _rukiaImageIndex = (_rukiaImageIndex + 1) %
+                                    _rukiaImages.length;
+                              });
+                            },
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundImage:
+                                  AssetImage(_rukiaImages[_rukiaImageIndex]),
+                              onBackgroundImageError: (exception, stackTrace) {
+                                print(
+                                    "L'imatge no se ha pogut carregar encara");
+                              },
+                              backgroundColor:
+                                  Color.fromARGB(255, 24, 121, 239),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 },
@@ -275,8 +363,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.transparent, // BottomNavigationBar translúcido
-        elevation: 0, // Sin sombra
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -303,7 +391,6 @@ class _HomeScreenState extends State<HomeScreen> {
               Provider.of<DialogueProvider>(context, listen: false);
 
           if (index == 0) {
-            // HomeScreen
             dialogueProvider.setDialogueData(
               [
                 "Benvingut a HollowsGo!",
@@ -320,7 +407,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           } else if (index == 2) {
-            // TendaScreen
             dialogueProvider.setDialogueData(
               [
                 "Hola, sóc l'Urahara, i sigues benvingut a la tenda!",
@@ -337,8 +423,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           }
-
-          // Update the selected menu option
           uiProvider.selectedMenuOpt = index;
         },
       ),

@@ -4,6 +4,11 @@ import 'package:hollows_go/screens/mapscreen.dart';
 
 import 'imports.dart';
 
+/*
+Aquesta és la classe Main. En aquesta classe es creen les rutes nombrades de l'aplicació i es defineix el tema.
+A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
+*/
+
 void main() {
   runApp(MyApp());
 }

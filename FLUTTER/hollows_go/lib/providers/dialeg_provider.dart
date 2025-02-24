@@ -2,44 +2,92 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class DialogueProvider extends ChangeNotifier {
+  // Diálogos e imágenes para la pantalla de inicio
   int _dialogIndex = 0;
   List<String> _dialogues = [];
   List<String> _characterImages = [];
   String _currentImage = '';
 
+  // Diálogos e imágenes para la biblioteca
+  int _libraryDialogIndex = 0;
+  List<String> _libraryDialogues = [];
+  List<String> _libraryCharacterImages = [];
+  String _currentLibraryImage = '';
+
   DialogueProvider();
 
-  void setDialogueData(List<String> dialogues, List<String> images) {
-    _dialogues = dialogues;
-    _characterImages = images;
-    _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
-    _dialogIndex = 0;
+  // Método para establecer los diálogos e imágenes
+  void setDialogueData(List<String> dialogues, List<String> images,
+      {bool isLibrary = false}) {
+    if (isLibrary) {
+      _libraryDialogues = dialogues;
+      _libraryCharacterImages = images;
+      _currentLibraryImage =
+          _libraryCharacterImages.isNotEmpty ? _libraryCharacterImages[0] : '';
+      _libraryDialogIndex = 0;
+    } else {
+      _dialogues = dialogues;
+      _characterImages = images;
+      _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
+      _dialogIndex = 0;
+    }
     notifyListeners();
   }
 
-  String get currentDialogue => _dialogues.isNotEmpty ? _dialogues[_dialogIndex] : "";
+  // Getters para la pantalla de inicio
+  String get currentDialogue =>
+      _dialogues.isNotEmpty ? _dialogues[_dialogIndex] : "";
   String get currentImage => _currentImage;
 
-  void nextDialogue() {
-    if (_dialogues.isEmpty || _characterImages.isEmpty) return;
+  // Getters para la biblioteca
+  String get currentLibraryDialogue => _libraryDialogues.isNotEmpty
+      ? _libraryDialogues[_libraryDialogIndex]
+      : "";
+  String get currentLibraryImage => _currentLibraryImage;
 
-    _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
+  // Método para avanzar al siguiente diálogo
+  void nextDialogue({bool isLibrary = false}) {
+    if (isLibrary) {
+      if (_libraryDialogues.isEmpty || _libraryCharacterImages.isEmpty) return;
 
-    String newImage;
-    do {
-      newImage = _characterImages[Random().nextInt(_characterImages.length)];
-    } while (newImage == _currentImage);
+      _libraryDialogIndex =
+          (_libraryDialogIndex + 1) % _libraryDialogues.length;
 
-    _currentImage = newImage;
+      String newImage;
+      do {
+        newImage = _libraryCharacterImages[
+            Random().nextInt(_libraryCharacterImages.length)];
+      } while (newImage == _currentLibraryImage);
+
+      _currentLibraryImage = newImage;
+    } else {
+      if (_dialogues.isEmpty || _characterImages.isEmpty) return;
+
+      _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
+
+      String newImage;
+      do {
+        newImage = _characterImages[Random().nextInt(_characterImages.length)];
+      } while (newImage == _currentImage);
+
+      _currentImage = newImage;
+    }
     notifyListeners();
   }
 
-// Mètode per reiniciar els valors
-  void resetDialogue() {
-    _dialogues = [];
-    _characterImages = [];
-    _dialogIndex = 0;
-    _currentImage = '';
-    notifyListeners();  
+  // Método para reiniciar los valores
+  void resetDialogue({bool isLibrary = false}) {
+    if (isLibrary) {
+      _libraryDialogues = [];
+      _libraryCharacterImages = [];
+      _libraryDialogIndex = 0;
+      _currentLibraryImage = '';
+    } else {
+      _dialogues = [];
+      _characterImages = [];
+      _dialogIndex = 0;
+      _currentImage = '';
+    }
+    notifyListeners();
   }
 }
