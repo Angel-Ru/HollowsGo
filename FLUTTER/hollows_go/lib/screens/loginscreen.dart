@@ -1,8 +1,11 @@
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../imports.dart';
+
+/*
+En la classe es gestiona i crea el diàleg de login.
+En aquest diàleg es connecta amb el servidor per a comprovar les dades d'inici de sessió.
+Un cop les dades són correctes, es redirigeix a la pantalla principal de l'aplicació, la qual és la HomeScreen.
+*/
 
 class LoginScreen extends StatefulWidget {
   @override

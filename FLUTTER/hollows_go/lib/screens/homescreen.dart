@@ -1,7 +1,15 @@
 import 'dart:ui';
-import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/providers/user_provider.dart';
-import 'package:hollows_go/screens/mapscreen.dart';
+import '../imports.dart';
+
+/*
+Aquesta és la classe HomeScreen. En aquesta classe es crea la pantalla principal de l'aplicació.
+En aquesta pantalla es mostren diferents diàlegs de personatges de Bleach.
+La classe també permet canviar la imatge de perfil i mostrar el nombre de monedes que té l'usuari a través d'un AppBar.
+En aquesta pantalla també es mostren els diferents menús de l'aplicació, a on hi han la pantalla del mapa, la de la tenda i la de la biblioteca de personatjes i enemics.
+A la pantalla trobam que hi han dos diàlegs diferents, un de n'Ichigo i un de na Rukia.
+El de n'Ichigo usa el provider de DialogueProvider per a mostrar les imatges i els diàlegs de n'Ichigo.
+Els diàlegs de na Rukia en canvi estàn gestionats d'una manera diferent, amb una llista per a les frases i una altre llista per a les imatges.
+*/
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -40,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
         userProvider.fetchUserPoints();
       });
 
-      // Mover la llamada a setDialogueData() fuera de initState() para evitar el error
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
       dialogueProvider.setDialogueData(
@@ -71,11 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final imagePath = prefs.getString('profileImagePath');
 
-    // Establir la ruta de la imatge per defecte si no es troba una ruta vàlida
     setState(() {
       _imagePath = (imagePath != null && imagePath.isNotEmpty)
           ? imagePath
-          : 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg'; // Imatge per defecte
+          : 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
     });
   }
 
@@ -265,7 +271,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       SizedBox(height: 16),
-                      // Diálogo de Rukia
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -358,8 +363,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.transparent, // BottomNavigationBar translúcido
-        elevation: 0, // Sin sombra
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -386,7 +391,6 @@ class _HomeScreenState extends State<HomeScreen> {
               Provider.of<DialogueProvider>(context, listen: false);
 
           if (index == 0) {
-            // HomeScreen
             dialogueProvider.setDialogueData(
               [
                 "Benvingut a HollowsGo!",
@@ -403,7 +407,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             );
           } else if (index == 2) {
-            // TendaScreen
             dialogueProvider.setDialogueData(
               [
                 "Hola, sóc l'Urahara, i sigues benvingut a la tenda!",

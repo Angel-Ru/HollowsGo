@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
-import 'dart:math';
 import '../imports.dart';
-import '../providers/skins_enemics_personatges.dart';
+
+/*
+A la combatScreen es crea la pantalla de combat. En aquesta pantalla es realitza el combat entre el personatge i l'enemic.
+Es pot accedir a ella des de la pantalla de mapa, quan l'usuari toca un Hollow.
+En aquesta pantalla es mostren les dades del combat, com la salut del personatge i de l'enemic, el nom del personatge i de l'enemic, la imatge del personatge i de l'enemic, etc.
+Té els fons de combat aleatoris.
+*/
 
 class CombatScreen extends StatefulWidget {
   @override
@@ -21,10 +22,9 @@ class _CombatScreenState extends State<CombatScreen> {
   double aliatHealth = 1000.0;
   double enemicHealth = 1000.0;
   int aliatDamage = 300;
-  int enemicDamage = 50; // S'actualitzarà amb el malTotal de la skin
+  int enemicDamage = 50;
   String AllyName = "Ichigo Kurosaki";
-  String EnemyName =
-      "Sosuke Aizen"; // S'actualitzarà amb el personatgeNom de la skin
+  String EnemyName = "Sosuke Aizen";
   String backgroundImage = 'lib/images/combat_proves/fondo_combat_1.png';
   bool isEnemyTurn = false;
   bool isEnemyHit = false;
@@ -38,10 +38,9 @@ class _CombatScreenState extends State<CombatScreen> {
     super.initState();
     _initializeVideoPlayer();
     _setRandomBackground();
-    _selectRandomSkin(); // Cridar el mètode per seleccionar una skin aleatòria
+    _selectRandomSkin();
   }
 
-  // Inicialitzar el reproductor de vídeo
   void _initializeVideoPlayer() {
     _videoController =
         VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
@@ -69,7 +68,6 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
-  // Establir un fons aleatori
   void _setRandomBackground() {
     final random = Random();
     int randomIndex = random.nextInt(5) + 1;
@@ -79,7 +77,6 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
-  // Seleccionar una skin aleatòria
   void _selectRandomSkin() {
     final provider =
         Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
@@ -93,7 +90,6 @@ class _CombatScreenState extends State<CombatScreen> {
     super.dispose();
   }
 
-//Atac de l'enemic
   void _attack() {
     if (!isEnemyTurn && !isAttackInProgress) {
       setState(() {
@@ -103,7 +99,6 @@ class _CombatScreenState extends State<CombatScreen> {
             context,
             listen: false);
 
-        // Actualitzar la vida actual de l'enemic (currentHealth)
         provider.updateEnemyHealth(enemicHealth.toInt() - aliatDamage.toInt());
 
         enemicHealth -= aliatDamage;
@@ -120,7 +115,6 @@ class _CombatScreenState extends State<CombatScreen> {
     }
   }
 
-  // Atac de l'enemic
   void _enemyAttack() {
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
@@ -144,11 +138,10 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
-  // Diàleg de victòria
   void _showVictoryDialog() async {
     final provider =
         Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
-    await provider.fetchEnemyPoints(); // Actualitza els punts de l'enemic
+    await provider.fetchEnemyPoints();
 
     showDialog(
       context: context,
@@ -163,7 +156,7 @@ class _CombatScreenState extends State<CombatScreen> {
             ),
             SizedBox(height: 10),
             Text(
-              "+${provider.coinEnemies}", // Mostra els punts de l'enemic
+              "+${provider.coinEnemies}",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
@@ -183,7 +176,6 @@ class _CombatScreenState extends State<CombatScreen> {
     );
   }
 
-  // Diàleg de derrota
   void _showDefeatDialog() {
     showDialog(
       context: context,
@@ -225,7 +217,7 @@ class _CombatScreenState extends State<CombatScreen> {
     return Scaffold(
       body: _isVideoPlaying
           ? Container(
-              color: Colors.black, // Fondo negro
+              color: Colors.black,
               child: Center(
                 child: _videoController.value.isInitialized
                     ? Chewie(controller: _chewieController)
@@ -268,7 +260,7 @@ class _CombatScreenState extends State<CombatScreen> {
                             opacity: isEnemyHit ? 0.5 : 1.0,
                             child: Image.network(
                               skin?.imatge ??
-                                  'lib/images/combat_proves/aizen_combat.png', // Imatge de la skin
+                                  'lib/images/combat_proves/aizen_combat.png',
                               height: 300,
                               width: 300,
                             ),

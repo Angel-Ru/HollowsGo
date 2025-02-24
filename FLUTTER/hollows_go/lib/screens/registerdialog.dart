@@ -1,9 +1,11 @@
-import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // Importar la librería fluttertoast
 import '../imports.dart';
+
+/*
+Aquesta és la classe RegisterDialog. En aquesta classe es crea el diàleg de registre.
+En aquest diàleg ens connectam amb el servidor per a poernos crear un compte per a poder-nos connectar a l'aplicació.
+Un cop ens hem registrat, ens redirigeix a la pantalla principal de l'aplicació, la qual es la HomeScreen.
+*/
 
 class RegisterDialog extends StatefulWidget {
   @override
@@ -26,19 +28,16 @@ class _RegisterDialogState extends State<RegisterDialog> {
     super.dispose();
   }
 
-  /// 🔹 Elimina todas las SharedPreferences antes de guardar nuevas.
   Future<void> _clearPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
 
-  // Método para mostrar Toast
   void _showToast(String message) {
     Fluttertoast.showToast(
       msg: message,
-      toastLength:
-          Toast.LENGTH_SHORT, // Puedes usar LONG para que dure más tiempo
-      gravity: ToastGravity.BOTTOM, // Ubicación en la pantalla
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 1,
       backgroundColor: Colors.black,
       textColor: Colors.white,
@@ -46,14 +45,12 @@ class _RegisterDialogState extends State<RegisterDialog> {
     );
   }
 
-  // Validación del correo electrónico
   bool _isEmailValid(String email) {
     String pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
     RegExp regExp = RegExp(pattern);
     return regExp.hasMatch(email);
   }
 
-  // Validar que la contraseña tenga al menos 6 caracteres
   bool _isPasswordValid(String password) {
     return password.length >= 6;
   }
@@ -68,13 +65,11 @@ class _RegisterDialogState extends State<RegisterDialog> {
       return;
     }
 
-    // Validar email
     if (!_isEmailValid(email)) {
       _showToast("El correu electrònic no és vàlid");
       return;
     }
 
-    // Validar contrasenya
     if (!_isPasswordValid(password)) {
       _showToast("La contrasenya ha de tenir almenys 6 caràcters");
       return;
