@@ -1,4 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
+import 'dart:math';
 import '../imports.dart';
+import '../providers/skins_enemics_personatges.dart';
 
 class CombatScreen extends StatefulWidget {
   @override
@@ -10,14 +16,15 @@ class _CombatScreenState extends State<CombatScreen> {
   late ChewieController _chewieController;
   bool _isVideoPlaying = true;
 
-  // Variables para el combate
+  // Variables per al combat
   int punts = 100;
   double aliatHealth = 1000.0;
   double enemicHealth = 1000.0;
-  int aliatDamage = 50;
-  int enemicDamage = 50;
+  int aliatDamage = 300;
+  int enemicDamage = 50; // S'actualitzarà amb el malTotal de la skin
   String AllyName = "Ichigo Kurosaki";
-  String EnemyName = "Sosuke Aizen";
+  String EnemyName =
+      "Sosuke Aizen"; // S'actualitzarà amb el personatgeNom de la skin
   String backgroundImage = 'lib/images/combat_proves/fondo_combat_1.png';
   bool isEnemyTurn = false;
   bool isEnemyHit = false;
@@ -31,8 +38,10 @@ class _CombatScreenState extends State<CombatScreen> {
     super.initState();
     _initializeVideoPlayer();
     _setRandomBackground();
+    _selectRandomSkin(); // Cridar el mètode per seleccionar una skin aleatòria
   }
 
+  // Inicialitzar el reproductor de vídeo
   void _initializeVideoPlayer() {
     _videoController =
         VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
@@ -60,6 +69,7 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
+  // Establir un fons aleatori
   void _setRandomBackground() {
     final random = Random();
     int randomIndex = random.nextInt(5) + 1;
@@ -69,6 +79,13 @@ class _CombatScreenState extends State<CombatScreen> {
     });
   }
 
+  // Seleccionar una skin aleatòria
+  void _selectRandomSkin() {
+    final provider =
+        Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
+    provider.selectRandomSkin(); // Cridar el mètode del Provider
+  }
+
   @override
   void dispose() {
     _videoController.dispose();
@@ -76,20 +93,22 @@ class _CombatScreenState extends State<CombatScreen> {
     super.dispose();
   }
 
+//Atac de l'enemic
   void _attack() {
     if (!isEnemyTurn && !isAttackInProgress) {
       setState(() {
         isAttackInProgress = true;
         isEnemyHit = true;
+        final provider = Provider.of<Skins_Enemics_Personatges_Provider>(
+            context,
+            listen: false);
+
+        // Actualitzar la vida actual de l'enemic (currentHealth)
+        provider.updateEnemyHealth(enemicHealth.toInt() - aliatDamage.toInt());
+
         enemicHealth -= aliatDamage;
         if (enemicHealth < 0) enemicHealth = 0;
       });
-
-      // Verificar si el enemigo ha sido derrotado
-      if (enemicHealth <= 0) {
-        _showVictoryDialog();
-        return; // Terminar el combate
-      }
 
       Future.delayed(Duration(milliseconds: 300), () {
         setState(() {
@@ -101,66 +120,70 @@ class _CombatScreenState extends State<CombatScreen> {
     }
   }
 
+  // Atac de l'enemic
   void _enemyAttack() {
-    setState(() {
-      isAllyHit = true;
-      aliatHealth -= enemicDamage;
-      if (aliatHealth < 0) aliatHealth = 0;
-    });
-
-    // Verificar si el jugador ha sido derrotado
-    if (aliatHealth <= 0) {
-      _showDefeatDialog();
-      return; // Terminar el combate
-    }
-
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(Duration(seconds: 1), () {
       setState(() {
-        isAllyHit = false;
-        isEnemyTurn = false;
-        isAttackInProgress = false;
+        isAllyHit = true;
+        aliatHealth -= enemicDamage;
+        if (aliatHealth < 0) aliatHealth = 0;
       });
+      Future.delayed(Duration(milliseconds: 500), () {
+        setState(() {
+          isAllyHit = false;
+          isEnemyTurn = false;
+          isAttackInProgress = false;
+        });
+      });
+
+      if (enemicHealth <= 0) {
+        _showVictoryDialog();
+      } else if (aliatHealth <= 0) {
+        _showDefeatDialog();
+      }
     });
   }
 
-  void _showVictoryDialog() {
+  // Diàleg de victòria
+  void _showVictoryDialog() async {
+    final provider =
+        Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
+    await provider.fetchEnemyPoints(); // Actualitza els punts de l'enemic
+
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Has guanyat"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('lib/images/kan_moneda.png'),
-              ),
-              SizedBox(height: 10),
-              Text("+$punts",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // Use the context from the Builder to access the provider
-                Provider.of<Skins_Enemics_Personatges_Provider>(context,
-                        listen: false)
-                    .fetchUserPoints();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
-                );
-              },
-              child: Text("Continuar"),
+      builder: (context) => AlertDialog(
+        title: Text("Has guanyat"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('lib/images/kan_moneda.png'),
+            ),
+            SizedBox(height: 10),
+            Text(
+              "+${provider.coinEnemies}", // Mostra els punts de l'enemic
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => HomeScreen()),
+              );
+            },
+            child: Text("Continuar"),
+          ),
+        ],
+      ),
     );
   }
 
+  // Diàleg de derrota
   void _showDefeatDialog() {
     showDialog(
       context: context,
@@ -192,6 +215,13 @@ class _CombatScreenState extends State<CombatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<Skins_Enemics_Personatges_Provider>(context);
+    final skin = provider.selectedSkin;
+
+    EnemyName = skin?.personatgeNom ?? "Desconegut Enemic";
+    enemicDamage = skin?.malTotal ?? 50;
+    enemicHealth = skin?.currentHealth.toDouble() ?? 1000;
+    int vidaMaxima = skin?.vida ?? 1000;
     return Scaffold(
       body: _isVideoPlaying
           ? Container(
@@ -236,13 +266,14 @@ class _CombatScreenState extends State<CombatScreen> {
                           AnimatedOpacity(
                             duration: Duration(milliseconds: 300),
                             opacity: isEnemyHit ? 0.5 : 1.0,
-                            child: Image.asset(
-                              'lib/images/combat_proves/aizen_combat.png',
+                            child: Image.network(
+                              skin?.imatge ??
+                                  'lib/images/combat_proves/aizen_combat.png', // Imatge de la skin
                               height: 300,
                               width: 300,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 1),
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -265,7 +296,8 @@ class _CombatScreenState extends State<CombatScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 10),
-                                _buildHealthBar(enemicHealth, 1000),
+                                _buildHealthBar(
+                                    skin!.currentHealth.toDouble(), vidaMaxima),
                               ],
                             ),
                           ),
@@ -284,7 +316,7 @@ class _CombatScreenState extends State<CombatScreen> {
                               width: 250,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 0),
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -371,6 +403,7 @@ class _CombatScreenState extends State<CombatScreen> {
     );
   }
 
+  // Barra de salut
   Widget _buildHealthBar(double health, int maxHealth) {
     double healthPercentage = health / maxHealth;
     Color barColor = healthPercentage < 0.2

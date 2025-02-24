@@ -63,11 +63,6 @@ class _TendaScreenState extends State<TendaScreen> {
         final remainingCoins = data['remainingCoins'];
 
         await _showVideoPopup(skin);
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Has obtingut la skin: ${skin['nom']}! Monedes restants: $remainingCoins'),
-        ));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Error: ${response.body}'),
@@ -141,25 +136,71 @@ class _TendaScreenState extends State<TendaScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Has obtingut una nueva skin!'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Center(
+            child: Text(
+              '🎉 Nova Skin Obtinguda! 🎉',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.orangeAccent,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.network(skin['imatge'],
-                  width: 100, height: 100, fit: BoxFit.cover),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.network(
+                  skin['imatge'],
+                  width: 200, // Aumentado el tamaño
+                  height: 200,
+                  fit: BoxFit.cover,
+                ),
+              ),
               SizedBox(height: 10),
               Text(
-                'Skin: ${skin['nom']}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                'Has desbloquejat la skin:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 5),
+              Text(
+                skin['nom'],
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
           actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Tancar'),
+            Center(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Acceptar',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         );

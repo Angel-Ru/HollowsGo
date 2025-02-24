@@ -26,4 +26,6 @@ router.post('/admin/', verificacioUsuari.verifyAdminDB, userController.crearUsua
 // Ruta per eliminar un usuari per ID (només accessible per a administradors)
 router.delete('/:id', verificacioUsuari.verifyAdminDB, userController.borrarUsuari);
 
+
+
 module.exports = router;

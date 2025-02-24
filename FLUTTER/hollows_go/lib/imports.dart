@@ -10,7 +10,6 @@ export '/providers/loginprovider.dart';
 export '/providers/blinkingtextprovider.dart';
 export '/providers/ui_provider.dart';
 export '/providers/dialeg_provider.dart';
-export '/providers/skins_enemics_personatges_provider.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';

@@ -100,7 +100,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
         final user = responseData['user'];
 
         await _clearPreferences();
-        
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('userEmail', user['email']);

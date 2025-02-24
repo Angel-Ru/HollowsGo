@@ -124,6 +124,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
+                  SizedBox(height: 100),
                   // Contenedor de personaje con diálogo
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
