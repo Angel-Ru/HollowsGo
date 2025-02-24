@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/models/skin.dart';
 import 'package:hollows_go/providers/skins_enemics_personatges.dart';
 import 'package:provider/provider.dart';
@@ -45,16 +46,29 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   @override
   void initState() {
     super.initState();
-    // Carregar les dades dels personatges aliats i enemics al inicialitzar la pantalla
+    _loadUserData(); // Carregar les dades de l'usuari
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId'); // Obtenir l'ID de l'usuari
+
+    if (userId == null) {
+      print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
+      return;
+    }
+
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.fetchPersonatgesAmbSkins('60'); // Carregar aliats
+    provider.fetchPersonatgesAmbSkins(userId.toString()); // Carregar aliats
     provider.fetchPersonatgesEnemicsAmbSkins(); // Carregar enemics
   }
 
   void _selectSkinAliat(Skin skin) {
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.setSelectedSkinAliat(skin); // Guardem la skin seleccionada per a l'aliat
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    provider.setSelectedSkinAliat(
+        skin); // Guardem la skin seleccionada per a l'aliat
   }
 
   @override
@@ -281,12 +295,14 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                     PageController(viewportFraction: 0.7),
                                 itemBuilder: (context, index) {
                                   var skin = personatge.skins[index];
-                                  final isSelected = provider.selectedSkinAliat?.id == skin.id;
+                                  final isSelected =
+                                      provider.selectedSkinAliat?.id == skin.id;
 
                                   return GestureDetector(
                                     onTap: () {
                                       if (!_switchValue) {
-                                        _selectSkinAliat(skin); // Seleccionar skin per a l'aliat
+                                        _selectSkinAliat(
+                                            skin); // Seleccionar skin per a l'aliat
                                       }
                                     },
                                     child: Padding(
@@ -303,7 +319,9 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   border: Border.all(
-                                                    color: isSelected ? Colors.green : Colors.black,
+                                                    color: isSelected
+                                                        ? Colors.green
+                                                        : Colors.black,
                                                     width: isSelected ? 4 : 2,
                                                   ),
                                                 ),
@@ -354,10 +372,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                               5, // Exemple: 5 estrelles màxim
                                               (index) => Icon(
                                                 Icons.star,
-                                                color:
-                                                    index < (skin.categoria ?? 0)
-                                                        ? Colors.yellow
-                                                        : Colors.grey,
+                                                color: index <
+                                                        (skin.categoria ?? 0)
+                                                    ? Colors.yellow
+                                                    : Colors.grey,
                                                 size: 20,
                                               ),
                                             ),
