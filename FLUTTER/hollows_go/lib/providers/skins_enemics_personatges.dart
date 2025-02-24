@@ -38,7 +38,7 @@ class Skins_Enemics_Personatges_Provider with ChangeNotifier {
 
       if (userEmail == null) return;
 
-      final url = Uri.parse('http://172.20.10.2:3000/skins/enemic/');
+      final url = Uri.parse('http://192.168.1.28:3000/skins/enemic/');
       final response = await http.get(
         url,
         headers: {'Content-Type': 'application/json'},

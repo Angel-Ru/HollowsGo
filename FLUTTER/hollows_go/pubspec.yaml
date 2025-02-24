@@ -82,6 +82,7 @@ flutter:
     - lib/images/mayuri_character/
     - lib/images/kyoraku_character/
     - lib/images/nel_character/
+    - lib/images/rukia_character/
     - lib/images/combat_proves/
     - lib/images/hollows/
     - lib/images/banner_gacha/banner.png
