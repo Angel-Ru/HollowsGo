@@ -1,3 +1,7 @@
+/*
+En aquest arxiu s'importen tots els arxius, paquets, ...,  que es faràn servir a l'aplicació.
+*/
+
 export '/screens/homescreen.dart';
 export '/screens/loginscreen.dart';
 export '/screens/imageselectionpage.dart';
@@ -6,10 +10,13 @@ export '/screens/tendascreen.dart';
 export '/screens/bibliotecascreen.dart';
 export '/screens/registerdialog.dart';
 export '/screens/combatscreen.dart';
+export '../screens/mapscreen.dart';
+
 export '/providers/loginprovider.dart';
 export '/providers/blinkingtextprovider.dart';
 export '/providers/ui_provider.dart';
 export '/providers/dialeg_provider.dart';
+export '/providers/user_provider.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
