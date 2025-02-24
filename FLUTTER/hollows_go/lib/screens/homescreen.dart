@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _dialogIndex = 0;
   final List<String> _dialoguesrukia = [
     "Si baixes la guardia, et podries trobar amb un Hollow.",
-    "No et fies de ningú, ni tan sols de mi. Sóc un Shinigami, recorda-ho.",
+    "No et fies de ningú, ni tan sols de mi. Sóc un Shinigami.",
     "La lluna esta hermosa aquesta nit, no creus?",
     "En Chappy el conillet es molt més bonic que tu",
     "Si tens algun problema, no dubtis en demanar ajuda.",
@@ -172,6 +172,18 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Image.asset(
               'lib/images/homescreen_image.png',
               fit: BoxFit.cover,
+            ),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(height: 250),
+                Image.asset(
+                  "lib/images/prehomescreen_imatges/nom_aplicacio.png",
+                  width: 300,
+                ),
+              ],
             ),
           ),
           if (uiProvider.selectedMenuOpt == 0)
