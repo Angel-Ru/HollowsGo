@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
               elevation: 0, // Sin sombra
               title: Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
-                  return Row(
+                  return Row( 
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(

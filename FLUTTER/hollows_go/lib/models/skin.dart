@@ -1,63 +1,40 @@
-// To parse this JSON data, do
-//
-//     final skin = skinFromJson(jsonString);
-
-import 'dart:convert';
-
-Skin skinFromJson(String str) => Skin.fromJson(json.decode(str));
-
-String skinToJson(Skin data) => json.encode(data.toJson());
-
 class Skin {
-    SkinClass skin;
+  int id;
+  String nom;
+  int? categoria;       // Pot ser null
+  String? imatge;       // Pot ser null
+  int? puntsDonats;     // Pot ser null
+  int? malTotal;        // Pot ser null
+  String? personatgeNom; // Pot ser null
+  int? vida;            // Pot ser null
+  int? currentHealth;
+  String? atac;
 
-    Skin({
-        required this.skin,
-    });
+  Skin({
+    required this.id,
+    required this.nom,
+    this.categoria,
+    this.imatge,
+    this.puntsDonats,
+    this.malTotal,
+    this.personatgeNom,
+    this.vida,
+    this.atac
+  }) : currentHealth = vida ?? 0; // Si vida és null, currentHealth serà 0
 
-    factory Skin.fromJson(Map<String, dynamic> json) => Skin(
-        skin: SkinClass.fromJson(json["skin"]),
-    );
-
-    Map<String, dynamic> toJson() => {
-        "skin": skin.toJson(),
-    };
-}
-
-class SkinClass {
-    int id;
-    String nom;
-    int categoria;
-    String imatge;
-    int puntsDonats;
-    int malTotal;
-    String personatgeNom;
-    int vida;
-    int currentHealth;
-
-    SkinClass({
-        required this.id,
-        required this.nom,
-        required this.categoria,
-        required this.imatge,
-        required this.puntsDonats,
-        required this.malTotal,
-        required this.personatgeNom,
-        required this.vida,
-    }): currentHealth = vida;
-
-    factory SkinClass.fromJson(Map<String, dynamic> json) => SkinClass(
+  factory Skin.fromJson(Map<String, dynamic> json) => Skin(
         id: json["id"],
         nom: json["nom"],
-        categoria: json["categoria"],
-        imatge: json["imatge"],
-        puntsDonats: json["punts_donats"],
-        malTotal: json["mal_total"],
-        personatgeNom: json["personatge_nom"],
+        categoria: json["categoria"], // Pot ser null
+        imatge: json["imatge"],       // Pot ser null
+        puntsDonats: json["punts_donats"], // Pot ser null
+        malTotal: json["mal_total"],       // Pot ser null
+        personatgeNom: json["personatge_nom"], // Pot ser null
         vida: json["vida"],
-    );
+        atac: json["atac_nom"]                   // Pot ser null
+      );
 
-    Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() => {
         "id": id,
         "nom": nom,
         "categoria": categoria,
@@ -66,5 +43,6 @@ class SkinClass {
         "mal_total": malTotal,
         "personatge_nom": personatgeNom,
         "vida": vida,
-    };
+        "atac_nom": atac,
+      };
 }

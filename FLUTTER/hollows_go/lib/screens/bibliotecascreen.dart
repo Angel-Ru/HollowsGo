@@ -1,6 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:hollows_go/models/skin.dart';
+import 'package:hollows_go/providers/skins_enemics_personatges.dart';
+import 'package:provider/provider.dart';
 
 class BibliotecaScreen extends StatefulWidget {
   @override
@@ -9,7 +11,7 @@ class BibliotecaScreen extends StatefulWidget {
 
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
   int _dialogIndex = 0;
-  bool _switchValue = false; // Estado del switch
+  bool _switchValue = false; // Estat del switch
 
   final List<String> _dialoguesEnemigos = [
     "Oh, quina sorpresa.",
@@ -40,70 +42,48 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   int _mayuriImageIndex = 0;
   int _nelImageIndex = 0;
 
-  final List<Map<String, dynamic>> _charactersEnemigos = [
-    {
-      "name": "PENIS BLANC",
-      "skins": [
-        {
-          "image": "lib/images/combat_proves/bleach_combat.png",
-          "name": "Fase Final",
-          "stars": 4
-        },
-        {
-          "image": "lib/images/combat_proves/bleach_combat.png",
-          "name": "Bankai",
-          "stars": 3
-        },
-        {
-          "image": "lib/images/combat_proves/bleach_combat.png",
-          "name": "Hollow",
-          "stars": 4
-        },
-      ],
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Carregar les dades dels personatges aliats i enemics al inicialitzar la pantalla
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    provider.fetchPersonatgesAmbSkins('60'); // Carregar aliats
+    provider.fetchPersonatgesEnemicsAmbSkins(); // Carregar enemics
+  }
 
-  final List<Map<String, dynamic>> _charactersAliats = [
-    {
-      "name": "PENIS NEGRE",
-      "skins": [
-        {
-          "image": "lib/images/combat_proves/bleach_combat.png",
-          "name": "Shikai",
-          "stars": 4
-        },
-        {
-          "image": "lib/images/combat_proves/bleach_combat.png",
-          "name": "Bankai",
-          "stars": 5
-        },
-      ],
-    },
-  ];
+  void _selectSkinAliat(Skin skin) {
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    provider.setSelectedSkinAliat(skin); // Guardem la skin seleccionada per a l'aliat
+  }
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
+
+    // Seleccionar la llista de personatges segons l'estat del Switch
+    final personatges =
+        _switchValue ? provider.characterEnemies : provider.personatges;
+
     return Scaffold(
-      extendBodyBehindAppBar: true, // Extiende el cuerpo detrás del AppBar
+      extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0), // Altura del AppBar
+        preferredSize: Size.fromHeight(0),
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaX: 10, sigmaY: 10), // Efecto de desenfoque
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white
-                  .withOpacity(0.5), // Fondo blanco semi-transparente
-              elevation: 0, // Sin sombra
-              title: null, // No hay título en el AppBar
+              backgroundColor: Colors.white.withOpacity(0.5),
+              elevation: 0,
+              title: null,
             ),
           ),
         ),
       ),
       body: Stack(
         children: [
-          // Fondo de pantalla que cubre toda la pantalla
+          // Fons de pantalla
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -111,11 +91,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               image: DecorationImage(
                 image: AssetImage(
                   _switchValue
-                      ? 'lib/images/biblioteca_enemics_fondo.png' // Fondo aliados
-                      : 'lib/images/biblioteca_aliats_fondo.png', // Fondo enemigos
+                      ? 'lib/images/biblioteca_enemics_fondo.png'
+                      : 'lib/images/biblioteca_aliats_fondo.png',
                 ),
-                fit: BoxFit
-                    .cover, // Asegura que la imagen cubra toda la pantalla
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -124,7 +103,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Contenedor de personaje con diálogo
+                  SizedBox(height: 100),
+                  // Contenidor de personatge amb diàleg
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -150,16 +130,13 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: _switchValue
-                                ? Colors.green // Color verde para aliados
-                                : Color.fromARGB(
-                                    255, 167, 55, 187), // Morado para enemigos
+                                ? Colors.green
+                                : Color.fromARGB(255, 167, 55, 187),
                             image: DecorationImage(
                               image: AssetImage(
                                 _switchValue
-                                    ? _nelImages[
-                                        _nelImageIndex] // Nel para aliados
-                                    : _mayuriImages[
-                                        _mayuriImageIndex], // Mayuri para enemigos
+                                    ? _nelImages[_nelImageIndex]
+                                    : _mayuriImages[_mayuriImageIndex],
                               ),
                               fit: BoxFit.cover,
                             ),
@@ -199,9 +176,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  _switchValue
-                                      ? 'Nel' // Nombre de personaje para aliados
-                                      : 'Mayuri Kurotsuchi', // Nombre de personaje para enemigos
+                                  _switchValue ? 'Nel' : 'Mayuri Kurotsuchi',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -210,29 +185,21 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                   ),
                                 ),
                               ),
-                              // Eliminar el SizedBox aquí para pegar el nombre al diálogo
                               Container(
                                 width: double.infinity,
-                                height: 100, // Establecer altura fija
+                                height: 100,
                                 padding: EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   color: _switchValue
                                       ? Colors.green
                                       : const Color.fromARGB(255, 167, 55, 187),
-                                  borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(8),
-                                    topLeft: Radius.circular(8),
-                                    bottomLeft: Radius.circular(8),
-                                    bottomRight: Radius.circular(8),
-                                  ),
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: SingleChildScrollView(
                                   child: Text(
                                     _switchValue
-                                        ? _dialoguesAliats[
-                                            _dialogIndex] // Diálogo para aliados
-                                        : _dialoguesEnemigos[
-                                            _dialogIndex], // Diálogo para enemigos
+                                        ? _dialoguesAliats[_dialogIndex]
+                                        : _dialoguesEnemigos[_dialogIndex],
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
@@ -243,7 +210,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 ),
                               ),
                               SizedBox(height: 8),
-                              // Switch debajo del avatar
+                              // Switch
                               Container(
                                 padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(
@@ -254,8 +221,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                   children: [
                                     Text(
                                       _switchValue
-                                          ? 'Biblioteca Aliats'
-                                          : 'Biblioteca Enemics',
+                                          ? 'Biblioteca Enemics'
+                                          : 'Biblioteca Aliats',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
@@ -282,12 +249,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  // Personajes y Skins
+                  // Personatges i Skins
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children:
-                        (_switchValue ? _charactersAliats : _charactersEnemigos)
-                            .map((character) {
+                    children: personatges.map((personatge) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 20),
                         child: Column(
@@ -300,7 +265,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                character["name"],
+                                personatge.nom,
                                 style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -311,66 +276,94 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                             SizedBox(
                               height: 250,
                               child: PageView.builder(
-                                itemCount: character["skins"].length,
+                                itemCount: personatge.skins.length,
                                 controller:
                                     PageController(viewportFraction: 0.7),
                                 itemBuilder: (context, index) {
-                                  var skin = character["skins"][index];
-                                  return Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 5),
-                                    child: Column(
-                                      children: [
-                                        // Imagen de la skin
-                                        Container(
-                                          width: 180,
-                                          height: 180,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: Colors.black, width: 2),
+                                  var skin = personatge.skins[index];
+                                  final isSelected = provider.selectedSkinAliat?.id == skin.id;
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      if (!_switchValue) {
+                                        _selectSkinAliat(skin); // Seleccionar skin per a l'aliat
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 5),
+                                      child: Column(
+                                        children: [
+                                          // Imatge de la skin amb marcador de selecció
+                                          Stack(
+                                            children: [
+                                              Container(
+                                                width: 180,
+                                                height: 180,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  border: Border.all(
+                                                    color: isSelected ? Colors.green : Colors.black,
+                                                    width: isSelected ? 4 : 2,
+                                                  ),
+                                                ),
+                                                child: ClipRRect(
+                                                  child: Image.network(
+                                                    skin.imatge ?? '',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (isSelected)
+                                                Positioned(
+                                                  top: 8,
+                                                  right: 8,
+                                                  child: Icon(
+                                                    Icons.check_circle,
+                                                    color: Colors.green,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                          child: ClipRRect(
-                                            child: Image.asset(
-                                              skin["image"],
-                                              fit: BoxFit.cover,
+                                          SizedBox(height: 5),
+                                          // Nom de la skin
+                                          Container(
+                                            padding: EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(0.8),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              '${skin.nom} (Mal: ${skin.malTotal})',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        // Nombre de la skin
-                                        Container(
-                                          padding: EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.8),
-                                            borderRadius:
-                                                BorderRadius.circular(4),
-                                          ),
-                                          child: Text(
-                                            skin["name"],
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
+                                          SizedBox(height: 3),
+                                          // Qualitat en estrelles (exemple)
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: List.generate(
+                                              5, // Exemple: 5 estrelles màxim
+                                              (index) => Icon(
+                                                Icons.star,
+                                                color:
+                                                    index < (skin.categoria ?? 0)
+                                                        ? Colors.yellow
+                                                        : Colors.grey,
+                                                size: 20,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                        SizedBox(height: 3),
-                                        // Calidad en estrellas
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: List.generate(
-                                            skin["stars"],
-                                            (index) => Icon(
-                                              Icons.star,
-                                              color: Colors.yellow,
-                                              size: 20,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },

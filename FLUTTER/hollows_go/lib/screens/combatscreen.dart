@@ -10,7 +10,6 @@ class CombatScreen extends StatefulWidget {
   @override
   _CombatScreenState createState() => _CombatScreenState();
 }
-
 class _CombatScreenState extends State<CombatScreen> {
   late VideoPlayerController _videoController;
   late ChewieController _chewieController;
@@ -20,9 +19,9 @@ class _CombatScreenState extends State<CombatScreen> {
   int punts = 100;
   double aliatHealth = 1000.0;
   double enemicHealth = 1000.0;
-  int aliatDamage = 50;
+  int aliatDamage = 300;
   int enemicDamage = 50; // S'actualitzarà amb el malTotal de la skin
-  String AllyName = "Ichigo Kurosaki";
+  String AllyName = "Ichigo Kurosaki"; // S'actualitzarà amb el nom de la skin de l'aliat
   String EnemyName = "Sosuke Aizen"; // S'actualitzarà amb el personatgeNom de la skin
   String backgroundImage = 'lib/images/combat_proves/fondo_combat_1.png';
   bool isEnemyTurn = false;
@@ -37,7 +36,6 @@ class _CombatScreenState extends State<CombatScreen> {
     _initializeVideoPlayer();
     _setRandomBackground();
     _selectRandomSkin(); // Cridar el mètode per seleccionar una skin aleatòria
-   
   }
 
   // Inicialitzar el reproductor de vídeo
@@ -78,12 +76,9 @@ class _CombatScreenState extends State<CombatScreen> {
 
   // Seleccionar una skin aleatòria
   void _selectRandomSkin() {
-    final provider = Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     provider.selectRandomSkin(); // Cridar el mètode del Provider
-    
   }
-
-
 
   @override
   void dispose() {
@@ -92,58 +87,63 @@ class _CombatScreenState extends State<CombatScreen> {
     super.dispose();
   }
 
-//Atac de l'enemic
- void _attack() {
-  if (!isEnemyTurn && !isAttackInProgress) {
-    setState(() {
-      isAttackInProgress = true;
-      isEnemyHit = true;
-      final provider = Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
-      
-      // Actualitzar la vida actual de l'enemic (currentHealth)
-      provider.updateEnemyHealth(enemicHealth.toInt() - aliatDamage.toInt());  
-
-      enemicHealth -= aliatDamage;
-      if (enemicHealth < 0) enemicHealth = 0;
-    });
-
-    Future.delayed(Duration(milliseconds: 300), () {
+  // Atac de l'aliat
+  void _attack() {
+    if (!isEnemyTurn && !isAttackInProgress) {
       setState(() {
-        isEnemyHit = false;
-        isEnemyTurn = true;
-      });
-      _enemyAttack();
-    });
-  }
-}
+        isAttackInProgress = true;
+        isEnemyHit = true;
+        final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-  // Atac de l'enemic
-  void _enemyAttack() {
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        isAllyHit = true;
-        aliatHealth -= enemicDamage;
-        if (aliatHealth < 0) aliatHealth = 0;
+        // Actualitzar la vida actual de l'enemic (currentHealth)
+        provider.updateEnemyHealth(enemicHealth.toInt() - aliatDamage.toInt());
+
+        enemicHealth -= aliatDamage;
+        if (enemicHealth < 0) enemicHealth = 0;
       });
-      Future.delayed(Duration(milliseconds: 500), () {
+
+      Future.delayed(Duration(milliseconds: 300), () {
         setState(() {
-          isAllyHit = false;
-          isEnemyTurn = false;
-          isAttackInProgress = false;
+          isEnemyHit = false;
+          isEnemyTurn = true;
         });
+        _enemyAttack();
       });
-
-      if (enemicHealth <= 0) {
-        _showVictoryDialog();
-      } else if (aliatHealth <= 0) {
-        _showDefeatDialog();
-      }
-    });
+    }
   }
+
+  void _enemyAttack() {
+  Future.delayed(Duration(seconds: 1), () {
+    setState(() {
+      isAllyHit = true;
+
+      // Actualitzar la salut de l'aliat
+      final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+      provider.updateAllyHealth(aliatHealth.toInt() - enemicDamage.toInt());
+
+      aliatHealth -= enemicDamage;
+      if (aliatHealth < 0) aliatHealth = 0;
+    });
+
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        isAllyHit = false;
+        isEnemyTurn = false;
+        isAttackInProgress = false;
+      });
+    });
+
+    if (enemicHealth <= 0) {
+      _showVictoryDialog();
+    } else if (aliatHealth <= 0) {
+      _showDefeatDialog();
+    }
+  });
+}
 
   // Diàleg de victòria
   void _showVictoryDialog() async {
-    final provider = Provider.of<Skins_Enemics_Personatges_Provider>(context, listen: false);
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.fetchEnemyPoints(); // Actualitza els punts de l'enemic
 
     showDialog(
@@ -211,14 +211,20 @@ class _CombatScreenState extends State<CombatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<Skins_Enemics_Personatges_Provider>(context);
-    final skin = provider.selectedSkin;
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
+    final skinEnemic = provider.selectedSkin; // Skin de l'enemic
+    final skinAliat = provider.selectedSkinAliat; // Skin de l'aliat
 
-  
-  EnemyName = skin?.personatgeNom ?? "Desconegut Enemic";
-  enemicDamage = skin?.malTotal ?? 50;
-  enemicHealth = skin?.currentHealth.toDouble() ?? 1000;
-  int vidaMaxima = skin?.vida ?? 1000;
+    // Configurar les dades de l'aliat
+    AllyName = skinAliat?.nom ?? "Desconegut Aliat";
+    aliatDamage = skinAliat?.malTotal ?? 300;
+    aliatHealth = skinAliat?.currentHealth?.toDouble() ?? 1000;
+    techniqueName = skinAliat!.atac!;
+    // Configurar les dades de l'enemic
+    EnemyName = skinEnemic?.personatgeNom ?? "Desconegut Enemic";
+    enemicDamage = skinEnemic?.malTotal ?? 50;
+    enemicHealth = skinEnemic?.currentHealth?.toDouble() ?? 1000;
+
     return Scaffold(
       body: _isVideoPlaying
           ? Container(
@@ -264,12 +270,12 @@ class _CombatScreenState extends State<CombatScreen> {
                             duration: Duration(milliseconds: 300),
                             opacity: isEnemyHit ? 0.5 : 1.0,
                             child: Image.network(
-                              skin?.imatge ?? 'lib/images/combat_proves/aizen_combat.png', // Imatge de la skin
+                              skinEnemic?.imatge ?? 'lib/images/combat_proves/aizen_combat.png', // Imatge de la skin de l'enemic
                               height: 300,
                               width: 300,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 1),
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -292,7 +298,7 @@ class _CombatScreenState extends State<CombatScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 10),
-                                _buildHealthBar(skin!.currentHealth.toDouble(), vidaMaxima),
+                                _buildHealthBar(enemicHealth, skinEnemic?.vida ?? 1000),
                               ],
                             ),
                           ),
@@ -305,13 +311,13 @@ class _CombatScreenState extends State<CombatScreen> {
                           AnimatedOpacity(
                             duration: Duration(milliseconds: 300),
                             opacity: isAllyHit ? 0.5 : 1.0,
-                            child: Image.asset(
-                              'lib/images/combat_proves/bleach_combat.png',
+                            child: Image.network(
+                              skinAliat?.imatge ?? 'lib/images/combat_proves/bleach_combat.png', // Imatge de la skin de l'aliat
                               height: 250,
                               width: 250,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 0),
                           Container(
                             padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
@@ -322,7 +328,7 @@ class _CombatScreenState extends State<CombatScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    _buildHealthBar(aliatHealth, 1000),
+                                    _buildHealthBar(aliatHealth, skinAliat?.vida ?? 1000),
                                     SizedBox(width: 10),
                                     Flexible(
                                       child: Text(

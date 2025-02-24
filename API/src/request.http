@@ -1,2 +1,2 @@
-GET localhost:3000/skins/enemic/
+GET http://192.168.2.197:3000/skins/biblioteca/60
 

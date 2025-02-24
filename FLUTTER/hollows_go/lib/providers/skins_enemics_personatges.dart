@@ -1,55 +1,83 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:hollows_go/models/personatge.dart'; // Importa el model Personatge
 import 'package:hollows_go/models/skin.dart'; // Importa el model Skin
 
-class Skins_Enemics_Personatges_Provider with ChangeNotifier {
+class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
+  // Constants per a URLs i claus de SharedPreferences
+  static const String _baseUrl = 'http://192.168.2.197:3000';
+  static const String _userPuntsKey = 'userPunts';
+  static const String _userNameKey = 'userName';
+  static const String _userEmailKey = 'userEmail';
+
   int _coinCount = 0; // Punts de l'usuari
   int _coinEnemies = 0; // Punts de l'enemic
   String _username = 'Usuari';
-  SkinClass? _selectedSkin; // Skin seleccionada (utilitzant el model)
+  Skin? _selectedSkin; // Skin seleccionada
+  Skin? _selectedSkinAliat;
+  List<Personatge> _personatges = []; // Llista de personatges
+  List<Personatge> _characterEnemies = []; // Llista de personatges enemics
+  List<Skin> _skins = []; // Llista de skins
 
+  // Getters
+  List<Personatge> get personatges => _personatges;
+  List<Personatge> get characterEnemies => _characterEnemies;
+  List<Skin> get skins => _skins;
   int get coinCount => _coinCount;
-  int get coinEnemies => _coinEnemies; // Getter per als punts de l'enemic
+  int get coinEnemies => _coinEnemies;
   String get username => _username;
-  SkinClass? get selectedSkin => _selectedSkin; // Getter per a la skin seleccionada
+  Skin? get selectedSkin => _selectedSkin;
+  Skin? get selectedSkinAliat => _selectedSkinAliat;
 
-  Skins_Enemics_Personatges_Provider() {
+  
+
+  SkinsEnemicsPersonatgesProvider() {
     _loadUserData();
   }
 
-  // Carregar dades locals i després obtenir les actualitzades de l'API
+  // Carregar dades locals
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    _coinCount = prefs.getInt('userPunts') ?? 0;
-    _username = prefs.getString('userName') ?? 'Usuari';
+    _coinCount = prefs.getInt(_userPuntsKey) ?? 0;
+    _username = prefs.getString(_userNameKey) ?? 'Usuari';
     notifyListeners();
   }
 
+  
+  void setSelectedSkinAliat(Skin skin) {
+    _selectedSkinAliat = skin;
+    notifyListeners();
+  }
+
+ 
   // Seleccionar una skin aleatòria
 Future<void> selectRandomSkin() async {
   try {
     final prefs = await SharedPreferences.getInstance();
-    String? userEmail = prefs.getString('userEmail'); 
+    String? userEmail = prefs.getString(_userEmailKey);
 
-    if (userEmail == null) return; 
+    if (userEmail == null) return;
 
-   
-    final url = Uri.parse('http://192.168.2.197:3000/skins/enemic/');
+    final url = Uri.parse('$_baseUrl/skins/enemic/');
     final response = await http.get(
       url,
       headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
-      
-      Skin skin = skinFromJson(response.body);
-      
-      _selectedSkin = skin.skin;
-      notifyListeners(); 
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      // Extreure l'objecte "skin" del JSON
+      if (data.containsKey("skin")) {
+        final Map<String, dynamic> skinData = data["skin"];
+        _selectedSkin = Skin.fromJson(skinData); 
+        notifyListeners();
+      } else {
+        print('Error: No s\'ha trobat la clau "skin" en la resposta');
+      }
     } else {
       print('Error en la resposta: ${response.statusCode}');
     }
@@ -58,11 +86,20 @@ Future<void> selectRandomSkin() async {
   }
 }
 
-void updateEnemyHealth(int newHealth) {
-  if (selectedSkin != null) {
-    // Comprovar si l'enemic canviat té una nova skin
-    selectedSkin!.currentHealth = max(newHealth, 0);  // S'assegura que la salut no sigui negativa
+  void updateEnemyHealth(int newHealth) {
+  if (_selectedSkin != null) {
+    _selectedSkin!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
     notifyListeners();
+  } else {
+    print('Error: No s\'ha seleccionat cap skin');
+  }
+}
+void updateAllyHealth(int newHealth) {
+  if (_selectedSkinAliat != null) {
+    _selectedSkinAliat!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
+    notifyListeners();
+  } else {
+    print('Error: No s\'ha seleccionat cap skin d\'aliat');
   }
 }
 
@@ -70,15 +107,14 @@ void updateEnemyHealth(int newHealth) {
   Future<void> fetchEnemyPoints() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? userEmail = prefs.getString('userEmail'); // Obtenir el correu guardat
+      String? userEmail = prefs.getString(_userEmailKey);
 
-      if (userEmail == null || _selectedSkin == null) return; // Si no hi ha correu o skin seleccionada, no fem res
+      if (userEmail == null || _selectedSkin == null) return;
 
       // Obtenir el nom de la skin seleccionada
-      String skinName = _selectedSkin!.nom;
+      String? skinName = _selectedSkin!.personatgeNom;
 
-      // Endpoint per obtenir els punts de l'enemic basant-se en la skin seleccionada
-      final url = Uri.parse('http://192.168.2.197:3000/personatges/enemics/$skinName/punts');
+      final url = Uri.parse('$_baseUrl/personatges/enemics/$skinName/punts');
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -87,17 +123,90 @@ void updateEnemyHealth(int newHealth) {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-
         if (data.containsKey('punts_enemic')) {
-          // Actualitza els punts de l'enemic
           _coinEnemies = data['punts_enemic'];
-          notifyListeners(); // Notifica als listeners que els punts han canviat
+          notifyListeners();
         }
       } else {
         print('Error en la resposta: ${response.statusCode}');
       }
     } catch (error) {
       print('Error en fetchEnemyPoints: $error');
+    }
+  }
+
+  // Obtenir personatges amb les seves skins
+  Future<void> fetchPersonatgesAmbSkins(String userId) async {
+  try {
+    final url = Uri.parse('$_baseUrl/skins/biblioteca/$userId');
+    final response = await http.get(
+      url,
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+
+      // Netegem les llistes abans d'afegir noves dades
+      _personatges.clear();
+      _skins.clear();
+
+      for (var item in data) {
+        // Creem el personatge
+        final personatge = Personatge.fromJson(item['personatge']);
+
+        // Afegim les skins del personatge
+        if (item.containsKey('skins') && item['skins'] is List) {
+          for (var skinJson in item['skins']) {
+            personatge.skins.add(Skin.fromJson(skinJson));
+          }
+        }
+
+        // Afegim el personatge a la llista
+        _personatges.add(personatge);
+      }
+
+      notifyListeners();
+    } else {
+      print('Error en la resposta: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error en fetchPersonatgesAmbSkins: $error');
+  }
+}
+
+ // Carregar personatges enemics amb les seves skins
+  Future<void> fetchPersonatgesEnemicsAmbSkins() async {
+    try {
+      final url = Uri.parse('$_baseUrl/skins/enemic/personatges');
+      final response = await http.get(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        _characterEnemies.clear();
+
+        for (var item in data) {
+          final personatge = Personatge.fromJson(item['personatge']);
+
+          if (item.containsKey('skins') && item['skins'] is List) {
+            for (var skinJson in item['skins']) {
+              personatge.skins.add(Skin.fromJson(skinJson));
+            }
+          }
+
+          _characterEnemies.add(personatge);
+        }
+
+        notifyListeners();
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error en fetchPersonatgesEnemicsAmbSkins: $error');
     }
   }
 

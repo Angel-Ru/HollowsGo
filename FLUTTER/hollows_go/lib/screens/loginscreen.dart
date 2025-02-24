@@ -59,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setBool('isLoggedIn', true);
 
         await prefs.setBool('isLoggedIn', true);
+        await prefs.setInt('userId', data['user']['id']);
         await prefs.setString('userEmail', data['user']['email']);
         await prefs.setString('userName', data['user']['nom']);
         await prefs.setInt('userPunts', data['user']['punts_emmagatzemats']);

@@ -4,8 +4,16 @@ const skinsController = require('../controllers/skinsController');
 const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifica que esta ruta sea correcta
 
 
+
+
+//Ruta per obtenir tots els personatges amb les seves skins de l'usuari
+router.get('/biblioteca/:id', skinsController.getPersonatgesAmbSkinsPerUsuari);
+
 //Ruta per obtenir una skin d'un enemic amb el seu mal de forma aleatoria
 router.get('/enemic/', skinsController.seleccionarSkinAleatoria);
+
+//Ruta per obtenir una skin d'un enemic amb el seu mal de forma aleatoria
+router.get('/enemic/personatges', skinsController.getPersonatgesEnemicsAmbSkins);
 
 // Ruta per obtenir totes les skins d'un personatge
 router.get('/:id', skinsController.getSkinsPersonatge);
