@@ -2,6 +2,14 @@ import 'dart:ui';
 import '../imports.dart';
 import 'package:http/http.dart' as http;
 
+/*
+Aquesta és la classe TendaScreen. En aquesta classe es crea la pantalla de la tenda de l'aplicació.
+En aquesta pantalla es mostra un banner de gacha i un botó per fer una tirada del gacha, la qual costa 100 monedes.
+Quan l'usuari fa una tirada de gacha, es fa una petició HTTP a un servidor per obtenir una nova skin.
+Després de la tirada, es mostra un vídeo d'animació i un diàleg amb la informació de la nova skin obtinguda.
+La classe també gestiona la reproducció del vídeo d'animació utilitzant els controladors VideoPlayerController i ChewieController.
+*/
+
 class TendaScreen extends StatefulWidget {
   @override
   _TendaScreenState createState() => _TendaScreenState();
@@ -157,7 +165,7 @@ class _TendaScreenState extends State<TendaScreen> {
                 borderRadius: BorderRadius.circular(15),
                 child: Image.network(
                   skin['imatge'],
-                  width: 200, // Aumentado el tamaño
+                  width: 200,
                   height: 200,
                   fit: BoxFit.cover,
                 ),
@@ -211,19 +219,17 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // Extiende el cuerpo detrás del AppBar
+      extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0), // Altura del AppBar
+        preferredSize: Size.fromHeight(0),
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaX: 10, sigmaY: 10), // Efecto de desenfoque
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white
-                  .withOpacity(0.5), // Fondo blanco semi-transparente
-              elevation: 0, // Sin sombra
-              title: null, // No hay título en el AppBar
+              backgroundColor: Colors.white.withOpacity(0.5),
+              elevation: 0,
+              title: null,
             ),
           ),
         ),
