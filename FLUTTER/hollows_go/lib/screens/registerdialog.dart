@@ -3,8 +3,8 @@ import '../imports.dart';
 
 /*
 Aquesta és la classe RegisterDialog. En aquesta classe es crea el diàleg de registre.
-En aquest diàleg ens connectam amb el servidor per a poernos crear un compte per a poder-nos connectar a l'aplicació.
-Un cop ens hem registrat, ens redirigeix a la pantalla principal de l'aplicació, la qual es la HomeScreen.
+En aquest diàleg ens connectam amb el servidor per a poder-nos crear un compte per a poder-nos connectar a l'aplicació.
+Un cop ens hem registrat, ens redirigeix a la pantalla principal de l'aplicació, la qual és la HomeScreen.
 S'ha de canviar l'IP del servidor per a que funcioni correctament.
 */
 

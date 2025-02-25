@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 /*
 Aquesta és la classe TendaScreen. En aquesta classe es crea la pantalla de la tenda de l'aplicació.
-En aquesta pantalla es mostra un banner de gacha i un botó per fer una tirada del gacha, la qual costa 100 monedes.
+En aquesta pantalla es mostra un bàner de gacha i un botó per fer una tirada del gacha, la qual costa 100 monedes.
 Quan l'usuari fa una tirada de gacha, es fa una petició HTTP a un servidor per obtenir una nova skin.
 Després de la tirada, es mostra un vídeo d'animació i un diàleg amb la informació de la nova skin obtinguda.
 La classe també gestiona la reproducció del vídeo d'animació utilitzant els controladors VideoPlayerController i ChewieController.

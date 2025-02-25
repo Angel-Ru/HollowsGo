@@ -3,8 +3,8 @@ import '../imports.dart';
 /*
 L'ImageSelectionPage és una pàgina que permet seleccionar una imatge de perfil.
 En aquesta classe s'hi pot arribar des del menú desplegable que surt quan es fa clic a la imatge de perfil de l'AppBar.
-L'imatge de perfil seleccionada es guarda a les Shared Preferences.
-Per ajudar a l'usuari a escollir una imatge, la pàgina mostra un diàleg amb en Kyoraku que et dóna consells per a poder-ne escollir una.
+La imatge de perfil seleccionada es guarda a les Shared Preferences.
+Per ajudar l'usuari a escollir una imatge, la pàgina mostra un diàleg amb en Kyoraku que et dona consells per a poder-ne escollir una.
 */
 
 class ImageSelectionPage extends StatefulWidget {

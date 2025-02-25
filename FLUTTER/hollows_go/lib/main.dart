@@ -1,7 +1,7 @@
 import 'imports.dart';
 
 /*
-Aquesta és la classe Main. En aquesta classe es creen les rutes nombrades de l'aplicació i es defineix el tema.
+Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l'aplicació i es defineix el tema.
 A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
 */
 

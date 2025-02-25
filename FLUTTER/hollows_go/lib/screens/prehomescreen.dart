@@ -3,7 +3,7 @@ import '../imports.dart';
 /*
 En aquesta classe es crea la pantalla de benvinguda de l'aplicació.
 En aquesta pantalla mostren diferents animacions i unes imatges aleatòries d'en Kon.
-Quan es toca la pantalla, es mostra el diàleg de login, en el qual et pots registrar o iniciar sessió.
+Quan es toca la pantalla, es mostra el diàleg d'inici de sessió, en el qual et pots registrar o iniciar sessió.
 */
 
 class PreHomeScreen extends StatefulWidget {

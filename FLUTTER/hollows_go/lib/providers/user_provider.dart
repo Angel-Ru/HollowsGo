@@ -4,7 +4,7 @@ import '../imports.dart';
 /*
 Aquesta classe és un provider que conté la informació de l'usuari.
 Aquesta informació es pot actualitzar amb el mètode fetchUserPoints.
-Aquest mètode fa una petició a la API per obtenir els punts de l'usuari.
+Aquest mètode fa una petició a l'API per obtenir els punts de l'usuari.
 S'ha de canviar l'IP del servidor per a que funcioni correctament.
 */
 

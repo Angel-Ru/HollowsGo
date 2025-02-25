@@ -2,8 +2,8 @@ import 'dart:ui';
 import '../imports.dart';
 
 /*
-A la classe BibliotecaScreen es mostra la pantalla de la biblioteca, on es poden veure els personatges i les seves skins que l'usuari ha conseguit al gacha.
-A més, es pot canviar entre veure els personatges aliats i els enemics, a través d'un switch.
+A la classe BibliotecaScreen es mostra la pantalla de la biblioteca, on es poden veure els personatges i les seves skins que l'usuari ha aconseguit al gacha.
+A més, es pot canviar entre veure els personatges aliats i els enemics, a través d'un interruptor.
 Cada personatge surt amb les seves skins, el mal que fa i la seva categoria/raressa.
 L'usuari pot seleccionar una skin d'un personatge per a poder-la emprar als combats contra els enemics.
 */

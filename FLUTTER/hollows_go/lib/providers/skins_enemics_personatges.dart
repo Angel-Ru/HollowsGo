@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 /*
 El provider SkinsEnemicsPersonatgesProvider conté la informació dels personatges, les skins i els enemics.
 Ens serveix per a poder obtenir les seves dades.
-Alguns metodes principals són el de seleccionar una skin dels enemics de manera aleatoria, actualitzar la vida dels enemics i dels aliats, i obtenir els punts dels enemics.  
+Alguns mètodes principals són el de seleccionar una skin dels enemics de manera aleatòria, actualitzar la vida dels enemics i dels aliats, i obtenir els punts dels enemics. 
 */
 
 class SkinsEnemicsPersonatgesProvider with ChangeNotifier {

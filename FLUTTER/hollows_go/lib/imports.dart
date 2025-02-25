@@ -1,5 +1,5 @@
 /*
-En aquest arxiu s'importen tots els arxius, paquets, ...,  que es faràn servir a l'aplicació.
+En aquest arxiu s'importen tots els arxius, paquets..., que es faran servir a l'aplicació.
 */
 
 export '/screens/homescreen.dart';

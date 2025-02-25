@@ -5,10 +5,10 @@ import '../imports.dart';
 Aquesta és la classe HomeScreen. En aquesta classe es crea la pantalla principal de l'aplicació.
 En aquesta pantalla es mostren diferents diàlegs de personatges de Bleach.
 La classe també permet canviar la imatge de perfil i mostrar el nombre de monedes que té l'usuari a través d'un AppBar.
-En aquesta pantalla també es mostren els diferents menús de l'aplicació, a on hi han la pantalla del mapa, la de la tenda i la de la biblioteca de personatjes i enemics.
-A la pantalla trobam que hi han dos diàlegs diferents, un de n'Ichigo i un de na Rukia.
+En aquesta pantalla també es mostren els diferents menús de l'aplicació, a on hi ha la pantalla del mapa, la de la tenda i la de la biblioteca de personatjes i enemics.
+A la pantalla trobam que hi ha dos diàlegs diferents, un de n'Ichigo i un de na Rukia.
 El de n'Ichigo usa el provider de DialogueProvider per a mostrar les imatges i els diàlegs de n'Ichigo.
-Els diàlegs de na Rukia en canvi estàn gestionats d'una manera diferent, amb una llista per a les frases i una altre llista per a les imatges.
+Els diàlegs de na Rukia, en canvi, estan gestionats d'una manera diferent, amb una llista per a les frases i un altre llista per a les imatges.
 */
 
 class HomeScreen extends StatefulWidget {
@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
               elevation: 0,
               title: Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
-                  return Row( 
+                  return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
