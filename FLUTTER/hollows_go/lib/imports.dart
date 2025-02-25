@@ -29,6 +29,7 @@ export 'package:flutter/services.dart';
 export 'package:video_player/video_player.dart';
 export 'package:chewie/chewie.dart';
 export 'package:fluttertoast/fluttertoast.dart';
+export 'package:audioplayers/audioplayers.dart';
 
 export 'dart:convert';
 export 'dart:math';
