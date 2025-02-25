@@ -1,38 +1,37 @@
 class Skin {
   int id;
   String nom;
-  int? categoria;       // Pot ser null
-  String? imatge;       // Pot ser null
-  int? puntsDonats;     // Pot ser null
-  int? malTotal;        // Pot ser null
-  String? personatgeNom; // Pot ser null
-  int? vida;            // Pot ser null
+  int? categoria;
+  String? imatge;
+  int? puntsDonats;
+  int? malTotal;
+  String? personatgeNom;
+  int? vida;
   int? currentHealth;
   String? atac;
 
-  Skin({
-    required this.id,
-    required this.nom,
-    this.categoria,
-    this.imatge,
-    this.puntsDonats,
-    this.malTotal,
-    this.personatgeNom,
-    this.vida,
-    this.atac
-  }) : currentHealth = vida ?? 0; // Si vida és null, currentHealth serà 0
+  Skin(
+      {required this.id,
+      required this.nom,
+      this.categoria,
+      this.imatge,
+      this.puntsDonats,
+      this.malTotal,
+      this.personatgeNom,
+      this.vida,
+      this.atac})
+      : currentHealth = vida ?? 0;
 
   factory Skin.fromJson(Map<String, dynamic> json) => Skin(
-        id: json["id"],
-        nom: json["nom"],
-        categoria: json["categoria"], // Pot ser null
-        imatge: json["imatge"],       // Pot ser null
-        puntsDonats: json["punts_donats"], // Pot ser null
-        malTotal: json["mal_total"],       // Pot ser null
-        personatgeNom: json["personatge_nom"], // Pot ser null
-        vida: json["vida"],
-        atac: json["atac_nom"]                   // Pot ser null
-      );
+      id: json["id"],
+      nom: json["nom"],
+      categoria: json["categoria"],
+      imatge: json["imatge"],
+      puntsDonats: json["punts_donats"],
+      malTotal: json["mal_total"],
+      personatgeNom: json["personatge_nom"],
+      vida: json["vida"],
+      atac: json["atac_nom"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,

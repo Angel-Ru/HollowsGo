@@ -13,7 +13,6 @@ export '/screens/combatscreen.dart';
 export '/screens/mapscreen.dart';
 
 export '/providers/loginprovider.dart';
-// export '/providers/blinkingtextprovider.dart';
 export '/providers/ui_provider.dart';
 export '/providers/dialeg_provider.dart';
 export '/providers/user_provider.dart';

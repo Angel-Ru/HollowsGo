@@ -3,9 +3,9 @@ import 'package:hollows_go/models/skin.dart';
 class Personatge {
   int id;
   String nom;
-  int? vidaBase; // Pot ser null
-  int? malBase;  // Pot ser null
-  List<Skin> skins; // Llista de skins del personatge
+  int? vidaBase;
+  int? malBase;
+  List<Skin> skins;
 
   Personatge({
     required this.id,
@@ -19,9 +19,9 @@ class Personatge {
     return Personatge(
       id: json['id'],
       nom: json['nom'],
-      vidaBase: json['vida_base'], // Pot ser null
-      malBase: json['mal_base'],   // Pot ser null
-      skins: [], // Inicialment buida, s'assignarà després
+      vidaBase: json['vida_base'],
+      malBase: json['mal_base'],
+      skins: [],
     );
   }
 

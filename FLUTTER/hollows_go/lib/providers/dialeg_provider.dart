@@ -1,14 +1,16 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+/*
+Aquesta és la classe DialogueProvider. Aquesta classe s'encarrega de gestionar els diàlegs de l'aplicació.
+*/
+
 class DialogueProvider extends ChangeNotifier {
-  // Diálogos e imágenes para la pantalla de inicio
   int _dialogIndex = 0;
   List<String> _dialogues = [];
   List<String> _characterImages = [];
   String _currentImage = '';
 
-  // Diálogos e imágenes para la biblioteca
   int _libraryDialogIndex = 0;
   List<String> _libraryDialogues = [];
   List<String> _libraryCharacterImages = [];
@@ -16,7 +18,6 @@ class DialogueProvider extends ChangeNotifier {
 
   DialogueProvider();
 
-  // Método para establecer los diálogos e imágenes
   void setDialogueData(List<String> dialogues, List<String> images,
       {bool isLibrary = false}) {
     if (isLibrary) {
@@ -34,7 +35,6 @@ class DialogueProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Getters para la pantalla de inicio
   String get currentDialogue =>
       _dialogues.isNotEmpty ? _dialogues[_dialogIndex] : "";
   String get currentImage => _currentImage;
@@ -45,7 +45,6 @@ class DialogueProvider extends ChangeNotifier {
       : "";
   String get currentLibraryImage => _currentLibraryImage;
 
-  // Método para avanzar al siguiente diálogo
   void nextDialogue({bool isLibrary = false}) {
     if (isLibrary) {
       if (_libraryDialogues.isEmpty || _libraryCharacterImages.isEmpty) return;
@@ -75,7 +74,6 @@ class DialogueProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Método para reiniciar los valores
   void resetDialogue({bool isLibrary = false}) {
     if (isLibrary) {
       _libraryDialogues = [];
