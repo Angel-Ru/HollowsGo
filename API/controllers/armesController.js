@@ -9,7 +9,7 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
- * /skins/{id}/armes:
+ * /armes/{skin_id}/:
  *   get:
  *     tags: [Armes]
  *     summary: Obtenir totes les armes d'una skin per ID
@@ -24,32 +24,69 @@ const { connectDB, sql } = require('../config/dbConfig');
  *     responses:
  *       200:
  *         description: Llista d'armes de la skin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID de l'arma
+ *                   nom:
+ *                     type: string
+ *                     description: Nom de l'arma
+ *                   descripcio:
+ *                     type: string
+ *                     description: Descripció de l'arma
+ *                   skin_id:
+ *                     type: integer
+ *                     description: ID de la skin associada
  *       404:
  *         description: No s'han trobat armes per a aquesta skin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "No s'han trobat armes per a aquesta skin"
  *       500:
  *         description: Error en la consulta
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Error en la consulta"
  */
 exports.getArmesPerSkinId = async (req, res) => {
     try {
+        const { id } = req.params;
+
         const pool = await connectDB();
         const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
+            .input('id', sql.Int, id)
             .query(`
                 SELECT a.*
                 FROM ARMES a
-                         JOIN SKINS s ON a.skin_id = s.id
+                         JOIN SKINS_ARMES sa ON a.id = sa.arma
+                         JOIN SKINS s ON sa.skin = s.id
                 WHERE s.id = @id
             `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat armes per a aquesta skin');
+
+        if (result.recordset.length > 0) {
+            res.status(200).json(result.recordset);
+        } else {
+            res.status(404).send("No s'han trobat armes per a aquesta skin");
+        }
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en la consulta');
+        res.status(500).send("Error en la consulta");
     }
 };
 
 /**
  * @swagger
- * /skins/{nom}/armes:
+ * /armes/nom/{nom_skin}:
  *   get:
  *     tags: [Armes]
  *     summary: Obtenir totes les armes d'una skin per nom
@@ -64,32 +101,69 @@ exports.getArmesPerSkinId = async (req, res) => {
  *     responses:
  *       200:
  *         description: Llista d'armes de la skin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                     description: ID de l'arma
+ *                   nom:
+ *                     type: string
+ *                     description: Nom de l'arma
+ *                   descripcio:
+ *                     type: string
+ *                     description: Descripció de l'arma
+ *                   skin_id:
+ *                     type: integer
+ *                     description: ID de la skin associada
  *       404:
  *         description: No s'han trobat armes per a aquesta skin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "No s'han trobat armes per a aquesta skin"
  *       500:
  *         description: Error en la consulta
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Error en la consulta"
  */
 exports.getArmesPerSkinNom = async (req, res) => {
     try {
+        const { nom } = req.params;
+
         const pool = await connectDB();
         const result = await pool.request()
-            .input('nom', sql.VarChar(50), req.params.nom)
+            .input('nom', sql.VarChar(50), nom)
             .query(`
                 SELECT a.*
                 FROM ARMES a
-                         JOIN SKINS s ON a.skin_id = s.id
+                         JOIN SKINS_ARMES sa ON a.id = sa.arma
+                         JOIN SKINS s ON sa.skin = s.id
                 WHERE s.nom = @nom
             `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat armes per a aquesta skin');
+
+        if (result.recordset.length > 0) {
+            res.status(200).json(result.recordset);
+        } else {
+            res.status(404).send("No s'han trobat armes per a aquesta skin");
+        }
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en la consulta');
+        res.status(500).send("Error en la consulta");
     }
 };
 
 /**
  * @swagger
- * /skins/{id}/armes/{arma_id}:
+ * /armes/{id}/{arma_id}:
  *   get:
  *     tags: [Armes]
  *     summary: Obtenir una arma d'una skin per ID
@@ -110,33 +184,68 @@ exports.getArmesPerSkinNom = async (req, res) => {
  *     responses:
  *       200:
  *         description: Detalls de l'arma
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: ID de l'arma
+ *                 nom:
+ *                   type: string
+ *                   description: Nom de l'arma
+ *                 descripcio:
+ *                   type: string
+ *                   description: Descripció de l'arma
+ *                 skin_id:
+ *                   type: integer
+ *                   description: ID de la skin associada
  *       404:
  *         description: No s'ha trobat l'arma per a aquesta skin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "No s'ha trobat l'arma per a aquesta skin"
  *       500:
  *         description: Error en la consulta
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Error en la consulta"
  */
 exports.getArmaSkinId = async (req, res) => {
     try {
+        const { id, arma_id } = req.params;
+
         const pool = await connectDB();
         const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .input('arma_id', sql.Int, req.params.arma_id)
+            .input('id', sql.Int, id)
+            .input('arma_id', sql.Int, arma_id)
             .query(`
                 SELECT a.*
                 FROM ARMES a
-                         JOIN SKINS s ON a.skin_id = s.id
+                         JOIN SKINS_ARMES sa ON a.id = sa.arma
+                         JOIN SKINS s ON sa.skin = s.id
                 WHERE s.id = @id AND a.id = @arma_id
             `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'arma per a aquesta skin');
+
+        if (result.recordset.length > 0) {
+            res.status(200).json(result.recordset[0]);
+        } else {
+            res.status(404).send("No s'ha trobat l'arma per a aquesta skin");
+        }
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en la consulta');
+        res.status(500).send("Error en la consulta");
     }
 };
 
 /**
  * @swagger
- * /skins/{nom}/armes/{arma_nom}:
+ * /armes/{nom_skin}/{nom_arma}:
  *   get:
  *     tags: [Armes]
  *     summary: Obtenir una arma per nom d'una skin per nom
@@ -157,27 +266,62 @@ exports.getArmaSkinId = async (req, res) => {
  *     responses:
  *       200:
  *         description: Detalls de l'arma
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: ID de l'arma
+ *                 nom:
+ *                   type: string
+ *                   description: Nom de l'arma
+ *                 descripcio:
+ *                   type: string
+ *                   description: Descripció de l'arma
+ *                 skin_id:
+ *                   type: integer
+ *                   description: ID de la skin associada
  *       404:
  *         description: No s'ha trobat l'arma per a aquesta skin
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "No s'ha trobat l'arma per a aquesta skin"
  *       500:
  *         description: Error en la consulta
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *               example: "Error en la consulta"
  */
 exports.getArmaSkinNom = async (req, res) => {
     try {
+        const { nom, arma_nom } = req.params;
+
         const pool = await connectDB();
         const result = await pool.request()
-            .input('nom', sql.VarChar(50), req.params.nom)
-            .input('arma_nom', sql.VarChar(50), req.params.arma_nom)
+            .input('nom', sql.VarChar(50), nom)
+            .input('arma_nom', sql.VarChar(50), arma_nom)
             .query(`
                 SELECT a.*
                 FROM ARMES a
-                         JOIN SKINS s ON a.skin_id = s.id
+                         JOIN SKINS_ARMES sa ON a.id = sa.arma
+                         JOIN SKINS s ON sa.skin = s.id
                 WHERE s.nom = @nom AND a.nom = @arma_nom
             `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'arma per a aquesta skin');
+
+        if (result.recordset.length > 0) {
+            res.status(200).json(result.recordset[0]);
+        } else {
+            res.status(404).send("No s'ha trobat l'arma per a aquesta skin");
+        }
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en la consulta');
+        res.status(500).send("Error en la consulta");
     }
 };
 
@@ -187,22 +331,43 @@ exports.getArmaSkinNom = async (req, res) => {
  *   post:
  *     tags: [Armes]
  *     summary: Crear una nova arma
- *     description: Afegeix una nova arma a la base de dades.
+ *     description: |
+ *       Afegeix una nova arma a la base de dades.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
+ *
+ *       **Exemple de sol·licitud**:
+ *       ```json
+ *       {
+ *         "email": "exemple@gmail.com",
+ *         "nom": "Espasa Llarga",
+ *         "categoria": 1,
+ *         "buff_atac": 10
+ *       }
+ *       ```
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - nom
+ *               - categoria
+ *               - buff_atac
  *             properties:
  *               nom:
  *                 type: string
- *               tipus:
- *                 type: string
- *               dany:
+ *                 description: Nom de l'arma.
+ *                 example: "Espasa Llarga"
+ *               categoria:
  *                 type: integer
- *               skin_id:
+ *                 description: Categoria de l'arma.
+ *                 example: 1
+ *               buff_atac:
  *                 type: integer
+ *                 description: Buff d'atac que proporciona l'arma.
+ *                 example: 10
  *     responses:
  *       201:
  *         description: Arma afegida correctament
@@ -211,16 +376,15 @@ exports.getArmaSkinNom = async (req, res) => {
  */
 exports.crearArma = async (req, res) => {
     try {
-        const { nom, tipus, dany, skin_id } = req.body;
+        const { nom, categoria, buff_atac } = req.body;
         const pool = await connectDB();
         await pool.request()
             .input('nom', sql.VarChar(50), nom)
-            .input('tipus', sql.VarChar(50), tipus)
-            .input('dany', sql.Int, dany)
-            .input('skin_id', sql.Int, skin_id)
+            .input('categoria', sql.Int, categoria)
+            .input('buff_atac', sql.Int, buff_atac)
             .query(`
-                INSERT INTO ARMES (nom, tipus, dany, skin_id)
-                VALUES (@nom, @tipus, @dany, @skin_id)
+                INSERT INTO ARMES (nom, buff_atac, categoria)
+                VALUES (@nom, @buff_atac, @categoria)
             `);
         res.status(201).send('Arma afegida correctament');
     } catch (err) {
@@ -235,7 +399,10 @@ exports.crearArma = async (req, res) => {
  *   delete:
  *     tags: [Armes]
  *     summary: Eliminar una arma per ID
- *     description: Elimina una arma de la base de dades mitjançant el seu ID.
+ *     description: |
+ *       Elimina una arma de la base de dades mitjançant el seu ID.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
  *     parameters:
  *       - in: path
  *         name: id

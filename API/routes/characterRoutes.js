@@ -22,4 +22,10 @@ router.post('/enemics/:nom/punts', verificacioUsuari.verifyToken,characterContro
 //Borrar un personatge per ID
 router.delete('/:id', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, characterController.borrarPersonatgeId);
 
+//Modificar la vide d'un personatge per ID
+router.put('/:id/vida', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, characterController.modificarVida);
+
+//Modificar el mal d'un personatge per ID
+router.put('/:id/mal', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, characterController.modificarMal);
+
 module.exports = router;

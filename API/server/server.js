@@ -22,7 +22,10 @@ const swaggerOptions = {
         info: {
             title: 'API-REST HOLLWOS GO',
             version: '1.0.0',
-            description: "Documentació de l'API per gestionar personatges, skins, armes, habilitats i usuaris de l'aplicació HollowsGo.",
+            description: "Documentació de l'API per gestionar personatges, skins, armes, habilitats, atacs i usuaris de l'aplicació HollowsGo. Cal dir que per l'eliminació de alguns objectes s'haurà de respetar les relacions amb la base de dades." +
+                "Per exemple: Personatges esta relacionat amb biblioteca i skins, per tant si es vol eliminar un personatge s'haurà de fer primer l'eliminació de les relacions amb la biblioteca i les skins." +
+                "Per a més informació sobre les relacions entre objectes, consultar l'imatge que es adjuntara de la base de dades.",
+
         },
         servers: [
             {

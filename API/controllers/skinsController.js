@@ -10,7 +10,7 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
- * /skins/{id}:
+ * /skins/{personatge_id}:
  *   get:
  *     tags: [Skins]
  *     summary: Obtenir totes les skins d'un personatge
@@ -61,58 +61,10 @@ exports.getSkinsPersonatge = async (req, res) => {
 
 /**
  * @swagger
- * /skins/user/{id}:
+ * /skins/usuari/{user_id}/{skin_id}:
  *   get:
  *     tags: [Skins]
- *     summary: Obtenir totes les skins d'un personatge d'un usuari
- *     description: Aquesta API retorna totes les skins d'un personatge que un usuari ha obtingut.
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: ID de l'usuari per obtenir les skins del personatge associades.
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Llista de skins trobades per a l'usuari.
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *       404:
- *         description: No s'han trobat skins per a aquest usuari.
- *       500:
- *         description: Error en la consulta.
- */
-exports.getSkinsUsuari = async (req, res) => {
-    try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query(`
-                SELECT s.*
-                FROM SKINS s
-                         JOIN PERSONATGES p ON s.personatge_id = p.id
-                         JOIN BIBLIOTECA b ON p.id = b.personatge_id
-                         JOIN USUARIS u ON b.user_id = u.id
-                WHERE u.id = @id
-            `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'han trobat skins per a aquest usuari');
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error en la consulta');
-    }
-};
-
-/**
- * @swagger
- * /skin/user/{id}/{skin_id}:
- *   get:
- *     tags: [Skins]
- *     summary: Obtenir una skin específica d'un personatge per ID d'usuari
+ *     summary: Obtenir una skin específica d'un personatge per ID d'usuari, per comprovar si l'usuari té aquesta skin.
  *     description: Aquesta API retorna una skin específica d'un personatge per un usuari determinat mitjançant els seus IDs.
  *     parameters:
  *       - name: id
@@ -148,7 +100,7 @@ exports.getSkinUsuariPerId = async (req, res) => {
             .query(`
                 SELECT s.*
                 FROM SKINS s
-                         JOIN PERSONATGES p ON s.personatge_id = p.id
+                         JOIN PERSONATGES p ON s.personatge = p.id
                          JOIN BIBLIOTECA b ON p.id = b.personatge_id
                          JOIN USUARIS u ON b.user_id = u.id
                 WHERE u.id = @id AND s.id = @skin_id
@@ -162,7 +114,7 @@ exports.getSkinUsuariPerId = async (req, res) => {
 
 /**
  * @swagger
- * /skin/user/{id}/{nom}:
+ * /skins/usuari/{id}/nom/{skin_nom}:
  *   get:
  *     tags: [Skins]
  *     summary: Obtenir una skin per nom d'un personatge per usuari
@@ -201,7 +153,7 @@ exports.getSkinPerNomUsuariPerId = async (req, res) => {
             .query(`
                 SELECT s.*
                 FROM SKINS s
-                         JOIN PERSONATGES p ON s.personatge_id = p.id
+                         JOIN PERSONATGES p ON s.personatge = p.id
                          JOIN BIBLIOTECA b ON p.id = b.personatge_id
                          JOIN USUARIS u ON b.user_id = u.id
                 WHERE u.id = @id AND s.nom = @nom
@@ -215,24 +167,59 @@ exports.getSkinPerNomUsuariPerId = async (req, res) => {
 
 /**
  * @swagger
- * /skins:
+ * /skins/:
  *   post:
  *     tags: [Skins]
  *     summary: Crear una nova skin
- *     description: Aquesta API permet afegir una nova skin a la base de dades.
+ *     description: |
+ *       Afegeix una nova skin a la base de dades.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
+ *
+ *       **Exemple de sol·licitud**:
+ *       ```json
+ *       {
+ *         "email": "exemple@gmail.com",
+ *         "nom": "Skin Nova",
+ *         "categoria": 1,
+ *         "imatge": "imatge.png",
+ *         "personatge": 1,
+ *         "atac": 1
+ *       }
+ *       ```
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - nom
+ *               - categoria
+ *               - imatge
+ *               - personatge
+ *               - atac
  *             properties:
  *               nom:
  *                 type: string
- *               descripcio:
- *                 type: string
- *               personatge_id:
+ *                 description: Nom de la skin.
+ *                 example: "Skin Nova"
+ *               categoria:
  *                 type: integer
+ *                 description: Categoria de la skin.
+ *                 example: 1
+ *               imatge:
+ *                 type: string
+ *                 description: URL de la imatge de la skin.
+ *                 example: "imatge.png"
+ *               personatge:
+ *                 type: integer
+ *                 description: ID del personatge associat.
+ *                 example: 1
+ *               atac:
+ *                 type: integer
+ *                 description: ID de l'atac associat.
+ *                 example: 1
  *     responses:
  *       201:
  *         description: Skin afegida correctament.
@@ -241,15 +228,17 @@ exports.getSkinPerNomUsuariPerId = async (req, res) => {
  */
 exports.crearSkin = async (req, res) => {
     try {
-        const { nom, descripcio, personatge_id } = req.body;
+        const { nom, categoria, imatge, personatge, atac } = req.body;
         const pool = await connectDB();
         await pool.request()
             .input('nom', sql.VarChar(50), nom)
-            .input('descripcio', sql.VarChar(255), descripcio)
-            .input('personatge_id', sql.Int, personatge_id)
+            .input('categoria', sql.Int, categoria)
+            .input('imatge', sql.VarChar(255), imatge)
+            .input('personatge', sql.Int, personatge)
+            .input('atac', sql.Int, atac)
             .query(`
-                INSERT INTO SKINS (nom, descripcio, personatge_id)
-                VALUES (@nom, @descripcio, @personatge_id)
+                INSERT INTO SKINS (nom, categoria, imatge, personatge, atac)
+                VALUES (@nom, @categoria, @imatge, @personatge, @atac)
             `);
         res.status(201).send('Skin afegida correctament');
     } catch (err) {

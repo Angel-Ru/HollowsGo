@@ -9,7 +9,7 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
- * /personatges:
+ * /personatges/:
  *   get:
  *     summary: Obtenir tots els personatges
  *     description: Retorna una llista de tots els personatges registrats a la base de dades.
@@ -99,10 +99,23 @@ exports.getPersonatgeNom = async (req, res) => {
 
 /**
  * @swagger
- * /personatges:
+ * /personatges/:
  *   post:
  *     summary: Crear un nou personatge
- *     description: Afegeix un nou personatge a la base de dades.
+ *     description: |
+ *       Afegeix un nou personatge a la base de dades.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
+ *
+ *       **Exemple de sol·licitud**:
+ *       ```json
+ *       {
+ *         "email": "exemple@gmail.com",
+ *         "nom": "Personatge Nou",
+ *         "vida_base": 100,
+ *         "mal_base": 50
+ *       }
+ *       ```
  *     tags: [Personatges]
  *     requestBody:
  *       required: true
@@ -110,13 +123,23 @@ exports.getPersonatgeNom = async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - nom
+ *               - vida_base
+ *               - mal_base
  *             properties:
  *               nom:
  *                 type: string
+ *                 description: Nom del personatge.
+ *                 example: "Personatge Nou"
  *               vida_base:
  *                 type: integer
+ *                 description: Vida base del personatge.
+ *                 example: 100
  *               mal_base:
  *                 type: integer
+ *                 description: Mal base del personatge.
+ *                 example: 50
  *     responses:
  *       201:
  *         description: Personatge afegit correctament
@@ -144,7 +167,10 @@ exports.crearPersonatge = async (req, res) => {
  * /personatges/{id}:
  *   delete:
  *     summary: Eliminar un personatge per ID
- *     description: Elimina un personatge de la base de dades mitjançant el seu ID.
+ *     description: |
+ *       Elimina un personatge de la base de dades mitjançant el seu ID.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
  *     tags: [Personatges]
  *     parameters:
  *       - in: path
@@ -184,7 +210,8 @@ exports.borrarPersonatgeId = async (req, res) => {
  * /personatges/enemics/{nom}/punts:
  *   post:
  *     summary: Obtenir els punts que dona un enemic i sumar-los als punts de l'usuari
- *     description: Aquest endpoint obté els punts que dona un enemic específic (mitjançant el seu nom) i suma aquests punts als punts emmagatzemats de l'usuari. Només retorna els punts que dona l'enemic.
+ *     description: |
+ *       Aquest endpoint obté els punts que dona un enemic específic (mitjançant el seu nom) i suma aquests punts als punts emmagatzemats de l'usuari. Només retorna els punts que dona l'enemic.
  *     tags: [Personatges]
  *     parameters:
  *       - in: path
@@ -220,19 +247,19 @@ exports.borrarPersonatgeId = async (req, res) => {
  */
 exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
     try {
-        const { nom } = req.params; // Nom de l'enemic
-        const { email } = req.body; // Email de l'usuari
+        const {nom} = req.params; // Nom de l'enemic
+        const {email} = req.body; // Email de l'usuari
 
-        // 1. Obtenir els punts que dona l'enemic
+        //Obtenir els punts que dona l'enemic
         const pool = await connectDB();
 
         // Primer, obtenir l'ID de l'enemic a través del nom de la taula PERSONATGES
         const resultEnemic = await pool.request()
             .input('nom', sql.VarChar(50), nom)
             .query(`
-                SELECT e.punts_donats 
+                SELECT e.punts_donats
                 FROM ENEMICS e
-                INNER JOIN PERSONATGES p ON e.personatge_id = p.id
+                         INNER JOIN PERSONATGES p ON e.personatge_id = p.id
                 WHERE p.nom = @nom
             `);
 
@@ -242,7 +269,7 @@ exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
 
         const puntsEnemic = resultEnemic.recordset[0].punts_donats; // Punts que dona l'enemic
 
-        // 2. Verificar si l'usuari existeix
+        //Verificar si l'usuari existeix
         const resultUsuari = await pool.request()
             .input('email', sql.VarChar(50), email)
             .query('SELECT id FROM USUARIS WHERE email = @email');
@@ -251,18 +278,114 @@ exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
             return res.status(404).send('Usuari no trobat');
         }
 
-        const usuari_id = resultUsuari.recordset[0].id; // ID de l'usuari
+        const usuari_id = resultUsuari.recordset[0].id;
 
-        // 3. Sumar els punts de l'enemic als punts emmagatzemats de l'usuari
+        //Sumar els punts de l'enemic als punts emmagatzemats de l'usuari
         await pool.request()
             .input('usuari_id', sql.Int, usuari_id)
             .input('punts', sql.Int, puntsEnemic)
             .query('UPDATE USUARIS SET punts_emmagatzemats = punts_emmagatzemats + @punts WHERE id = @usuari_id');
 
-        // 4. Retornar només els punts que dona l'enemic
-        res.status(200).json({ punts_enemic: puntsEnemic });
+        // Retornar només els punts que dona l'enemic
+        res.status(200).json({punts_enemic: puntsEnemic});
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en el servidor');
+    }
+};
+
+/**
+ * @swagger
+ * /personatges/{id}/vida:
+ *   put:
+ *     summary: Modificar la vida d'un personatge
+ *     description: |
+ *       Modifica la vida d'un personatge existent a la base de dades.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
+ *     tags: [Personatges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: L'ID del personatge a modificar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               vida:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Vida del personatge modificada correctament
+ *       500:
+ *         description: Error en modificar la vida del personatge
+ */
+exports.modificarVida = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { vida } = req.body;
+        const pool = await connectDB();
+        await pool.request()
+            .input('id', sql.Int, id)
+            .input('vida', sql.Int, vida)
+            .query(`UPDATE PERSONATGES SET vida_base = @vida WHERE id = @id`);
+        res.status(200).send('Vida del personatge modificada correctament');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en modificar la vida del personatge');
+    }
+};
+
+/**
+ * @swagger
+ * /personatges/{id}/mal:
+ *   put:
+ *     summary: Modificar el mal d'un personatge
+ *     description: |
+ *       Modifica el mal d'un personatge existent a la base de dades.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
+ *     tags: [Personatges]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: L'ID del personatge a modificar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               mal:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Mal del personatge modificat correctament
+ *       500:
+ *         description: Error en modificar el mal del personatge
+ */
+exports.modificarMal = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { mal } = req.body;
+        const pool = await connectDB();
+        await pool.request()
+            .input('id', sql.Int, id)
+            .input('mal', sql.Int, mal)
+            .query(`UPDATE PERSONATGES SET mal_base = @mal WHERE id = @id`);
+        res.status(200).send('Mal del personatge modificat correctament');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en modificar el mal del personatge');
     }
 };
