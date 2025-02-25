@@ -1,4 +1,8 @@
-import 'package:hollows_go/imports.dart';
+import '../imports.dart';
+
+/*
+Aquesta és la classe UIProvider. Aquesta classe s'encarrega de gestionar la informació de la UI de l'aplicació.
+*/
 
 class UIProvider extends ChangeNotifier {
   int _selectedMenuOpt = 0;

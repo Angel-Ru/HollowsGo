@@ -1,9 +1,12 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/models/skin.dart';
-import 'package:hollows_go/providers/skins_enemics_personatges.dart';
-import 'package:provider/provider.dart';
+import '../imports.dart';
+
+/*
+A la classe BibliotecaScreen es mostra la pantalla de la biblioteca, on es poden veure els personatges i les seves skins que l'usuari ha aconseguit al gacha.
+A més, es pot canviar entre veure els personatges aliats i els enemics, a través d'un interruptor.
+Cada personatge surt amb les seves skins, el mal que fa i la seva categoria/raressa.
+L'usuari pot seleccionar una skin d'un personatge per a poder-la emprar als combats contra els enemics.
+*/
 
 class BibliotecaScreen extends StatefulWidget {
   @override
@@ -12,7 +15,7 @@ class BibliotecaScreen extends StatefulWidget {
 
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
   int _dialogIndex = 0;
-  bool _switchValue = false; // Estat del switch
+  bool _switchValue = false;
 
   final List<String> _dialoguesEnemigos = [
     "Oh, quina sorpresa.",
@@ -46,12 +49,12 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserData(); // Carregar les dades de l'usuari
+    _loadUserData();
   }
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getInt('userId'); // Obtenir l'ID de l'usuari
+    final userId = prefs.getInt('userId');
 
     if (userId == null) {
       print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
@@ -60,22 +63,20 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.fetchPersonatgesAmbSkins(userId.toString()); // Carregar aliats
-    provider.fetchPersonatgesEnemicsAmbSkins(); // Carregar enemics
+    provider.fetchPersonatgesAmbSkins(userId.toString());
+    provider.fetchPersonatgesEnemicsAmbSkins();
   }
 
   void _selectSkinAliat(Skin skin) {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.setSelectedSkinAliat(
-        skin); // Guardem la skin seleccionada per a l'aliat
+    provider.setSelectedSkinAliat(skin);
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
 
-    // Seleccionar la llista de personatges segons l'estat del Switch
     final personatges =
         _switchValue ? provider.characterEnemies : provider.personatges;
 
@@ -97,7 +98,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       ),
       body: Stack(
         children: [
-          // Fons de pantalla
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -118,7 +118,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               child: Column(
                 children: [
                   SizedBox(height: 100),
-                  // Contenidor de personatge amb diàleg
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -263,7 +262,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  // Personatges i Skins
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: personatges.map((personatge) {
@@ -297,12 +295,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                   var skin = personatge.skins[index];
                                   final isSelected =
                                       provider.selectedSkinAliat?.id == skin.id;
-
                                   return GestureDetector(
                                     onTap: () {
                                       if (!_switchValue) {
-                                        _selectSkinAliat(
-                                            skin); // Seleccionar skin per a l'aliat
+                                        _selectSkinAliat(skin);
                                       }
                                     },
                                     child: Padding(
@@ -310,7 +306,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                           EdgeInsets.symmetric(horizontal: 5),
                                       child: Column(
                                         children: [
-                                          // Imatge de la skin amb marcador de selecció
                                           Stack(
                                             children: [
                                               Container(
@@ -345,7 +340,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                             ],
                                           ),
                                           SizedBox(height: 5),
-                                          // Nom de la skin
                                           Container(
                                             padding: EdgeInsets.all(4),
                                             decoration: BoxDecoration(
@@ -364,12 +358,11 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                             ),
                                           ),
                                           SizedBox(height: 3),
-                                          // Qualitat en estrelles (exemple)
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: List.generate(
-                                              5, // Exemple: 5 estrelles màxim
+                                              5,
                                               (index) => Icon(
                                                 Icons.star,
                                                 color: index <

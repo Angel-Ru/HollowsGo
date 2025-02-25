@@ -1,11 +1,7 @@
-import 'package:hollows_go/providers/skins_enemics_personatges.dart';
-import 'package:hollows_go/providers/user_provider.dart';
-import 'package:hollows_go/screens/mapscreen.dart';
-
 import 'imports.dart';
 
 /*
-Aquesta és la classe Main. En aquesta classe es creen les rutes nombrades de l'aplicació i es defineix el tema.
+Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l'aplicació i es defineix el tema.
 A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
 */
 
@@ -22,7 +18,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UIProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DialogueProvider()),
-        ChangeNotifierProvider(create: (_) => SkinsEnemicsPersonatgesProvider()),
+        ChangeNotifierProvider(
+            create: (_) => SkinsEnemicsPersonatgesProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -6,7 +6,7 @@ Aquesta és la classe Mapscreen. En aquesta classe crea la pantalla del mapa de 
 En aquesta pantalla es mostra un mapa de Google Maps amb la ubicació actual de l'usuari i uns punts aleatoris.
 Aquests punts aleatoris són Hollows, els quals et duen a un combat contra un enemic.
 Els Hollows generats són aleatoris i es mostren en un radi de 250 metres al voltant de la ubicació actual de l'usuari.
-La generació de la quantitat de Hollows és aleatòria, entre 3 i 7. Igual que les imatges dels mateixos.
+La generació de la quantitat de Hollows és aleatòria, entre 3 i 7. Igual que les imatges d'aquests.
 El marcador de la ubicació actual de l'usuari és personalitzat amb la imatge de perfil que tengui posada.
 */
 

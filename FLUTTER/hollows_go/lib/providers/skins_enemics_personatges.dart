@@ -1,28 +1,27 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../imports.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:hollows_go/models/personatge.dart'; // Importa el model Personatge
-import 'package:hollows_go/models/skin.dart'; // Importa el model Skin
+
+/*
+El provider SkinsEnemicsPersonatgesProvider conté la informació dels personatges, les skins i els enemics.
+Ens serveix per a poder obtenir les seves dades.
+Alguns mètodes principals són el de seleccionar una skin dels enemics de manera aleatòria, actualitzar la vida dels enemics i dels aliats, i obtenir els punts dels enemics. 
+*/
 
 class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
-  // Constants per a URLs i claus de SharedPreferences
-  static const String _baseUrl = 'http://192.168.2.197:3000';
+  static const String _baseUrl = 'http://192.168.1.28:3000';
   static const String _userPuntsKey = 'userPunts';
   static const String _userNameKey = 'userName';
   static const String _userEmailKey = 'userEmail';
 
-  int _coinCount = 0; // Punts de l'usuari
-  int _coinEnemies = 0; // Punts de l'enemic
+  int _coinCount = 0;
+  int _coinEnemies = 0;
   String _username = 'Usuari';
-  Skin? _selectedSkin; // Skin seleccionada
+  Skin? _selectedSkin;
   Skin? _selectedSkinAliat;
-  List<Personatge> _personatges = []; // Llista de personatges
-  List<Personatge> _characterEnemies = []; // Llista de personatges enemics
-  List<Skin> _skins = []; // Llista de skins
+  List<Personatge> _personatges = [];
+  List<Personatge> _characterEnemies = [];
+  List<Skin> _skins = [];
 
-  // Getters
   List<Personatge> get personatges => _personatges;
   List<Personatge> get characterEnemies => _characterEnemies;
   List<Skin> get skins => _skins;
@@ -36,7 +35,6 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     _loadUserData();
   }
 
-  // Carregar dades locals
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _coinCount = prefs.getInt(_userPuntsKey) ?? 0;
@@ -49,7 +47,6 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Seleccionar una skin aleatòria
   Future<void> selectRandomSkin() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -65,14 +62,13 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Incloure el token
+          'Authorization': 'Bearer $token',
         },
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
 
-        // Extreure l'objecte "skin" del JSON
         if (data.containsKey("skin")) {
           final Map<String, dynamic> skinData = data["skin"];
           _selectedSkin = Skin.fromJson(skinData);
@@ -90,7 +86,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
 
   void updateEnemyHealth(int newHealth) {
     if (_selectedSkin != null) {
-      _selectedSkin!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
+      _selectedSkin!.currentHealth = max(newHealth, 0);
       notifyListeners();
     } else {
       print('Error: No s\'ha seleccionat cap skin');
@@ -99,25 +95,23 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
 
   void updateAllyHealth(int newHealth) {
     if (_selectedSkinAliat != null) {
-      _selectedSkinAliat!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
+      _selectedSkinAliat!.currentHealth = max(newHealth, 0);
       notifyListeners();
     } else {
       print('Error: No s\'ha seleccionat cap skin d\'aliat');
     }
   }
 
-  // Obtenir els punts de l'enemic basant-se en la skin seleccionada
   Future<void> fetchEnemyPoints() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token'); // Obtenir el token
+      String? token = prefs.getString('token');
 
       if (token == null || _selectedSkin == null) {
         print("No s'ha trobat cap token o skin seleccionada.");
         return;
       }
 
-      // Obtenir el nom de la skin seleccionada
       String? skinName = _selectedSkin!.personatgeNom;
 
       final url = Uri.parse('$_baseUrl/personatges/enemics/$skinName/punts');
@@ -125,7 +119,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Incloure el token
+          'Authorization': 'Bearer $token',
         },
         body: json.encode({'email': prefs.getString(_userEmailKey)}),
       );
@@ -144,7 +138,6 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     }
   }
 
-  // Obtenir personatges amb les seves skins
   Future<void> fetchPersonatgesAmbSkins(String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -160,29 +153,25 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Incloure el token
+          'Authorization': 'Bearer $token',
         },
       );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
-        // Netegem les llistes abans d'afegir noves dades
         _personatges.clear();
         _skins.clear();
 
         for (var item in data) {
-          // Creem el personatge
           final personatge = Personatge.fromJson(item['personatge']);
 
-          // Afegim les skins del personatge
           if (item.containsKey('skins') && item['skins'] is List) {
             for (var skinJson in item['skins']) {
               personatge.skins.add(Skin.fromJson(skinJson));
             }
           }
 
-          // Afegim el personatge a la llista
           _personatges.add(personatge);
         }
 
@@ -195,11 +184,10 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     }
   }
 
-  // Carregar personatges enemics amb les seves skins
   Future<void> fetchPersonatgesEnemicsAmbSkins() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token'); // Obtenir el token
+      String? token = prefs.getString('token');
 
       if (token == null) {
         print("No s'ha trobat cap token. L'usuari no està autenticat.");
@@ -211,7 +199,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Incloure el token
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -241,7 +229,6 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     }
   }
 
-  // Forçar l'actualització de punts manualment
   void refreshPoints() {
     fetchEnemyPoints();
   }

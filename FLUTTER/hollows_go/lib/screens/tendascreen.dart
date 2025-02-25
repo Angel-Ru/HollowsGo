@@ -4,10 +4,11 @@ import 'package:http/http.dart' as http;
 
 /*
 Aquesta és la classe TendaScreen. En aquesta classe es crea la pantalla de la tenda de l'aplicació.
-En aquesta pantalla es mostra un banner de gacha i un botó per fer una tirada del gacha, la qual costa 100 monedes.
+En aquesta pantalla es mostra un bàner de gacha i un botó per fer una tirada del gacha, la qual costa 100 monedes.
 Quan l'usuari fa una tirada de gacha, es fa una petició HTTP a un servidor per obtenir una nova skin.
 Després de la tirada, es mostra un vídeo d'animació i un diàleg amb la informació de la nova skin obtinguda.
 La classe també gestiona la reproducció del vídeo d'animació utilitzant els controladors VideoPlayerController i ChewieController.
+S'ha de canviar l'IP del servidor per a que funcioni correctament.
 */
 
 class TendaScreen extends StatefulWidget {
@@ -61,9 +62,10 @@ class _TendaScreenState extends State<TendaScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.2.197:3000/skins/gacha'),
-        headers: {'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
+        Uri.parse('http://192.168.1.28:3000/skins/gacha'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
         },
         body: json.encode({'email': email}),
       );
