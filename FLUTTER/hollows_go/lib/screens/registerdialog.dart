@@ -5,6 +5,7 @@ import '../imports.dart';
 Aquesta és la classe RegisterDialog. En aquesta classe es crea el diàleg de registre.
 En aquest diàleg ens connectam amb el servidor per a poernos crear un compte per a poder-nos connectar a l'aplicació.
 Un cop ens hem registrat, ens redirigeix a la pantalla principal de l'aplicació, la qual es la HomeScreen.
+S'ha de canviar l'IP del servidor per a que funcioni correctament.
 */
 
 class RegisterDialog extends StatefulWidget {
@@ -55,7 +56,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
     return password.length >= 6;
   }
 
-   Future<void> _register() async {
+  Future<void> _register() async {
     final username = _usernameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -124,7 +125,6 @@ class _RegisterDialogState extends State<RegisterDialog> {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

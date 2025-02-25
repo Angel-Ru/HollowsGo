@@ -8,7 +8,7 @@ import 'package:hollows_go/models/skin.dart'; // Importa el model Skin
 
 class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   // Constants per a URLs i claus de SharedPreferences
-  static const String _baseUrl = 'http://192.168.2.197:3000';
+  static const String _baseUrl = 'http://192.168.1.28:3000';
   static const String _userPuntsKey = 'userPunts';
   static const String _userNameKey = 'userName';
   static const String _userEmailKey = 'userEmail';
@@ -90,7 +90,8 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
 
   void updateEnemyHealth(int newHealth) {
     if (_selectedSkin != null) {
-      _selectedSkin!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
+      _selectedSkin!.currentHealth =
+          max(newHealth, 0); // Assegura que la salut no sigui negativa
       notifyListeners();
     } else {
       print('Error: No s\'ha seleccionat cap skin');
@@ -99,7 +100,8 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
 
   void updateAllyHealth(int newHealth) {
     if (_selectedSkinAliat != null) {
-      _selectedSkinAliat!.currentHealth = max(newHealth, 0); // Assegura que la salut no sigui negativa
+      _selectedSkinAliat!.currentHealth =
+          max(newHealth, 0); // Assegura que la salut no sigui negativa
       notifyListeners();
     } else {
       print('Error: No s\'ha seleccionat cap skin d\'aliat');

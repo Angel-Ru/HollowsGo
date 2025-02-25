@@ -13,11 +13,15 @@ export '/screens/combatscreen.dart';
 export '/screens/mapscreen.dart';
 
 export '/providers/loginprovider.dart';
-export '/providers/blinkingtextprovider.dart';
+// export '/providers/blinkingtextprovider.dart';
 export '/providers/ui_provider.dart';
 export '/providers/dialeg_provider.dart';
 export '/providers/user_provider.dart';
 export '/providers/skins_enemics_personatges.dart';
+
+export '/models/user.dart';
+export '/models/skin.dart';
+export '/models/personatge.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';

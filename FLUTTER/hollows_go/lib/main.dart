@@ -1,7 +1,3 @@
-import 'package:hollows_go/providers/skins_enemics_personatges.dart';
-import 'package:hollows_go/providers/user_provider.dart';
-import 'package:hollows_go/screens/mapscreen.dart';
-
 import 'imports.dart';
 
 /*
@@ -22,7 +18,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UIProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DialogueProvider()),
-        ChangeNotifierProvider(create: (_) => SkinsEnemicsPersonatgesProvider()),
+        ChangeNotifierProvider(
+            create: (_) => SkinsEnemicsPersonatgesProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
