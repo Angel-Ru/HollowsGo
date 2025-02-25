@@ -1,5 +1,4 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
+import '../imports.dart';
 
 /*
 Aquesta és la classe DialogueProvider. Aquesta classe s'encarrega de gestionar els diàlegs de l'aplicació.
@@ -39,7 +38,6 @@ class DialogueProvider extends ChangeNotifier {
       _dialogues.isNotEmpty ? _dialogues[_dialogIndex] : "";
   String get currentImage => _currentImage;
 
-  // Getters para la biblioteca
   String get currentLibraryDialogue => _libraryDialogues.isNotEmpty
       ? _libraryDialogues[_libraryDialogIndex]
       : "";

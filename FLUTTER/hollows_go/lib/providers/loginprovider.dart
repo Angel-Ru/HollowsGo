@@ -1,4 +1,4 @@
-import 'package:hollows_go/imports.dart';
+import '../imports.dart';
 
 /*
 El LoginProvider és el provider que s'encarrega de gestionar el login de l'usuari.
