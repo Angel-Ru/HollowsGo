@@ -1,3 +1,5 @@
+import 'package:hollows_go/config.dart';
+
 import '../imports.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,13 +10,15 @@ Alguns mètodes principals són el de seleccionar una skin dels enemics de maner
 */
 
 class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
-  static const String _baseUrl = 'http://192.168.1.28:3000';
+  static const String _baseUrl = 'http://${Config.ip}:3000';
   static const String _userPuntsKey = 'userPunts';
   static const String _userNameKey = 'userName';
   static const String _userEmailKey = 'userEmail';
 
   int _coinCount = 0;
   int _coinEnemies = 0;
+  int? _maxEnemyHealth;
+  int? _maxAllyHealth;
   String _username = 'Usuari';
   Skin? _selectedSkin;
   Skin? _selectedSkinAliat;
@@ -100,6 +104,25 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     } else {
       print('Error: No s\'ha seleccionat cap skin d\'aliat');
     }
+  }
+
+   void setMaxEnemyHealth(int maxHealth) {
+    _maxEnemyHealth = maxHealth;
+    notifyListeners();
+  }
+
+  void setMaxAllyHealth(int maxHealth) {
+    _maxAllyHealth = maxHealth;
+    notifyListeners();
+  }
+  void resetHealth() {
+    if (_selectedSkin != null && _maxEnemyHealth != null) {
+      _selectedSkin!.currentHealth = _maxEnemyHealth!;
+    }
+    if (_selectedSkinAliat != null && _maxAllyHealth != null) {
+      _selectedSkinAliat!.currentHealth = _maxAllyHealth!;
+    }
+    notifyListeners();
   }
 
   Future<void> fetchEnemyPoints() async {

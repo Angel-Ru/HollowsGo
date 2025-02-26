@@ -18,6 +18,8 @@ export '/providers/dialeg_provider.dart';
 export '/providers/user_provider.dart';
 export '/providers/skins_enemics_personatges.dart';
 
+export 'package:hollows_go/config.dart';
+
 export '/models/user.dart';
 export '/models/skin.dart';
 export '/models/personatge.dart';

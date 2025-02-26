@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:hollows_go/config.dart';
+
 import '../imports.dart';
 import 'package:http/http.dart' as http;
 
@@ -62,7 +64,7 @@ class _TendaScreenState extends State<TendaScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.1.28:3000/skins/gacha'),
+        Uri.parse('http://${Config.ip}:3000/skins/gacha'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
