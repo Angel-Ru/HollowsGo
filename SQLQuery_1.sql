@@ -506,4 +506,40 @@ INSERT INTO SKINS_ARMES(skin, arma) VALUES
 -- Yumichika
 (118, 87), -- Yumichika - Fuji Kujaku (Arma base)
 (119, 88); -- Yumichika Bankai - Fuji Kujaku (Shikai)
+
+
+
+-- HOLLOWS GO REMASTERED
+
+-- INSERTS FETS PER EN MIQUEL SANSÓ TORRES
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Riruka', 600, 65)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Yhwach', 1000, 180)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Ichibe Hyosube', 1100, 175)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Kirio Hikifune', 1200, 150)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Asguiaro Ebern', 650, 70)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Quilge Opie', 700, 85)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Chojiro Tadaoki', 900, 110)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Ryuken Ishida', 800, 100)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Lille Barro', 1000, 165)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Jugram Haschwalth', 1050, 170)
+insert into personatges(nom, vida_base, mal_base) values('Isshin Kurosaki', 850, 100)
+insert into personatges(nom, vida_base, mal_base) values('Yachiru', 600, 65)
+insert into personatges(nom, vida_base, mal_base) values('Rōjūrō Ōtoribashi', 900, 110)
+
+-- INSERTS FETS PER N'ALBERT GALÁN CÀNAVES
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('NaNaNa', 700, 70)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Äs Nödt', 750, 85)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Mask De Masculine', 800, 90)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Giselle Gewelle', 800, 75)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Bambietta Basteaban', 600, 90)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES ('Robert Accutrone', 600, 75)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES ('Candice Catnipp', 700, 80)
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES ('Oh-Etsu Nimaiya', 1100, 170)
+insert into personatges(nom, vida_base, mal_base) values('Kūgo Ginjō', 700, 80)
+insert into personatges(nom, vida_base, mal_base) values('Jackie Tristan', 650, 70)
+
+-- INSERTS FETS PER ÀNGEL RUBIO OLIVER
+INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Bazz-B', 760, 115),('Senjumaru Shutara',1100, 165),('Gremmy Thoumeaux',1000,145),('Askin Nakk Le Vaar', 1000, 90),('Meninas', 700, 85),('Masaki Kurosaki', 600, 110),('Cang Du', 700, 80)
+insert into personatges(nom, vida_base, mal_base) values('Shūkurō Tsukishima', 650, 75)
+insert into personatges(nom, vida_base, mal_base) values('Driscoll Berci', 800, 115)
 */
