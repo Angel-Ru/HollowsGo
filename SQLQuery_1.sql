@@ -542,4 +542,127 @@ insert into personatges(nom, vida_base, mal_base) values('Jackie Tristan', 650, 
 INSERT INTO PERSONATGES(nom, vida_base, mal_base) VALUES('Bazz-B', 760, 115),('Senjumaru Shutara',1100, 165),('Gremmy Thoumeaux',1000,145),('Askin Nakk Le Vaar', 1000, 90),('Meninas', 700, 85),('Masaki Kurosaki', 600, 110),('Cang Du', 700, 80)
 insert into personatges(nom, vida_base, mal_base) values('Shūkurō Tsukishima', 650, 75)
 insert into personatges(nom, vida_base, mal_base) values('Driscoll Berci', 800, 115)
+
+-- INSERTS DE SKINS FETS PER MIQUEL SANSÓ
+
+--Riruka
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Riruka',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275824/PERSONATGES/Riruka/d2cqpyghyjainwvwbxyl.png',75,NULL);
+
+-- Ichibe Hyosube
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Ichibe',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277834/PERSONATGES/Ichibe/zdajpd9uijppl7ofmjtj.png',77,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Ichibe Bankai',4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277816/PERSONATGES/Ichibe/oxzpt7st0gdvq6h7fnuw.png',77,NULL);
+
+-- Kirio Hikifune
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Kirio',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277632/PERSONATGES/Kirio/uwuht1xskff6mbwifdl4.png',78,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Kirio Prima',4,'',78,NULL);
+
+-- Chojiro Tadaoki
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Chojiro Jove',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275747/PERSONATGES/Chojiro/zezsekgqwu0f4fvfsbwq.png',81,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Chojiro Bankai',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275748/PERSONATGES/Chojiro/srfadni62w4oobghiafo.png',81,NULL);
+
+-- Ryūken Ishida
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Ryūken',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744616813/PERSONATGES/Ryuken/cf8rlvm3ycygpodlxnjq.png',82,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Ryūken Disparant',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744616813/PERSONATGES/Ryuken/j2zram9bkm4iqwlhzjik.png',82,NULL);
+
+-- Isshin Kurosaki
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Isshin',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744358653/1602-c2759e22-b290-43cd-96e6-029d767ae5ff_pcgrfa.png',85,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Isshin Jove',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744358655/1753-54cecd36-4db6-4dad-b0c2-dfb2aff706d1_ilp44x.png',85,NULL);
+
+-- Yachiru
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Yachiru',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277068/PERSONATGES/Yachiru/umnzcpgkgmwa9hetrph7.png',86,NULL);
+
+-- Rōjūrō Ōtoribashi "Rose" 
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Rose',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277428/PERSONATGES/Rojuro/jc8svrcedkeuzvsjjqnb.png',87,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Rose Capità',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277443/PERSONATGES/Rojuro/xabdnbudi5vlruejguoz.png',87,NULL);
+
+-- Oh-Etsu Nimaiya
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Oh-Etsu',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277719/PERSONATGES/Oh/cywqorfdszalf4hpjwkd.png',74,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Oh-Etsu Apuntant',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277774/PERSONATGES/Oh/ymiyacu0yu5qbp1bf0h1.png',74,NULL);
+
+-- Kūgo Ginjō
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Kūgo Ginjō',1,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275776/PERSONATGES/Ginjo/j0hoii1ypzvxq0o6skxm.png',88,NULL);
+
+-- Jackie Tristan
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Jackie',1,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275776/PERSONATGES/Ginjo/j0hoii1ypzvxq0o6skxm.png',88,NULL);
+
+
+-- INSERTS DE SKINS FETS PER ÀNGEL RUBIO
+
+-- Senjumaru Shutara
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Senjumaru',3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277548/PERSONATGES/Senjumaru/dnagivpuc9pxccaggbiv.png',61,NULL);
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Senjumaru Bankai',4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277533/PERSONATGES/Senjumaru/fpts8za3sj5g0mg8y5ls.png',61,NULL);
+
+-- Shūkurō Tsukishima
+insert into SKINS(nom, categoria, imatge,personatge,atac) VALUES('Tsukushima',2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275765/PERSONATGES/Tsukishima/qlyfi5q8tb6ld8nndvsi.png',61,NULL);
+
+-- Äs Nödt
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Äs Nödt', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275520/QUINCIES/%C3%84s/icsfiu7x0dvbnzioh6kv.png', 68, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Äs Nödt Vollständig', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275520/QUINCIES/%C3%84s/wckhskjiwcovhr0djf2o.png', 68, NULL)
+
+--Askin Nakk
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Askin Nakk', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275529/QUINCIES/Askin/w7haazedhcayuhudosif.png', 63, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Askin Nakk Vollständig', 3, 'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275529/QUINCIES/Askin/vfqw1owjlbsnpcg3e7mc.png', 63, NULL)
+
+--Bambietta
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Bambietta', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275547/QUINCIES/Bambietta/foqqmwtrg9vvuxbwdlkh.png', 71, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Bambietta Zombie', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275547/QUINCIES/Bambietta/wota2etju1ymjjozwdmg.png', 71, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Bambietta Vollständig', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275548/QUINCIES/Bambietta/pu96ltxvk088cp71kh7s.png', 71, NULL)
+
+--Bazz B
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Bazz B', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275554/QUINCIES/Bazz/sz3bcd1qmrn0f0rypm9a.png', 60, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Bazz B Full Fingers', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275554/QUINCIES/Bazz/p87pxcvypvrjqshfshjb.png', 60, NULL)
+
+--Candice
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Candice Catnipp', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275562/QUINCIES/Candice/jakt6jshaeutx4xt8fx2.png', 73, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Candice Catnipp Vollständig', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275561/QUINCIES/Candice/sw8ogfkg52hkmj5f5rfr.png', 73, NULL)
+
+--Cang Du
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Cang Du', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275570/QUINCIES/Cang/w2emaaqjllocntxglnd0.png', 66, NULL)
+
+--Driscoll Berci
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Driscoll Berci', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275578/QUINCIES/Driscoll/u9ie4wdvtgwh4bybsclk.png', 91, NULL)
+
+--Ebern
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Asguiaro Ebern', 1,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275586/QUINCIES/Ebern/m2hjdkzz5s05tvlizy77.png', 79, NULL)
+
+--Giselle
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Giselle Gewelle', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275595/QUINCIES/Giselle/o0zifzybc2lhxsd94svc.png', 70, NULL)
+
+
+-- INSERTS DE SKINS FETS PER ALBERT GALÀN
+
+--Gremmy
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Gremmy Thoumeaux', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275605/QUINCIES/Gremmy/xgxavc2f0hc8pbqej9rl.png', 62, NULL)
+
+
+--Hashwalth
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Jugram Haschwalth', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275612/QUINCIES/Haschwalth/eqc7sdsainjoasvf3jem.png', 84, NULL)
+
+--Ishida
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Ishida Uryu Casual', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275622/QUINCIES/Ishida/itvy0lxk7ujnkjwyfy88.png', 11, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Ishida Uryu Wandenreich', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275622/QUINCIES/Ishida/glstla3g2d3mykqtc1l1.png', 11, NULL)
+
+--Lille
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Lille Barro', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275629/QUINCIES/Lille/lato30xehm0vsffhycx4.png', 83, NULL)
+
+--Masaki
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Masaki Kurosaki', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275637/QUINCIES/Masaki/tue4iezc9btwsgsdtosq.png', 65, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Masaki Kurosaki Salvadora', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275638/QUINCIES/Masaki/kxw5cikem45wd1upzgw9.png', 65, NULL)
+
+--Mask
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Mask De Masculine Vollständig', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275648/QUINCIES/Mask/jrlayer6rt6tffjnotjy.png', 69, NULL)
+
+--Meninas
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Meninas McAllon', 2,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275658/QUINCIES/Meninas/lnbuscvfbbhqeq9cadc7.png', 64, NULL)
+
+--Quilge
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Quilge Opie Vollständig', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275680/QUINCIES/Quilge/uiqnrgsw6idsfcqpvbfl.png', 80, NULL)
+
+--Robert
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Robert Accutrone', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744616489/QUINCIES/Robert/lr1io362bvanumwh1d0h.png', 72, NULL)
+
+--Yhwach
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yhwach', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275950/QUINCIES/Yhwach/zguftxszsacvmbt6krws.png', 76, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yhwach Mimihagi', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275950/QUINCIES/Yhwach/xmpcrotrn1ih90dxxgyn.png', 76, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yhwach Forma Final', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275951/QUINCIES/Yhwach/t0vyonrwkiyyryipnnzx.png', 76, NULL)
 */
