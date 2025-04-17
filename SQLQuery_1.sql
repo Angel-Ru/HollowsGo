@@ -665,4 +665,76 @@ INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Robert Accut
 INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yhwach', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275950/QUINCIES/Yhwach/zguftxszsacvmbt6krws.png', 76, NULL)
 INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yhwach Mimihagi', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275950/QUINCIES/Yhwach/xmpcrotrn1ih90dxxgyn.png', 76, NULL)
 INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yhwach Forma Final', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744275951/QUINCIES/Yhwach/t0vyonrwkiyyryipnnzx.png', 76, NULL)
+
+
+-- INSERTS D'SKINS DELS PERSONATGES QUE JA ESTAVEN INSERITS
+
+-- INSERTS DE SKINS FETS PER ÀNGEL RUBIO
+--Ichigo(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Ichigo (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276237/PERSONATGES/Ichigo/ae7sofaf7izulwc6opii.png', 9, NULL)
+
+--Aizen(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Aizen (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276013/PERSONATGES/Aizen/e3ilurbqyhneqi9lxhm9.png', 1, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Aizen Yokoso', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276027/PERSONATGES/Aizen/zm84przllasfq61tfx5u.png', 1, NULL)
+
+--Byakuya(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Byakuya (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276056/PERSONATGES/Byakuya/rjvkww2d102fy1fzw0ob.png', 2, NULL)
+
+--Chad(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Chad (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276100/PERSONATGES/Chad/nwfay0yahixhvlutzgxk.png', 3, NULL)
+
+--Toshiro Hitsugaya(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Hitsugaya (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276162/PERSONATGES/Hitsugaya/kyue76nnduvrwhjlo0pd.png', 7, NULL)
+
+--Kenpachi(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Kenpachi (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276296/PERSONATGES/Kenpachi/lgaoududyghen8bhkews.png', 12, NULL)
+
+--Kensei(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Kensei (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276321/PERSONATGES/Kensei/abb1wmjy7rcg4anotkwg.png', 13, NULL)
+
+
+-- INSERTS DE SKINS FETS PER ALBERT GALÀN
+
+--Komamura(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Komamura (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276392/PERSONATGES/Komamura/lv9g9kyrexh9a4mamfnr.png', 15, NULL)
+
+--Kyoraku(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Kyoraku (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276458/PERSONATGES/Kyoraku/w84baxxysaluj9cixppp.png', 18, NULL)
+
+--Matsumoto(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Matsumoto (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276914/PERSONATGES/Matsumoto/ukg8doaukzvy0rfcvkqn.png', 22, NULL)
+
+--Mayuri(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Mayuri (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744277164/PERSONATGES/Mayuri/whd3yhyyrz7dhwq65vm4.png', 23, NULL)
+
+--Orihime(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Orihime (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276536/PERSONATGES/Orihime/fpn7kl58h2xnshd14fcf.png', 25, NULL)
+
+--Renji(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Renji (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276599/PERSONATGES/Renji/zbjygqzin9if2ua9eh1d.png', 27, NULL)
+
+--Rukia(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Rukia (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276636/PERSONATGES/Rukia/gjxrillov8kshsyzxus5.png', 28, NULL)
+
+
+-- INSERTS DE SKINS FETS PER MIQUEL SANSÓ
+
+--Shinji(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Shinji (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276670/PERSONATGES/Shinji/dv5fsded4mtjvvnydbft.png', 29, NULL)
+
+--Soi Fon(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Soi Fon (TYBW)', 3,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276692/PERSONATGES/Soi%20Fon/eppvocy6uyssoosgezol.png', 30, NULL)
+
+--Unohana(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Unohana (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276758/PERSONATGES/Unohana/b1shijhenfnhgioli0qo.png', 33, NULL)
+
+--Urahara(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Urahara (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276798/PERSONATGES/Urahara/sixqptqwrpttabqbpvrt.png', 34, NULL)
+
+--Yamamoto(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yamamoto (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276837/PERSONATGES/Yamamoto/c9uu12carjc9rscmuvyi.png', 36, NULL)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yamamoto (Jove)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276833/PERSONATGES/Yamamoto/cqqnmc0mn47tco4knvjo.png', 36, NULL)
+
+--Yoruichi(Thousand Year War Blood)
+INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yoruichi (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276887/PERSONATGES/Yoruichi/a4b2dxwxzz7trkshowq6.png', 37, NULL)
 */
