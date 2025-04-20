@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('http://192.168.1.28:3000/usuaris/login');
+    final url = Uri.parse('http://192.168.1.23:3000/usuaris/login');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'email': username,

@@ -14,6 +14,7 @@ class BibliotecaScreen extends StatefulWidget {
 }
 
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
+  //CHARACTERS DIALOGS
   int _dialogIndex = 0;
   bool _switchValue = false;
 
@@ -46,6 +47,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   int _mayuriImageIndex = 0;
   int _nelImageIndex = 0;
 
+  // LOAD USER DATA (CHARACTERS, HOLLOWS AND SKINS)
   @override
   void initState() {
     super.initState();
@@ -67,6 +69,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     provider.fetchPersonatgesEnemicsAmbSkins();
   }
 
+  // SELECT SKIN ALLY
   void _selectSkinAliat(Skin skin) {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);

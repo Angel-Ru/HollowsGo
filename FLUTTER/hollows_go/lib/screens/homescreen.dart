@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // CHARACTER IMAGES AND DIALOGUES
   String _imagePath =
       'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
   final String _coinImagePath = 'lib/images/kan_moneda.png';
@@ -74,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  // USER PERFIL IMAGE
   Future<void> _loadProfileImage() async {
     final prefs = await SharedPreferences.getInstance();
     final imagePath = prefs.getString('profileImagePath');
@@ -85,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // INFERIROR NAVIGATION BAR
   Widget _getSelectedScreen(int selectedIndex) {
     switch (selectedIndex) {
       case 1:
@@ -175,8 +178,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'lib/images/homescreen_image.png',
+            child: Image.network(
+              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708286/IMATGES_APP/t0jcgcpqz5xuagemwfv0.jpg',
               fit: BoxFit.cover,
             ),
           ),
@@ -429,6 +432,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // PICK IMAGE METHOD
   Future<void> _pickImage(BuildContext context) async {
     await Navigator.push(
       context,
@@ -450,6 +454,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // LOGOUT METHOD
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
