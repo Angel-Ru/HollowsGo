@@ -29,7 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   animated_text_kit: ^4.2.3
-  audioplayers: ^6.2.0
+  #audioplayers: ^6.2.0
   chewie: ^1.10.0
   cupertino_icons: ^1.0.8
   file_picker: ^8.3.3
