@@ -7,10 +7,9 @@ const { connectDB, sql } = require('../config/dbConfig');
  *   description: Operacions relacionades amb les habilitats llegendàries
  */
 
-
 /**
  * @swagger
- * /skins/{id}/habilitats:
+ * /habilitats/{id}:
  *   get:
  *     tags: [Habilitats]
  *     summary: Obtenir la habilitat llegendària d'una skin per ID
@@ -37,8 +36,8 @@ exports.getHabilitatId = async (req, res) => {
             .input('id', sql.Int, req.params.id)
             .query(`
                 SELECT h.*
-                FROM HABILITATS h
-                         JOIN SKINS s ON h.skin_id = s.id
+                FROM HABILITAT_LLEGENDARIA h
+                         JOIN SKINS s ON h.skin_personatge = s.id
                 WHERE s.id = @id
             `);
         res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
@@ -50,7 +49,7 @@ exports.getHabilitatId = async (req, res) => {
 
 /**
  * @swagger
- * /skins/{nom}/habilitats:
+ * /habilitats/{skin_nom}:
  *   get:
  *     tags: [Habilitats]
  *     summary: Obtenir la habilitat llegendària d'una skin per nom
@@ -77,8 +76,8 @@ exports.getHabilitatSkinNom = async (req, res) => {
             .input('nom', sql.VarChar(50), req.params.nom)
             .query(`
                 SELECT h.*
-                FROM HABILITATS h
-                         JOIN SKINS s ON h.skin_id = s.id
+                FROM HABILITAT_LLEGENDARIA h
+                         JOIN SKINS s ON h.skin_personatge = s.id
                 WHERE s.nom = @nom
             `);
         res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
@@ -90,49 +89,106 @@ exports.getHabilitatSkinNom = async (req, res) => {
 
 /**
  * @swagger
- * /habilitats:
+ * /habilitats/:
  *   post:
  *     tags: [Habilitats]
- *     summary: Crear una nova habilitat
- *     description: Afegeix una nova habilitat a la base de dades.
+ *     summary: Crear una nova habilitat.
+ *     description: |
+ *       Afegeix una nova habilitat a la base de dades.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
+ *
+ *       **Exemple de sol·licitud**:
+ *       ```json
+ *       {
+ *         "email": "exemple@gmail.com"
+ *         "nom": "Bola de Foc",
+ *         "descripcio": "Llança una bola de foc que crema als enemics.",
+ *         "video": "https://exemple.com/video",
+ *         "musica_combat": "https://exemple.com/musica",
+ *         "skin_personatge": 1
+ *       }
+ *       ```
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - nom
+ *               - descripcio
+ *               - video
+ *               - musica_combat
+ *               - skin_personatge
  *             properties:
  *               nom:
  *                 type: string
+ *                 description: Nom de l'habilitat.
+ *                 example: "Bola de Foc"
  *               descripcio:
  *                 type: string
- *               tipus:
+ *                 description: Descripció de l'habilitat.
+ *                 example: "Llança una bola de foc que crema als enemics."
+ *               video:
  *                 type: string
- *               skin_id:
+ *                 description: Enllaç al vídeo de l'habilitat.
+ *                 example: "https://exemple.com/video"
+ *               musica_combat:
+ *                 type: string
+ *                 description: Enllaç a la música de combat de l'habilitat.
+ *                 example: "https://exemple.com/musica"
+ *               skin_personatge:
  *                 type: integer
+ *                 description: ID de la skin associada a l'habilitat.
+ *                 example: 1
  *     responses:
  *       201:
- *         description: Habilitat afegida correctament
+ *         description: Habilitat afegida correctament.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Habilitat afegida correctament."
  *       500:
- *         description: Error en inserir l'habilitat
+ *         description: Error en inserir l'habilitat.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "Error en inserir l'habilitat."
  */
 exports.crearHabilitat = async (req, res) => {
     try {
-        const { nom, descripcio, tipus, skin_id } = req.body;
+        const { nom, descripcio, video, musica_combat, skin_personatge } = req.body;
+
+        // Validació bàsica de les dades
+        if (!nom || !descripcio || !video || !musica_combat || !skin_personatge) {
+            return res.status(400).json({ error: "Falten dades obligatòries." });
+        }
+
         const pool = await connectDB();
         await pool.request()
             .input('nom', sql.VarChar(50), nom)
             .input('descripcio', sql.VarChar(255), descripcio)
-            .input('tipus', sql.VarChar(50), tipus)
-            .input('skin_id', sql.Int, skin_id)
+            .input('video', sql.VarChar(255), video)
+            .input('musica_combat', sql.VarChar(255), musica_combat)
+            .input('skin_personatge', sql.Int, skin_personatge)
             .query(`
-                INSERT INTO HABILITATS (nom, descripcio, tipus, skin_id)
-                VALUES (@nom, @descripcio, @tipus, @skin_id)
+                INSERT INTO HABILITAT_LLEGENDARIA (nom, descripcio, video, musica_combat, skin_personatge)
+                VALUES (@nom, @descripcio, @video, @musica_combat, @skin_personatge)
             `);
-        res.status(201).send('Habilitat afegida correctament');
+
+        res.status(201).json({ message: "Habilitat afegida correctament." });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en inserir l\'habilitat');
+        res.status(500).json({ error: "Error en inserir l'habilitat." });
     }
 };
 
@@ -142,7 +198,10 @@ exports.crearHabilitat = async (req, res) => {
  *   delete:
  *     tags: [Habilitats]
  *     summary: Eliminar una habilitat per ID
- *     description: Elimina una habilitat de la base de dades mitjançant el seu ID.
+ *     description: |
+ *       Elimina una habilitat de la base de dades mitjançant el seu ID.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
  *     parameters:
  *       - in: path
  *         name: id
@@ -163,7 +222,7 @@ exports.borrarHabilitatId = async (req, res) => {
         const pool = await connectDB();
         const result = await pool.request()
             .input('id', sql.Int, req.params.id)
-            .query('DELETE FROM HABILITATS WHERE id = @id');
+            .query('DELETE FROM HABILITAT_LLEGENDARIA WHERE id = @id');
 
         if (result.rowsAffected[0] === 0) {
             return res.status(404).send('Habilitat no trobada');

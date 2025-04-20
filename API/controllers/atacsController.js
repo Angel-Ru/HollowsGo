@@ -9,7 +9,7 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 /**
  * @swagger
- * /skins/{id}/atacs:
+ * /atacs/{skin_id}:
  *   get:
  *     summary: Obtenir l'atac d'una skin per ID
  *     description: Retorna l'atac associat a una skin específica mitjançant el seu ID.
@@ -37,7 +37,7 @@ exports.getAtacSkinPerId = async (req, res) => {
             .query(`
                 SELECT a.*
                 FROM ATACS a
-                         JOIN SKINS s ON a.skin_id = s.id
+                         JOIN SKINS s ON a.id = s.atac
                 WHERE s.id = @id
             `);
         res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'atac per a aquesta skin');
@@ -49,7 +49,7 @@ exports.getAtacSkinPerId = async (req, res) => {
 
 /**
  * @swagger
- * /skins/{nom}/atacs:
+ * /atacs/nom/{skin_nom}:
  *   get:
  *     summary: Obtenir l'atac d'una skin per nom
  *     description: Retorna l'atac associat a una skin específica mitjançant el seu nom.
@@ -77,7 +77,7 @@ exports.getAtacSkinPerNom = async (req, res) => {
             .query(`
                 SELECT a.*
                 FROM ATACS a
-                         JOIN SKINS s ON a.skin_id = s.id
+                         JOIN SKINS s ON a.id = s.atac
                 WHERE s.nom = @nom
             `);
         res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'atac per a aquesta skin');
@@ -89,10 +89,22 @@ exports.getAtacSkinPerNom = async (req, res) => {
 
 /**
  * @swagger
- * /atacs:
+ * /atacs/:
  *   post:
  *     summary: Crear un nou atac
- *     description: Afegeix un nou atac a la base de dades.
+ *     description: |
+ *       Afegeix un nou atac a la base de dades.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
+ *
+ *       **Exemple de sol·licitud**:
+ *       ```json
+ *       {
+ *         "email": "exemple@gmail.com",
+ *         "nom": "Atac Nou",
+ *         "mal": 50
+ *       }
+ *       ```
  *     tags: [Atacs]
  *     requestBody:
  *       required: true
@@ -100,15 +112,18 @@ exports.getAtacSkinPerNom = async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - nom
+ *               - mal
  *             properties:
  *               nom:
  *                 type: string
- *               dany:
+ *                 description: Nom de l'atac.
+ *                 example: "Atac Nou"
+ *               mal:
  *                 type: integer
- *               tipus:
- *                 type: string
- *               skin_id:
- *                 type: integer
+ *                 description: Mal que causa l'atac.
+ *                 example: 50
  *     responses:
  *       201:
  *         description: Atac afegit correctament
@@ -117,16 +132,14 @@ exports.getAtacSkinPerNom = async (req, res) => {
  */
 exports.crearAtac = async (req, res) => {
     try {
-        const { nom, dany, tipus, skin_id } = req.body;
+        const { nom, mal } = req.body;
         const pool = await connectDB();
         await pool.request()
             .input('nom', sql.VarChar(50), nom)
-            .input('dany', sql.Int, dany)
-            .input('tipus', sql.VarChar(50), tipus)
-            .input('skin_id', sql.Int, skin_id)
+            .input('mal', sql.Int, mal)
             .query(`
-                INSERT INTO ATACS (nom, dany, tipus, skin_id)
-                VALUES (@nom, @dany, @tipus, @skin_id)
+                INSERT INTO ATACS (nom, mal)
+                VALUES (@nom, @mal)
             `);
         res.status(201).send('Atac afegit correctament');
     } catch (err) {
@@ -140,7 +153,10 @@ exports.crearAtac = async (req, res) => {
  * /atacs/{id}:
  *   delete:
  *     summary: Eliminar un atac per ID
- *     description: Elimina un atac de la base de dades mitjançant el seu ID.
+ *     description: |
+ *       Elimina un atac de la base de dades mitjançant el seu ID.
+ *       **Nota**: Cal especificar l'email a la capçalera `Content-Type`.
+ *       Si l'usuari no és administrador, no podrà realitzar aquesta acció.
  *     tags: [Atacs]
  *     parameters:
  *       - in: path

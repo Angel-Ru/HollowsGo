@@ -508,7 +508,6 @@ INSERT INTO SKINS_ARMES(skin, arma) VALUES
 (119, 88); -- Yumichika Bankai - Fuji Kujaku (Shikai)
 
 
-
 -- HOLLOWS GO REMASTERED
 
 -- INSERTS FETS PER EN MIQUEL SANSÓ TORRES

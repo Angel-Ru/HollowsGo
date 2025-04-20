@@ -1,3 +1,5 @@
+import 'package:hollows_go/providers/gacha_provider.dart';
+
 import 'imports.dart';
 
 /*
@@ -18,6 +20,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UIProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DialogueProvider()),
+        ChangeNotifierProvider(create: (_) => GachaProvider()),
         ChangeNotifierProvider(
             create: (_) => SkinsEnemicsPersonatgesProvider()),
       ],

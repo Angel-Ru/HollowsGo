@@ -26,6 +26,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   late Animation<double> _opacityAnimation;
   late ScrollController _scrollControllerTop;
   late ScrollController _scrollControllerBottom;
+  late AudioPlayer _audioPlayer;
 
   // INICIALATE THE ANIMATION CONTROLLER AND THE SCROLL CONTROLLERS
   @override
@@ -51,6 +52,17 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
     _startAutoScroll(_scrollControllerTop);
     _startAutoScroll(_scrollControllerBottom);
+
+    _audioPlayer = AudioPlayer();
+    _playBackgroundMusic();
+  }
+
+  void _playBackgroundMusic() async {
+    await _audioPlayer.play(AssetSource('../assets/Number_One.mp3'));
+  }
+
+  void _stopBackgroundMusic() async {
+    await _audioPlayer.stop();
   }
 
   // THIS FUNCTION IS FOR THE SCROLLING ANIMATION OF THE SKULLS + LOOPING
@@ -80,6 +92,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     _controller.dispose();
     _scrollControllerTop.dispose();
     _scrollControllerBottom.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -94,6 +107,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
+          _stopBackgroundMusic();
           _showLoginDialog(context);
         },
         child: Stack(

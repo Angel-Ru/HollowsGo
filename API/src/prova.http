@@ -1,7 +1,8 @@
-POST localhost:3000/usuaris/login
-Content-Type: application/json
+POST  localhost:3000/habilitats/
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjAsInRpcG8iOjAsImlhdCI6MTc0MDQzNzM5NX0.UhIZ5umQAmIVN787FhIfEzN8Kz-SHckTR5zSHIwlhhM
 
 {
-    "email": "mandibulagorda@gmail.com",
-    "contrassenya": "123456"
+    "email" : "prova2@gmail.com",
+    "habilitat" : "prova"
 }

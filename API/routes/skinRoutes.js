@@ -18,9 +18,6 @@ router.get('/enemic/personatges', verificacioUsuari.verifyToken,skinsController.
 // Ruta per obtenir totes les skins d'un personatge
 router.get('/:id', verificacioUsuari.verifyToken,skinsController.getSkinsPersonatge);
 
-// Ruta per obtenir totes les skins d'un personatge que té un usuari
-router.get('/usuari/:id', verificacioUsuari.verifyToken,skinsController.getSkinsUsuari);
-
 // Ruta per obtenir una skin específica d'un personatge d'un usuari per ID
 router.get('/usuari/:id/:skin_id', verificacioUsuari.verifyToken,skinsController.getSkinUsuariPerId);
 

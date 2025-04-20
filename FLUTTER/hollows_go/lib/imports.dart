@@ -18,6 +18,8 @@ export '/providers/dialeg_provider.dart';
 export '/providers/user_provider.dart';
 export '/providers/skins_enemics_personatges.dart';
 
+export 'package:hollows_go/config.dart';
+
 export '/models/user.dart';
 export '/models/skin.dart';
 export '/models/personatge.dart';
@@ -32,6 +34,7 @@ export 'package:flutter/services.dart';
 export 'package:video_player/video_player.dart';
 export 'package:chewie/chewie.dart';
 export 'package:fluttertoast/fluttertoast.dart';
+export 'package:audioplayers/audioplayers.dart';
 
 export 'dart:convert';
 export 'dart:math';
