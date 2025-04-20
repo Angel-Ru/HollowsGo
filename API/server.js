@@ -41,12 +41,12 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Importer les rutes
-const characterRoutes = require('/API/routes/characterRoutes');
-const skinRoutes = require('/API/routes/skinRoutes');
-const armesRoutes = require('/API/routes/armesRoutes');
-const habilitatsRoutes = require('/API/routes/habilitatsRoutes');
-const atacsRoutes = require('/API/routes/atacsRoutes');
-const userRoutes = require('/API/routes/userRoutes');
+const characterRoutes = require('routes/characterRoutes');
+const skinRoutes = require('routes/skinRoutes');
+const armesRoutes = require('routes/armesRoutes');
+const habilitatsRoutes = require('routes/habilitatsRoutes');
+const atacsRoutes = require('routes/atacsRoutes');
+const userRoutes = require('routes/userRoutes');
 
 
 
