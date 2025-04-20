@@ -19,6 +19,7 @@ class UserProvider with ChangeNotifier {
     _loadUserData();
   }
 
+  // LOAD ALL USER DATA
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _coinCount = prefs.getInt('userPunts') ?? 0;
@@ -27,6 +28,7 @@ class UserProvider with ChangeNotifier {
     fetchUserPoints();
   }
 
+  // GET USER COINS OR POINTS FROM THE API
   Future<void> fetchUserPoints() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -36,7 +38,7 @@ class UserProvider with ChangeNotifier {
       if (nomUsuari == null || token == null) return;
 
       final url =
-          Uri.parse('http://${Config.ip}:3000/usuaris/punts/$nomUsuari');
+          Uri.parse('https://${Config.ip}/usuaris/punts/$nomUsuari');
       final headers = {
         'Authorization': 'Bearer $token',
       };
@@ -60,6 +62,7 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  // REFERESH THE AMOUNT OF POINTS THAT THE USER HAS
   void refreshPoints() {
     fetchUserPoints();
   }

@@ -13,6 +13,7 @@ class PreHomeScreen extends StatefulWidget {
 
 class _PreHomeScreenState extends State<PreHomeScreen>
     with SingleTickerProviderStateMixin {
+  // IMAGES OF KON FOR THE RANDOM IMAGE ARRAY
   final List<String> imagePaths = [
     'lib/images/prehomescreen_imatges/koncapitan.png',
     'lib/images/prehomescreen_imatges/konepico.png',
@@ -27,6 +28,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   late ScrollController _scrollControllerBottom;
   // late AudioPlayer _audioPlayer;
 
+  // INICIALATE THE ANIMATION CONTROLLER AND THE SCROLL CONTROLLERS
   @override
   void initState() {
     super.initState();
@@ -63,6 +65,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     await _audioPlayer.stop();
   }*/
 
+  // THIS FUNCTION IS FOR THE SCROLLING ANIMATION OF THE SKULLS + LOOPING
   void _startAutoScroll(ScrollController scrollController) {
     Future.doWhile(() async {
       await Future.delayed(Duration(milliseconds: 20));
@@ -95,6 +98,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    // KON RANDOM IMAGE
     final random = Random();
     final randomImage = random.nextInt(imagePaths.length);
 
@@ -122,6 +126,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                         width: 39,
                         height: 39,
                         child: Image.asset(
+                          // CHANGE THE IMAGE + UPLOAD IT TO CLOUDINARY
                           "lib/images/prehomescreen_imatges/skull_border.png",
                           fit: BoxFit.cover,
                         ),
@@ -192,6 +197,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     );
   }
 
+  // lOGIN DIALOG METOD
   void _showLoginDialog(BuildContext context) {
     showDialog(
       context: context,
