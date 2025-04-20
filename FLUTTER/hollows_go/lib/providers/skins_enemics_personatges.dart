@@ -10,7 +10,7 @@ Alguns mètodes principals són el de seleccionar una skin dels enemics de maner
 */
 
 class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
-  static const String _baseUrl = '${Config.ip}';
+  static const String _baseUrl = 'https://${Config.ip}';
   static const String _userPuntsKey = 'userPunts';
   static const String _userNameKey = 'userName';
   static const String _userEmailKey = 'userEmail';

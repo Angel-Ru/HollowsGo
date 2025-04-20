@@ -38,7 +38,7 @@ class UserProvider with ChangeNotifier {
       if (nomUsuari == null || token == null) return;
 
       final url =
-          Uri.parse('${Config.ip}/usuaris/punts/$nomUsuari');
+          Uri.parse('https://${Config.ip}/usuaris/punts/$nomUsuari');
       final headers = {
         'Authorization': 'Bearer $token',
       };

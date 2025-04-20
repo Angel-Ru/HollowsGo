@@ -80,7 +80,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('${Config.ip}/usuaris/');
+    final url = Uri.parse('https://${Config.ip}/usuaris/');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       "nom": username,

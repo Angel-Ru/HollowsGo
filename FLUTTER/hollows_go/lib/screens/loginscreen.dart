@@ -1,13 +1,6 @@
 import 'package:http/http.dart' as http;
 import '../imports.dart';
 
-/*
-En la classe es gestiona i crea el diàleg de login.
-En aquest diàleg es connecta amb el servidor per a comprovar les dades d'inici de sessió.
-Un cop les dades són correctes, es redirigeix a la pantalla principal de l'aplicació, la qual és la HomeScreen.
-S'ha de canviar l'IP del servidor per a que funcioni correctament.
-*/
-
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -34,6 +27,16 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  String extractJson(String responseBody) {
+    int jsonStart = responseBody.indexOf('[');
+    if (jsonStart == -1) jsonStart = responseBody.indexOf('{');
+    if (jsonStart != -1) {
+      return responseBody.substring(jsonStart).trim();
+    } else {
+      throw FormatException("No s'ha trobat JSON vàlid a la resposta");
+    }
+  }
+
   Future<void> _login() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
@@ -47,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    final url = Uri.parse('${Config.ip}/usuaris/login');
+    final url = Uri.parse('https://${Config.ip}/usuaris/login');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({
       'email': username,
@@ -56,35 +59,39 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-      final data = jsonDecode(response.body);
+
+      final cleanJson = extractJson(response.body);
+      final List<dynamic> data = jsonDecode(cleanJson);
 
       if (response.statusCode == 200) {
-        final prefs = await SharedPreferences.getInstance();
-
-        // Guardar l'estat de login i les dades de l'usuari
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setInt('userId', data['user']['id']);
-        await prefs.setString('userEmail', data['user']['email']);
-        await prefs.setString('userName', data['user']['nom']);
-        await prefs.setInt('userPunts', data['user']['punts_emmagatzemats']);
-        await prefs.setInt('userTipo', data['user']['tipo']);
-
-        // Imprimir el token per consola
-        print("Token rebut: ${data['token']}");
-
-        // Guardar el token
-        await prefs.setString('token', data['token']);
-
-        _showSnackBar("Inici de sessió correcte");
-
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomeScreen()),
+        final user = data.firstWhere(
+          (u) => u['email'] == username,
+          orElse: () => null,
         );
+
+        if (user != null) {
+          final prefs = await SharedPreferences.getInstance();
+
+          await prefs.setBool('isLoggedIn', true);
+          await prefs.setInt('userId', user['id']);
+          await prefs.setString('userEmail', user['email']);
+          await prefs.setString('userName', user['nom']);
+          await prefs.setInt('userPunts', user['punts_emmagatzemats']);
+          await prefs.setInt('userTipo', user['tipo']);
+
+          _showSnackBar("Inici de sessió correcte");
+
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => HomeScreen()),
+          );
+        } else {
+          _showSnackBar("Credencials incorrectes");
+        }
       } else {
-        _showSnackBar(data['message'] ?? "Error desconegut");
+        _showSnackBar("Error del servidor: ${response.statusCode}");
       }
     } catch (e) {
-      _showSnackBar("Error de connexió: $e");
+      _showSnackBar("Error: $e");
     } finally {
       setState(() {
         _isLoading = false;
