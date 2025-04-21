@@ -48,24 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _timer = Timer.periodic(Duration(seconds: 5), (timer) {
         userProvider.fetchUserPoints();
       });
-
+    
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
-      dialogueProvider.setDialogueData(
-        [
-          "Benvingut a HollowsGo!",
-          "Getsuga... Tenshō!!",
-          "Sóc un shinigami substitut, com que no saps què és?",
-          "Si tens alguna pregunta, no dubtis en preguntar-me!",
-        ],
-        [
-          'lib/images/ichigo_character/ichigo_1.png',
-          'lib/images/ichigo_character/ichigo_2.png',
-          'lib/images/ichigo_character/ichigo_3.png',
-          'lib/images/ichigo_character/ichigo_4.png',
-          'lib/images/ichigo_character/ichigo_5.png',
-        ],
-      );
+          dialogueProvider.loadDialogueFromJson("ichigo");
     });
   }
 
@@ -394,37 +380,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Provider.of<DialogueProvider>(context, listen: false);
 
           if (index == 0) {
-            dialogueProvider.setDialogueData(
-              [
-                "Benvingut a HollowsGo!",
-                "Getsuga... Tenshō!!",
-                "Sóc un shinigami substitut, com que no saps què és?",
-                "Si tens alguna pregunta, no dubtis en preguntar-me!",
-              ],
-              [
-                'lib/images/ichigo_character/ichigo_1.png',
-                'lib/images/ichigo_character/ichigo_2.png',
-                'lib/images/ichigo_character/ichigo_3.png',
-                'lib/images/ichigo_character/ichigo_4.png',
-                'lib/images/ichigo_character/ichigo_5.png',
-              ],
-            );
+            dialogueProvider.loadDialogueFromJson("ichigo");
           } else if (index == 2) {
-            dialogueProvider.setDialogueData(
-              [
-                "Hola, sóc l'Urahara, i sigues benvingut a la tenda!",
-                "Aquí podràs fer les diverses tirades al gacha.",
-                "Tens prou diners per una tirada?",
-                "Em vaig a fer una becadeta...",
-              ],
-              [
-                'lib/images/urahara_character/urahara_1.png',
-                'lib/images/urahara_character/urahara_2.png',
-                'lib/images/urahara_character/urahara_3.png',
-                'lib/images/urahara_character/urahara_4.png',
-                'lib/images/urahara_character/urahara_5.png',
-              ],
-            );
+            dialogueProvider.loadDialogueFromJson("urahara");
           }
           uiProvider.selectedMenuOpt = index;
         },
