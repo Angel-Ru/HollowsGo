@@ -64,7 +64,8 @@ class _GachaVideoPopupState extends State<GachaVideoPopup> {
             backgroundColor: Colors.transparent,
             child: AspectRatio(
               aspectRatio: 16 / 9,
-              child: _chewieController.videoPlayerController.value.isInitialized
+              child: (_videoController.value.isInitialized &&
+                      _chewieController != null)
                   ? Chewie(controller: _chewieController)
                   : Center(child: CircularProgressIndicator()),
             ),
