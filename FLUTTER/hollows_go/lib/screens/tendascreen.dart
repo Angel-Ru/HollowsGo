@@ -40,7 +40,7 @@ class _TendaScreenState extends State<TendaScreen> {
         children: [
           Positioned.fill(
             child: Image.asset(
-              'lib/images/tenda_urahara.jpg',
+              'lib/images/Yoroichi.jpeg',
               fit: BoxFit.cover,
             ),
           ),
