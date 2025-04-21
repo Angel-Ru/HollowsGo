@@ -592,6 +592,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                 FROM PERSONATGES p
                          JOIN BIBLIOTECA b ON p.id = b.personatge_id
                 WHERE b.user_id = @userId
+                ORDER BY p.nom
             `);
 
         if (personatgesResult.recordset.length === 0) {
