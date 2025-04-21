@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -7,14 +8,36 @@ import 'package:hollows_go/widgets/gachavideodialog.dart';
 import 'package:hollows_go/widgets/skinrewarddialog.dart';
 import 'package:provider/provider.dart';
 
-
-
 class TendaScreen extends StatefulWidget {
   @override
   _TendaScreenState createState() => _TendaScreenState();
 }
 
 class _TendaScreenState extends State<TendaScreen> {
+  final List<String> _backgroundImages = [
+    'lib/images/Yoroichi.jpeg',
+    'lib/images/Byakuya.jpeg',
+  ];
+
+  int _currentImageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startBackgroundRotation();
+  }
+
+  void _startBackgroundRotation() {
+    Future.delayed(Duration(seconds: 20), () {
+      if (!mounted) return;
+      setState(() {
+        _currentImageIndex =
+            (_currentImageIndex + 1) % _backgroundImages.length;
+      });
+      _startBackgroundRotation();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final gachaProvider = Provider.of<GachaProvider>(context);
@@ -39,9 +62,17 @@ class _TendaScreenState extends State<TendaScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'lib/images/Yoroichi.jpeg',
-              fit: BoxFit.cover,
+            child: AnimatedSwitcher(
+              duration: Duration(seconds: 2),
+              switchInCurve: Curves.easeInOut,
+              switchOutCurve: Curves.easeInOut,
+              child: SizedBox.expand(
+                key: ValueKey(_backgroundImages[_currentImageIndex]),
+                child: Image.asset(
+                  _backgroundImages[_currentImageIndex],
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
           Positioned(
@@ -54,7 +85,9 @@ class _TendaScreenState extends State<TendaScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                        color: Colors.grey[700]!.withOpacity(0.8), width: 3),
+                      color: Colors.grey[700]!.withOpacity(0.8),
+                      width: 3,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.5),
