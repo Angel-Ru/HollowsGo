@@ -1,14 +1,9 @@
-import '../imports.dart';
-import 'dart:ui' as ui;
+import 'dart:async';
 
-/*
-Aquesta és la classe Mapscreen. En aquesta classe crea la pantalla del mapa de l'aplicació.
-En aquesta pantalla es mostra un mapa de Google Maps amb la ubicació actual de l'usuari i uns punts aleatoris.
-Aquests punts aleatoris són Hollows, els quals et duen a un combat contra un enemic.
-Els Hollows generats són aleatoris i es mostren en un radi de 250 metres al voltant de la ubicació actual de l'usuari.
-La generació de la quantitat de Hollows és aleatòria, entre 3 i 7. Igual que les imatges d'aquests.
-El marcador de la ubicació actual de l'usuari és personalitzat amb la imatge de perfil que tengui posada.
-*/
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../helpers/marker_helper.dart';
+import '../helpers/location_helper.dart';
 
 class Mapscreen extends StatefulWidget {
   final String profileImagePath;
@@ -27,17 +22,17 @@ class _MapaScreenState extends State<Mapscreen> {
   Set<Marker> _markers = {};
   final double _radiusInMeters = 250;
   final List<String> imagePaths = [
-    'lib/images/hollows/grandfisher.png',
-    'lib/images/hollows/Cabezon.png',
-    'lib/images/hollows/chepudo.png',
-    'lib/images/hollows/menosgrande.png',
-    'lib/images/hollows/volador.png'
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rf9vbqlqbpza3inl5syo.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/au1f1y75qc1aguz4nzze.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
   ];
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _loadMapData();
   }
 
   @override
@@ -48,130 +43,30 @@ class _MapaScreenState extends State<Mapscreen> {
     }
   }
 
-  Future<void> _getCurrentLocation() async {
-    try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        throw "Els serveis d'ubicació estan desactivats.";
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          throw "Permisos d'ubicació denegats.";
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        throw "Permisos d'ubicació denegats permanentment.";
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      _currentLocation = LatLng(position.latitude, position.longitude);
+  Future<void> _loadMapData() async {
+    final location = await LocationHelper.getCurrentLocation();
+    if (location != null) {
+      setState(() {
+        _currentLocation = location;
+      });
       await _updateMarkers();
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      print("Error obtenint l'ubicació: $e");
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _updateMarkers() async {
-    Set<Marker> newMarkers = {};
-
-    final Uint8List markerIcon =
-        await _getMarkerIcon(widget.profileImagePath, shouldRound: true);
-    newMarkers.add(
-      Marker(
-        markerId: const MarkerId('currentLocation'),
-        position: _currentLocation,
-        infoWindow: const InfoWindow(title: 'Ubicació actual'),
-        icon: BitmapDescriptor.fromBytes(markerIcon),
-      ),
-    );
-
-    final Random random = Random();
-    const double earthRadius = 6371000;
-    int numRandomPoints = random.nextInt(5) + 3;
-
-    for (int i = 0; i < numRandomPoints; i++) {
-      double randomAngle = random.nextDouble() * 2 * pi;
-      double randomDistance = sqrt(random.nextDouble()) * _radiusInMeters;
-
-      double deltaLat = (randomDistance / earthRadius) * (180 / pi);
-      double deltaLng = (randomDistance / earthRadius) *
-          (180 / pi) /
-          cos(_currentLocation.latitude * pi / 180);
-
-      LatLng randomPoint = LatLng(
-        _currentLocation.latitude + deltaLat * cos(randomAngle),
-        _currentLocation.longitude + deltaLng * sin(randomAngle),
-      );
-
-      String randomImagePath = imagePaths[random.nextInt(imagePaths.length)];
-
-      try {
-        final Uint8List iconBytes =
-            await _getMarkerIcon(randomImagePath, shouldRound: false);
-
-        newMarkers.add(
-          Marker(
-            markerId: MarkerId('random_$i'),
-            position: randomPoint,
-            infoWindow: InfoWindow(title: 'Punt Aleatori $i'),
-            icon: BitmapDescriptor.fromBytes(iconBytes),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CombatScreen()),
-              );
-            },
-          ),
-        );
-      } catch (e) {
-        print('Error al cargar la imagen para el marcador: $e');
-      }
     }
     setState(() {
-      _markers = newMarkers;
+      _isLoading = false;
     });
   }
 
-  Future<Uint8List> _getMarkerIcon(String imagePath,
-      {bool shouldRound = false}) async {
-    ByteData byteData = await rootBundle.load(imagePath);
-    ui.Codec codec = await ui
-        .instantiateImageCodec(byteData.buffer.asUint8List(), targetWidth: 100);
-    ui.FrameInfo frameInfo = await codec.getNextFrame();
-
-    if (shouldRound) {
-      final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-      final Canvas canvas = Canvas(pictureRecorder);
-      final Paint paint = Paint()..isAntiAlias = true;
-      final double radius = 50;
-
-      canvas.drawCircle(const Offset(50, 50), radius, paint);
-      paint.blendMode = BlendMode.srcIn;
-      canvas.drawImage(frameInfo.image, const Offset(0, 0), paint);
-
-      final ui.Image img =
-          await pictureRecorder.endRecording().toImage(100, 100);
-      final ByteData? imgBytes =
-          await img.toByteData(format: ui.ImageByteFormat.png);
-      return imgBytes!.buffer.asUint8List();
-    } else {
-      final ByteData? imgBytes =
-          await frameInfo.image.toByteData(format: ui.ImageByteFormat.png);
-      return imgBytes!.buffer.asUint8List();
-    }
+  Future<void> _updateMarkers() async {
+    final newMarkers = await MarkerHelper.generateMarkers(
+      currentLocation: _currentLocation,
+      profileImagePath: widget.profileImagePath,
+      context: context,
+      imagePaths: imagePaths,
+      radius: _radiusInMeters,
+    );
+    setState(() {
+      _markers = newMarkers;
+    });
   }
 
   @override
@@ -193,10 +88,11 @@ class _MapaScreenState extends State<Mapscreen> {
                   markers: _markers,
                   mapType: _currentMapType,
                   initialCameraPosition: _puntInicial,
-                  onMapCreated: (GoogleMapController controller) {
+                  onMapCreated: (controller) {
                     _controller.complete(controller);
                     controller.setMapStyle(
-                        '[{"featureType":"poi","stylers":[{"visibility":"off"}]}]');
+                      '[{"featureType":"poi","stylers":[{"visibility":"off"}]}]',
+                    );
                   },
                 ),
                 Positioned(
@@ -204,10 +100,7 @@ class _MapaScreenState extends State<Mapscreen> {
                   right: 330,
                   child: FloatingActionButton(
                     backgroundColor: Colors.deepPurple,
-                    child: const Icon(
-                      Icons.layers,
-                      color: Colors.white,
-                    ),
+                    child: const Icon(Icons.layers, color: Colors.white),
                     onPressed: () {
                       setState(() {
                         _currentMapType = _currentMapType == MapType.normal
