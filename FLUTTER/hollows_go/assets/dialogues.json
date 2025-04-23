@@ -7,11 +7,15 @@
             "Si tens alguna pregunta, no dubtis en preguntar-me!"
         ],
         "images": [
-            "lib/images/ichigo_character/ichigo_1.png",
-            "lib/images/ichigo_character/ichigo_2.png",
-            "lib/images/ichigo_character/ichigo_3.png",
-            "lib/images/ichigo_character/ichigo_4.png",
-            "lib/images/ichigo_character/ichigo_5.png"
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253109/DIALOGS_CHARACTERS/ICHIGO/qgihe9glzzho4w3gazpa.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253108/DIALOGS_CHARACTERS/ICHIGO/vttk41sr4jcazfmfbv10.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253108/DIALOGS_CHARACTERS/ICHIGO/ubdjpwv1pewa5qmak9gq.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253107/DIALOGS_CHARACTERS/ICHIGO/diqo26cusvrfw4kcpxiu.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745426959/DIALOGS_CHARACTERS/ICHIGO/eehrsuvitrbva44tzwju.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253106/DIALOGS_CHARACTERS/ICHIGO/a9su1sdfhs34x5fuuhum.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253105/DIALOGS_CHARACTERS/ICHIGO/auuaatxjcpdat0se7u49.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253038/DIALOGS_CHARACTERS/ICHIGO/jawbmaxck3r4dx1e6feu.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745253037/DIALOGS_CHARACTERS/ICHIGO/b0bqzj9o66ssgk9bp6yp.png"
         ]
     },
     "rukia": {

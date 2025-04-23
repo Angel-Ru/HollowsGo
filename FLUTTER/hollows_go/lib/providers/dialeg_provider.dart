@@ -17,20 +17,20 @@ class DialogueProvider extends ChangeNotifier {
 
   DialogueProvider();
 
-
-
-  Future<void> loadDialogueFromJson(String characterKey,{bool isLibrary = false}) async {
-    final String response = await rootBundle.loadString('assets/dialogues.json');
+  Future<void> loadDialogueFromJson(String characterKey,
+      {bool isLibrary = false}) async {
+    final String response =
+        await rootBundle.loadString('assets/dialogues.json');
     final data = json.decode(response);
 
     if (!data.containsKey(characterKey)) return;
 
-    final List<String> dialogues = List<String>.from(data[characterKey]["dialogues"]);
+    final List<String> dialogues =
+        List<String>.from(data[characterKey]["dialogues"]);
     final List<String> images = List<String>.from(data[characterKey]["images"]);
 
     setDialogueData(dialogues, images, isLibrary: isLibrary);
   }
-
 
   void setDialogueData(List<String> dialogues, List<String> images,
       {bool isLibrary = false}) {
@@ -102,5 +102,8 @@ class DialogueProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
+  void aestheticDialogue() {
+    ;
+    notifyListeners();
+  }
 }

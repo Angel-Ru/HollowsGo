@@ -48,10 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _timer = Timer.periodic(Duration(seconds: 5), (timer) {
         userProvider.fetchUserPoints();
       });
-    
+
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
-          dialogueProvider.loadDialogueFromJson("ichigo");
+      dialogueProvider.loadDialogueFromJson("ichigo");
     });
   }
 
@@ -165,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Positioned.fill(
             child: Image.network(
-              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708286/IMATGES_APP/t0jcgcpqz5xuagemwfv0.jpg',
+              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254121/HOMESCREEN/a4fjbn9cxunuxw34bned.jpg',
               fit: BoxFit.cover,
             ),
           ),
@@ -383,6 +383,10 @@ class _HomeScreenState extends State<HomeScreen> {
             dialogueProvider.loadDialogueFromJson("ichigo");
           } else if (index == 2) {
             dialogueProvider.loadDialogueFromJson("urahara");
+          } else if (index == 3) {
+            dialogueProvider.loadDialogueFromJson("mayuri");
+          } else if (index == 4) {
+            dialogueProvider.loadDialogueFromJson("nel");
           }
           uiProvider.selectedMenuOpt = index;
         },

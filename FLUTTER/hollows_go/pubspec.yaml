@@ -75,19 +75,19 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - lib/images/
-    - lib/images/perfil_predeterminat/
-    - lib/images/prehomescreen_imatges/
-    - lib/images/urahara_character/
-    - lib/images/mayuri_character/
-    - lib/images/kyoraku_character/
-    - lib/images/nel_character/
-    - lib/images/rukia_character/
-    - lib/images/combat_proves/
-    - lib/images/hollows/
-    - lib/images/banner_gacha/banner.png
-    - lib/images/ichigo_character/
-    - lib/images/combat_proves/
+    # - lib/images/
+    # - lib/images/perfil_predeterminat/
+    # - lib/images/prehomescreen_imatges/
+    # - lib/images/urahara_character/
+    # - lib/images/mayuri_character/
+    # - lib/images/kyoraku_character/
+    # - lib/images/nel_character/
+    # - lib/images/rukia_character/
+    # - lib/images/combat_proves/
+    # - lib/images/hollows/
+    # - lib/images/banner_gacha/banner.png
+    # - lib/images/ichigo_character/
+    # - lib/images/combat_proves/
     - lib/videos/animacion_gacha.mp4
     - lib/videos/animacion_combate.mp4
     - assets/Number_One.mp3
