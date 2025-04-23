@@ -14,7 +14,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     super.initState();
     _loadUserData();
 
-    // Cargar diálogos iniciales para biblioteca
+    // Cargar diÃ¡logos iniciales para biblioteca
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
@@ -104,8 +104,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 ? Colors.green
                                 : Color.fromARGB(255, 167, 55, 187),
                             image: DecorationImage(
-                              image: AssetImage(
-                                  dialogueProvider.currentImage),
+                              image: AssetImage(dialogueProvider.currentImage),
                               fit: BoxFit.cover,
                             ),
                           ),
