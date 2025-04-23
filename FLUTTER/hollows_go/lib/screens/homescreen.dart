@@ -384,6 +384,9 @@ class _HomeScreenState extends State<HomeScreen> {
           } else if (index == 2) {
             dialogueProvider.loadDialogueFromJson("urahara");
           }
+          else if (index == 3) {
+            dialogueProvider.loadDialogueFromJson("mayuri");
+          }
           uiProvider.selectedMenuOpt = index;
         },
       ),

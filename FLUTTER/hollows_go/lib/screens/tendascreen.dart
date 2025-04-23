@@ -25,6 +25,13 @@ class _TendaScreenState extends State<TendaScreen> {
   void initState() {
     super.initState();
     _startBackgroundRotation();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dialogueProvider =
+          Provider.of<DialogueProvider>(context, listen: false);
+        dialogueProvider.loadDialogueFromJson('urahara');
+      
+    });
   }
 
   void _startBackgroundRotation() {
@@ -178,7 +185,7 @@ class _TendaScreenState extends State<TendaScreen> {
                     SizedBox(width: 16),
                     Expanded(
                       child: GestureDetector(
-                        onTap: dialogueProvider.nextDialogue,
+                        onTap:  dialogueProvider.nextDialogue,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

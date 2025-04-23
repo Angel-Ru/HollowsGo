@@ -1,57 +1,25 @@
 import 'dart:ui';
 import '../imports.dart';
 
-/*
-A la classe BibliotecaScreen es mostra la pantalla de la biblioteca, on es poden veure els personatges i les seves skins que l'usuari ha aconseguit al gacha.
-A més, es pot canviar entre veure els personatges aliats i els enemics, a través d'un interruptor.
-Cada personatge surt amb les seves skins, el mal que fa i la seva categoria/raressa.
-L'usuari pot seleccionar una skin d'un personatge per a poder-la emprar als combats contra els enemics.
-*/
-
 class BibliotecaScreen extends StatefulWidget {
   @override
   _BibliotecaScreenState createState() => _BibliotecaScreenState();
 }
 
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
-  //CHARACTERS DIALOGS
-  int _dialogIndex = 0;
   bool _switchValue = false;
 
-  final List<String> _dialoguesEnemigos = [
-    "Oh, quina sorpresa.",
-    "Un altre ignorant en busca de coneixement?",
-    "Benvingut al meu arxiu de meravelles...",
-    "O potser hauria de dir, al teu infern de curiositat?",
-    "Espero que hagis vingut a aprendre, i no només a perdre el temps.",
-    "T’agradaria ser el meu pròxim subjecte d’experimentació?",
-    "Els meus arxius contenen el que cap altre Shinigami gosaria investigar.",
-    "Mmm... potser aquesta és una oportunitat per fer un experiment amb tu...",
-  ];
-
-  final List<String> _dialoguesAliats = [
-    "Hola, sóc la Nel.",
-    "On es l'Ichigo, tinc por!",
-    "El Pesche el Dondochakka i el Bawabawa son els germans de la Nel",
-    "Per què tots aquí tenen una cara tan enfadada?",
-    "Ai ai ai... la Nel no vol estar aquí...",
-    "Aquest lloc fa molta por...",
-    "Ichigo, vine a buscar la Nel, si us plau...",
-  ];
-
-  final List<String> _mayuriImages = List.generate(
-      8, (index) => 'lib/images/mayuri_character/mayuri_${index + 1}.png');
-  final List<String> _nelImages = List.generate(
-      4, (index) => 'lib/images/nel_character/nel_${index + 1}.png');
-
-  int _mayuriImageIndex = 0;
-  int _nelImageIndex = 0;
-
-  // LOAD USER DATA (CHARACTERS, HOLLOWS AND SKINS)
   @override
   void initState() {
     super.initState();
     _loadUserData();
+
+    // Cargar diálogos iniciales para biblioteca
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dialogueProvider =
+          Provider.of<DialogueProvider>(context, listen: false);
+      dialogueProvider.loadDialogueFromJson('mayuri');
+    });
   }
 
   Future<void> _loadUserData() async {
@@ -69,7 +37,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     provider.fetchPersonatgesEnemicsAmbSkins();
   }
 
-  // SELECT SKIN ALLY
   void _selectSkinAliat(Skin skin) {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
@@ -79,7 +46,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
-
+    final dialogueProvider = Provider.of<DialogueProvider>(context);
     final personatges =
         _switchValue ? provider.characterEnemies : provider.personatges;
 
@@ -126,19 +93,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          setState(() {
-                            _dialogIndex = (_dialogIndex + 1) %
-                                (_switchValue
-                                    ? _dialoguesAliats.length
-                                    : _dialoguesEnemigos.length);
-                            if (_switchValue) {
-                              _nelImageIndex =
-                                  (_nelImageIndex + 1) % _nelImages.length;
-                            } else {
-                              _mayuriImageIndex = (_mayuriImageIndex + 1) %
-                                  _mayuriImages.length;
-                            }
-                          });
+                          dialogueProvider.nextDialogue();
                         },
                         child: Container(
                           width: 80,
@@ -150,10 +105,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 : Color.fromARGB(255, 167, 55, 187),
                             image: DecorationImage(
                               image: AssetImage(
-                                _switchValue
-                                    ? _nelImages[_nelImageIndex]
-                                    : _mayuriImages[_mayuriImageIndex],
-                              ),
+                                  dialogueProvider.currentImage),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -163,19 +115,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() {
-                              _dialogIndex = (_dialogIndex + 1) %
-                                  (_switchValue
-                                      ? _dialoguesAliats.length
-                                      : _dialoguesEnemigos.length);
-                              if (_switchValue) {
-                                _nelImageIndex =
-                                    (_nelImageIndex + 1) % _nelImages.length;
-                              } else {
-                                _mayuriImageIndex = (_mayuriImageIndex + 1) %
-                                    _mayuriImages.length;
-                              }
-                            });
+                            dialogueProvider.nextDialogue();
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,9 +153,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 ),
                                 child: SingleChildScrollView(
                                   child: Text(
-                                    _switchValue
-                                        ? _dialoguesAliats[_dialogIndex]
-                                        : _dialoguesEnemigos[_dialogIndex],
+                                    dialogueProvider.currentDialogue,
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
@@ -226,7 +164,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 ),
                               ),
                               SizedBox(height: 8),
-                              // Switch
                               Container(
                                 padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(
@@ -251,6 +188,15 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                         setState(() {
                                           _switchValue = value;
                                         });
+
+                                        final dialogueProvider =
+                                            Provider.of<DialogueProvider>(
+                                                context,
+                                                listen: false);
+                                        dialogueProvider.loadDialogueFromJson(
+                                          value ? 'nel' : 'mayuri',
+                                        
+                                        );
                                       },
                                       activeColor: Colors.yellowAccent,
                                       inactiveTrackColor: Colors.grey,
@@ -297,7 +243,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 itemBuilder: (context, index) {
                                   var skin = personatge.skins[index];
                                   final isSelected =
-                                      provider.selectedSkinAliat?.id == skin.id;
+                                      provider.selectedSkinAliat?.id ==
+                                          skin.id;
                                   return GestureDetector(
                                     onTap: () {
                                       if (!_switchValue) {
