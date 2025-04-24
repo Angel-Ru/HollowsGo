@@ -14,7 +14,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     super.initState();
     _loadUserData();
 
-    // Cargar diÃ¡logos iniciales para biblioteca
+    // Cargar diÃlogos iniciales para biblioteca
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
@@ -194,7 +194,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                                 listen: false);
                                         dialogueProvider.loadDialogueFromJson(
                                           value ? 'nel' : 'mayuri',
-                                        
                                         );
                                       },
                                       activeColor: Colors.yellowAccent,
@@ -242,8 +241,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 itemBuilder: (context, index) {
                                   var skin = personatge.skins[index];
                                   final isSelected =
-                                      provider.selectedSkinAliat?.id ==
-                                          skin.id;
+                                      provider.selectedSkinAliat?.id == skin.id;
                                   return GestureDetector(
                                     onTap: () {
                                       if (!_switchValue) {

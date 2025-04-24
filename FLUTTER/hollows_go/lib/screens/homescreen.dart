@@ -21,21 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _imagePath =
       'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
   final String _coinImagePath = 'lib/images/kan_moneda.png';
+
   Timer? _timer;
-  int _dialogIndex = 0;
-  final List<String> _dialoguesrukia = [
-    "Si baixes la guardia, et podries trobar amb un Hollow.",
-    "No et fies de ningú, ni tan sols de mi. Sóc un Shinigami.",
-    "La lluna esta hermosa aquesta nit, no creus?",
-    "En Chappy el conillet es molt més bonic que tu",
-    "Si tens algun problema, no dubtis en demanar ajuda.",
-    "Recorda que el gachapon costa 100 monedes.",
-  ];
-
-  final List<String> _rukiaImages = List.generate(
-      8, (index) => 'lib/images/rukia_character/rukia_${index + 1}.png');
-
-  int _rukiaImageIndex = 0;
 
   @override
   void initState() {
@@ -48,10 +35,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _timer = Timer.periodic(Duration(seconds: 5), (timer) {
         userProvider.fetchUserPoints();
       });
-    
+
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
-          dialogueProvider.loadDialogueFromJson("ichigo");
+      dialogueProvider.loadDialogueFromJson("ichigo");
     });
   }
 
@@ -165,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Positioned.fill(
             child: Image.network(
-              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708286/IMATGES_APP/t0jcgcpqz5xuagemwfv0.jpg',
+              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254121/HOMESCREEN/a4fjbn9cxunuxw34bned.jpg',
               fit: BoxFit.cover,
             ),
           ),
@@ -260,89 +247,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       SizedBox(height: 16),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _dialogIndex = (_dialogIndex + 1) %
-                                      _dialoguesrukia.length;
-                                  _rukiaImageIndex = (_rukiaImageIndex + 1) %
-                                      _rukiaImages.length;
-                                });
-                              },
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          243, 194, 194, 194),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(8),
-                                        topRight: Radius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Kuchiki Rukia',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blueAccent,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blueAccent.withOpacity(0.8),
-                                      borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(8),
-                                        bottomRight: Radius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      _dialoguesrukia[_dialogIndex],
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _dialogIndex =
-                                    (_dialogIndex + 1) % _dialoguesrukia.length;
-                                _rukiaImageIndex = (_rukiaImageIndex + 1) %
-                                    _rukiaImages.length;
-                              });
-                            },
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  AssetImage(_rukiaImages[_rukiaImageIndex]),
-                              onBackgroundImageError: (exception, stackTrace) {
-                                print(
-                                    "L'imatge no se ha pogut carregar encara");
-                              },
-                              backgroundColor:
-                                  Color.fromARGB(255, 24, 121, 239),
-                            ),
-                          ),
-                        ],
-                      ),
                     ],
                   );
                 },
@@ -383,8 +287,7 @@ class _HomeScreenState extends State<HomeScreen> {
             dialogueProvider.loadDialogueFromJson("ichigo");
           } else if (index == 2) {
             dialogueProvider.loadDialogueFromJson("urahara");
-          }
-          else if (index == 3) {
+          } else if (index == 3) {
             dialogueProvider.loadDialogueFromJson("mayuri");
           }
           uiProvider.selectedMenuOpt = index;
