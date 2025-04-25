@@ -1,14 +1,5 @@
-import 'dart:async';
 import 'dart:ui';
-
-import 'package:flutter/material.dart';
-import 'package:hollows_go/providers/dialeg_provider.dart';
-import 'package:hollows_go/providers/gacha_provider.dart';
-import 'package:hollows_go/widgets/bannergachawidget.dart';
-import 'package:hollows_go/widgets/dialogue_widget.dart';
-import 'package:hollows_go/widgets/gachavideodialog.dart';
-import 'package:hollows_go/widgets/skinrewarddialog.dart';
-import 'package:provider/provider.dart';
+import '../imports.dart';
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -99,7 +90,7 @@ class _TendaScreenState extends State<TendaScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(height: 20),
-                DialogueBox(
+                DialogueWidget(
                   characterName: 'Kisuke Urahara',
                   nameColor: Colors.green,
                   bubbleColor: Color.fromARGB(212, 238, 238, 238),

@@ -6,9 +6,8 @@ Aquesta és la classe HomeScreen. En aquesta classe es crea la pantalla principa
 En aquesta pantalla es mostren diferents diàlegs de personatges de Bleach.
 La classe també permet canviar la imatge de perfil i mostrar el nombre de monedes que té l'usuari a través d'un AppBar.
 En aquesta pantalla també es mostren els diferents menús de l'aplicació, a on hi ha la pantalla del mapa, la de la tenda i la de la biblioteca de personatjes i enemics.
-A la pantalla trobam que hi ha dos diàlegs diferents, un de n'Ichigo i un de na Rukia.
+A la pantalla trobam que hi ha diàlegs de n'Ichigo.
 El de n'Ichigo usa el provider de DialogueProvider per a mostrar les imatges i els diàlegs de n'Ichigo.
-Els diàlegs de na Rukia, en canvi, estan gestionats d'una manera diferent, amb una llista per a les frases i un altre llista per a les imatges.
 */
 
 class HomeScreen extends StatefulWidget {
@@ -171,85 +170,18 @@ class _HomeScreenState extends State<HomeScreen> {
           if (uiProvider.selectedMenuOpt == 0)
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Consumer<DialogueProvider>(
-                builder: (context, dialogueProvider, child) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: dialogueProvider.nextDialogue,
-                            child: CircleAvatar(
-                              radius: 50,
-                              backgroundImage:
-                                  AssetImage(dialogueProvider.currentImage),
-                              onBackgroundImageError: (exception, stackTrace) {
-                                print(
-                                    "L'imatge no se ha pogut carregar encara");
-                              },
-                              backgroundColor:
-                                  Color.fromARGB(255, 239, 178, 24),
-                            ),
-                          ),
-                          SizedBox(width: 16),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: dialogueProvider.nextDialogue,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          243, 194, 194, 194),
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(8),
-                                        topRight: Radius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'Kurosaki Ichigo',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.orange,
-                                        decoration: TextDecoration.underline,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.all(16),
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                          211, 247, 160, 39),
-                                      borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(8),
-                                        bottomRight: Radius.circular(8),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      dialogueProvider.currentDialogue,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
-                    ],
-                  );
-                },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(height: 20),
+                  DialogueWidget(
+                    characterName: 'Kisuke Urahara',
+                    nameColor: Colors.orange,
+                    bubbleColor: Color.fromARGB(212, 238, 238, 238),
+                    backgroundColor: Color.fromARGB(255, 233, 179, 77),
+                  ),
+                  SizedBox(height: 16),
+                ],
               ),
             ),
           _getSelectedScreen(uiProvider.selectedMenuOpt),

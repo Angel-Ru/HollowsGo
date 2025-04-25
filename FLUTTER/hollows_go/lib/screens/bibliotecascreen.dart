@@ -14,7 +14,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     super.initState();
     _loadUserData();
 
-    // Cargar diÃlogos iniciales para biblioteca
+    // Charge the dialoges at the bibliotecascreen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);

@@ -17,12 +17,18 @@ export '/providers/ui_provider.dart';
 export '/providers/dialeg_provider.dart';
 export '/providers/user_provider.dart';
 export '/providers/skins_enemics_personatges.dart';
+export '/providers/gacha_provider.dart';
 
 export 'package:hollows_go/config.dart';
 
 export '/models/user.dart';
 export '/models/skin.dart';
 export '/models/personatge.dart';
+
+export '/widgets/bannergachawidget.dart';
+export '/widgets/dialogue_widget.dart';
+export '/widgets/gachavideodialog.dart';
+export '/widgets/skinrewarddialog.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:hollows_go/providers/dialeg_provider.dart';
 import 'package:provider/provider.dart';
 
-class DialogueBox extends StatelessWidget {
+class DialogueWidget extends StatelessWidget {
   final String characterName;
   final Color nameColor;
   final Color bubbleColor;
   final Color backgroundColor;
 
-  const DialogueBox({
+  const DialogueWidget({
     Key? key,
     required this.characterName,
     this.nameColor = Colors.green,
