@@ -14,7 +14,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     super.initState();
     _loadUserData();
 
-    // Charge the dialoges at the bibliotecascreen
+    // Cargar diálogos al iniciar la pantalla
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
@@ -46,7 +46,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
-    final dialogueProvider = Provider.of<DialogueProvider>(context);
     final personatges =
         _switchValue ? provider.characterEnemies : provider.personatges;
 
@@ -88,127 +87,59 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               child: Column(
                 children: [
                   SizedBox(height: 100),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          dialogueProvider.nextDialogue();
-                        },
-                        child: Container(
-                          width: 80,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _switchValue
-                                ? Colors.green
-                                : Color.fromARGB(255, 167, 55, 187),
-                            image: DecorationImage(
-                              image: AssetImage(dialogueProvider.currentImage),
-                              fit: BoxFit.cover,
-                            ),
+                  // Diálogo adaptado usando DialogueBox
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: DialogueWidget(
+                      characterName: _switchValue ? 'Nel' : 'Mayuri Kurotsuchi',
+                      nameColor: _switchValue ? Colors.green : Colors.purple,
+                      bubbleColor: Color.fromARGB(212, 238, 238, 238),
+                      backgroundColor: _switchValue
+                          ? Color.fromARGB(255, 76, 175, 80)
+                          : Color.fromARGB(255, 167, 55, 187),
+                    ),
+                  ),
+                  // Switch para cambiar entre aliados/enemigos
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          _switchValue
+                              ? 'Biblioteca Enemics'
+                              : 'Biblioteca Aliats',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            dialogueProvider.nextDialogue();
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(243, 194, 194, 194),
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(8),
-                                    topRight: Radius.circular(8),
-                                  ),
-                                ),
-                                child: Text(
-                                  _switchValue ? 'Nel' : 'Mayuri Kurotsuchi',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.yellowAccent,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                width: double.infinity,
-                                height: 100,
-                                padding: EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: _switchValue
-                                      ? Colors.green
-                                      : const Color.fromARGB(255, 167, 55, 187),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: SingleChildScrollView(
-                                  child: Text(
-                                    dialogueProvider.currentDialogue,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.7),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      _switchValue
-                                          ? 'Biblioteca Enemics'
-                                          : 'Biblioteca Aliats',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Switch(
-                                      value: _switchValue,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          _switchValue = value;
-                                        });
+                        Spacer(),
+                        Switch(
+                          value: _switchValue,
+                          onChanged: (value) {
+                            setState(() {
+                              _switchValue = value;
+                            });
 
-                                        final dialogueProvider =
-                                            Provider.of<DialogueProvider>(
-                                                context,
-                                                listen: false);
-                                        dialogueProvider.loadDialogueFromJson(
-                                          value ? 'nel' : 'mayuri',
-                                        );
-                                      },
-                                      activeColor: Colors.yellowAccent,
-                                      inactiveTrackColor: Colors.grey,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                            final dialogueProvider =
+                                Provider.of<DialogueProvider>(context,
+                                    listen: false);
+                            dialogueProvider.loadDialogueFromJson(
+                              value ? 'nel' : 'mayuri',
+                            );
+                          },
+                          activeColor: Colors.yellowAccent,
+                          inactiveTrackColor: Colors.grey,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   SizedBox(height: 20),
+                  // Lista de personajes
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: personatges.map((personatge) {
