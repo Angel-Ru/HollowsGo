@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:hollows_go/providers/dialeg_provider.dart';
-import 'package:provider/provider.dart';
+import '../imports.dart';
 
 class DialogueWidget extends StatelessWidget {
   final String characterName;

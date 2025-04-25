@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../imports.dart';
 
 class SkinRewardDialog extends StatelessWidget {
   final Map<String, dynamic> skin;

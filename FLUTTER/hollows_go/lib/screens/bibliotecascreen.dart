@@ -13,13 +13,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   void initState() {
     super.initState();
     _loadUserData();
-
-    // Cargar diálogos al iniciar la pantalla
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final dialogueProvider =
-          Provider.of<DialogueProvider>(context, listen: false);
-      dialogueProvider.loadDialogueFromJson('mayuri');
-    });
+    _loadInitialDialogue();
   }
 
   Future<void> _loadUserData() async {
@@ -35,6 +29,14 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     provider.fetchPersonatgesAmbSkins(userId.toString());
     provider.fetchPersonatgesEnemicsAmbSkins();
+  }
+
+  void _loadInitialDialogue() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final dialogueProvider =
+          Provider.of<DialogueProvider>(context, listen: false);
+      dialogueProvider.loadDialogueFromJson('mayuri');
+    });
   }
 
   void _selectSkinAliat(Skin skin) {
@@ -67,6 +69,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       ),
       body: Stack(
         children: [
+          // Fondo
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -81,13 +84,16 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               ),
             ),
           ),
+
+          // Contenido
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   SizedBox(height: 100),
-                  // Diálogo adaptado usando DialogueBox
+
+                  // Diálogo
                   Padding(
                     padding: const EdgeInsets.only(bottom: 20),
                     child: DialogueWidget(
@@ -99,173 +105,62 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           : Color.fromARGB(255, 167, 55, 187),
                     ),
                   ),
-                  // Switch para cambiar entre aliados/enemigos
-                  Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          _switchValue
-                              ? 'Biblioteca Enemics'
-                              : 'Biblioteca Aliats',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Spacer(),
-                        Switch(
-                          value: _switchValue,
-                          onChanged: (value) {
-                            setState(() {
-                              _switchValue = value;
-                            });
 
-                            final dialogueProvider =
-                                Provider.of<DialogueProvider>(context,
-                                    listen: false);
-                            dialogueProvider.loadDialogueFromJson(
-                              value ? 'nel' : 'mayuri',
-                            );
-                          },
-                          activeColor: Colors.yellowAccent,
-                          inactiveTrackColor: Colors.grey,
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Selector de modo
+                  _buildModeSwitch(),
+
                   SizedBox(height: 20),
-                  // Lista de personajes
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: personatges.map((personatge) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.7),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                personatge.nom,
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
+
+                  // Lista de personajes usando el nuevo widget
+                  ...personatges
+                      .map((personatge) => Padding(
+                            padding: const EdgeInsets.only(bottom: 20),
+                            child: PersonatgesCardSwiper(
+                              personatge: personatge,
+                              isEnemyMode: _switchValue,
+                              onSkinSelected: (skin) => _selectSkinAliat(skin),
+                              selectedSkin: provider.selectedSkinAliat,
                             ),
-                            SizedBox(height: 10),
-                            SizedBox(
-                              height: 250,
-                              child: PageView.builder(
-                                itemCount: personatge.skins.length,
-                                controller:
-                                    PageController(viewportFraction: 0.7),
-                                itemBuilder: (context, index) {
-                                  var skin = personatge.skins[index];
-                                  final isSelected =
-                                      provider.selectedSkinAliat?.id == skin.id;
-                                  return GestureDetector(
-                                    onTap: () {
-                                      if (!_switchValue) {
-                                        _selectSkinAliat(skin);
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 5),
-                                      child: Column(
-                                        children: [
-                                          Stack(
-                                            children: [
-                                              Container(
-                                                width: 180,
-                                                height: 180,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  border: Border.all(
-                                                    color: isSelected
-                                                        ? Colors.green
-                                                        : Colors.black,
-                                                    width: isSelected ? 4 : 2,
-                                                  ),
-                                                ),
-                                                child: ClipRRect(
-                                                  child: Image.network(
-                                                    skin.imatge ?? '',
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                              if (isSelected)
-                                                Positioned(
-                                                  top: 8,
-                                                  right: 8,
-                                                  child: Icon(
-                                                    Icons.check_circle,
-                                                    color: Colors.green,
-                                                    size: 24,
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 5),
-                                          Container(
-                                            padding: EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Colors.black.withOpacity(0.8),
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                            child: Text(
-                                              '${skin.nom} (Mal: ${skin.malTotal})',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 3),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: List.generate(
-                                              5,
-                                              (index) => Icon(
-                                                Icons.star,
-                                                color: index <
-                                                        (skin.categoria ?? 0)
-                                                    ? Colors.yellow
-                                                    : Colors.grey,
-                                                size: 20,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                  ),
+                          ))
+                      .toList(),
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeSwitch() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Text(
+            _switchValue ? 'Biblioteca Enemics' : 'Biblioteca Aliats',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Spacer(),
+          Switch(
+            value: _switchValue,
+            onChanged: (value) {
+              setState(() {
+                _switchValue = value;
+              });
+              final dialogueProvider =
+                  Provider.of<DialogueProvider>(context, listen: false);
+              dialogueProvider.loadDialogueFromJson(value ? 'nel' : 'mayuri');
+            },
+            activeColor: Colors.yellowAccent,
+            inactiveTrackColor: Colors.grey,
           ),
         ],
       ),

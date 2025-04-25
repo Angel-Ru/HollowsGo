@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:hollows_go/providers/gacha_provider.dart';
-import 'package:hollows_go/widgets/gachavideodialog.dart';
-import 'package:hollows_go/widgets/skinrewarddialog.dart';
-import 'package:provider/provider.dart';
+import '../imports.dart';
 
 class GachaBannerWidget extends StatelessWidget {
   const GachaBannerWidget({super.key});
