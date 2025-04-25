@@ -4,6 +4,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hollows_go/providers/dialeg_provider.dart';
 import 'package:hollows_go/providers/gacha_provider.dart';
+import 'package:hollows_go/widgets/bannergachawidget.dart';
+import 'package:hollows_go/widgets/dialogue_widget.dart';
 import 'package:hollows_go/widgets/gachavideodialog.dart';
 import 'package:hollows_go/widgets/skinrewarddialog.dart';
 import 'package:provider/provider.dart';
@@ -29,8 +31,7 @@ class _TendaScreenState extends State<TendaScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
-        dialogueProvider.loadDialogueFromJson('urahara');
-      
+      dialogueProvider.loadDialogueFromJson('urahara');
     });
   }
 
@@ -48,7 +49,6 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   Widget build(BuildContext context) {
     final gachaProvider = Provider.of<GachaProvider>(context);
-    final dialogueProvider = Provider.of<DialogueProvider>(context);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -88,79 +88,8 @@ class _TendaScreenState extends State<TendaScreen> {
             right: MediaQuery.of(context).size.width * 0.15,
             child: Column(
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: Colors.grey[700]!.withOpacity(0.8),
-                      width: 3,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 6,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
-                      'lib/images/banner_gacha/banner.png',
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      height: MediaQuery.of(context).size.width * 0.38,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+                GachaBannerWidget(),
                 SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () async {
-                    final success = await gachaProvider.gachaPull(context);
-
-                    if (success && gachaProvider.latestSkin != null) {
-                      await showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (_) => GachaVideoPopup(
-                          onVideoEnd: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) => SkinRewardDialog(
-                                skin: gachaProvider.latestSkin!,
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    }
-                  },
-                  child: Text(
-                    'Tirar Gacha',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      foreground: Paint()
-                        ..color = Color(0xFFFF6A13)
-                        ..style = PaintingStyle.stroke,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(1.5, 1.5),
-                          blurRadius: 3.0,
-                          color: Colors.black.withOpacity(0.7),
-                        ),
-                      ],
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFF8B400),
-                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.black, width: 2),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -170,68 +99,11 @@ class _TendaScreenState extends State<TendaScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(height: 20),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    GestureDetector(
-                      onTap: dialogueProvider.nextDialogue,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage:
-                            AssetImage(dialogueProvider.currentImage),
-                        backgroundColor: Color.fromARGB(255, 151, 250, 173),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap:  dialogueProvider.nextDialogue,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(243, 194, 194, 194),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(8),
-                                  topRight: Radius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                'Kisuke Urahara',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.green,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(212, 238, 238, 238),
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(8),
-                                  bottomRight: Radius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                dialogueProvider.currentDialogue,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                DialogueBox(
+                  characterName: 'Kisuke Urahara',
+                  nameColor: Colors.green,
+                  bubbleColor: Color.fromARGB(212, 238, 238, 238),
+                  backgroundColor: Color.fromARGB(255, 151, 250, 173),
                 ),
                 SizedBox(height: 16),
                 if (gachaProvider.isLoading)
