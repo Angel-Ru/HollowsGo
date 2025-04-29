@@ -129,30 +129,32 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                   if (!_switchValue)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
-                      child: ElevatedButton(
-                        onPressed: _selectRandomSkin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                      child: Center(
+                        // Centrar el botón horizontalmente
+                        child: ElevatedButton(
+                          onPressed: _selectRandomSkin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
                           ),
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 24, vertical: 12),
-                        ),
-                        child: Text(
-                          _randomSkinName.isEmpty
-                              ? 'Seleccionar Skin Aleatoria'
-                              : 'Skin seleccionada: $_randomSkinName',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                          child: Text(
+                            _randomSkinName.isEmpty
+                                ? 'Seleccionar Skin Aleatoria'
+                                : 'Skin seleccionada: $_randomSkinName',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
-
                   SizedBox(height: 10),
 
                   if (!_switchValue && provider.selectedSkinAliat != null)
