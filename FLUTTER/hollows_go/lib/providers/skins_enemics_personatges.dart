@@ -76,6 +76,11 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void unselectSkinAliat() {
+    _selectedSkinAliat = null;
+    notifyListeners();
+  }
+
   Future<void> selectRandomSkin() async {
     try {
       final prefs = await SharedPreferences.getInstance();

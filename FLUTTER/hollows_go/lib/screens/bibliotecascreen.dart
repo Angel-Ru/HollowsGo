@@ -168,6 +168,16 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                               personatge: personatge,
                               isEnemyMode: _switchValue,
                               onSkinSelected: _selectSkinAliat,
+                              onSkinDeselected: () {
+                                final provider = Provider.of<
+                                        SkinsEnemicsPersonatgesProvider>(
+                                    context,
+                                    listen: false);
+                                provider.unselectSkinAliat();
+                                setState(() {
+                                  _randomSkinName = ''; // Resetear el nombre
+                                });
+                              },
                               selectedSkin: provider.selectedSkinAliat,
                             ),
                           ))

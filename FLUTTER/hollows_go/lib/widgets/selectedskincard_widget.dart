@@ -11,10 +11,9 @@ class SelectedSkinCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center, // Centrar horizontalmente
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Center(
-          // Centrar el texto horizontalmente
           child: Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(

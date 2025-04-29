@@ -5,6 +5,7 @@ class PersonatgesCardSwiper extends StatelessWidget {
   final Personatge personatge;
   final bool isEnemyMode;
   final Function(Skin) onSkinSelected;
+  final Function()? onSkinDeselected;
   final Skin? selectedSkin;
 
   const PersonatgesCardSwiper({
@@ -12,6 +13,7 @@ class PersonatgesCardSwiper extends StatelessWidget {
     required this.personatge,
     required this.isEnemyMode,
     required this.onSkinSelected,
+    this.onSkinDeselected,
     this.selectedSkin,
   }) : super(key: key);
 
@@ -58,7 +60,22 @@ class PersonatgesCardSwiper extends StatelessWidget {
 
   Widget _buildSkinCard(Skin skin, bool isSkinSelected) {
     return GestureDetector(
-      onTap: isEnemyMode ? null : () => onSkinSelected(skin),
+      onTap: () {
+        if (isEnemyMode) return;
+
+        if (isSkinSelected) {
+          return;
+        } else {
+          onSkinSelected(skin);
+        }
+      },
+      onDoubleTap: () {
+        if (isEnemyMode) return;
+
+        if (isSkinSelected && onSkinDeselected != null) {
+          onSkinDeselected!();
+        }
+      },
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 5),
         child: Column(
