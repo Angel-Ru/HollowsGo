@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import '../imports.dart';
 
 class BibliotecaScreen extends StatefulWidget {
@@ -8,6 +9,8 @@ class BibliotecaScreen extends StatefulWidget {
 
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
   bool _switchValue = false;
+  String _randomSkinName =
+      ''; // Variable para almacenar el nombre de la skin aleatoria
 
   @override
   void initState() {
@@ -39,10 +42,24 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     });
   }
 
+  Future<void> _selectRandomSkin() async {
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    await provider.selectRandomUserSkin();
+
+    // Actualizar el nombre de la skin seleccionada
+    setState(() {
+      _randomSkinName = provider.selectedSkinAliat?.nom ?? '';
+    });
+  }
+
   void _selectSkinAliat(Skin skin) {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     provider.setSelectedSkinAliat(skin);
+    setState(() {
+      _randomSkinName = skin.nom;
+    });
   }
 
   @override
@@ -69,7 +86,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       ),
       body: Stack(
         children: [
-          // Fondo
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -84,8 +100,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               ),
             ),
           ),
-
-          // Contenido
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -106,19 +120,54 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                     ),
                   ),
 
-                  // Selector de modo
+                  // SWITCH
                   _buildModeSwitch(),
 
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
 
-                  // Lista de personajes usando el nuevo widget
+                  // Botón de selección aleatoria con nombre de skin
+                  if (!_switchValue)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: Center(
+                        // Centrar el botón horizontalmente
+                        child: ElevatedButton(
+                          onPressed: _selectRandomSkin,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 12),
+                          ),
+                          child: Text(
+                            _randomSkinName.isEmpty
+                                ? 'Seleccionar Skin Aleatoria'
+                                : 'Skin seleccionada: $_randomSkinName',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 10),
+
+                  if (!_switchValue && provider.selectedSkinAliat != null)
+                    SelectedSkinCard(skin: provider.selectedSkinAliat!),
+
+                  // Lista de personajes
                   ...personatges
                       .map((personatge) => Padding(
                             padding: const EdgeInsets.only(bottom: 20),
                             child: PersonatgesCardSwiper(
                               personatge: personatge,
                               isEnemyMode: _switchValue,
-                              onSkinSelected: (skin) => _selectSkinAliat(skin),
+                              onSkinSelected: _selectSkinAliat,
                               selectedSkin: provider.selectedSkinAliat,
                             ),
                           ))
@@ -154,6 +203,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
             onChanged: (value) {
               setState(() {
                 _switchValue = value;
+                _randomSkinName = ''; // Resetear el nombre al cambiar de modo
               });
               final dialogueProvider =
                   Provider.of<DialogueProvider>(context, listen: false);
