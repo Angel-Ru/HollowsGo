@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../imports.dart';
 
 class PersonatgesCardSwiper extends StatelessWidget {
