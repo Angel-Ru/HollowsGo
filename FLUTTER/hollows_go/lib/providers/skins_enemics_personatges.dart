@@ -46,6 +46,31 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<Skin> selectRandomUserSkin() async {
+    try {
+      if (_personatges.isEmpty) {
+        throw Exception('No hay personajes disponibles');
+      }
+
+      final allUserSkins = _personatges.expand((p) => p.skins).toList();
+
+      if (allUserSkins.isEmpty) {
+        throw Exception('El usuario no tiene skins disponibles');
+      }
+
+      final random = Random();
+      final randomSkin = allUserSkins[random.nextInt(allUserSkins.length)];
+
+      _selectedSkinAliat = randomSkin;
+      notifyListeners();
+
+      return randomSkin; // Devolver la skin seleccionada
+    } catch (e) {
+      print('Error al seleccionar skin aleatoria: $e');
+      throw e; // Relanzar el error para manejarlo en la UI
+    }
+  }
+
   void setSelectedSkinAliat(Skin skin) {
     _selectedSkinAliat = skin;
     notifyListeners();
@@ -106,7 +131,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     }
   }
 
-   void setMaxEnemyHealth(int maxHealth) {
+  void setMaxEnemyHealth(int maxHealth) {
     _maxEnemyHealth = maxHealth;
     notifyListeners();
   }
@@ -115,6 +140,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     _maxAllyHealth = maxHealth;
     notifyListeners();
   }
+
   void resetHealth() {
     if (_selectedSkin != null && _maxEnemyHealth != null) {
       _selectedSkin!.currentHealth = _maxEnemyHealth!;

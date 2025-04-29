@@ -30,6 +30,7 @@ export '/widgets/dialogue_widget.dart';
 export '/widgets/gachavideodialog.dart';
 export '/widgets/skinrewarddialog.dart';
 export '/widgets/personatges_cardswiper_widget.dart';
+export 'widgets/selectedskincard_widget.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
@@ -47,3 +48,4 @@ export 'dart:convert';
 export 'dart:math';
 export 'dart:async';
 export 'dart:typed_data';
+export 'dart:io';
