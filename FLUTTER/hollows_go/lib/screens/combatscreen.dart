@@ -41,19 +41,17 @@ class _CombatScreenState extends State<CombatScreen> {
     _resetHealth();
   }
 
- void _resetHealth() {
-  final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-  final skinAliat = provider.selectedSkinAliat;
-  final skinEnemic = provider.selectedSkin;
+  void _resetHealth() {
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final skinAliat = provider.selectedSkinAliat;
+    final skinEnemic = provider.selectedSkin;
 
-  
-  provider.setMaxAllyHealth(skinAliat?.vida ?? 1000);
-  provider.setMaxEnemyHealth(skinEnemic?.vida ?? 1000);
+    provider.setMaxAllyHealth(skinAliat?.vida ?? 1000);
+    provider.setMaxEnemyHealth(skinEnemic?.vida ?? 1000);
 
- 
-  provider.resetHealth();
-}
-
+    provider.resetHealth();
+  }
 
   void _initializeVideoPlayer() {
     _videoController =
