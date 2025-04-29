@@ -1,9 +1,4 @@
-import 'dart:async';
-
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../helpers/marker_helper.dart';
-import '../helpers/location_helper.dart';
+import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
   final String profileImagePath;
@@ -32,7 +27,44 @@ class _MapaScreenState extends State<Mapscreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkSkinSelection();
+    });
     _loadMapData();
+  }
+
+  void _checkSkinSelection() {
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    if (provider.selectedSkinAliat == null) {
+      _showNoSkinSelectedDialog();
+    }
+  }
+
+  Future<void> _showNoSkinSelectedDialog() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Skin no seleccionada',
+              style: TextStyle(color: Colors.deepPurple)),
+          content: Text(
+              'Debes seleccionar una skin en la biblioteca antes de poder jugar.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Ir a Biblioteca',
+                  style: TextStyle(color: Colors.deepPurple)),
+              onPressed: () {
+                Provider.of<UIProvider>(context, listen: false)
+                    .selectedMenuOpt = 3;
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

@@ -19,7 +19,7 @@ export '/providers/user_provider.dart';
 export '/providers/skins_enemics_personatges.dart';
 export '/providers/gacha_provider.dart';
 
-export 'package:hollows_go/config.dart';
+export '../config.dart';
 
 export '/models/user.dart';
 export '/models/skin.dart';
@@ -30,7 +30,7 @@ export '/widgets/dialogue_widget.dart';
 export '/widgets/gachavideodialog.dart';
 export '/widgets/skinrewarddialog.dart';
 export '/widgets/personatges_cardswiper_widget.dart';
-export 'widgets/selectedskincard_widget.dart';
+export '/widgets/selectedskincard_widget.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
@@ -49,3 +49,6 @@ export 'dart:math';
 export 'dart:async';
 export 'dart:typed_data';
 export 'dart:io';
+
+export '../helpers/marker_helper.dart';
+export '../helpers/location_helper.dart';

@@ -175,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   SizedBox(height: 20),
                   DialogueWidget(
-                    characterName: 'Kisuke Urahara',
+                    characterName: 'Ichigo Kurosaki',
                     nameColor: Colors.orange,
                     bubbleColor: Color.fromARGB(212, 238, 238, 238),
                     backgroundColor: Color.fromARGB(255, 233, 179, 77),

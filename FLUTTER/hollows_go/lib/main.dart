@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
           '/map': (context) => Mapscreen(
                 profileImagePath: '',
               ),
+          '/biblioteca': (context) => BibliotecaScreen(),
         },
       ),
     );
