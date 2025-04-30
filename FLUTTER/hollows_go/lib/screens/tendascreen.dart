@@ -8,10 +8,37 @@ class TendaScreen extends StatefulWidget {
 
 class _TendaScreenState extends State<TendaScreen> {
   final List<String> _backgroundImages = [
-    'lib/images/Yoroichi.jpeg',
-    'lib/images/Byakuya.jpeg',
-  ];
-
+  'lib/images/fondo_tendascreen/Aizen.jpg',
+  'lib/images/fondo_tendascreen/Aporro.jpg',
+  'lib/images/fondo_tendascreen/Byakuya.jpg',
+  'lib/images/fondo_tendascreen/Gigachad.jpg',
+  'lib/images/fondo_tendascreen/Gin.jpg',
+  'lib/images/fondo_tendascreen/Grimmjow.jpg',
+  'lib/images/fondo_tendascreen/Halibel.jpg',
+  'lib/images/fondo_tendascreen/Hisagi.jpg',
+  'lib/images/fondo_tendascreen/Ikkaku.jpg',
+  'lib/images/fondo_tendascreen/Ishida.jpg',
+  'lib/images/fondo_tendascreen/Kaien.jpg',
+  'lib/images/fondo_tendascreen/Kira.jpg',
+  'lib/images/fondo_tendascreen/Komamura.jpg',
+  'lib/images/fondo_tendascreen/Kulosaki.jpg',
+  'lib/images/fondo_tendascreen/Kyoraku.jpg',
+  'lib/images/fondo_tendascreen/Matsumoto.jpg',
+  'lib/images/fondo_tendascreen/Mayurin.jpg',
+  'lib/images/fondo_tendascreen/Nelliel.jpg',
+  'lib/images/fondo_tendascreen/Nnoitra.jpg',
+  'lib/images/fondo_tendascreen/Renji.jpg',
+  'lib/images/fondo_tendascreen/Rukia.jpg',
+  'lib/images/fondo_tendascreen/Shinji.jpg',
+  'lib/images/fondo_tendascreen/SoiFon.jpg',
+  'lib/images/fondo_tendascreen/Stark.jpg',
+  'lib/images/fondo_tendascreen/Tosen.jpg',
+  'lib/images/fondo_tendascreen/Toshiro.jpg',
+  'lib/images/fondo_tendascreen/Ulquiorra.jpg',
+  'lib/images/fondo_tendascreen/Urahara.jpg',
+  'lib/images/fondo_tendascreen/Yamamoto.jpg',
+  'lib/images/fondo_tendascreen/Yoruichi.jpg',
+];
   int _currentImageIndex = 0;
 
   @override
@@ -27,7 +54,7 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   void _startBackgroundRotation() {
-    Future.delayed(Duration(seconds: 20), () {
+    Future.delayed(Duration(seconds: 8), () {
       if (!mounted) return;
       setState(() {
         _currentImageIndex =

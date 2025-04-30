@@ -94,6 +94,7 @@ flutter:
     - lib/videos/animacion_gacha.mp4
     - lib/images/Yoroichi.jpeg
     - lib/images/Byakuya.jpeg
+    - lib/images/fondo_tendascreen/
     - assets/dialogues.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
