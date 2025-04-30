@@ -1,3 +1,5 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+
 import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
@@ -67,21 +69,19 @@ class _MapaScreenState extends State<Mapscreen> {
   //   );
   // }
   Future<void> _showNoSkinSelectedDialog() async {
-  return AwesomeDialog(
-    context: context,
-    dialogType: DialogType.info,
-    animType: AnimType.scale,
-    barrierDismissible: false,
-    title: 'Skin no seleccionada',
-    desc: 'Debes seleccionar una skin en la biblioteca antes de poder jugar.',
-    btnOkText: 'Ir a Biblioteca',
-    btnOkOnPress: () {
-      Provider.of<UIProvider>(context, listen: false).selectedMenuOpt = 3;
-    },
-    btnOkColor: Colors.deepPurple,
-  ).show();
-}
-
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.info,
+      animType: AnimType.scale,
+      title: 'Skin no seleccionada',
+      desc: 'Debes seleccionar una skin en la biblioteca antes de poder jugar.',
+      btnOkText: 'Ir a Biblioteca',
+      btnOkOnPress: () {
+        Provider.of<UIProvider>(context, listen: false).selectedMenuOpt = 3;
+      },
+      btnOkColor: Colors.deepPurple,
+    ).show();
+  }
 
   @override
   void didUpdateWidget(Mapscreen oldWidget) {
