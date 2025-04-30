@@ -138,7 +138,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 Spacer(),
                 Container(
                   height: 200,
-                  child: Image.asset(
+                  child: Image.network(
                     imagePaths[randomImage],
                     fit: BoxFit.cover,
                   ),
@@ -170,7 +170,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                       return Container(
                         width: 39,
                         height: 39,
-                        child: Image.asset(
+                        child: Image.network(
                           "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/skull_border_rsfqcx.png",
                           fit: BoxFit.cover,
                         ),
@@ -185,7 +185,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 150),
-                  Image.asset(
+                  Image.network(
                     "https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708246/PREHOMESCREEN/ee9hwiaahvn6mj2dcnov.png",
                     width: 300,
                   ),
