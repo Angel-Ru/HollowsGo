@@ -407,8 +407,8 @@ const starGroups = {
 };
 
 availableSkins.recordset.forEach(skin => {
-    if (starGroups[skin.estrelles]) {
-        starGroups[skin.estrelles].push(skin);
+    if (starGroups[skin.categoria]) {
+        starGroups[skin.categoria].push(skin);
     }
 });
 
