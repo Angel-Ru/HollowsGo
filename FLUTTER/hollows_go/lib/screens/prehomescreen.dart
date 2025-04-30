@@ -15,11 +15,11 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     with SingleTickerProviderStateMixin {
   // IMAGES OF KON FOR THE RANDOM IMAGE ARRAY
   final List<String> imagePaths = [
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/konrap_yify65.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/konlike_uzabno.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/konepico_giynzj.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995716/koncapitan_hvdr2e.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995716/konbrillitos_ivxff6.png',
+    'lib/images/prehomescreen_images/konbrillitos.png',
+    'lib/images/prehomescreen_images/koncapitan.png',
+    'lib/images/prehomescreen_images/konepico.png',
+    'lib/images/prehomescreen_images/konlike.png',
+    'lib/images/prehomescreen_images/konrap.png',
   ];
 
   late AnimationController _controller;
@@ -87,6 +87,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       return true;
     });
   }
+
   Future<void> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('isLoggedIn') ?? false) {
@@ -135,9 +136,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                       return Container(
                         width: 39,
                         height: 39,
-                        child: Image.network(
-                          // CHANGE THE IMAGE + UPLOAD IT TO CLOUDINARY
-                          "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/skull_border_rsfqcx.png",
+                        child: Image.asset(
+                          "lib/images/prehomescreen_images/skull_border.png",
                           fit: BoxFit.cover,
                         ),
                       );
@@ -147,7 +147,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 Spacer(),
                 Container(
                   height: 200,
-                  child: Image.network(
+                  child: Image.asset(
                     imagePaths[randomImage],
                     fit: BoxFit.cover,
                   ),
@@ -179,8 +179,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                       return Container(
                         width: 39,
                         height: 39,
-                        child: Image.network(
-                          "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/skull_border_rsfqcx.png",
+                        child: Image.asset(
+                          "lib/images/prehomescreen_images/skull_border.png",
                           fit: BoxFit.cover,
                         ),
                       );

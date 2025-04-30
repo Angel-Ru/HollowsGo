@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void precargarImagenes(List<Personatge> personatges) {
     for (var personatge in personatges) {
       for (var skin in personatge.skins) {
-        final imageUrl = skin.imatge; 
+        final imageUrl = skin.imatge;
         if (imageUrl != null && imageUrl.isNotEmpty) {
           CachedNetworkImageProvider(imageUrl).resolve(ImageConfiguration());
         }
@@ -185,8 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.network(
-              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254121/HOMESCREEN/a4fjbn9cxunuxw34bned.jpg',
+            child: Image.asset(
+              'lib/images/homescreen_images/background.png',
               fit: BoxFit.cover,
             ),
           ),

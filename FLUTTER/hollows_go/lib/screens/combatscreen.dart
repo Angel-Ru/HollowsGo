@@ -30,7 +30,8 @@ class _CombatScreenState extends State<CombatScreen> {
   }
 
   void _resetHealth() {
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     final skinAliat = provider.selectedSkinAliat;
     final skinEnemic = provider.selectedSkin;
 
@@ -43,12 +44,14 @@ class _CombatScreenState extends State<CombatScreen> {
     final random = Random();
     int randomIndex = random.nextInt(5) + 1;
     setState(() {
-      backgroundImage = 'lib/images/combat_proves/fondo_combat_$randomIndex.png';
+      backgroundImage =
+          'lib/images/combat_proves/fondo_combat_$randomIndex.png';
     });
   }
 
   void _selectRandomSkin() {
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     provider.selectRandomSkin();
   }
 
@@ -57,7 +60,8 @@ class _CombatScreenState extends State<CombatScreen> {
       setState(() {
         isAttackInProgress = true;
         isEnemyHit = true;
-        final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+        final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context,
+            listen: false);
         provider.updateEnemyHealth(enemicHealth.toInt() - aliatDamage.toInt());
 
         enemicHealth -= aliatDamage;
@@ -78,7 +82,8 @@ class _CombatScreenState extends State<CombatScreen> {
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
         isAllyHit = true;
-        final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+        final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context,
+            listen: false);
         provider.updateAllyHealth(aliatHealth.toInt() - enemicDamage.toInt());
 
         aliatHealth -= enemicDamage;
@@ -102,7 +107,8 @@ class _CombatScreenState extends State<CombatScreen> {
   }
 
   void _showVictoryDialog() async {
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.fetchEnemyPoints();
 
     showDialog(
@@ -113,9 +119,9 @@ class _CombatScreenState extends State<CombatScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('lib/images/kan_moneda.png'),
-            ),
+                radius: 50,
+                backgroundImage: NetworkImage(
+                    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png')),
             SizedBox(height: 10),
             Text(
               "+${provider.coinEnemies}",
@@ -148,7 +154,8 @@ class _CombatScreenState extends State<CombatScreen> {
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('lib/images/kon_plorant.png'),
+              backgroundImage: AssetImage(
+                  'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254233/COMBATSCREEN/yhh1xy0qy4lumw9v7jtd.png'),
             ),
           ],
         ),
@@ -201,7 +208,8 @@ class _CombatScreenState extends State<CombatScreen> {
               ),
               child: Text(
                 isEnemyTurn ? "Torn: $EnemyName" : "Torn: $AllyName",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -216,7 +224,8 @@ class _CombatScreenState extends State<CombatScreen> {
                       duration: Duration(milliseconds: 300),
                       opacity: isEnemyHit ? 0.5 : 1.0,
                       child: Image.network(
-                        skinEnemic?.imatge ?? 'lib/images/combat_proves/aizen_combat.png',
+                        skinEnemic?.imatge ??
+                            'lib/images/combat_proves/aizen_combat.png',
                         height: 300,
                         width: 300,
                       ),
@@ -244,7 +253,8 @@ class _CombatScreenState extends State<CombatScreen> {
                             ),
                           ),
                           SizedBox(width: 10),
-                          _buildHealthBar(enemicHealth, skinEnemic?.vida ?? 1000),
+                          _buildHealthBar(
+                              enemicHealth, skinEnemic?.vida ?? 1000),
                         ],
                       ),
                     ),
@@ -258,7 +268,8 @@ class _CombatScreenState extends State<CombatScreen> {
                       duration: Duration(milliseconds: 300),
                       opacity: isAllyHit ? 0.5 : 1.0,
                       child: Image.network(
-                        skinAliat?.imatge ?? 'lib/images/combat_proves/bleach_combat.png',
+                        skinAliat?.imatge ??
+                            'lib/images/combat_proves/bleach_combat.png',
                         height: 250,
                         width: 250,
                       ),
@@ -274,7 +285,8 @@ class _CombatScreenState extends State<CombatScreen> {
                         children: [
                           Row(
                             children: [
-                              _buildHealthBar(aliatHealth, skinAliat?.vida ?? 1000),
+                              _buildHealthBar(
+                                  aliatHealth, skinAliat?.vida ?? 1000),
                               SizedBox(width: 10),
                               Flexible(
                                 child: Text(
@@ -292,11 +304,15 @@ class _CombatScreenState extends State<CombatScreen> {
                           ),
                           SizedBox(height: 20),
                           ElevatedButton(
-                            onPressed: isEnemyTurn || isAttackInProgress ? null : _attack,
+                            onPressed: isEnemyTurn || isAttackInProgress
+                                ? null
+                                : _attack,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orange,
-                              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                              textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 10),
+                              textStyle: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             child: Column(
                               children: [
