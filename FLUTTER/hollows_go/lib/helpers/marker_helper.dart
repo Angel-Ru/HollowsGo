@@ -1,4 +1,5 @@
 import 'package:hollows_go/imports.dart';
+import 'package:hollows_go/screens/combatvideoscreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:ui' as ui;
 
@@ -109,7 +110,7 @@ class MarkerHelper {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => CombatScreen()),
+                MaterialPageRoute(builder: (context) => CombatIntroVideoScreen()),
               );
             },
           ),

@@ -26,6 +26,7 @@ class UserProvider with ChangeNotifier {
     _username = prefs.getString('userName') ?? 'Usuari';
     notifyListeners();
     fetchUserPoints();
+  
   }
 
   // GET USER COINS OR POINTS FROM THE API
