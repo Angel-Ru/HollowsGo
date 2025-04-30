@@ -398,11 +398,50 @@ exports.gachaTirada = async (req, res) => {
             return res.status(400).send('No hay skins disponibles.');
         }
 
-        const randomSkin = availableSkins.recordset[Math.floor(Math.random() * availableSkins.recordset.length)];
+        // Classifica les skins per estrelles
+
+        const starGroups = {
+            1: [],
+            2: [],
+            3: [],
+            4: []
+        };
+
+        availableSkins.recordset.forEach(skin => {
+            if (starGroups[skin.estrelles]) {
+                starGroups[skin.estrelles].push(skin);
+            }
+        });
+
+        // Defineix les probabilitats (com acumulades)
+        const probabilities = [
+            { stars: 1, threshold: 0.6 },
+            { stars: 2, threshold: 0.85 },
+            { stars: 3, threshold: 0.95 },
+            { stars: 4, threshold: 1.0 }
+        ];
+
+        const rand = Math.random();
+        let chosenStars = 1;
+
+        for (const prob of probabilities) {
+            if (rand <= prob.threshold) {
+                chosenStars = prob.stars;
+                break;
+            }
+        }
+
+        // Si no hi ha skins per aquest nivell, baixa fins trobar-ne una vàlida
+        while (starGroups[chosenStars].length === 0 && chosenStars > 1) {
+            chosenStars--;
+        }
+
+        const selectedGroup = starGroups[chosenStars];
+        const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
 
         const userSkins = await pool.request()
             .input('userId', sql.Int, userId)
-            .input('personatgeId', sql.Int, randomSkin.personatge)  // Filtrar por el ID del personaje
+            .input('personatgeId', sql.Int, randomSkin.personatge)
             .query('SELECT skin_ids FROM BIBLIOTECA WHERE user_id = @userId AND personatge_id = @personatgeId');
 
         let userSkinIds = userSkins.recordset.length > 0 ? userSkins.recordset[0].skin_ids.split(',') : [];

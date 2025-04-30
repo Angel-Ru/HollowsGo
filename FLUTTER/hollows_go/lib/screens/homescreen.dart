@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void precargarImagenes(List<Personatge> personatges) {
     for (var personatge in personatges) {
       for (var skin in personatge.skins) {
-        final imageUrl = skin.imatge; // Ajusta esto al campo correcto
+        final imageUrl = skin.imatge; 
         if (imageUrl != null && imageUrl.isNotEmpty) {
           CachedNetworkImageProvider(imageUrl).resolve(ImageConfiguration());
         }
