@@ -91,7 +91,6 @@ flutter:
     - lib/images/combat_proves/
     - lib/videos/animacion_gacha.mp4
     - lib/videos/animacion_combate.mp4
-    - assets/Number_One.mp3
     - lib/images/Yoroichi.jpeg
     - lib/images/Byakuya.jpeg
     - assets/dialogues.json

@@ -20,8 +20,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   // CHARACTER IMAGES AND DIALOGUES
   String _imagePath =
-      'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
-  final String _coinImagePath = 'lib/images/kan_moneda.png';
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
+  final String _coinImagePath =
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png';
 
   Timer? _timer;
 
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _imagePath = (imagePath != null && imagePath.isNotEmpty)
           ? imagePath
-          : 'lib/images/perfil_predeterminat/perfil_predeterminat.jpg';
+          : 'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
     });
   }
 
@@ -91,8 +92,6 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
   }
-
-  
 
   // INFERIROR NAVIGATION BAR
   Widget _getSelectedScreen(int selectedIndex) {
@@ -195,8 +194,8 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 SizedBox(height: 250),
-                Image.asset(
-                  "lib/images/prehomescreen_imatges/nom_aplicacio.png",
+                Image.network(
+                  "https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708246/PREHOMESCREEN/ee9hwiaahvn6mj2dcnov.png",
                   width: 300,
                 ),
               ],
