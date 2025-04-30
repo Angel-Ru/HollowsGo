@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           CircleAvatar(
                             radius: 20,
-                            backgroundImage: AssetImage(_coinImagePath),
+                            backgroundImage: NetworkImage(_coinImagePath),
                           ),
                           SizedBox(width: 8),
                           Text('${userProvider.coinCount}'),
@@ -145,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             offset: Offset(0, 50),
                             icon: CircleAvatar(
                               radius: 20,
-                              backgroundImage: AssetImage(_imagePath),
+                              backgroundImage: NetworkImage(_imagePath),
                             ),
                             itemBuilder: (context) => <PopupMenuEntry>[
                               PopupMenuItem(
