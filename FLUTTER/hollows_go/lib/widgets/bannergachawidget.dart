@@ -26,8 +26,8 @@ class GachaBannerWidget extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
-            child: Image.asset(
-              'lib/images/banner_gacha/banner.png',
+            child: Image.network(
+              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745251932/TENDASCREEN/ojcss6ugdfrxgvag65ok.png',
               width: MediaQuery.of(context).size.width * 0.7,
               height: MediaQuery.of(context).size.width * 0.38,
               fit: BoxFit.cover,

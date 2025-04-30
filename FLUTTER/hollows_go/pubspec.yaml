@@ -77,23 +77,23 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - lib/images/
-    - lib/images/perfil_predeterminat/
-    - lib/images/prehomescreen_imatges/
-    - lib/images/urahara_character/
-    - lib/images/mayuri_character/
-    - lib/images/kyoraku_character/
-    - lib/images/nel_character/
-    - lib/images/rukia_character/
-    - lib/images/combat_proves/
+    - lib/images/bibliotecascreen_images/
+    - lib/images/combatscreen_images/
     - lib/images/hollows/
-    - lib/images/banner_gacha/banner.png
+    - lib/images/homescreen_images/
     - lib/images/ichigo_character/
-    - lib/images/combat_proves/
-    - lib/videos/animacion_gacha.mp4
+    - lib/images/kyoraku_character/
+    - lib/images/mayuri_character/
+    - lib/images/nel_character/
+    - lib/images/others/
+    - lib/images/prehomescreen_images/
+    - lib/images/profile_photos/
+    - lib/images/tendascreen_images/
+    - lib/images/urahara_character/
     - lib/videos/animacion_combate.mp4
+    - lib/videos/animacion_gacha.mp4
     - lib/images/Yoroichi.jpeg
     - lib/images/Byakuya.jpeg
-    - lib/images/homescreen_images/
     - assets/dialogues.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

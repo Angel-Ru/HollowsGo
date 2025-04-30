@@ -28,10 +28,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       return;
     }
 
-     final provider =
+    final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-     provider.fetchPersonatgesAmbSkins(userId.toString());
-     provider.fetchPersonatgesEnemicsAmbSkins();
+    provider.fetchPersonatgesAmbSkins(userId.toString());
+    provider.fetchPersonatgesEnemicsAmbSkins();
   }
 
   void _loadInitialDialogue() {
@@ -93,8 +93,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               image: DecorationImage(
                 image: AssetImage(
                   _switchValue
-                      ? 'lib/images/biblioteca_enemics_fondo.png'
-                      : 'lib/images/biblioteca_aliats_fondo.png',
+                      ? 'lib/images/bibliotecascreen_images/biblioteca_enemics_fondo.png'
+                      : 'lib/images/bibliotecascreen_images/biblioteca_aliats_fondo.png',
                 ),
                 fit: BoxFit.cover,
               ),

@@ -11,11 +11,12 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   @override
   void initState() {
     super.initState();
-    _videoController = VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
-      ..initialize().then((_) {
-        setState(() {});
-        _videoController.play();
-      });
+    _videoController =
+        VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
+          ..initialize().then((_) {
+            setState(() {});
+            _videoController.play();
+          });
 
     _videoController.addListener(() {
       if (_videoController.value.position >= _videoController.value.duration) {

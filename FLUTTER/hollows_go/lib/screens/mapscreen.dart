@@ -50,10 +50,11 @@ class _MapaScreenState extends State<Mapscreen> {
           title: Text('Skin no seleccionada',
               style: TextStyle(color: Colors.deepPurple)),
           content: Text(
-              'Debes seleccionar una skin en la biblioteca antes de poder jugar.'),
+            'Has de seleccionar una skin dels teus aliats a la biblioteca',
+          ),
           actions: <Widget>[
             TextButton(
-              child: Text('Ir a Biblioteca',
+              child: Text('Anar a la biblioteca ->',
                   style: TextStyle(color: Colors.deepPurple)),
               onPressed: () {
                 Provider.of<UIProvider>(context, listen: false)
