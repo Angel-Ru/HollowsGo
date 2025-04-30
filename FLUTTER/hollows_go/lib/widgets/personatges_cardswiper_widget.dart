@@ -7,6 +7,15 @@ class PersonatgesCardSwiper extends StatelessWidget {
   final Function()? onSkinDeselected;
   final Skin? selectedSkin;
 
+  double _calculateMaxSkinCardHeight(List<Skin> skins) {
+    return skins.fold<double>(0.0, (max, skin) {
+      final nameLength = skin.nom.length;
+      final lines = (nameLength / 20).ceil();
+      final height = 180 + (lines * 18) + 20 + 20;
+      return height.toDouble() > max ? height.toDouble() : max;
+    });
+  }
+
   const PersonatgesCardSwiper({
     Key? key,
     required this.personatge,
@@ -18,6 +27,7 @@ class PersonatgesCardSwiper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final maxHeight = _calculateMaxSkinCardHeight(personatge.skins);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -41,7 +51,7 @@ class PersonatgesCardSwiper extends StatelessWidget {
 
         // Swiper de skins
         SizedBox(
-          height: 250,
+          height: maxHeight,
           child: PageView.builder(
             itemCount: personatge.skins.length,
             controller: PageController(viewportFraction: 0.7),
