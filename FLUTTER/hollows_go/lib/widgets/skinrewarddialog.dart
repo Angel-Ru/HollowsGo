@@ -1,3 +1,5 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
+
 import '../imports.dart';
 
 class SkinRewardDialog extends StatelessWidget {
@@ -40,15 +42,30 @@ class SkinRewardDialog extends StatelessWidget {
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
           SizedBox(height: 5),
-          Text(
-            skin['nom'],
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.blueAccent,
+          Center(
+            child: Container(
+            
+              height: 40,
+              alignment: Alignment.center,
+              child: ClipRect(
+                child: AnimatedTextKit(
+                  animatedTexts: [
+                    ScaleAnimatedText(
+                      skin['nom'],
+                      textStyle: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  repeatForever: true,
+                  pause: Duration(milliseconds: 100),
+                ),
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
+          )
         ],
       ),
       actions: <Widget>[
