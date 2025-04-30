@@ -13,7 +13,6 @@ class PreHomeScreen extends StatefulWidget {
 
 class _PreHomeScreenState extends State<PreHomeScreen>
     with SingleTickerProviderStateMixin {
-  // IMAGES OF KON FOR THE RANDOM IMAGE ARRAY
   final List<String> imagePaths = [
     'lib/images/prehomescreen_images/konbrillitos.png',
     'lib/images/prehomescreen_images/koncapitan.png',
@@ -28,7 +27,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   late ScrollController _scrollControllerBottom;
   late AudioPlayer _audioPlayer;
 
-  // INICIALATE THE ANIMATION CONTROLLER AND THE SCROLL CONTROLLERS
+  Duration _currentPosition = Duration.zero;
+
   @override
   void initState() {
     super.initState();
@@ -59,14 +59,24 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
   void _playBackgroundMusic() async {
     await _audioPlayer.play(UrlSource(
-        'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3'));
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
+    ));
   }
 
-  void _stopBackgroundMusic() async {
+  Future<void> _pauseBackgroundMusic() async {
+    _currentPosition = await _audioPlayer.getCurrentPosition() ?? Duration.zero;
+    await _audioPlayer.pause();
+  }
+
+  Future<void> _resumeBackgroundMusic() async {
+    await _audioPlayer.seek(_currentPosition);
+    await _audioPlayer.resume();
+  }
+
+  Future<void> _stopBackgroundMusic() async {
     await _audioPlayer.stop();
   }
 
-  // THIS FUNCTION IS FOR THE SCROLLING ANIMATION OF THE SKULLS + LOOPING
   void _startAutoScroll(ScrollController scrollController) {
     Future.doWhile(() async {
       await Future.delayed(Duration(milliseconds: 20));
@@ -88,13 +98,16 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     });
   }
 
-  Future<void> _checkLogin() async {
+  Future<bool> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('isLoggedIn') ?? false) {
+      await _stopBackgroundMusic();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => HomeScreen()),
       );
+      return true;
     }
+    return false;
   }
 
   @override
@@ -108,7 +121,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // KON RANDOM IMAGE
     final random = Random();
     final randomImage = random.nextInt(imagePaths.length);
 
@@ -116,10 +128,13 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       backgroundColor: Color(0xFFEAE4F2),
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
-        onTap: () {
-          _stopBackgroundMusic();
-          _checkLogin();
-          _showLoginDialog(context);
+        onTap: () async {
+          await _pauseBackgroundMusic();
+          bool wentToHome = await _checkLogin();
+          if (!wentToHome) {
+            await _showLoginDialog(context);
+            await _resumeBackgroundMusic();
+          }
         },
         child: Stack(
           children: [
@@ -207,14 +222,24 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     );
   }
 
-  // lOGIN DIALOG METOD
-  void _showLoginDialog(BuildContext context) {
-    showDialog(
+  Future<void> _showLoginDialog(BuildContext context) async {
+    final result = await showDialog<bool>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return LoginScreen();
       },
     );
+
+    if (result == true) {
+      await _stopBackgroundMusic();
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => HomeScreen()),
+        );
+      }
+    } else {
+      await _resumeBackgroundMusic();
+    }
   }
 }

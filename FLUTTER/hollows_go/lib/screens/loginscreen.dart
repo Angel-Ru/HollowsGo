@@ -69,9 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         _showSnackBar("Inici de sessió correcte");
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomeScreen()),
-        );
+        Navigator.of(context).pop(true);
       } else {
         _showSnackBar(data['message'] ?? "Error desconegut");
       }
