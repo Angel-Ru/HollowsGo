@@ -12,10 +12,60 @@
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745821760/DIALOGS_CHARACTERS/ICHIGO/vttk41sr4jcazfmfbv10.png",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745821782/DIALOGS_CHARACTERS/ICHIGO/ubdjpwv1pewa5qmak9gq.png",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745821803/DIALOGS_CHARACTERS/ICHIGO/diqo26cusvrfw4kcpxiu.png",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745821837/DIALOGS_CHARACTERS/ICHIGO/a9su1sdfhs34x5fuuhum.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1746018461/DIALOGS_CHARACTERS/ICHIGO/hazqi2qemvdeah1c9woi.png",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745821865/DIALOGS_CHARACTERS/ICHIGO/auuaatxjcpdat0se7u49.png",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745821886/DIALOGS_CHARACTERS/ICHIGO/jawbmaxck3r4dx1e6feu.png",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745821913/DIALOGS_CHARACTERS/ICHIGO/b0bqzj9o66ssgk9bp6yp.png"
+        ]
+    },
+    "urahara": {
+        "dialogues": [
+            "Hola, sóc l'Urahara, i sigues benvingut a la tenda!",
+            "Aquí podràs fer les diverses tirades al gacha.",
+            "Tens prou diners per una tirada?",
+            "Em vaig a fer una becadeta...",
+            "No et preocupis per mi, sóc un venedor qualsevol."
+        ],
+        "images": [
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822828/DIALOGS_CHARACTERS/URAHARA/vu4khphxooqtreujozuo.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822847/DIALOGS_CHARACTERS/URAHARA/m1rszlzyunksrfor7zii.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822867/DIALOGS_CHARACTERS/URAHARA/kv9v0d74fpv9ur64ke1f.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822882/DIALOGS_CHARACTERS/URAHARA/rlqq6fhcymv7pchikmnc.png"
+        ]
+    },
+    "mayuri": {
+        "dialogues": [
+            "Oh, quina sorpresa.",
+            "Un altre ignorant en cerca de coneixement?",
+            "Benvingut al meu arxiu de meravelles...",
+            "O potser hauria de dir, al teu infern de curiositat?",
+            "Espero que hagis vingut a aprendre, i no només a perdre el temps.",
+            "T’agradaria ser el meu pròxim subjecte d’experimentació?",
+            "Els meus arxius contenen el que cap altre Shinigami gosaria investigar.",
+            "Mmm... potser aquesta és una oportunitat per fer un experiment amb tu..."
+        ],
+        "images": [
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822289/DIALOGS_CHARACTERS/MAYURI/cqvcctr4govzknihn6ck.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822326/DIALOGS_CHARACTERS/MAYURI/hpwcngz9uzgdjzyl5nws.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822373/DIALOGS_CHARACTERS/MAYURI/vbttkwauqhvnr9r9qmox.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822393/DIALOGS_CHARACTERS/MAYURI/hr9yxjpoxrobqraxl63z.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822409/DIALOGS_CHARACTERS/MAYURI/krljmmyt3gbvl6cvciur.png"
+        ]
+    },
+    "nel": {
+        "dialogues": [
+            "Hola, sóc la Nel.",
+            "On es l'Ichigo, tinc por!",
+            "El Pesche el Dondochakka i el Bawabawa son els germans de la Nel",
+            "Per què tots aquí tenen una cara tan enfadada?",
+            "Ai ai ai... la Nel no vol estar aquí...",
+            "Aquest lloc fa molta por...",
+            "Ichigo, vine a buscar la Nel, si us plau..."
+        ],
+        "images": [
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822441/DIALOGS_CHARACTERS/NEL/umnss5uhgyskig1kkhp6.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822464/DIALOGS_CHARACTERS/NEL/uidljorqcbxybbzclsg4.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822485/DIALOGS_CHARACTERS/NEL/y9dk0ni8deex8ief3tlu.png"
         ]
     }
     

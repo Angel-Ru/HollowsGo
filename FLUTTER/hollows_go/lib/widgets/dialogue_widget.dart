@@ -4,14 +4,14 @@ class DialogueWidget extends StatelessWidget {
   final String characterName;
   final Color nameColor;
   final Color bubbleColor;
-  final Color backgroundColor;
+  //final Color backgroundColor;
 
   const DialogueWidget({
     Key? key,
     required this.characterName,
     this.nameColor = Colors.green,
     this.bubbleColor = const Color.fromARGB(212, 238, 238, 238),
-    this.backgroundColor = const Color.fromARGB(255, 151, 250, 173),
+    //this.backgroundColor = const Color.fromARGB(255, 151, 250, 173),
   }) : super(key: key);
 
   @override
@@ -24,16 +24,16 @@ class DialogueWidget extends StatelessWidget {
         GestureDetector(
           onTap: dialogueProvider.nextDialogue,
           child: Container(
-            width: 150,
-            height: 250,
-            color: backgroundColor,
+            width: 125,
+            height: 200,
+            //color: backgroundColor,
             child: Image.network(
               dialogueProvider.currentImage,
               fit: BoxFit.cover,
             ),
           ),
         ),
-        SizedBox(width: 16),
+        SizedBox(width: 16), // amplitud entre la imatge i el text
         Expanded(
           child: GestureDetector(
             onTap: dialogueProvider.nextDialogue,

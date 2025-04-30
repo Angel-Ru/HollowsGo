@@ -109,14 +109,15 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
                   // Diálogo
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.only(bottom: 0),
                     child: DialogueWidget(
                       characterName: _switchValue ? 'Nel' : 'Mayuri Kurotsuchi',
                       nameColor: _switchValue ? Colors.green : Colors.purple,
                       bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                      backgroundColor: _switchValue
+                      /*backgroundColor: _switchValue
                           ? Color.fromARGB(255, 76, 175, 80)
                           : Color.fromARGB(255, 167, 55, 187),
+                          */
                     ),
                   ),
 

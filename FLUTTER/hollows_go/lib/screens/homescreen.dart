@@ -203,7 +203,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           if (uiProvider.selectedMenuOpt == 0)
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 0,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -212,9 +216,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     characterName: 'Ichigo Kurosaki',
                     nameColor: Colors.orange,
                     bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                    backgroundColor: Color.fromARGB(255, 233, 179, 77),
+                    //backgroundColor: Color.fromARGB(255, 233, 179, 77),
                   ),
-                  SizedBox(height: 16),
                 ],
               ),
             ),
