@@ -58,7 +58,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   }
 
   void _playBackgroundMusic() async {
-    await _audioPlayer.play(AssetSource(
+    await _audioPlayer.play(UrlSource(
         'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3'));
   }
 
