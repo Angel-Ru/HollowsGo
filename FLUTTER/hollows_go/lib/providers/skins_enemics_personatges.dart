@@ -46,6 +46,15 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool _combatVideoPlayed = false;
+
+  bool get combatVideoPlayed => _combatVideoPlayed;
+
+  void markCombatVideoAsPlayed() {
+    _combatVideoPlayed = true;
+    notifyListeners();
+  }
+
   Future<Skin> selectRandomUserSkin() async {
     try {
       if (_personatges.isEmpty) {
