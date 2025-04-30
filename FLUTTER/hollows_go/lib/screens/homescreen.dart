@@ -42,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
       dialogueProvider.loadDialogueFromJson("ichigo");
     });
     _loadUserData();
-    
   }
+
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('userId');
@@ -55,9 +55,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.fetchPersonatgesAmbSkins(userId.toString());
-    provider.fetchPersonatgesEnemicsAmbSkins();
+
+    await provider.fetchPersonatgesAmbSkins(userId.toString());
+    precargarImagenes(provider.personatges);
+
+    await provider.fetchPersonatgesEnemicsAmbSkins();
+    precargarImagenes(provider.characterEnemies);
   }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -77,15 +82,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void precargarImagenes(List<Personatge> personatges) {
-  for (var personatge in personatges) {
-    for (var skin in personatge.skins) {
-      final imageUrl = skin.imatge; // Ajusta esto al campo correcto
-      if (imageUrl != null && imageUrl.isNotEmpty) {
-        CachedNetworkImageProvider(imageUrl).resolve(ImageConfiguration());
+    for (var personatge in personatges) {
+      for (var skin in personatge.skins) {
+        final imageUrl = skin.imatge; // Ajusta esto al campo correcto
+        if (imageUrl != null && imageUrl.isNotEmpty) {
+          CachedNetworkImageProvider(imageUrl).resolve(ImageConfiguration());
+        }
       }
     }
   }
-}
+
+  
 
   // INFERIROR NAVIGATION BAR
   Widget _getSelectedScreen(int selectedIndex) {

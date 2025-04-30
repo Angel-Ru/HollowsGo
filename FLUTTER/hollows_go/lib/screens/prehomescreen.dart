@@ -15,11 +15,11 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     with SingleTickerProviderStateMixin {
   // IMAGES OF KON FOR THE RANDOM IMAGE ARRAY
   final List<String> imagePaths = [
-    'lib/images/prehomescreen_imatges/koncapitan.png',
-    'lib/images/prehomescreen_imatges/konepico.png',
-    'lib/images/prehomescreen_imatges/konlike.png',
-    'lib/images/prehomescreen_imatges/konbrillitos.png',
-    'lib/images/prehomescreen_imatges/konrap.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/konrap_yify65.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/konlike_uzabno.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/konepico_giynzj.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995716/koncapitan_hvdr2e.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995716/konbrillitos_ivxff6.png',
   ];
 
   late AnimationController _controller;
@@ -58,7 +58,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   }
 
   void _playBackgroundMusic() async {
-    await _audioPlayer.play(AssetSource('../assets/Number_One.mp3'));
+    await _audioPlayer.play(UrlSource(
+        'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3'));
   }
 
   void _stopBackgroundMusic() async {
@@ -86,6 +87,14 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       return true;
     });
   }
+  Future<void> _checkLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('isLoggedIn') ?? false) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -108,6 +117,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       body: GestureDetector(
         onTap: () {
           _stopBackgroundMusic();
+          _checkLogin();
           _showLoginDialog(context);
         },
         child: Stack(
@@ -125,9 +135,9 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                       return Container(
                         width: 39,
                         height: 39,
-                        child: Image.asset(
+                        child: Image.network(
                           // CHANGE THE IMAGE + UPLOAD IT TO CLOUDINARY
-                          "lib/images/prehomescreen_imatges/skull_border.png",
+                          "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/skull_border_rsfqcx.png",
                           fit: BoxFit.cover,
                         ),
                       );
@@ -137,7 +147,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 Spacer(),
                 Container(
                   height: 200,
-                  child: Image.asset(
+                  child: Image.network(
                     imagePaths[randomImage],
                     fit: BoxFit.cover,
                   ),
@@ -169,8 +179,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                       return Container(
                         width: 39,
                         height: 39,
-                        child: Image.asset(
-                          "lib/images/prehomescreen_imatges/skull_border.png",
+                        child: Image.network(
+                          "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745995717/skull_border_rsfqcx.png",
                           fit: BoxFit.cover,
                         ),
                       );
@@ -184,8 +194,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 150),
-                  Image.asset(
-                    "lib/images/prehomescreen_imatges/nom_aplicacio.png",
+                  Image.network(
+                    "https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708246/PREHOMESCREEN/ee9hwiaahvn6mj2dcnov.png",
                     width: 300,
                   ),
                 ],

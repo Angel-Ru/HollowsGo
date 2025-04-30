@@ -28,10 +28,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       return;
     }
 
-    final provider =
+     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.fetchPersonatgesAmbSkins(userId.toString());
-    provider.fetchPersonatgesEnemicsAmbSkins();
+     provider.fetchPersonatgesAmbSkins(userId.toString());
+     provider.fetchPersonatgesEnemicsAmbSkins();
   }
 
   void _loadInitialDialogue() {
