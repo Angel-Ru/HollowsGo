@@ -96,7 +96,7 @@ exports.getPuntsUsuari = async (req, res) => {
         const pool = await connectDB();
         const result = await pool.request()
             .input('nom', sql.VarChar(50), req.params.nom)
-            .query('SELECT punts_emmagatzemats FROM USUARIS WHERE nom = @nom');
+            .query('SELECT punts_emmagatzemats, nom FROM USUARIS WHERE nom = @nom');
 
         console.log("Resultat de la consulta:", result.recordset); // 🟢 Debug
 
