@@ -93,6 +93,7 @@ flutter:
     - lib/videos/animacion_combate.mp4
     - lib/images/Yoroichi.jpeg
     - lib/images/Byakuya.jpeg
+    - lib/images/homescreen_images/
     - assets/dialogues.json
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

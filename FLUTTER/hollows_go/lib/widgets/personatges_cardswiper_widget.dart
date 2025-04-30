@@ -132,7 +132,7 @@ class PersonatgesCardSwiper extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                5,
+                4,
                 (index) => Icon(
                   Icons.star,
                   color: index < (skin.categoria ?? 0)
