@@ -41,31 +41,47 @@ class _MapaScreenState extends State<Mapscreen> {
     }
   }
 
+  // Future<void> _showNoSkinSelectedDialog() async {
+  //   return showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Skin no seleccionada',
+  //             style: TextStyle(color: Colors.deepPurple)),
+  //         content: Text(
+  //             'Debes seleccionar una skin en la biblioteca antes de poder jugar.'),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             child: Text('Ir a Biblioteca',
+  //                 style: TextStyle(color: Colors.deepPurple)),
+  //             onPressed: () {
+  //               Provider.of<UIProvider>(context, listen: false)
+  //                   .selectedMenuOpt = 3;
+  //               Navigator.pop(context);
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
   Future<void> _showNoSkinSelectedDialog() async {
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Skin no seleccionada',
-              style: TextStyle(color: Colors.deepPurple)),
-          content: Text(
-              'Debes seleccionar una skin en la biblioteca antes de poder jugar.'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Ir a Biblioteca',
-                  style: TextStyle(color: Colors.deepPurple)),
-              onPressed: () {
-                Provider.of<UIProvider>(context, listen: false)
-                    .selectedMenuOpt = 3;
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  return AwesomeDialog(
+    context: context,
+    dialogType: DialogType.info,
+    animType: AnimType.scale,
+    barrierDismissible: false,
+    title: 'Skin no seleccionada',
+    desc: 'Debes seleccionar una skin en la biblioteca antes de poder jugar.',
+    btnOkText: 'Ir a Biblioteca',
+    btnOkOnPress: () {
+      Provider.of<UIProvider>(context, listen: false).selectedMenuOpt = 3;
+    },
+    btnOkColor: Colors.deepPurple,
+  ).show();
+}
+
 
   @override
   void didUpdateWidget(Mapscreen oldWidget) {
