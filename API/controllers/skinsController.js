@@ -415,9 +415,9 @@ availableSkins.recordset.forEach(skin => {
 // Defineix les probabilitats (com acumulades)
 const probabilities = [
     { stars: 1, threshold: 0.6 },
-    { stars: 2, threshold: 0.85 },
-    { stars: 3, threshold: 0.95 },
-    { stars: 4, threshold: 1.0 }
+    { stars: 2, threshold: 0.7 },
+    { stars: 3, threshold: 0.8 },
+    { stars: 4, threshold: 0.85 }
 ];
 
 const rand = Math.random();
