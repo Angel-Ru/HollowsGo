@@ -51,10 +51,10 @@ class UserProvider with ChangeNotifier {
 
         if (data.isNotEmpty) {
           int newCoinCount = data[0]['punts_emmagatzemats'];
-          String newUsername = data[1]['nom'];
+          _username = data[0]['nom'];
           _coinCount = newCoinCount;
           await prefs.setInt('userPunts', newCoinCount);
-          await prefs.setString('userName', newUsername);
+          await prefs.setString('userName', _username);
           notifyListeners();
         }
       } else {
