@@ -23,10 +23,14 @@ class DialogueWidget extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: dialogueProvider.nextDialogue,
-          child: CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage(dialogueProvider.currentImage),
-            backgroundColor: backgroundColor,
+          child: Container(
+            width: 150,
+            height: 250,
+            color: backgroundColor,
+            child: Image.network(
+              dialogueProvider.currentImage,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         SizedBox(width: 16),

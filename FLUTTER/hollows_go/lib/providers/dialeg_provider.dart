@@ -1,5 +1,4 @@
 import '../imports.dart';
-import 'dart:math';
 
 class DialogueProvider extends ChangeNotifier {
   int _dialogIndex = 0;
@@ -24,14 +23,12 @@ class DialogueProvider extends ChangeNotifier {
 
     final List<String> dialogues =
         List<String>.from(data[characterKey]["dialogues"]);
-    final List<String> images =
-        List<String>.from(data[characterKey]["images"]);
+    final List<String> images = List<String>.from(data[characterKey]["images"]);
 
     _dialogues = dialogues;
     _characterImages = images;
     _dialogIndex = 0;
-    _currentImage =
-        _characterImages.isNotEmpty ? _characterImages[0] : '';
+    _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
     _currentCharacter = characterKey;
 
     notifyListeners();
@@ -44,8 +41,7 @@ class DialogueProvider extends ChangeNotifier {
 
     String newImage;
     do {
-      newImage =
-          _characterImages[Random().nextInt(_characterImages.length)];
+      newImage = _characterImages[Random().nextInt(_characterImages.length)];
     } while (newImage == _currentImage);
 
     _currentImage = newImage;

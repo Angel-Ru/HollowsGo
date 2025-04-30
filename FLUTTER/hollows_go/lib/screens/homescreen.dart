@@ -36,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
       userProvider.fetchUserPoints();
       _timer = Timer.periodic(Duration(seconds: 5), (timer) {
         userProvider.fetchUserPoints();
-        
       });
 
       final dialogueProvider =
