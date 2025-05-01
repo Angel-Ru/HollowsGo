@@ -181,6 +181,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CombatScreen()),
+          );
+        },
+        backgroundColor: Colors.red, // Color del botón
+      ),
       body: Stack(
         children: [
           Positioned.fill(

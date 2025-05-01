@@ -18,11 +18,11 @@ class ImageSelectionPage extends StatefulWidget {
 
 class _ImageSelectionPageState extends State<ImageSelectionPage> {
   final List<String> imagePaths = [
-    'lib/images/perfil_predeterminat/chad.png',
-    'lib/images/perfil_predeterminat/kon.png',
-    'lib/images/perfil_predeterminat/kenpachi.png',
-    'lib/images/perfil_predeterminat/grimmjaw.png',
-    'lib/images/perfil_predeterminat/komamura_goty.jpg',
+    'lib/images/profile_photos/chad.png',
+    'lib/images/profile_photos/kon.png',
+    'lib/images/profile_photos/kenpachi.png',
+    'lib/images/profile_photos/grimmjaw.png',
+    'lib/images/profile_photos/komamura_goty.jpg',
     'lib/images/urahara_character/urahara_1.png',
     'lib/images/urahara_character/urahara_2.png',
     'lib/images/urahara_character/urahara_3.png',

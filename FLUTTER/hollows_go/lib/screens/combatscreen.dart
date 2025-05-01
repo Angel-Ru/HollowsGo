@@ -1,25 +1,33 @@
+// combat_screen.dart
+import 'package:hollows_go/providers/combat_provider.dart';
+import 'package:hollows_go/widgets/characterdisplaywidget.dart';
+
 import '../imports.dart';
 
-class CombatScreen extends StatefulWidget {
+class CombatScreen extends StatelessWidget {
   @override
-  _CombatScreenState createState() => _CombatScreenState();
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CombatProvider()),
+      ],
+      child: _CombatScreenContent(),
+    );
+  }
 }
 
-class _CombatScreenState extends State<CombatScreen> {
-  int punts = 100;
-  double aliatHealth = 1000.0;
-  double enemicHealth = 1000.0;
-  int aliatDamage = 300;
-  int enemicDamage = 50;
-  String AllyName = "Ichigo Kurosaki";
-  String EnemyName = "Sosuke Aizen";
-  String backgroundImage = 'lib/images/combat_proves/fondo_combat_1.png';
-  bool isEnemyTurn = false;
-  bool isEnemyHit = false;
-  bool isAllyHit = false;
-  bool isAttackInProgress = false;
-  String techniqueName =
-      "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)";
+class _CombatScreenContent extends StatefulWidget {
+  @override
+  _CombatScreenContentState createState() => _CombatScreenContentState();
+}
+
+class _CombatScreenContentState extends State<_CombatScreenContent> {
+  late String _backgroundImage;
+  late String _techniqueName;
+  late int _aliatDamage;
+  late int _enemicDamage;
+  late String _allyName;
+  late String _enemyName;
 
   @override
   void initState() {
@@ -34,76 +42,23 @@ class _CombatScreenState extends State<CombatScreen> {
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     final skinAliat = provider.selectedSkinAliat;
     final skinEnemic = provider.selectedSkin;
+    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
 
     provider.setMaxAllyHealth(skinAliat?.vida ?? 1000);
     provider.setMaxEnemyHealth(skinEnemic?.vida ?? 1000);
-    provider.resetHealth();
+    combatProvider.resetCombat();
   }
 
   void _setRandomBackground() {
     final random = Random();
     int randomIndex = random.nextInt(5) + 1;
-    setState(() {
-      backgroundImage =
-          'lib/images/combat_proves/fondo_combat_$randomIndex.png';
-    });
+    _backgroundImage =
+        'lib/images/combatscreen_images/fondo_combat_$randomIndex.png';
   }
 
   void _selectRandomSkin() {
-    final provider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.selectRandomSkin();
-  }
-
-  void _attack() {
-    if (!isEnemyTurn && !isAttackInProgress) {
-      setState(() {
-        isAttackInProgress = true;
-        isEnemyHit = true;
-        final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context,
-            listen: false);
-        provider.updateEnemyHealth(enemicHealth.toInt() - aliatDamage.toInt());
-
-        enemicHealth -= aliatDamage;
-        if (enemicHealth < 0) enemicHealth = 0;
-      });
-
-      Future.delayed(Duration(milliseconds: 300), () {
-        setState(() {
-          isEnemyHit = false;
-          isEnemyTurn = true;
-        });
-        _enemyAttack();
-      });
-    }
-  }
-
-  void _enemyAttack() {
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        isAllyHit = true;
-        final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context,
-            listen: false);
-        provider.updateAllyHealth(aliatHealth.toInt() - enemicDamage.toInt());
-
-        aliatHealth -= enemicDamage;
-        if (aliatHealth < 0) aliatHealth = 0;
-      });
-
-      Future.delayed(Duration(milliseconds: 500), () {
-        setState(() {
-          isAllyHit = false;
-          isEnemyTurn = false;
-          isAttackInProgress = false;
-        });
-      });
-
-      if (enemicHealth <= 0) {
-        _showVictoryDialog();
-      } else if (aliatHealth <= 0) {
-        _showDefeatDialog();
-      }
-    });
+    Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false)
+        .selectRandomSkin();
   }
 
   void _showVictoryDialog() async {
@@ -112,6 +67,7 @@ class _CombatScreenState extends State<CombatScreen> {
     await provider.fetchEnemyPoints();
 
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Has guanyat"),
@@ -119,9 +75,11 @@ class _CombatScreenState extends State<CombatScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(
-                    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png')),
+              radius: 50,
+              backgroundImage: NetworkImage(
+                'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png',
+              ),
+            ),
             SizedBox(height: 10),
             Text(
               "+${provider.coinEnemies}",
@@ -146,6 +104,7 @@ class _CombatScreenState extends State<CombatScreen> {
 
   void _showDefeatDialog() {
     showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Has perdut"),
@@ -154,8 +113,9 @@ class _CombatScreenState extends State<CombatScreen> {
           children: [
             CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage(
-                  'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254233/COMBATSCREEN/yhh1xy0qy4lumw9v7jtd.png'),
+              backgroundImage: NetworkImage(
+                'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254233/COMBATSCREEN/yhh1xy0qy4lumw9v7jtd.png',
+              ),
             ),
           ],
         ),
@@ -177,23 +137,24 @@ class _CombatScreenState extends State<CombatScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
+    final combatProvider = Provider.of<CombatProvider>(context);
     final skinEnemic = provider.selectedSkin;
     final skinAliat = provider.selectedSkinAliat;
 
-    AllyName = skinAliat?.nom ?? "Desconegut Aliat";
-    aliatDamage = skinAliat?.malTotal ?? 300;
-    aliatHealth = skinAliat?.currentHealth?.toDouble() ?? 1000;
-    techniqueName = skinAliat?.atac ?? techniqueName;
-    EnemyName = skinEnemic?.personatgeNom ?? "Desconegut Enemic";
-    enemicDamage = skinEnemic?.malTotal ?? 50;
-    enemicHealth = skinEnemic?.currentHealth?.toDouble() ?? 1000;
+    // Actualizar datos basados en las skins
+    _allyName = skinAliat?.nom ?? "Desconegut Aliat";
+    _aliatDamage = skinAliat?.malTotal ?? 300;
+    _techniqueName = skinAliat?.atac ??
+        "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)";
+    _enemyName = skinEnemic?.personatgeNom ?? "Desconegut Enemic";
+    _enemicDamage = skinEnemic?.malTotal ?? 50;
 
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              backgroundImage,
+              _backgroundImage,
               fit: BoxFit.cover,
             ),
           ),
@@ -203,11 +164,13 @@ class _CombatScreenState extends State<CombatScreen> {
             child: Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isEnemyTurn ? Colors.red : Colors.green,
+                color: combatProvider.isEnemyTurn ? Colors.red : Colors.green,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                isEnemyTurn ? "Torn: $EnemyName" : "Torn: $AllyName",
+                combatProvider.isEnemyTurn
+                    ? "Torn: $_enemyName"
+                    : "Torn: $_allyName",
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
@@ -217,138 +180,28 @@ class _CombatScreenState extends State<CombatScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 300),
-                      opacity: isEnemyHit ? 0.5 : 1.0,
-                      child: Image.network(
-                        skinEnemic?.imatge ??
-                            'lib/images/combat_proves/aizen_combat.png',
-                        height: 300,
-                        width: 300,
-                      ),
-                    ),
-                    SizedBox(height: 1),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              "$EnemyName",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: true,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          _buildHealthBar(
-                              enemicHealth, skinEnemic?.vida ?? 1000),
-                        ],
-                      ),
-                    ),
-                  ],
+                CharacterDisplayWidget(
+                  imageUrl: skinEnemic?.imatge ??
+                      'lib/images/combatscreen_images/aizen_combat.png',
+                  name: _enemyName,
+                  health: skinEnemic?.currentHealth?.toDouble() ??
+                      combatProvider.enemicHealth,
+                  maxHealth: skinEnemic?.vida ?? 1000,
+                  isHit: combatProvider.isEnemyHit,
+                  isEnemy: true,
                 ),
                 Spacer(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    AnimatedOpacity(
-                      duration: Duration(milliseconds: 300),
-                      opacity: isAllyHit ? 0.5 : 1.0,
-                      child: Image.network(
-                        skinAliat?.imatge ??
-                            'lib/images/combat_proves/bleach_combat.png',
-                        height: 250,
-                        width: 250,
-                      ),
-                    ),
-                    SizedBox(height: 0),
-                    Container(
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              _buildHealthBar(
-                                  aliatHealth, skinAliat?.vida ?? 1000),
-                              SizedBox(width: 10),
-                              Flexible(
-                                child: Text(
-                                  "$AllyName",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  softWrap: true,
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: isEnemyTurn || isAttackInProgress
-                                ? null
-                                : _attack,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orange,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 10),
-                              textStyle: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            child: Column(
-                              children: [
-                                Text("LLUITA", style: TextStyle(fontSize: 18)),
-                                SizedBox(height: 4),
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    techniqueName,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    softWrap: false,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  "(MAL: $aliatDamage)",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                CharacterDisplayWidget(
+                  imageUrl: skinAliat?.imatge ??
+                      'lib/images/combatscreen_images/bleach_combat.png',
+                  name: _allyName,
+                  health: skinAliat?.currentHealth?.toDouble() ??
+                      combatProvider.aliatHealth,
+                  maxHealth: skinAliat?.vida ?? 1000,
+                  isHit: combatProvider.isAllyHit,
                 ),
+                SizedBox(height: 20),
+                _buildActionButtons(context, combatProvider),
               ],
             ),
           ),
@@ -357,47 +210,92 @@ class _CombatScreenState extends State<CombatScreen> {
     );
   }
 
-  Widget _buildHealthBar(double health, int maxHealth) {
-    double healthPercentage = health / maxHealth;
-    Color barColor = healthPercentage < 0.2
-        ? Colors.red
-        : (healthPercentage < 0.6 ? Colors.orange : Colors.green);
-
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          width: 200,
-          height: 24,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade700,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.black, width: 2),
-          ),
-        ),
-        Positioned(
-          left: 0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              width: 200 * healthPercentage,
-              height: 24,
-              decoration: BoxDecoration(
-                color: barColor,
-                borderRadius: BorderRadius.circular(10),
+  Widget _buildActionButtons(
+      BuildContext context, CombatProvider combatProvider) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            flex: 3,
+            child: ElevatedButton(
+              onPressed: combatProvider.isEnemyTurn ||
+                      combatProvider.isAttackInProgress ||
+                      combatProvider.enemicHealth <= 0
+                  ? null
+                  : () => combatProvider.performAttack(
+                        _aliatDamage,
+                        _enemicDamage,
+                        _showVictoryDialog,
+                        _showDefeatDialog,
+                      ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              child: Column(
+                children: [
+                  Text("LLUITA", style: TextStyle(fontSize: 18)),
+                  SizedBox(height: 4),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      _techniqueName,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "(MAL: $_aliatDamage)",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-        Text(
-          "${health.toInt()}/$maxHealth",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+          SizedBox(width: 10),
+          Expanded(
+            flex: 1,
+            child: Container(
+              height: 60,
+              decoration: BoxDecoration(
+                color: Colors.yellow,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 5,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: Icon(Icons.auto_awesome, color: Colors.black),
+                onPressed: () {
+                  // Lógica del botón amarillo
+                },
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
