@@ -32,9 +32,12 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
   @override
   void initState() {
     super.initState();
-    _setRandomBackground();
-    _selectRandomSkin();
-    _resetHealth();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setRandomBackground();
+      _selectRandomSkin();
+      _resetHealth();
+    });
   }
 
   void _resetHealth() {
@@ -184,8 +187,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
                   imageUrl: skinEnemic?.imatge ??
                       'lib/images/combatscreen_images/aizen_combat.png',
                   name: _enemyName,
-                  health: skinEnemic?.currentHealth?.toDouble() ??
-                      combatProvider.enemicHealth,
+                  health: combatProvider.enemicHealth,
                   maxHealth: skinEnemic?.vida ?? 1000,
                   isHit: combatProvider.isEnemyHit,
                   isEnemy: true,
@@ -195,8 +197,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
                   imageUrl: skinAliat?.imatge ??
                       'lib/images/combatscreen_images/bleach_combat.png',
                   name: _allyName,
-                  health: skinAliat?.currentHealth?.toDouble() ??
-                      combatProvider.aliatHealth,
+                  health: combatProvider.aliatHealth,
                   maxHealth: skinAliat?.vida ?? 1000,
                   isHit: combatProvider.isAllyHit,
                 ),
