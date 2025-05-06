@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white.withOpacity(0.5),
+              backgroundColor: Colors.grey.withOpacity(0.5),
               elevation: 0,
               title: Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
@@ -255,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
         currentIndex: uiProvider.selectedMenuOpt,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Colors.orange,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
           final dialogueProvider =
