@@ -24,8 +24,8 @@ class DialogueWidget extends StatelessWidget {
         GestureDetector(
           onTap: dialogueProvider.nextDialogue,
           child: Container(
-            width: 125,
-            height: 200,
+            width: 150,
+            height: 250,
             //color: backgroundColor,
             child: Image.network(
               dialogueProvider.currentImage,
@@ -33,7 +33,7 @@ class DialogueWidget extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 16), // amplitud entre la imatge i el text
+        SizedBox(width: 16),
         Expanded(
           child: GestureDetector(
             onTap: dialogueProvider.nextDialogue,
