@@ -447,7 +447,7 @@ const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length
         let userSkinIds = userSkins.recordset.length > 0 ? userSkins.recordset[0].skin_ids.split(',') : [];
 
         if (userSkinIds.includes(randomSkin.id.toString())) {
-            return res.status(200).send("Ja tens aquesta skin.");
+            return res.status(200).send({message: "Ja tens aquesta skin."});
         }
 
         userSkinIds.push(randomSkin.id);

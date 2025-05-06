@@ -35,22 +35,20 @@ class GachaProvider extends ChangeNotifier {
       body: json.encode({'email': email}),
     );
 
-    final data = json.decode(response.body);
-
     if (response.statusCode == 200) {
-      _latestSkin = data['skin']; 
-      isDuplicateSkin = false;
+      final data = json.decode(response.body);
+      _latestSkin = data['skin'];  // Esta es la skin obtenida
+      isDuplicateSkin = false;    // No es repetida
       notifyListeners();
       return true;
-    } else if (response.statusCode == 200 &&
-               data['message'] == 'Ja tens aquesta skin.') {
-     
+    } else if (response.body == "Ja tens aquesta skin.") {
+      
       _latestSkin = null;
       isDuplicateSkin = true;
       notifyListeners();
       return true; 
     } else {
-      _showError(context, 'Error: ${data['message'] ?? response.body}');
+      _showError(context, 'Error: ${response.body}');
       return false;
     }
   } catch (e) {
@@ -60,6 +58,7 @@ class GachaProvider extends ChangeNotifier {
     _setLoading(false);
   }
 }
+
 
 
   void _showError(BuildContext context, String message) {
