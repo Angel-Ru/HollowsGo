@@ -395,7 +395,7 @@ exports.gachaTirada = async (req, res) => {
             `);
 
         if (availableSkins.recordset.length === 0) {
-            return res.status(400).send('No hay skins disponibles.');
+            return res.status(400).send('No hi ha skins disponibles.');
         }
 
         // Classifica les skins per estrelles
@@ -441,13 +441,13 @@ const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length
 
         const userSkins = await pool.request()
             .input('userId', sql.Int, userId)
-            .input('personatgeId', sql.Int, randomSkin.personatge)  // Filtrar por el ID del personaje
+            .input('personatgeId', sql.Int, randomSkin.personatge) 
             .query('SELECT skin_ids FROM BIBLIOTECA WHERE user_id = @userId AND personatge_id = @personatgeId');
 
         let userSkinIds = userSkins.recordset.length > 0 ? userSkins.recordset[0].skin_ids.split(',') : [];
 
         if (userSkinIds.includes(randomSkin.id.toString())) {
-            return res.status(200).send("Ya tienes esta skin.");
+            return res.status(200).send("Ja tens aquesta skin.");
         }
 
         userSkinIds.push(randomSkin.id);
@@ -478,7 +478,7 @@ const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length
         }
 
         res.status(200).send({
-            message: '¡Tirada de gacha realizada con éxito!',
+            message: '¡Tirada gacha realitzada amb éxit!',
             skin: randomSkin,
             remainingCoins: userBalance.recordset[0].punts_emmagatzemats - 100,
         });

@@ -50,26 +50,42 @@ class _GachaVideoPopupState extends State<GachaVideoPopup> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ModalBarrier(
-          color: Colors.black.withOpacity(0.7),
-          dismissible: false,
-        ),
-        Center(
-          child: Dialog(
-            backgroundColor: Colors.transparent,
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: (_videoController.value.isInitialized &&
-                      _chewieController != null)
-                  ? Chewie(controller: _chewieController)
-                  : Center(child: CircularProgressIndicator()),
-            ),
+Widget build(BuildContext context) {
+  return Stack(
+    children: [
+      ModalBarrier(
+        color: Colors.black.withOpacity(0.7),
+        dismissible: false,
+      ),
+      Center(
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: (_videoController.value.isInitialized &&
+                    _chewieController != null)
+                ? Chewie(controller: _chewieController)
+                : Center(child: CircularProgressIndicator()),
           ),
         ),
-      ],
-    );
-  }
+      ),
+      Positioned(
+        top: 40,
+        right: 20,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black54,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            _videoController.pause();
+            Navigator.of(context).pop();
+            widget.onVideoEnd();
+          },
+          child: Text("SKIP"),
+        ),
+      ),
+    ],
+  );
+}
 }

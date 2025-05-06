@@ -49,6 +49,7 @@ class GachaBannerWidget extends StatelessWidget {
                       context: context,
                       builder: (_) => SkinRewardDialog(
                         skin: gachaProvider.latestSkin!,
+                        isDuplicate: gachaProvider.isDuplicateSkin,
                       ),
                     );
                   },
