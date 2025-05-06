@@ -11,106 +11,121 @@ class SkinRewardDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      title: Center(
-        child: Text(
-          isDuplicate ? '🔁 Skin Repetida! 🔁' : '🎉 Nova Skin Obtinguda! 🎉',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.orangeAccent,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
+    return Dialog(
+      backgroundColor: Colors.black.withOpacity(0.5),
+      child: Stack(
         children: [
-          // Si no es repetida, mostram la skin que ha aconseguit l'usuari.
-          if (!isDuplicate) ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                skin?['imatge'] ?? '',
-                width: 200,
-                height: 200,
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                    'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'), // Mismo fondo de la estética previa
                 fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.2), BlendMode.darken),
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Colors.grey.withOpacity(0.8),
+                width: 1,
               ),
             ),
-            SizedBox(height: 10),
-            Text(
-              'Has desbloquejat la skin:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            SizedBox(height: 5),
-            Center(
-              child: Container(
-                height: 40,
-                alignment: Alignment.center,
-                child: ClipRect(
-                  child: AnimatedTextKit(
-                    animatedTexts: [
-                      ScaleAnimatedText(
-                        skin?['nom'] ?? '',
-                        textStyle: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blueAccent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  isDuplicate ? '🔁 Skin Repetida! 🔁' : '🎉 Nova Skin Obtinguda! ',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange.shade300,
+                    letterSpacing: 1.2,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                if (!isDuplicate) ...[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Image.network(
+                      skin?['imatge'] ?? '',
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Has desbloquejat la skin:',
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+                  ),
+                  const SizedBox(height: 5),
+                  Center(
+                    child: Container(
+                      height: 40,
+                      alignment: Alignment.center,
+                      child: ClipRect(
+                        child: AnimatedTextKit(
+                          animatedTexts: [
+                            ScaleAnimatedText(
+                              skin?['nom'] ?? '',
+                              textStyle: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                          repeatForever: true,
+                          pause: Duration(milliseconds: 100),
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                    ],
-                    repeatForever: true,
-                    pause: Duration(milliseconds: 100),
+                    ),
+                  ),
+                ],
+                if (isDuplicate) ...[
+                  Image.asset(
+                    'lib/images/skinrepetida.gif',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Ja tens aquesta skin.\n Se ha retornat el cost del gacha',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+                  ),
+                ],
+                const SizedBox(height: 24),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.orangeAccent.shade200,
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Acceptar',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ],
-          // Si es repetida, mostram un dialeg per advertir a l'usuari
-          if (isDuplicate) ...[
-            Image.asset(
-              'lib/images/skinrepetida.gif',
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Ja tens aquesta skin.\n Se ha retornat el cost del gacha',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ]
-        ],
-      ),
-      actions: <Widget>[
-        Center(
-          child: TextButton(
-            style: TextButton.styleFrom(
-              backgroundColor: Colors.orangeAccent,
-              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              'Acceptar',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
