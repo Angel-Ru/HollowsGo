@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../imports.dart';
 
@@ -157,7 +156,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
                       onPressed: () => Navigator.of(context).pop(),
                       child: const Text(
                         'Cancel·la',
-                        style: TextStyle(color: Colors.white70),
+                        style: TextStyle(
+                            color: Color.fromARGB(233, 255, 255, 255)),
                       ),
                     ),
                     ElevatedButton(
@@ -197,8 +197,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white70),
+        labelStyle: const TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
+        prefixIcon: Icon(icon, color: Color.fromARGB(233, 255, 255, 255)),
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
         border: OutlineInputBorder(
@@ -215,12 +215,13 @@ class _RegisterDialogState extends State<RegisterDialog> {
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: 'Contrasenya',
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
+        labelStyle: const TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
+        prefixIcon: const Icon(Icons.lock_outline,
+            color: Color.fromARGB(233, 255, 255, 255)),
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-            color: Colors.white70,
+            color: Color.fromARGB(233, 255, 255, 255),
           ),
           onPressed: () {
             setState(() => _isPasswordVisible = !_isPasswordVisible);
