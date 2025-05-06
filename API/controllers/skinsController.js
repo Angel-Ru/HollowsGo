@@ -447,6 +447,10 @@ const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length
         let userSkinIds = userSkins.recordset.length > 0 ? userSkins.recordset[0].skin_ids.split(',') : [];
 
         if (userSkinIds.includes(randomSkin.id.toString())) {
+            await pool.request()
+            .input('userId', sql.Int, userId)
+            .input('newBalance', sql.Int, userBalance.recordset[0].punts_emmagatzemats)
+            .query('UPDATE USUARIS SET punts_emmagatzemats = @newBalance WHERE id = @userId')
             return res.status(200).send({message: "Ja tens aquesta skin."});
         }
 
