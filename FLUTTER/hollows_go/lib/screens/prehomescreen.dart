@@ -148,7 +148,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
             // Capa oscura para mejorar contraste
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.25),
+                color: Colors.black.withOpacity(0.4),
               ),
             ),
             Center(
@@ -173,7 +173,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                       );
                     },
                   ),
-                  SizedBox(height: 200),
+                  SizedBox(height: 250),
                 ],
               ),
             ),
@@ -181,7 +181,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(height: 150),
+                  SizedBox(height: 200),
                   Image.network(
                     "https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708246/PREHOMESCREEN/ee9hwiaahvn6mj2dcnov.png",
                     width: 300,
