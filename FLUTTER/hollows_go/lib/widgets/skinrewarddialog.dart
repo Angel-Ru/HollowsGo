@@ -2,10 +2,12 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import '../imports.dart';
 
 class SkinRewardDialog extends StatelessWidget {
-  final Map<String, dynamic>? skin;  // Cambié a nullable para que pueda ser null cuando es repetida.
+  final Map<String, dynamic>? skin;
   final bool isDuplicate;
 
-  const SkinRewardDialog({required this.skin, this.isDuplicate = false, Key? key}) : super(key: key);
+  const SkinRewardDialog(
+      {required this.skin, this.isDuplicate = false, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class SkinRewardDialog extends StatelessWidget {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Si no es repetida, mostramos la imagen de la skin
+          // Si no es repetida, mostram la skin que ha aconseguit l'usuari.
           if (!isDuplicate) ...[
             ClipRRect(
               borderRadius: BorderRadius.circular(15),
@@ -68,16 +70,17 @@ class SkinRewardDialog extends StatelessWidget {
               ),
             ),
           ],
-          // Si es repetida, mostramos un mensaje de advertencia
+          // Si es repetida, mostram un dialeg per advertir a l'usuari
           if (isDuplicate) ...[
-            Icon(
-              Icons.warning_amber_rounded,
-              size: 60,
-              color: Colors.orangeAccent,
+            Image.asset(
+              'lib/images/skinrepetida.gif',
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
             ),
             SizedBox(height: 10),
             Text(
-              'Ja tens aquesta skin.\n¡Has rebut monedes de recompensa!',
+              'Ja tens aquesta skin.\n Se ha retornat el cost del gacha',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),

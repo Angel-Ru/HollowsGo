@@ -98,6 +98,7 @@ flutter:
     - lib/images/Byakuya.jpeg
     - lib/images/fondo_tendascreen/
     - assets/dialogues.json
+    - lib/images/skinrepetida.gif
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see

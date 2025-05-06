@@ -39,7 +39,7 @@ class GachaBannerWidget extends StatelessWidget {
           onPressed: () async {
             final success = await gachaProvider.gachaPull(context);
 
-            if (success && gachaProvider.latestSkin != null) {
+            if (success) {
               await showDialog(
                 context: context,
                 barrierDismissible: false,
@@ -48,7 +48,7 @@ class GachaBannerWidget extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (_) => SkinRewardDialog(
-                        skin: gachaProvider.latestSkin!,
+                        skin: gachaProvider.latestSkin,
                         isDuplicate: gachaProvider.isDuplicateSkin,
                       ),
                     );
