@@ -1,12 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../imports.dart';
-
-/*
-Aquesta és la classe RegisterDialog. En aquesta classe es crea el diàleg de registre.
-En aquest diàleg ens connectam amb el servidor per a poder-nos crear un compte per a poder-nos connectar a l'aplicació.
-Un cop ens hem registrat, ens redirigeix a la pantalla principal de l'aplicació, la qual és la HomeScreen.
-S'ha de canviar l'IP del servidor per a que funcioni correctament.
-*/
 
 class RegisterDialog extends StatefulWidget {
   @override
@@ -39,17 +33,15 @@ class _RegisterDialogState extends State<RegisterDialog> {
       msg: message,
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.black87,
       textColor: Colors.white,
-      fontSize: 16.0,
+      fontSize: 16,
     );
   }
 
   bool _isEmailValid(String email) {
-    String pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-    RegExp regExp = RegExp(pattern);
-    return regExp.hasMatch(email);
+    return RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+        .hasMatch(email);
   }
 
   bool _isPasswordValid(String password) {
@@ -76,9 +68,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     final url = Uri.parse('https://${Config.ip}/usuaris/');
     final headers = {'Content-Type': 'application/json'};
@@ -94,7 +84,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
 
       if (response.statusCode == 201) {
         final user = responseData['user'];
-        final token = responseData['token']; // Obtenir el token JWT
+        final token = responseData['token'];
 
         await _clearPreferences();
 
@@ -104,14 +94,11 @@ class _RegisterDialogState extends State<RegisterDialog> {
         await prefs.setString('userName', user['nom']);
         await prefs.setInt('userPunts', user['punts_emmagatzemats']);
         await prefs.setInt('userTipo', user['tipo']);
-
-        // Guardar el token JWT
-        await prefs.setString('token', token); // Aquí es guarda el token
+        await prefs.setString('token', token);
 
         _showToast("T'has registrat correctament");
-
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (_) => HomeScreen()),
         );
       } else {
         final errorMsg = responseData['message'] ?? "Error desconegut";
@@ -120,83 +107,131 @@ class _RegisterDialogState extends State<RegisterDialog> {
     } catch (e) {
       _showToast("Error de connexió: $e");
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Registra\'t'),
-      content: Container(
-        width: 300,
-        height: 250,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 32),
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                labelText: 'Nom',
-                prefixIcon: const Icon(Icons.person_outline),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Stack(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                    'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'), // Ejemplo de fondo
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.7), BlendMode.darken),
               ),
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                prefixIcon: const Icon(Icons.email_outlined),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Contrasenya',
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility_off
-                        : Icons.visibility,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Crea el teu compte',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange.shade300,
+                    letterSpacing: 1.2,
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              obscureText: !_isPasswordVisible,
+                const SizedBox(height: 24),
+                _buildTextField(
+                    _usernameController, 'Nom', Icons.person_outline),
+                const SizedBox(height: 16),
+                _buildTextField(
+                    _emailController, 'Email', Icons.email_outlined),
+                const SizedBox(height: 16),
+                _buildPasswordField(),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text(
+                        'Cancel·la',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _register,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent.shade200,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Text('Registra\'t'),
+                    ),
+                  ],
+                )
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: Text('Cancel·la'),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String label, IconData icon) {
+    return TextField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextField(
+      controller: _passwordController,
+      obscureText: !_isPasswordVisible,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: 'Contrasenya',
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() => _isPasswordVisible = !_isPasswordVisible);
+          },
         ),
-        ElevatedButton(
-          onPressed: _isLoading ? null : _register,
-          child: _isLoading
-              ? CircularProgressIndicator(color: Colors.white)
-              : Text('Registra\'t'),
-        ),
-      ],
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+      ),
     );
   }
 }
