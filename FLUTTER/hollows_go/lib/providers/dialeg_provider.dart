@@ -24,7 +24,8 @@ class DialogueProvider extends ChangeNotifier {
     final List<String> dialogues =
         List<String>.from(data[characterKey]["dialogues"]);
     final List<String> images = List<String>.from(data[characterKey]["images"]);
-    final _dialogues = dialogues;
+
+    _dialogues = dialogues;
     _characterImages = images;
     _dialogIndex = 0;
     _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';

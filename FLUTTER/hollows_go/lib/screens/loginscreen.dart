@@ -1,12 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../imports.dart';
-
-/*
-En la classe es gestiona i crea el diàleg de login.
-En aquest diàleg es connecta amb el servidor per a comprovar les dades d'inici de sessió.
-Un cop les dades són correctes, es redirigeix a la pantalla principal de l'aplicació, la qual és la HomeScreen.
-S'ha de canviar l'IP del servidor per a que funcioni correctament.
-*/
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,13 +13,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  
-
   Future<void> _login() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
@@ -35,9 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
     final url = Uri.parse('https://${Config.ip}/usuaris/login');
     final headers = {'Content-Type': 'application/json'};
@@ -52,23 +37,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
-
-        // Guardar l'estat de login i les dades de l'usuari
         await prefs.setBool('isLoggedIn', true);
         await prefs.setInt('userId', data['user']['id']);
         await prefs.setString('userEmail', data['user']['email']);
         await prefs.setString('userName', data['user']['nom']);
         await prefs.setInt('userPunts', data['user']['punts_emmagatzemats']);
         await prefs.setInt('userTipo', data['user']['tipo']);
-
-        // Imprimir el token per consola
-        print("Token rebut: ${data['token']}");
-
-        // Guardar el token
         await prefs.setString('token', data['token']);
 
         _showSnackBar("Inici de sessió correcte");
-
         Navigator.of(context).pop(true);
       } else {
         _showSnackBar(data['message'] ?? "Error desconegut");
@@ -76,9 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       _showSnackBar("Error de connexió: $e");
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -90,81 +65,136 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Inicia sessió'),
-      content: Container(
-        width: 300,
-        height: 200,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 32),
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                prefixIcon: const Icon(Icons.person_outline),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Stack(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                    'https://i.pinimg.com/originals/f3/00/7c/f3007cfb61fa557ae8a56685dc9d4a4c.jpg'), // Cambia por la imagen que prefieras
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.75), BlendMode.darken),
               ),
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(
-                labelText: 'Contrasenya',
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility_off
-                        : Icons.visibility,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Inicia sessió',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange.shade300,
+                    letterSpacing: 1.2,
                   ),
+                ),
+                const SizedBox(height: 24),
+                _buildTextField(
+                    _usernameController, 'Email', Icons.person_outline),
+                const SizedBox(height: 16),
+                _buildPasswordField(),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text(
+                        'Cancel·la',
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: _isLoading ? null : _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent.shade200,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
+                            )
+                          : const Text('Inicia sessió'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                TextButton(
                   onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
+                    Navigator.of(context).pop();
+                    showDialog(
+                      context: context,
+                      builder: (context) => RegisterDialog(),
+                    );
                   },
+                  child: const Text(
+                    "Registra't",
+                    style: TextStyle(color: Colors.white60),
+                  ),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              obscureText: !_isPasswordVisible,
+              ],
             ),
-          ],
-        ),
-      ),
-      actions: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Cancel·la'),
-            ),
-            ElevatedButton(
-              onPressed: _isLoading ? null : _login,
-              child: _isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
-                  : Text('Inicia sessió'),
-            ),
-          ],
-        ),
-        Center(
-          child: TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              showDialog(
-                context: context,
-                builder: (context) => RegisterDialog(),
-              );
-            },
-            child: Text("Registra't"),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String label, IconData icon) {
+    return TextField(
+      controller: controller,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return TextField(
+      controller: _passwordController,
+      obscureText: !_isPasswordVisible,
+      style: const TextStyle(color: Colors.white),
+      decoration: InputDecoration(
+        labelText: 'Contrasenya',
+        labelStyle: const TextStyle(color: Colors.white70),
+        prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+            color: Colors.white70,
+          ),
+          onPressed: () {
+            setState(() => _isPasswordVisible = !_isPasswordVisible);
+          },
         ),
-      ],
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
+      ),
     );
   }
 
