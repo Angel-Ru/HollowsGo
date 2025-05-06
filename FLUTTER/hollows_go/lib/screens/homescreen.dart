@@ -1,6 +1,4 @@
 import 'dart:ui';
-import 'package:cached_network_image/cached_network_image.dart';
-
 import '../imports.dart';
 
 /*
@@ -233,41 +231,9 @@ class _HomeScreenState extends State<HomeScreen> {
           _getSelectedScreen(uiProvider.selectedMenuOpt),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Principal',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_run),
-            label: 'Mapa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: 'Tenda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.apps),
-            label: 'Biblioteca',
-          ),
-        ],
+      bottomNavigationBar: CustomBottomNavBar(
         currentIndex: uiProvider.selectedMenuOpt,
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
         onTap: (index) {
-          final dialogueProvider =
-              Provider.of<DialogueProvider>(context, listen: false);
-
-          if (index == 0) {
-            dialogueProvider.loadDialogueFromJson("ichigo");
-          } else if (index == 2) {
-            dialogueProvider.loadDialogueFromJson("urahara");
-          } else if (index == 3) {
-            dialogueProvider.loadDialogueFromJson("mayuri");
-          }
           uiProvider.selectedMenuOpt = index;
         },
       ),

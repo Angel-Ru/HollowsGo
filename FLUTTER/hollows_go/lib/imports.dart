@@ -31,6 +31,7 @@ export '/widgets/gachavideodialog.dart';
 export '/widgets/skinrewarddialog.dart';
 export '/widgets/personatges_cardswiper_widget.dart';
 export '/widgets/selectedskincard_widget.dart';
+export '/widgets/custom_bottom_nav_bar.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
@@ -43,6 +44,7 @@ export 'package:video_player/video_player.dart';
 export 'package:chewie/chewie.dart';
 export 'package:fluttertoast/fluttertoast.dart';
 export 'package:audioplayers/audioplayers.dart';
+export 'package:cached_network_image/cached_network_image.dart';
 
 export 'dart:convert';
 export 'dart:math';
