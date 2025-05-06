@@ -1,10 +1,5 @@
 import '../imports.dart';
-
-/*
-En aquesta classe es crea la pantalla de benvinguda de l'aplicació.
-En aquesta pantalla mostren diferents animacions i unes imatges aleatòries d'en Kon.
-Quan es toca la pantalla, es mostra el diàleg d'inici de sessió, en el qual et pots registrar o iniciar sessió.
-*/
+import 'dart:math';
 
 class PreHomeScreen extends StatefulWidget {
   @override
@@ -14,13 +9,19 @@ class PreHomeScreen extends StatefulWidget {
 class _PreHomeScreenState extends State<PreHomeScreen>
     with SingleTickerProviderStateMixin {
   final List<String> imagePaths = [
-    'lib/images/prehomescreen_images/konbrillitos.png',
-    'lib/images/prehomescreen_images/koncapitan.png',
-    'lib/images/prehomescreen_images/konepico.png',
-    'lib/images/prehomescreen_images/konlike.png',
-    'lib/images/prehomescreen_images/konrap.png',
+    'lib/images/imatges_prehomescreen/0c7569c5931f07a4fbce4e1dd58f9684.jpg',
+    'lib/images/imatges_prehomescreen/28bee056b92ef5af41ab8d7cc6f6949a.jpg',
+    'lib/images/imatges_prehomescreen/47a6c1657d9d7a35d1e852d28cd2316c.jpg',
+    'lib/images/imatges_prehomescreen/69c392cd882d589286c840dbfcac9cb.jpg',
+    'lib/images/imatges_prehomescreen/73fa9d142edb2cde3417eecc0d15fbcb.jpg',
+    'lib/images/imatges_prehomescreen/5951c02f2a2a74dea733a1085497562f.jpg',
+    'lib/images/imatges_prehomescreen/a82b5790310afc901065789e5073b5a4.jpg',
+    'lib/images/imatges_prehomescreen/a5717d71795e05c9c35eaf4032c546b.jpg',
+    'lib/images/imatges_prehomescreen/c7fbad03a224d0ee498ff8194ba14314.jpg',
+    'lib/images/imatges_prehomescreen/c7285af40c27b635bab67680262bcd84.jpg',
   ];
 
+  late String randomBackground;
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late ScrollController _scrollControllerTop;
@@ -32,6 +33,10 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   @override
   void initState() {
     super.initState();
+
+    // Selección aleatoria de fondo
+    final random = Random();
+    randomBackground = imagePaths[random.nextInt(imagePaths.length)];
 
     _controller = AnimationController(
       vsync: this,
@@ -121,9 +126,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final random = Random();
-    final randomImage = random.nextInt(imagePaths.length);
-
     return Scaffold(
       backgroundColor: Color(0xFFEAE4F2),
       resizeToAvoidBottomInset: false,
@@ -138,71 +140,43 @@ class _PreHomeScreenState extends State<PreHomeScreen>
         },
         child: Stack(
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  height: 40,
-                  child: ListView.builder(
-                    controller: _scrollControllerTop,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 100,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        width: 39,
-                        height: 39,
-                        child: Image.asset(
-                          "lib/images/prehomescreen_images/skull_border.png",
-                          fit: BoxFit.cover,
+            Positioned.fill(
+              child: Image.asset(
+                randomBackground,
+                fit: BoxFit.cover,
+              ),
+            ),
+            // Capa oscura para mejorar contraste
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.25),
+              ),
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Spacer(),
+                  SizedBox(height: 70),
+                  AnimatedBuilder(
+                    animation: _opacityAnimation,
+                    builder: (context, child) {
+                      return Opacity(
+                        opacity: _opacityAnimation.value,
+                        child: Text(
+                          "CLICA A ON SIGUI PER COMENÇAR",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       );
                     },
                   ),
-                ),
-                Spacer(),
-                Container(
-                  height: 200,
-                  child: Image.asset(
-                    imagePaths[randomImage],
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(height: 70),
-                AnimatedBuilder(
-                  animation: _opacityAnimation,
-                  builder: (context, child) {
-                    return Opacity(
-                      opacity: _opacityAnimation.value,
-                      child: Text(
-                        "CLICA A ON SIGUI PER COMENÇAR",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(height: 150),
-                Container(
-                  height: 40,
-                  child: ListView.builder(
-                    controller: _scrollControllerBottom,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 100,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        width: 39,
-                        height: 39,
-                        child: Image.asset(
-                          "lib/images/prehomescreen_images/skull_border.png",
-                          fit: BoxFit.cover,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
+                  SizedBox(height: 200),
+                ],
+              ),
             ),
             Center(
               child: Column(
