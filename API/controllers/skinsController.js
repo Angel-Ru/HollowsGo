@@ -388,10 +388,15 @@ exports.gachaTirada = async (req, res) => {
             .query(`
                 SELECT *
                 FROM SKINS s
-                WHERE NOT EXISTS (SELECT 1
-                                  FROM ENEMICS e
-                                  WHERE e.personatge_id = s.personatge)
-                   OR s.nom LIKE '%bo%' -- Incloure les skins que tenen "bo" al nom, encara que el personatge sigui un enemic
+                WHERE s.raça = 1
+                    AND (
+                        NOT EXISTS (
+                                    SELECT 1
+                                    FROM ENEMICS e
+                                    WHERE e.personatge_id = s.personatge
+                                    )
+                        OR s.nom LIKE '%bo%' -- Incloure les skins amb "bo" al nom
+  )
             `);
 
         if (availableSkins.recordset.length === 0) {
