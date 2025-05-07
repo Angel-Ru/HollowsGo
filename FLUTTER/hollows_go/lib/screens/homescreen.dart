@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:hollows_go/screens/prefilscreen.dart';
+
 import '../imports.dart';
 
 /*
@@ -100,6 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return TendaScreen();
       case 3:
         return BibliotecaScreen();
+      case 4:
+        return PerfilScreen();
       default:
         return Center(child: Text(''));
     }
