@@ -15,14 +15,14 @@ class CustomBottomNavBar extends StatelessWidget {
     return Container(
       height: 80,
       decoration: BoxDecoration(
-        color: Colors.black,
-        boxShadow: [
+        color: const Color.fromARGB(255, 61, 61, 61),
+        /*boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.grey.withOpacity(0.5),
             blurRadius: 10,
             spreadRadius: 5,
           ),
-        ],
+        ],*/
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,

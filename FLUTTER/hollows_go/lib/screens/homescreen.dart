@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             child: AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.grey.withOpacity(0.5),
+              backgroundColor: const Color.fromARGB(255, 61, 61, 61),
               elevation: 0,
               title: Consumer<UserProvider>(
                 builder: (context, userProvider, child) {
@@ -132,12 +132,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             backgroundImage: NetworkImage(_coinImagePath),
                           ),
                           SizedBox(width: 8),
-                          Text('${userProvider.coinCount}'),
+                          Text(
+                            '${userProvider.coinCount}',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
                         ],
                       ),
                       Row(
                         children: [
-                          Text(userProvider.username),
+                          Text(userProvider.username,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.normal,
+                              )),
                           SizedBox(width: 8),
                           PopupMenuButton(
                             offset: Offset(0, 50),
