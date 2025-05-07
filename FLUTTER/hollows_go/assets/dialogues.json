@@ -67,6 +67,20 @@
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822464/DIALOGS_CHARACTERS/NEL/uidljorqcbxybbzclsg4.png",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822485/DIALOGS_CHARACTERS/NEL/y9dk0ni8deex8ief3tlu.png"
         ]
+    },
+    "ryuken": {
+        "dialogues": [
+            "Hola, sóc el Ryuken.",
+            "Sóc un dels últims Quincys.",
+            "Els Quincys són enemics naturals dels Shinigamis.",
+            "No sóc un guerrer. Sóc metge. Només salvo vides.",
+            "Faré de tu un vertader Quincy. Però amb una condició..."
+        ],
+        "images": [
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822715/DIALOGS_CHARACTERS/RYUKEN/dhotwsdtahljom1ua5bw.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822733/DIALOGS_CHARACTERS/RYUKEN/uescl6o1rv50bqzjw5lv.png",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/v1745822800/DIALOGS_CHARACTERS/RYUKEN/o6jvcyvat6pvisoerbyi.png"
+        ]
     }
     
 }
