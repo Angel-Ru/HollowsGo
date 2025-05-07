@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:http/http.dart' as http;
 import '../imports.dart';
 
 class BibliotecaScreen extends StatefulWidget {
@@ -8,9 +8,9 @@ class BibliotecaScreen extends StatefulWidget {
 }
 
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
-  bool _switchValue = false;
-  String _randomSkinName =
-      ''; // Variable para almacenar el nombre de la skin aleatoria
+  int _currentMode = 0; // 0: Aliados, 1: Quincy, 2: Enemigos
+  String _randomSkinName = '';
+  List<Personatge> _quincyPersonatges = [];
 
   @override
   void initState() {
@@ -30,8 +30,39 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.fetchPersonatgesAmbSkins(userId.toString());
-    provider.fetchPersonatgesEnemicsAmbSkins();
+    await provider.fetchPersonatgesAmbSkins(userId.toString());
+    await provider.fetchPersonatgesEnemicsAmbSkins();
+    await _loadQuincyPersonatges(userId.toString());
+  }
+
+  Future<void> _loadQuincyPersonatges(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('https://${Config.ip}/user/quincy/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _quincyPersonatges =
+              data.map((item) => Personatge.fromJson(item)).toList();
+        });
+      }
+    } catch (error) {
+      print('Error cargando personajes Quincy: $error');
+    }
   }
 
   void _loadInitialDialogue() {
@@ -47,7 +78,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.selectRandomUserSkin();
 
-    // Actualizar el nombre de la skin seleccionada
     setState(() {
       _randomSkinName = provider.selectedSkinAliat?.nom ?? '';
     });
@@ -62,11 +92,75 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     });
   }
 
+  String _getModeTitle() {
+    switch (_currentMode) {
+      case 0:
+        return 'Biblioteca Aliats';
+      case 1:
+        return 'Biblioteca Quincy';
+      case 2:
+        return 'Biblioteca Enemics';
+      default:
+        return 'Biblioteca';
+    }
+  }
+
+  String _getBackgroundImage() {
+    switch (_currentMode) {
+      case 0:
+        return 'lib/images/bibliotecascreen_images/biblioteca_aliats_fondo.png';
+      case 1:
+        return 'lib/images/bibliotecascreen_images/biblioteca_quincy_fondo.png';
+      case 2:
+        return 'lib/images/bibliotecascreen_images/biblioteca_enemics_fondo.png';
+      default:
+        return 'lib/images/bibliotecascreen_images/biblioteca_aliats_fondo.png';
+    }
+  }
+
+  String _getDialogueCharacter() {
+    switch (_currentMode) {
+      case 0:
+        return 'mayuri';
+      case 1:
+        return 'ryuken';
+      case 2:
+        return 'nel';
+      default:
+        return 'mayuri';
+    }
+  }
+
+  Color _getDialogueColor() {
+    switch (_currentMode) {
+      case 0:
+        return Colors.purple;
+      case 1:
+        return Colors.blue;
+      case 2:
+        return Colors.green;
+      default:
+        return Colors.purple;
+    }
+  }
+
+  List<Personatge> _getCurrentPersonatges() {
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
+    switch (_currentMode) {
+      case 0:
+        return provider.personatges;
+      case 1:
+        return _quincyPersonatges;
+      case 2:
+        return provider.characterEnemies;
+      default:
+        return provider.personatges;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
-    final personatges =
-        _switchValue ? provider.characterEnemies : provider.personatges;
+    final currentPersonatges = _getCurrentPersonatges();
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -91,11 +185,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
             height: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                  _switchValue
-                      ? 'lib/images/bibliotecascreen_images/biblioteca_enemics_fondo.png'
-                      : 'lib/images/bibliotecascreen_images/biblioteca_aliats_fondo.png',
-                ),
+                image: AssetImage(_getBackgroundImage()),
                 fit: BoxFit.cover,
               ),
             ),
@@ -111,27 +201,22 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 0),
                     child: DialogueWidget(
-                      characterName: _switchValue ? 'Nel' : 'Mayuri Kurotsuchi',
-                      nameColor: _switchValue ? Colors.green : Colors.purple,
+                      characterName: _getDialogueCharacter(),
+                      nameColor: _getDialogueColor(),
                       bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                      /*backgroundColor: _switchValue
-                          ? Color.fromARGB(255, 76, 175, 80)
-                          : Color.fromARGB(255, 167, 55, 187),
-                          */
                     ),
                   ),
 
-                  // SWITCH
+                  // Triple Switch
                   _buildModeSwitch(),
 
                   SizedBox(height: 10),
 
-                  // Botón de selección aleatoria con nombre de skin
-                  if (!_switchValue)
+                  // Botón de selección aleatoria (solo para aliados)
+                  if (_currentMode == 0)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
                       child: Center(
-                        // Centrar el botón horizontalmente
                         child: ElevatedButton(
                           onPressed: _selectRandomSkin,
                           style: ElevatedButton.styleFrom(
@@ -158,16 +243,23 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                     ),
                   SizedBox(height: 10),
 
-                  if (!_switchValue && provider.selectedSkinAliat != null)
-                    SelectedSkinCard(skin: provider.selectedSkinAliat!),
+                  // Skin seleccionada (solo para aliados)
+                  if (_currentMode == 0 &&
+                      Provider.of<SkinsEnemicsPersonatgesProvider>(context)
+                              .selectedSkinAliat !=
+                          null)
+                    SelectedSkinCard(
+                        skin: Provider.of<SkinsEnemicsPersonatgesProvider>(
+                                context)
+                            .selectedSkinAliat!),
 
                   // Lista de personajes
-                  ...personatges
+                  ...currentPersonatges
                       .map((personatge) => Padding(
                             padding: const EdgeInsets.only(bottom: 20),
                             child: PersonatgesCardSwiper(
                               personatge: personatge,
-                              isEnemyMode: _switchValue,
+                              isEnemyMode: _currentMode == 2,
                               onSkinSelected: _selectSkinAliat,
                               onSkinDeselected: () {
                                 final provider = Provider.of<
@@ -176,10 +268,15 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                     listen: false);
                                 provider.unselectSkinAliat();
                                 setState(() {
-                                  _randomSkinName = ''; // Resetear el nombre
+                                  _randomSkinName = '';
                                 });
                               },
-                              selectedSkin: provider.selectedSkinAliat,
+                              selectedSkin: _currentMode == 0
+                                  ? Provider.of<
+                                              SkinsEnemicsPersonatgesProvider>(
+                                          context)
+                                      .selectedSkinAliat
+                                  : null,
                             ),
                           ))
                       .toList(),
@@ -200,28 +297,49 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            _switchValue ? 'Biblioteca Enemics' : 'Biblioteca Aliats',
+            _getModeTitle(),
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
-          Spacer(),
-          Switch(
-            value: _switchValue,
-            onChanged: (value) {
-              setState(() {
-                _switchValue = value;
-                _randomSkinName = ''; // Resetear el nombre al cambiar de modo
-              });
-              final dialogueProvider =
-                  Provider.of<DialogueProvider>(context, listen: false);
-              dialogueProvider.loadDialogueFromJson(value ? 'nel' : 'mayuri');
-            },
-            activeColor: Colors.yellowAccent,
-            inactiveTrackColor: Colors.grey,
+          Row(
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back_ios, color: Colors.white),
+                onPressed: () {
+                  setState(() {
+                    _currentMode = (_currentMode - 1) % 3;
+                    if (_currentMode < 0) _currentMode = 2;
+                    _randomSkinName = '';
+                  });
+                  final dialogueProvider =
+                      Provider.of<DialogueProvider>(context, listen: false);
+                  dialogueProvider
+                      .loadDialogueFromJson(_getDialogueCharacter());
+                },
+              ),
+              Text(
+                ['Aliats', 'Quincy', 'Enemics'][_currentMode],
+                style: TextStyle(color: Colors.white),
+              ),
+              IconButton(
+                icon: Icon(Icons.arrow_forward_ios, color: Colors.white),
+                onPressed: () {
+                  setState(() {
+                    _currentMode = (_currentMode + 1) % 3;
+                    _randomSkinName = '';
+                  });
+                  final dialogueProvider =
+                      Provider.of<DialogueProvider>(context, listen: false);
+                  dialogueProvider
+                      .loadDialogueFromJson(_getDialogueCharacter());
+                },
+              ),
+            ],
           ),
         ],
       ),
