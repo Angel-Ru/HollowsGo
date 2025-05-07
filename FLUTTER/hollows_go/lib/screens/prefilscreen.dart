@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/user_provider.dart';
 import 'imageselectionpage.dart';
+import 'settingsscreen.dart';
 
 class PerfilScreen extends StatefulWidget {
   @override
@@ -49,15 +50,47 @@ class _PerfilScreenState extends State<PerfilScreen> {
     });
   }
 
+  void _navigateToSettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SettingsScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(56),
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: IconButton(
+                icon: Container(
+                  padding: EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.settings,
+                    color: Colors.grey[600],
+                    size: 28,
+                  ),
+                ),
+                iconSize: 36,
+                onPressed: () => _navigateToSettings(context),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
-          SizedBox(height: 95),
+          SizedBox(height: 20),
           // Avatar con botón de edición
           Stack(
             alignment: Alignment.center,
@@ -126,7 +159,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   GestureDetector(
                     onTap: () {
                       // AQUI ANIRÀ EDICIÓ DE TITOLS DE USUARI
-                      // (Screen o Dialog ja ho veurem)
                     },
                     child: Icon(
                       Icons.edit,
