@@ -1,7 +1,41 @@
 import '../imports.dart';
 
-class GachaBannerWidget extends StatelessWidget {
+class GachaBannerWidget extends StatefulWidget {
   const GachaBannerWidget({super.key});
+
+  @override
+  State<GachaBannerWidget> createState() => _GachaBannerWidgetState();
+}
+
+class _GachaBannerWidgetState extends State<GachaBannerWidget> {
+  final List<String> _bannerImages = [
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/r1ak8j1is33rrshhvttw.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/dc8kvqgcrlrc0pglxy5h.png',
+  ];
+  
+  int _currentBannerIndex = 0;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startBannerAnimation();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startBannerAnimation() {
+    _timer = Timer.periodic(Duration(seconds: 8), (timer) {
+      if (!mounted) return;
+      setState(() {
+        _currentBannerIndex = (_currentBannerIndex + 1) % _bannerImages.length;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,28 +43,44 @@ class GachaBannerWidget extends StatelessWidget {
 
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(
-              color: Colors.grey[700]!.withOpacity(0.8),
-              width: 3,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.5),
-                blurRadius: 6,
-                offset: Offset(0, 4),
+        Transform.scale(
+          scale: 1.2,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(
+                color: Colors.grey[700]!.withOpacity(0.8),
+                width: 3,
               ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Image.network(
-              'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745251932/TENDASCREEN/ojcss6ugdfrxgvag65ok.png',
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: MediaQuery.of(context).size.width * 0.38,
-              fit: BoxFit.cover,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 6,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: AnimatedSwitcher(
+                duration: Duration(seconds: 2),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return FadeTransition(
+                    opacity: CurvedAnimation(
+                      parent: animation,
+                      curve: Curves.easeInOut,
+                    ),
+                    child: child,
+                  );
+                },
+                child: Image.network(
+                  key: ValueKey<String>(_bannerImages[_currentBannerIndex]),
+                  _bannerImages[_currentBannerIndex],
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: MediaQuery.of(context).size.width * 0.4,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
         ),
@@ -38,7 +88,6 @@ class GachaBannerWidget extends StatelessWidget {
         ElevatedButton(
           onPressed: () async {
             final success = await gachaProvider.gachaPull(context);
-
             if (success) {
               await showDialog(
                 context: context,
