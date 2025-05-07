@@ -69,7 +69,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
-      dialogueProvider.loadDialogueFromJson('mayuri');
+      dialogueProvider.loadDialogueFromJson('Mayuri');
     });
   }
 
@@ -180,6 +180,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       ),
       body: Stack(
         children: [
+          // Fondo de pantalla
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -190,23 +191,17 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
               ),
             ),
           ),
+
+          // Contenido principal (scrollable)
           SingleChildScrollView(
+            padding: EdgeInsets.only(
+              top: 100, // Espacio para el switch
+              bottom: 150, // Espacio para el diálogo y navigation bar
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  SizedBox(height: 100),
-
-                  // Diálogo
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 0),
-                    child: DialogueWidget(
-                      characterName: _getDialogueCharacter(),
-                      nameColor: _getDialogueColor(),
-                      bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                    ),
-                  ),
-
                   // Triple Switch
                   _buildModeSwitch(),
 
@@ -243,7 +238,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                     ),
                   SizedBox(height: 10),
 
-                  // Skin seleccionada (solo para aliados)
                   if (_currentMode == 0 &&
                       Provider.of<SkinsEnemicsPersonatgesProvider>(context)
                               .selectedSkinAliat !=
@@ -281,6 +275,19 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           ))
                       .toList(),
                 ],
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: DialogueWidget(
+                characterName: _getDialogueCharacter(),
+                nameColor: _getDialogueColor(),
+                bubbleColor: Color.fromARGB(212, 238, 238, 238),
               ),
             ),
           ),
