@@ -121,13 +121,13 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   String _getDialogueCharacter() {
     switch (_currentMode) {
       case 0:
-        return 'mayuri';
+        return 'Mayuri';
       case 1:
-        return 'ryuken';
+        return 'Ryuken';
       case 2:
-        return 'nel';
+        return 'Nel';
       default:
-        return 'mayuri';
+        return 'Mayuri';
     }
   }
 
