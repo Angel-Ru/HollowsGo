@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../providers/user_provider.dart';
+import 'imageselectionpage.dart';
 
 class PerfilScreen extends StatefulWidget {
   @override
@@ -27,6 +28,27 @@ class _PerfilScreenState extends State<PerfilScreen> {
     });
   }
 
+  Future<void> _pickImage(BuildContext context) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageSelectionPage(
+          onImageSelected: (String imagePath) {
+            setState(() {
+              _imagePath = imagePath;
+            });
+            Navigator.of(context).pop(imagePath);
+          },
+        ),
+      ),
+    ).then((imagePath) async {
+      if (imagePath != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('profileImagePath', _imagePath);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
@@ -35,21 +57,86 @@ class _PerfilScreenState extends State<PerfilScreen> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          SizedBox(height: 90), // Ajusté este valor para la posición vertical
-          Center(
-            child: CircleAvatar(
-              radius: 60,
-              backgroundImage: NetworkImage(_imagePath),
-            ),
+          SizedBox(height: 95),
+          // Avatar con botón de edición
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              CircleAvatar(
+                radius: 60,
+                backgroundImage: NetworkImage(_imagePath),
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: GestureDetector(
+                  onTap: () => _pickImage(context),
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[700],
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.edit,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 20),
-          Text(
-            userProvider.username,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
+          Column(
+            children: [
+              Text(
+                userProvider.username,
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 4),
+              // Título de usuario con ícono de edición
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'TITOL USUARI',
+                    style: TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: 16,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      // AQUI ANIRÀ EDICIÓ DE TITOLS DE USUARI
+                      // (Screen o Dialog ja ho veurem)
+                    },
+                    child: Icon(
+                      Icons.edit,
+                      size: 18,
+                      color: Colors.grey[500],
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
           SizedBox(height: 40),
 
@@ -58,7 +145,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               children: [
-                // Fila de títulos
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -80,10 +166,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     ),
                   ],
                 ),
-
                 SizedBox(height: 15),
-
-                // Fila de valores
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
