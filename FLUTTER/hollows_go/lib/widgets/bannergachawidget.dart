@@ -24,7 +24,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   int _currentBannerIndex = 0;
   late Timer _timer;
   final PageController _pageController = PageController();
-  final double _bannerHeight = 200; // Ajusta según necesidad
 
   @override
   void initState() {
@@ -110,9 +109,9 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
             children: [
               // Contenedor del banner
               Transform.scale(
-                scale: 1.2,
+                scale: 1.3,
                 child: Container(
-                  height: _bannerHeight,
+                 
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
@@ -141,8 +140,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                       child: Image.network(
                         key: ValueKey(_allBannerSets[_currentSetIndex][_currentBannerIndex]),
                         _allBannerSets[_currentSetIndex][_currentBannerIndex],
-                        width: MediaQuery.of(context).size.width * 0.7,
-                        height: _bannerHeight,
+                        width: MediaQuery.of(context).size.width * 0.8,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
@@ -184,7 +182,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
           ),
         ),
         
-        const SizedBox(height: 25),
+        const SizedBox(height: 30),
         
         // Botón de acción
         ElevatedButton(
