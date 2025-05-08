@@ -1205,21 +1205,24 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
         const pool = await connectDB();
         const userId = req.params.id;
 
-        // Obtenir els personatges quincy de l'usuario
+        // Obtenir els personatges enemics de l'usuario
         const personatgesResult = await pool.request()
-            .input('userId', sql.Int, userId)
-            .query(`
-                SELECT DISTINCT p.id  AS personatge_id,
-                                p.nom AS personatge_nom,
-                                p.vida_base,
-                                p.mal_base
-                FROM PERSONATGES p
-                         JOIN BIBLIOTECA b ON p.id = b.personatge_id
-                         JOIN SKINS s on s.personatge = p.id
-                         JOIN ENEMICS e on e.personatge_id = p.id
-                WHERE b.user_id = @userId and s.raça = 2
-                ORDER BY p.nom
-            `);
+    .input('userId', sql.Int, userId)
+    .query(`
+        SELECT DISTINCT p.id  AS personatge_id,
+                        p.nom AS personatge_nom,
+                        p.vida_base,
+                        p.mal_base
+        FROM PERSONATGES p
+                 JOIN BIBLIOTECA b ON p.id = b.personatge_id
+                 JOIN SKINS s on s.personatge = p.id
+                 JOIN ENEMICS e on e.personatge_id = p.id
+        WHERE b.user_id = @userId
+          AND s.raça = 2
+          AND p.nom NOT LIKE '%bo%'
+        ORDER BY p.nom
+    `);
+
 
         if (personatgesResult.recordset.length === 0) {
             return res.status(404).send('No s\'han trobat personatges per a aquest usuari');

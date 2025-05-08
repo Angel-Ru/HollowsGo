@@ -276,7 +276,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
 
-        _personatges.clear();
+        _characterEnemies.clear();
         _skins.clear();
 
         for (var item in data) {
