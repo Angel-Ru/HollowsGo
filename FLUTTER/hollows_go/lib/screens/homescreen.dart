@@ -193,7 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      /*floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
@@ -201,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
         backgroundColor: Colors.red, // Color del botón
-      ),
+      ),*/
       body: Stack(
         children: [
           Positioned.fill(
