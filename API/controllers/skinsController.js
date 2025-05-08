@@ -659,6 +659,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                        s.nom        AS skin_nom,
                        s.categoria,
                        s.imatge,
+                       s.raça,
                        a.mal        AS mal_arma,
                        a.nom        AS atac_nom,  -- Afegir el nom de l'atac
                        ar.buff_atac AS atac,
@@ -686,6 +687,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                 id: skin.skin_id,
                 nom: skin.skin_nom,
                 imatge: skin.imatge,
+                raça: skin.raça,
                 categoria: skin.categoria,
                 mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
                 vida: personatge.vida_base,
@@ -1200,6 +1202,7 @@ exports.gachaTiradaEnemics = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
     try {
         const pool = await connectDB();
@@ -1239,6 +1242,7 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
                        s.nom        AS skin_nom,
                        s.categoria,
                        s.imatge,
+                       s.raça,
                        a.mal        AS mal_arma,
                        a.nom        AS atac_nom,  -- Afegir el nom de l'atac
                        ar.buff_atac AS atac,
@@ -1269,7 +1273,8 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
                 categoria: skin.categoria,
                 mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
                 vida: personatge.vida_base,
-                atac_nom: skin.atac_nom  // Afegir el nom de l'atac
+                atac_nom: skin.atac_nom ,
+                raça: skin.raça // Afegir el nom de l'atac
             }));
 
             return {
