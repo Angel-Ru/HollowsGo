@@ -1,5 +1,3 @@
-import 'package:hollows_go/config.dart';
-
 import '../imports.dart';
 import 'package:http/http.dart' as http;
 
@@ -22,6 +20,8 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   String _username = 'Usuari';
   Skin? _selectedSkin;
   Skin? _selectedSkinAliat;
+  Skin? _selectedSkinEnemic;
+  Skin? _selectedSkinQuincy;
   List<Personatge> _personatges = [];
   List<Personatge> _characterEnemies = [];
   List<Skin> _skins = [];
@@ -36,6 +36,8 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   String get username => _username;
   Skin? get selectedSkin => _selectedSkin;
   Skin? get selectedSkinAliat => _selectedSkinAliat;
+  Skin? get selectedSkinEnemic => _selectedSkinEnemic;
+  Skin? get selectedSkinQuincy => _selectedSkinQuincy;
 
   SkinsEnemicsPersonatgesProvider() {
     _loadUserData();
@@ -89,11 +91,37 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
 
   void setSelectedSkinAliat(Skin skin) {
     _selectedSkinAliat = skin;
+    _selectedSkinEnemic = null;
+    _selectedSkinQuincy = null;
     notifyListeners();
   }
 
   void unselectSkinAliat() {
     _selectedSkinAliat = null;
+    notifyListeners();
+  }
+
+  void setSelectedSkinQuincy(Skin skin) {
+    _selectedSkinQuincy = skin;
+    _selectedSkinAliat = null;
+    _selectedSkinEnemic = null;
+    notifyListeners();
+  }
+
+  void unselectSkinQuincy() {
+    _selectedSkinQuincy = null;
+    notifyListeners();
+  }
+
+  void setSelectedSkinEnemic(Skin skin) {
+    _selectedSkinEnemic = skin;
+    _selectedSkinAliat = null;
+    _selectedSkinQuincy = null;
+    notifyListeners();
+  }
+
+  void unselectSkinEnemic() {
+    _selectedSkinEnemic = null;
     notifyListeners();
   }
 
