@@ -59,14 +59,19 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
 
   Future<Skin> selectRandomUserSkin() async {
     try {
-      if (_personatges.isEmpty) {
-        throw Exception('No hay personajes disponibles');
+      // Combinar personatges i quincys
+      final allCharacters = [..._personatges, ..._quincys];
+
+      if (allCharacters.isEmpty) {
+        throw Exception(
+            'No hi ha personatges disponibles (ni aliats ni quincys)');
       }
 
-      final allUserSkins = _personatges.expand((p) => p.skins).toList();
+      // Obtenir totes les skins de tots els personatges
+      final allUserSkins = allCharacters.expand((p) => p.skins).toList();
 
       if (allUserSkins.isEmpty) {
-        throw Exception('El usuario no tiene skins disponibles');
+        throw Exception('No hi ha skins disponibles per als aliats o quincys');
       }
 
       final random = Random();
@@ -75,10 +80,10 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
       _selectedSkinAliat = randomSkin;
       notifyListeners();
 
-      return randomSkin; // Devolver la skin seleccionada
+      return randomSkin; // Retorna la skin seleccionada
     } catch (e) {
-      print('Error al seleccionar skin aleatoria: $e');
-      throw e; // Relanzar el error para manejarlo en la UI
+      print('Error al seleccionar skin aleatòria: $e');
+      throw e;
     }
   }
 
