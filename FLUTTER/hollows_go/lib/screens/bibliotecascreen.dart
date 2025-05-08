@@ -10,6 +10,7 @@ class BibliotecaScreen extends StatefulWidget {
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
   int _currentMode = 0; // 0: Aliados, 1: Quincy, 2: Enemigos
   String _randomSkinName = '';
+  Skin? selectedSkin;
 
   @override
   void initState() {
@@ -129,7 +130,18 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
     final currentPersonatges = _getCurrentPersonatges();
+
+    // Aconseguim la skin seleccionada segons el mode
+    Skin? selectedSkin;
+    if (_currentMode == 0) {
+      selectedSkin = provider.selectedSkinAliat;
+    } else if (_currentMode == 1) {
+      selectedSkin = provider.selectedSkinQuincy;
+    } else {
+      selectedSkin = provider.selectedSkinEnemic;
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -164,19 +176,17 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
           // Contenido principal (scrollable)
           SingleChildScrollView(
             padding: EdgeInsets.only(
-              top: 100, // Espacio para el switch
-              bottom: 150, // Espacio para el diálogo y navigation bar
+              top: 100,
+              bottom: 150,
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  // Triple Switch
                   _buildModeSwitch(),
 
                   SizedBox(height: 10),
 
-                  // Botón de selección aleatoria (solo para aliados)
                   if (_currentMode == 0)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),
@@ -205,16 +215,12 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                         ),
                       ),
                     ),
+
                   SizedBox(height: 10),
 
-                  if (_currentMode == 0 &&
-                      Provider.of<SkinsEnemicsPersonatgesProvider>(context)
-                              .selectedSkinAliat !=
-                          null)
-                    SelectedSkinCard(
-                        skin: Provider.of<SkinsEnemicsPersonatgesProvider>(
-                                context)
-                            .selectedSkinAliat!),
+                  // Mostrar la targeta de skin seleccionada només si hi ha una skin seleccionada
+                  if (selectedSkin != null)
+                    SelectedSkinCard(skin: selectedSkin),
 
                   // Lista de personajes
                   ...currentPersonatges
