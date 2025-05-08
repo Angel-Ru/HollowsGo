@@ -30,7 +30,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.fetchPersonatgesAmbSkins(userId.toString());
-    await provider.fetchPersonatgesEnemicsAmbSkins();
+    await provider.fetchEnemicsAmbSkins(userId.toString());
     await provider.fetchPersonatgesAmbSkinsQuincys(userId.toString());
   }
 
