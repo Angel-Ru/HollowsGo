@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
+  flutter_volume_controller
   geolocator_windows
   rive_common
   screen_brightness_windows

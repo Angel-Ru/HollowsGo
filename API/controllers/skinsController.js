@@ -1062,6 +1062,229 @@ exports.getPersonatgesAmbSkinsPerUsuariQuincy = async (req, res) => {
         res.status(500).send('Error en la consulta');
     }
 };
+exports.gachaTiradaEnemics = async (req, res) => {
+    try {
+        const email = req.body.email;
+
+        if (!email) {
+            return res.status(400).send('Email no proporcionado.');
+        }
+
+        const pool = await connectDB();
+        const userRecord = await pool.request()
+            .input('email', sql.VarChar(255), email)
+            .query('SELECT id FROM USUARIS WHERE email = @email');
+
+        if (userRecord.recordset.length === 0) {
+            return res.status(400).send('No se encuentra un usuario con ese correo electrónico.');
+        }
+
+        const userId = userRecord.recordset[0].id;
+
+        const userBalance = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query('SELECT punts_emmagatzemats FROM USUARIS WHERE id = @userId');
+
+        if (userBalance.recordset.length === 0 || userBalance.recordset[0].punts_emmagatzemats < 100) {
+            return res.status(400).send('No tienes suficientes monedas para hacer el tiro.');
+        }
+
+        await pool.request()
+            .input('userId', sql.Int, userId)
+            .input('newBalance', sql.Int, userBalance.recordset[0].punts_emmagatzemats - 100)
+            .query('UPDATE USUARIS SET punts_emmagatzemats = @newBalance WHERE id = @userId');
+
+        // Obtenir totes les skins disponibles, excloent les dels personatges enemics excepte si tenen "bo" al nom
+        const availableSkins = await pool.request()
+            .query(`
+                SELECT *
+                FROM SKINS s
+                WHERE s.raça = 2
+            `);
+
+        if (availableSkins.recordset.length === 0) {
+            return res.status(400).send('No hi ha skins disponibles.');
+        }
+
+        // Classifica les skins per estrelles
+        const starGroups = {
+            1: [],
+            2: [],
+            3: [],
+            4: []
+        };
+
+        availableSkins.recordset.forEach(skin => {
+            if (starGroups[skin.categoria]) {
+                starGroups[skin.categoria].push(skin);
+            }
+        });
+
+// Defineix les probabilitats (com acumulades)
+        const probabilities = [
+            { stars: 1, threshold: 0.6 },
+            { stars: 2, threshold: 0.7 },
+            { stars: 3, threshold: 0.8 },
+            { stars: 4, threshold: 0.85 }
+        ];
+
+        const rand = Math.random();
+        let chosenStars = 1;
+
+        for (const prob of probabilities) {
+            if (rand <= prob.threshold) {
+                chosenStars = prob.stars;
+                break;
+            }
+        }
+
+// Si no hi ha skins per aquest nivell, baixa fins trobar-ne una vàlida
+        while (starGroups[chosenStars].length === 0 && chosenStars > 1) {
+            chosenStars--;
+        }
+
+        const selectedGroup = starGroups[chosenStars];
+        const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
+
+
+        const userSkins = await pool.request()
+            .input('userId', sql.Int, userId)
+            .input('personatgeId', sql.Int, randomSkin.personatge)
+            .query('SELECT skin_ids FROM BIBLIOTECA WHERE user_id = @userId AND personatge_id = @personatgeId');
+
+        let userSkinIds = userSkins.recordset.length > 0 ? userSkins.recordset[0].skin_ids.split(',') : [];
+
+        if (userSkinIds.includes(randomSkin.id.toString())) {
+            await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('newBalance', sql.Int, userBalance.recordset[0].punts_emmagatzemats)
+                .query('UPDATE USUARIS SET punts_emmagatzemats = @newBalance WHERE id = @userId')
+            return res.status(200).send({message: "Ja tens aquesta skin."});
+        }
+
+        userSkinIds.push(randomSkin.id);
+
+        const updatedSkinIds = userSkinIds.join(',');
+
+        if (userSkins.recordset.length === 0) {
+            await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('personatgeId', sql.Int, randomSkin.personatge)
+                .input('updatedSkinIds', sql.NVarChar, updatedSkinIds)
+                .input('date', sql.DateTime, new Date())
+                .query(`
+                    INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
+                    VALUES (@userId, @personatgeId, @date, @updatedSkinIds)
+                `);
+        } else {
+            await pool.request()
+                .input('userId', sql.Int, userId)
+                .input('personatgeId', sql.Int, randomSkin.personatge)
+                .input('updatedSkinIds', sql.NVarChar, updatedSkinIds)
+                .query(`
+                    UPDATE BIBLIOTECA
+                    SET skin_ids = @updatedSkinIds
+                    WHERE user_id = @userId
+                      AND personatge_id = @personatgeId
+                `);
+        }
+
+        res.status(200).send({
+            message: '¡Tirada gacha realitzada amb éxit!',
+            skin: randomSkin,
+            remainingCoins: userBalance.recordset[0].punts_emmagatzemats - 100,
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la tirada de gacha');
+    }
+};
+exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const userId = req.params.id;
+
+        // Obtenir els personatges quincy de l'usuario
+        const personatgesResult = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query(`
+                SELECT DISTINCT p.id  AS personatge_id,
+                                p.nom AS personatge_nom,
+                                p.vida_base,
+                                p.mal_base
+                FROM PERSONATGES p
+                         JOIN BIBLIOTECA b ON p.id = b.personatge_id
+                         JOIN SKINS s on s.personatge = p.id
+                WHERE b.user_id = @userId and s.raça = 2
+                ORDER BY p.nom
+            `);
+
+        if (personatgesResult.recordset.length === 0) {
+            return res.status(404).send('No s\'han trobat personatges per a aquest usuari');
+        }
+
+        const personatges = personatgesResult.recordset;
+        const personatgeIds = personatges.map(p => p.personatge_id);
+
+        // Obtener las skins en una sola consulta
+        const skinsResult = await pool.request()
+            .input('userId', sql.Int, userId)
+            .query(`
+                SELECT s.id         AS skin_id,
+                       s.nom        AS skin_nom,
+                       s.categoria,
+                       s.imatge,
+                       a.mal        AS mal_arma,
+                       a.nom        AS atac_nom,  -- Afegir el nom de l'atac
+                       ar.buff_atac AS atac,
+                       b.personatge_id
+                FROM SKINS s
+                         JOIN BIBLIOTECA b ON s.id IN (SELECT value FROM STRING_SPLIT(b.skin_ids, ','))
+                         LEFT JOIN skins_armes sa ON s.id = sa.skin
+                         LEFT JOIN ARMES ar ON sa.arma = ar.id
+                         LEFT JOIN ATACS a ON s.atac = a.id
+                WHERE b.user_id = @userId and s.raça = 0
+            `);
+
+        // Agrupar las skins por personaje
+        const skinsPerPersonatge = {};
+        skinsResult.recordset.forEach(skin => {
+            if (!skinsPerPersonatge[skin.personatge_id]) {
+                skinsPerPersonatge[skin.personatge_id] = [];
+            }
+            skinsPerPersonatge[skin.personatge_id].push(skin);
+        });
+
+        // Construir la respuesta final
+        const personatgesAmbSkins = personatges.map(personatge => {
+            const skins = (skinsPerPersonatge[personatge.personatge_id] || []).map(skin => ({
+                id: skin.skin_id,
+                nom: skin.skin_nom,
+                imatge: skin.imatge,
+                categoria: skin.categoria,
+                mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
+                vida: personatge.vida_base,
+                atac_nom: skin.atac_nom  // Afegir el nom de l'atac
+            }));
+
+            return {
+                personatge: {
+                    id: personatge.personatge_id,
+                    nom: personatge.personatge_nom,
+                    vida_base: personatge.vida_base,
+                    mal_base: personatge.mal_base,
+                },
+                skins: skins
+            };
+        });
+
+        res.status(200).json(personatgesAmbSkins);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+};
 
 
 

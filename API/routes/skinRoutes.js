@@ -12,6 +12,10 @@ router.get('/biblioteca/:id', verificacioUsuari.verifyToken,skinsController.getP
 // Ruta per obtenir tots els quincys amb les seves skins de l'usuari
 router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariQuincy);
 
+//Ruta per obtenir tots els enemics amb les seves skins de l'usuari
+router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariEnemics);
+
+
 //Ruta per obtenir una skin d'un enemic amb el seu mal de forma aleatoria
 router.get('/enemic/', verificacioUsuari.verifyToken,skinsController.seleccionarSkinAleatoria);
 
@@ -34,6 +38,9 @@ router.post('/gacha',verificacioUsuari.verifyToken, skinsController.gachaTirada)
 
 // Ruta per a la tirada de gacha dels quincys
 router.post('/gacha/quincys', verificacioUsuari.verifyToken, skinsController.gachaTiradaQuincy);
+
+//Ruta per a la tirada de gacha dels enemics
+router.post('/gacha/enemics', verificacioUsuari.verifyToken, skinsController.gachaTiradaEnemics)
 
 //Ruta per crear una skin
 router.post('/', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, skinsController.crearSkin);

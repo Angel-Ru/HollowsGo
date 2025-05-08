@@ -18,6 +18,10 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641904/TENDASCREEN/lllx814oz39coei2qjw2.png',
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/em78g2xplw170ms4opvj.png',
     ],
+    [
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/esxiqu8zcrdka97pacvr.png',
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746706732/TENDASCREEN/luibwaplkahoyqhqdeyp.png'
+    ]
   ];
 
   int _currentSetIndex = 0;
@@ -123,7 +127,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
               Transform.scale(
                 scale: 1.3,
                 child: Container(
-                 
+                 height: 160,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
