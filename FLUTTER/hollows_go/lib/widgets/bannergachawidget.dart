@@ -74,27 +74,42 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   }
 
   Future<void> _handleGachaPull(BuildContext context) async {
-    final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
-    final success = await gachaProvider.gachaPull(context);
-    
-    if (success) {
-      await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => GachaVideoPopup(
-          onVideoEnd: () {
-            showDialog(
-              context: context,
-              builder: (_) => SkinRewardDialog(
-                skin: gachaProvider.latestSkin,
-                isDuplicate: gachaProvider.isDuplicateSkin,
-              ),
-            );
-          },
-        ),
-      );
-    }
+
+  final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+  late Future<bool> typePull;
+
+  switch (_currentSetIndex) {
+    case 0:
+      typePull = gachaProvider.gachaPull(context);
+      break;
+    case 1:
+     // typePull = gachaProvider.gachaPullQuincy;
+      break;
+    default:
+      //typePull = gachaProvider.gachaPullSet0;
   }
+
+  final success = await typePull;
+
+  if (success) {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => GachaVideoPopup(
+        onVideoEnd: () {
+          showDialog(
+            context: context,
+            builder: (_) => SkinRewardDialog(
+              skin: gachaProvider.latestSkin,
+              isDuplicate: gachaProvider.isDuplicateSkin,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
