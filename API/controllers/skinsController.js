@@ -1244,7 +1244,7 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
                          LEFT JOIN skins_armes sa ON s.id = sa.skin
                          LEFT JOIN ARMES ar ON sa.arma = ar.id
                          LEFT JOIN ATACS a ON s.atac = a.id
-                WHERE b.user_id = @userId and s.raça = 0
+                WHERE b.user_id = @userId and s.raça = 2
             `);
 
         // Agrupar las skins por personaje
