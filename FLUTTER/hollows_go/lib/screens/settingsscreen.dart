@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:screen_brightness/screen_brightness.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../imports.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -83,6 +86,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  // LOGOUT METHOD
+  Future<void> _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => PreHomeScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 40),
 
             // Sección de volumen
@@ -166,11 +178,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Icon(Icons.volume_up),
               ],
             ),
-            Center(
+            SizedBox(
+              width: double.infinity,
               child: ElevatedButton.icon(
                 icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
                 label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
                 onPressed: _toggleMute,
+              ),
+            ),
+
+            SizedBox(height: 40),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                icon: Icon(Icons.logout),
+                label: Text('Tancar Sessió'),
+                style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16)),
+                onPressed: _logout,
               ),
             ),
           ],

@@ -1,16 +1,6 @@
 import 'dart:ui';
 import 'package:hollows_go/screens/prefilscreen.dart';
-
 import '../imports.dart';
-
-/*
-Aquesta és la classe HomeScreen. En aquesta classe es crea la pantalla principal de l'aplicació.
-En aquesta pantalla es mostren diferents diàlegs de personatges de Bleach.
-La classe també permet canviar la imatge de perfil i mostrar el nombre de monedes que té l'usuari a través d'un AppBar.
-En aquesta pantalla també es mostren els diferents menús de l'aplicació, a on hi ha la pantalla del mapa, la de la tenda i la de la biblioteca de personatjes i enemics.
-A la pantalla trobam que hi ha diàlegs de n'Ichigo.
-El de n'Ichigo usa el provider de DialogueProvider per a mostrar les imatges i els diàlegs de n'Ichigo.
-*/
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -93,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // INFERIROR NAVIGATION BAR
+  // INFERIOR NAVIGATION BAR
   Widget _getSelectedScreen(int selectedIndex) {
     switch (selectedIndex) {
       case 1:
@@ -153,35 +143,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontWeight: FontWeight.normal,
                               )),
                           SizedBox(width: 8),
-                          PopupMenuButton(
-                            offset: Offset(0, 50),
-                            icon: CircleAvatar(
+                          GestureDetector(
+                            onTap: () {
+                              uiProvider.selectedMenuOpt =
+                                  4; // Navega al perfil
+                            },
+                            child: CircleAvatar(
                               radius: 20,
                               backgroundImage: NetworkImage(_imagePath),
                             ),
-                            itemBuilder: (context) => <PopupMenuEntry>[
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.image),
-                                    SizedBox(width: 8),
-                                    Text('Canviar imatge de perfil'),
-                                  ],
-                                ),
-                                onTap: () => _pickImage(context),
-                              ),
-                              const PopupMenuDivider(),
-                              PopupMenuItem(
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.logout),
-                                    SizedBox(width: 8),
-                                    Text('Surt'),
-                                  ],
-                                ),
-                                onTap: () => _logout(),
-                              ),
-                            ],
                           ),
                         ],
                       ),
@@ -193,15 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      /*floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CombatScreen()),
-          );
-        },
-        backgroundColor: Colors.red, // Color del botón
-      ),*/
       body: Stack(
         children: [
           Positioned.fill(
@@ -237,7 +198,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     characterName: 'Ichigo Kurosaki',
                     nameColor: Colors.orange,
                     bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                    //backgroundColor: Color.fromARGB(255, 233, 179, 77),
                   ),
                 ],
               ),
@@ -274,14 +234,5 @@ class _HomeScreenState extends State<HomeScreen> {
         await prefs.setString('profileImagePath', _imagePath);
       }
     });
-  }
-
-  // LOGOUT METHOD
-  Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => PreHomeScreen()),
-    );
   }
 }
