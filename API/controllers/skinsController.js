@@ -639,7 +639,8 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                                 p.mal_base
                 FROM PERSONATGES p
                          JOIN BIBLIOTECA b ON p.id = b.personatge_id
-                WHERE b.user_id = @userId
+                         JOIN SKINS s on s.personatge = p.id
+                WHERE b.user_id = @userId and s.raça = 1
                 ORDER BY p.nom
             `);
 
