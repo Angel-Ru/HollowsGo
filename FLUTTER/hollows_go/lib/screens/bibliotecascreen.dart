@@ -223,15 +223,34 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                             child: PersonatgesCardSwiper(
                               personatge: personatge,
                               isEnemyMode: _currentMode == null,
-                              onSkinSelected: _selectSkinAliat,
+                              onSkinSelected: (skin) {
+                                final provider = Provider.of<
+                                        SkinsEnemicsPersonatgesProvider>(
+                                    context,
+                                    listen: false);
+                                if (_currentMode == 0) {
+                                  provider.setSelectedSkinAliat(skin);
+                                  setState(() => _randomSkinName = skin.nom);
+                                } else if (_currentMode == 1) {
+                                  provider.setSelectedSkinQuincy(skin);
+                                } else {
+                                  provider.setSelectedSkinEnemic(skin);
+                                }
+                              },
                               onSkinDeselected: () {
                                 final provider = Provider.of<
                                         SkinsEnemicsPersonatgesProvider>(
                                     context,
                                     listen: false);
-                                provider.unselectSkinAliat();
                                 setState(() {
-                                  _randomSkinName = '';
+                                  if (_currentMode == 0) {
+                                    provider.unselectSkinAliat();
+                                    _randomSkinName = '';
+                                  } else if (_currentMode == 1) {
+                                    provider.unselectSkinQuincy();
+                                  } else {
+                                    provider.unselectSkinEnemic();
+                                  }
                                 });
                               },
                               selectedSkin: _currentMode == 0
@@ -239,7 +258,15 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                               SkinsEnemicsPersonatgesProvider>(
                                           context)
                                       .selectedSkinAliat
-                                  : null,
+                                  : _currentMode == 1
+                                      ? Provider.of<
+                                                  SkinsEnemicsPersonatgesProvider>(
+                                              context)
+                                          .selectedSkinQuincy
+                                      : Provider.of<
+                                                  SkinsEnemicsPersonatgesProvider>(
+                                              context)
+                                          .selectedSkinEnemic,
                             ),
                           ))
                       .toList(),
