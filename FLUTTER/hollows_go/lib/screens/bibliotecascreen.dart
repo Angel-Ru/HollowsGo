@@ -10,7 +10,6 @@ class BibliotecaScreen extends StatefulWidget {
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
   int _currentMode = 0; // 0: Aliados, 1: Quincy, 2: Enemigos
   String _randomSkinName = '';
-  List<Personatge> _quincyPersonatges = [];
 
   @override
   void initState() {
@@ -32,37 +31,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.fetchPersonatgesAmbSkins(userId.toString());
     await provider.fetchPersonatgesEnemicsAmbSkins();
-    await _loadQuincyPersonatges(userId.toString());
-  }
-
-  Future<void> _loadQuincyPersonatges(String userId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token');
-
-      if (token == null) {
-        print("No s'ha trobat cap token. L'usuari no està autenticat.");
-        return;
-      }
-
-      final response = await http.get(
-        Uri.parse('https://${Config.ip}/user/quincy/$userId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          _quincyPersonatges =
-              data.map((item) => Personatge.fromJson(item)).toList();
-        });
-      }
-    } catch (error) {
-      print('Error cargando personajes Quincy: $error');
-    }
+    await provider.fetchPersonatgesAmbSkinsQuincys(userId.toString());
   }
 
   void _loadInitialDialogue() {
@@ -150,7 +119,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       case 0:
         return provider.personatges;
       case 1:
-        return _quincyPersonatges;
+        return provider.quincys;
       case 2:
         return provider.characterEnemies;
       default:

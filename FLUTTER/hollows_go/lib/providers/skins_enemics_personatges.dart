@@ -25,9 +25,11 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   List<Personatge> _personatges = [];
   List<Personatge> _characterEnemies = [];
   List<Skin> _skins = [];
+  List<Personatge> _quincys = [];
 
   List<Personatge> get personatges => _personatges;
   List<Personatge> get characterEnemies => _characterEnemies;
+  List<Personatge> get quincys => _quincys;
   List<Skin> get skins => _skins;
   int get coinCount => _coinCount;
   int get coinEnemies => _coinEnemies;
@@ -289,6 +291,52 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
       }
     } catch (error) {
       print('Error en fetchPersonatgesEnemicsAmbSkins: $error');
+    }
+  }
+
+  Future<void> fetchPersonatgesAmbSkinsQuincys(String userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token'); // Obtenir el token
+
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
+      }
+
+      final url = Uri.parse('$_baseUrl/skins/biblioteca/quincys/$userId');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        _quincys.clear();
+        _skins.clear();
+
+        for (var item in data) {
+          final personatge = Personatge.fromJson(item['personatge']);
+
+          if (item.containsKey('skins') && item['skins'] is List) {
+            for (var skinJson in item['skins']) {
+              personatge.skins.add(Skin.fromJson(skinJson));
+            }
+          }
+
+          _quincys.add(personatge);
+        }
+
+        notifyListeners();
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error en fetchPersonatgesAmbSkins: $error');
     }
   }
 
