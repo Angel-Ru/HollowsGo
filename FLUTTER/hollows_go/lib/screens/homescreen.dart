@@ -205,6 +205,17 @@ class _HomeScreenState extends State<HomeScreen> {
           _getSelectedScreen(uiProvider.selectedMenuOpt),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CombatScreen()),
+          );
+        },
+        backgroundColor: Colors.red,
+        child: Icon(Icons.sports_martial_arts, color: Colors.white),
+        tooltip: 'Anar a CombatScreen (proves)',
+      ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: uiProvider.selectedMenuOpt,
         onTap: (index) {
