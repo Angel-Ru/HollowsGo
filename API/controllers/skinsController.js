@@ -1216,6 +1216,7 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
                 FROM PERSONATGES p
                          JOIN BIBLIOTECA b ON p.id = b.personatge_id
                          JOIN SKINS s on s.personatge = p.id
+                         JOIN ENEMICS e on e.personatge_id = p.id
                 WHERE b.user_id = @userId and s.raça = 2
                 ORDER BY p.nom
             `);
