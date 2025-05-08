@@ -50,12 +50,11 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   void _handleSwipe(DragEndDetails details) {
     if (!mounted) return;
     
-    // Detecta la dirección del deslizamiento
     if (details.primaryVelocity! > 0) {
-      // Deslizamiento hacia la izquierda
+      
       _changeBannerSet((_currentSetIndex - 1) % _allBannerSets.length);
     } else if (details.primaryVelocity! < 0) {
-      // Deslizamiento hacia la derecha
+      
       _changeBannerSet((_currentSetIndex + 1) % _allBannerSets.length);
     }
   }
@@ -101,13 +100,11 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Banner con gesto de deslizamiento
         GestureDetector(
           onHorizontalDragEnd: _handleSwipe,
           child: Stack(
             alignment: Alignment.bottomCenter,
             children: [
-              // Contenedor del banner
               Transform.scale(
                 scale: 1.3,
                 child: Container(
@@ -157,8 +154,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                   ),
                 ),
               ),
-              
-              // Indicadores de paginación
               Positioned(
                 bottom: 10,
                 child: Row(
@@ -181,10 +176,9 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
             ],
           ),
         ),
-        
+        //Espai entre el banner i el botó de tirar el gacha(Ho he augmentat perque amb el tamany de banner més gross, no hi habia casi separació)
         const SizedBox(height: 30),
         
-        // Botón de acción
         ElevatedButton(
           onPressed: () => _handleGachaPull(context),
           child: Text(
