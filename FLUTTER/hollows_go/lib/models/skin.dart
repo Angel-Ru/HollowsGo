@@ -9,29 +9,33 @@ class Skin {
   int? vida;
   int? currentHealth;
   String? atac;
+  int? raca; // 👈 NUEVO CAMPO
 
-  Skin(
-      {required this.id,
-      required this.nom,
-      this.categoria,
-      this.imatge,
-      this.puntsDonats,
-      this.malTotal,
-      this.personatgeNom,
-      this.vida,
-      this.atac})
-      : currentHealth = vida ?? 0;
+  Skin({
+    required this.id,
+    required this.nom,
+    this.categoria,
+    this.imatge,
+    this.puntsDonats,
+    this.malTotal,
+    this.personatgeNom,
+    this.vida,
+    this.atac,
+    this.raca,
+  }) : currentHealth = vida ?? 0;
 
   factory Skin.fromJson(Map<String, dynamic> json) => Skin(
-      id: json["id"],
-      nom: json["nom"],
-      categoria: json["categoria"],
-      imatge: json["imatge"],
-      puntsDonats: json["punts_donats"],
-      malTotal: json["mal_total"],
-      personatgeNom: json["personatge_nom"],
-      vida: json["vida"],
-      atac: json["atac_nom"]);
+        id: json["id"],
+        nom: json["nom"],
+        categoria: json["categoria"],
+        imatge: json["imatge"],
+        puntsDonats: json["punts_donats"],
+        malTotal: json["mal_total"],
+        personatgeNom: json["personatge_nom"],
+        vida: json["vida"],
+        atac: json["atac_nom"],
+        raca: json["raça"], // 👈 AÑADIR AQUÍ
+      );
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -43,5 +47,6 @@ class Skin {
         "personatge_nom": personatgeNom,
         "vida": vida,
         "atac_nom": atac,
+        "raça": raca, // 👈 Y AQUÍ
       };
 }
