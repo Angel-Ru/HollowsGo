@@ -1219,7 +1219,7 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
                  JOIN ENEMICS e on e.personatge_id = p.id
         WHERE b.user_id = @userId
           AND s.raça = 2
-          AND p.nom NOT LIKE '%bo%'
+          AND s.nom NOT LIKE '%bo%'
         ORDER BY p.nom
     `);
 
