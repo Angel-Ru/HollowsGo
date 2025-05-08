@@ -222,7 +222,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                             padding: const EdgeInsets.only(bottom: 20),
                             child: PersonatgesCardSwiper(
                               personatge: personatge,
-                              isEnemyMode: _currentMode == 2,
+                              isEnemyMode: _currentMode == null,
                               onSkinSelected: _selectSkinAliat,
                               onSkinDeselected: () {
                                 final provider = Provider.of<
