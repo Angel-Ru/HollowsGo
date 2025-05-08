@@ -1,0 +1,2 @@
+C:/Users/Alumne/Documents/hollowsito/HollowsGo/FLUTTER/hollows_go/android/app/.cxx/Debug/394s5a2x/x86/CMakeFiles/edit_cache.dir
+C:/Users/Alumne/Documents/hollowsito/HollowsGo/FLUTTER/hollows_go/android/app/.cxx/Debug/394s5a2x/x86/CMakeFiles/rebuild_cache.dir
