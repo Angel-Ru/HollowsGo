@@ -981,7 +981,7 @@ exports.getPersonatgesAmbSkinsPerUsuariQuincy = async (req, res) => {
         const pool = await connectDB();
         const userId = req.params.id;
 
-        // Obtener los personajes del usuario
+        // Obtenir els personatges quincy de l'usuario
         const personatgesResult = await pool.request()
             .input('userId', sql.Int, userId)
             .query(`
@@ -991,7 +991,8 @@ exports.getPersonatgesAmbSkinsPerUsuariQuincy = async (req, res) => {
                                 p.mal_base
                 FROM PERSONATGES p
                          JOIN BIBLIOTECA b ON p.id = b.personatge_id
-                WHERE b.user_id = @userId
+                         JOIN SKINS s on s.personatge = p.id
+                WHERE b.user_id = @userId and s.raça = 0
                 ORDER BY p.nom
             `);
 
