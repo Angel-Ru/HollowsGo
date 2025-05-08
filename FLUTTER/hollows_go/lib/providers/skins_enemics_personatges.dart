@@ -254,17 +254,17 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchPersonatgesEnemicsAmbSkins() async {
+  Future<void> fetchEnemicsAmbSkins(String userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token');
+      String? token = prefs.getString('token'); // Obtenir el token
 
       if (token == null) {
         print("No s'ha trobat cap token. L'usuari no està autenticat.");
         return;
       }
 
-      final url = Uri.parse('$_baseUrl/skins/enemic/personatges');
+      final url = Uri.parse('$_baseUrl/skins/biblioteca/enemics/$userId');
       final response = await http.get(
         url,
         headers: {
@@ -277,6 +277,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         final List<dynamic> data = json.decode(response.body);
 
         _characterEnemies.clear();
+        _skins.clear();
 
         for (var item in data) {
           final personatge = Personatge.fromJson(item['personatge']);
@@ -295,7 +296,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         print('Error en la resposta: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error en fetchPersonatgesEnemicsAmbSkins: $error');
+      print('Error en fetchPersonatgesAmbSkins: $error');
     }
   }
 
