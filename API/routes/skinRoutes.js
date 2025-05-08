@@ -9,6 +9,9 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifi
 //Ruta per obtenir tots els personatges amb les seves skins de l'usuari
 router.get('/biblioteca/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuari);
 
+// Ruta per obtenir tots els quincys amb les seves skins de l'usuari
+router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariQuincy);
+
 //Ruta per obtenir una skin d'un enemic amb el seu mal de forma aleatoria
 router.get('/enemic/', verificacioUsuari.verifyToken,skinsController.seleccionarSkinAleatoria);
 
@@ -28,6 +31,9 @@ router.get('/usuari/:id/nom/:nom', verificacioUsuari.verifyToken,skinsController
 
 // Ruta per a la tirada de gacha
 router.post('/gacha',verificacioUsuari.verifyToken, skinsController.gachaTirada);  // Eliminat el :userId i ara rebem l'email en el cos de la petició
+
+// Ruta per a la tirada de gacha dels quincys
+router.post('/gacha/quincys', verificacioUsuari.verifyToken, skinsController.gachaTiradaQuincy);
 
 //Ruta per crear una skin
 router.post('/', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, skinsController.crearSkin);
