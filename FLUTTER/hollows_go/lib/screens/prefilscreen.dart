@@ -23,10 +23,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
     
     // Carregar dades de perfil
-    Future.microtask(() {
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
+    Future.microtask(() async {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt('userId');
+      print('User ID: $userId');
       final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-      perfilProvider.fetchPerfilData(userProvider.userId);
+      perfilProvider.fetchPerfilData(userId!);
     });
   }
 

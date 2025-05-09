@@ -1,2 +1,2 @@
-GET http://localhost:3000/usuaris/
+GET https://hollowsgo-production.up.railway.app/usuaris/perfil/66
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjAsInRpcG8iOjAsImlhdCI6MTc0MDQzNzM5NX0.UhIZ5umQAmIVN787FhIfEzN8Kz-SHckTR5zSHIwlhhM

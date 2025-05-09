@@ -1,9 +1,9 @@
-// lib/providers/perfil_provider.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../imports.dart';
+import '../config.dart';
 
 class PerfilProvider with ChangeNotifier {
   int _partidesJugades = 0;
@@ -18,7 +18,22 @@ class PerfilProvider with ChangeNotifier {
 
   Future<void> fetchPerfilData(int userId) async {
     try {
-      final response = await http.get(Uri.parse('https://${Config.ip}/usuaris/perfil/$userId'));
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        print("Token no disponible a SharedPreferences");
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('https://${Config.ip}/usuaris/perfil/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         _partidesJugades = data['partides_jugades'] ?? 0;
@@ -27,10 +42,10 @@ class PerfilProvider with ChangeNotifier {
         _nombreSkins = data['nombre_skins'] ?? 0;
         notifyListeners();
       } else {
-        throw Exception('Error carregant dades del perfil');
+        print('Error carregant dades del perfil: ${response.body}');
       }
     } catch (e) {
-      print('Error al obtenir dades del perfil: $e');
+      print('Error a fetchPerfilData: $e');
     }
   }
 }
