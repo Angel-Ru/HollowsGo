@@ -44,7 +44,12 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.selectRandomSkin();
 
-    final skinAliat = provider.selectedSkinAliat;
+    final aliat = 
+    provider.selectedSkinAliat ??
+    provider.selectedSkinQuincy ??
+    provider.selectedSkinEnemic;
+
+    final skinAliat = aliat;
     final skinEnemic = provider.selectedSkin;
 
     final maxAllyHealth = skinAliat?.vida ?? 1000;
@@ -145,7 +150,11 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
     final combatProvider = Provider.of<CombatProvider>(context);
     final skinEnemic = provider.selectedSkin;
-    final skinAliat = provider.selectedSkinAliat;
+    final aliat = 
+    provider.selectedSkinAliat ??
+    provider.selectedSkinQuincy ??
+    provider.selectedSkinEnemic;
+    final skinAliat = aliat;
 
     _allyName = skinAliat?.nom ?? "Desconegut Aliat";
     _aliatDamage = skinAliat?.malTotal ?? 300;
