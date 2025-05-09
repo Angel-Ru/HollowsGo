@@ -12,6 +12,9 @@ router.get('/:id', verificacioUsuari.verifyToken, userController.getUsuariPerId)
 // Ruta per obtenir els punts d'un usuari per nom (accessible per a tots, però requereix token)
 router.get('/punts/:nom', verificacioUsuari.verifyToken, userController.getPuntsUsuari);
 
+//Ruta per obtenir les dades del perfil d'usuari
+router.get('/perfil', verificacioUsuari.verifyToken, userController.mostrarDadesPerfil)
+
 // Ruta per crear un usuari de tipus 0 (usuari normal) (accessible per a tots, no requereix token)
 router.post('/', userController.crearUsuariNormalToken);
 
@@ -29,6 +32,12 @@ router.put('/nom', verificacioUsuari.verifyToken, userController.modificarNomUsu
 
 //Ruta perquè l'usuari pugui modificar la seva contrasenya, però només si posa la seva actual i coincideix amb la que ja tenia.
 router.put('/contrasenya', verificacioUsuari.verifyToken, userController.modificarContrasenyaUsuari);
+
+//Ruta per sumar una partida guanyada al perfil d'usuari
+router.put('/partida_guanyada', verificacioUsuari.verifyToken, userController.sumartPartidaGuanyada);
+
+//Ruta per sumar una partida jugada al perfil d'usuari
+router.put('/partida_jugada', verificacioUsuari.verifyToken, userController.sumarPartidaJugada);
 
 
 module.exports = router;

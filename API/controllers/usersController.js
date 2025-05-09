@@ -722,7 +722,7 @@ exports.modificarNomUsuari = async (req, res) => {
     }
 };
 //Endpoint per quan jugues una partida actualitzar el nombre de partides jugades
-exports.SumarPartidaJugada = async (req, res) => {
+exports.sumarPartidaJugada = async (req, res) => {
     try {
         const pool = await connectDB();
         await pool.request()
@@ -736,7 +736,7 @@ exports.SumarPartidaJugada = async (req, res) => {
 };
 
 //Endpoint per quan jugues una partides i la guanyes
-exports.SumpartPartidaGuanyada = async (req, res) => {
+exports.sumartPartidaGuanyada = async (req, res) => {
     try {
         const pool = await connectDB();
         await pool.request()
@@ -750,7 +750,7 @@ exports.SumpartPartidaGuanyada = async (req, res) => {
 };
 
 //Endpoint per quan vols seleccionar i mostrar les partides jugades i guanyades de l'usuari.
-exports.MostrarDadesPerfil = async (req, res) => {
+exports.mostrarDadesPerfil = async (req, res) => {
     try {
         const pool = await connectDB();
         const result = await pool.request()
