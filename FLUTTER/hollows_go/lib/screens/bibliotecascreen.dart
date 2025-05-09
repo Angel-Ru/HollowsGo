@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:http/http.dart' as http;
 import '../imports.dart';
 
 class BibliotecaScreen extends StatefulWidget {

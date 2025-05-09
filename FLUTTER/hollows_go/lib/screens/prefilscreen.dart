@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../providers/user_provider.dart';
+import '../providers/perfil_provider.dart';
 import 'imageselectionpage.dart';
 import 'settingsscreen.dart';
 
@@ -18,6 +20,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
   void initState() {
     super.initState();
     _loadProfileImage();
+
+    
+    // Carregar dades de perfil
+    Future.microtask(() {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+      perfilProvider.fetchPerfilData(userProvider.userId);
+    });
   }
 
   Future<void> _loadProfileImage() async {
@@ -60,6 +70,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final perfilProvider = Provider.of<PerfilProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -91,7 +102,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
       body: Column(
         children: [
           SizedBox(height: 20),
-          // Avatar con botón de edición
+          // Avatar amb botó d'edició
           Stack(
             alignment: Alignment.center,
             children: [
@@ -143,7 +154,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 ),
               ),
               SizedBox(height: 4),
-              // Título de usuario con ícono de edición
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -158,7 +168,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
-                      // AQUI ANIRÀ EDICIÓ DE TITOLS DE USUARI
+                      // Edició de títol d’usuari
                     },
                     child: Icon(
                       Icons.edit,
@@ -172,7 +182,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
           ),
           SizedBox(height: 40),
 
-          // Sección de estadísticas
+          // Estadístiques
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40),
             child: Column(
@@ -213,7 +223,23 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           ),
                         ),
                         Text(
-                          '0',
+                          '${perfilProvider.partidesJugades}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Guanyades:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          '${perfilProvider.partidesGuanyades}',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -226,14 +252,30 @@ class _PerfilScreenState extends State<PerfilScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'en Possesió:',
+                          'En possessió:',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey,
                           ),
                         ),
                         Text(
-                          '0',
+                          '${perfilProvider.nombrePersonatges}',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Skins:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          '${perfilProvider.nombreSkins}',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,

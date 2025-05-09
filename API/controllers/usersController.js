@@ -728,7 +728,7 @@ exports.sumarPartidaJugada = async (req, res) => {
         await pool.request()
             .input('id', sql.Int, req.params.id)
             .query('UPDATE PERFIL_USUARI SET partides_jugades = partides_jugades + 1 WHERE usuari = @id');
-        res.send('Partida juagada sumada');
+        res.send('Partida jugada sumada');
     } catch (err) {
         console.error(err);
         res.status(500).send("Error alhora de sumar la partida jugada");
@@ -742,7 +742,7 @@ exports.sumartPartidaGuanyada = async (req, res) => {
         await pool.request()
             .input('id', sql.Int, req.params.id)
             .query('UPDATE PERFIL_USUARI SET partides_guanyades = partides_guanyades + 1 WHERE usuari = @id');
-        res.send('Partida guanydada sumada');
+        res.send('Partida guanyada sumada');
     } catch (err) {
         console.error(err);
         res.status(500).send("Error alhora de sumar la partida guanyada");

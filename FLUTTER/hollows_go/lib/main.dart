@@ -1,3 +1,5 @@
+import 'package:hollows_go/providers/perfil_provider.dart';
+
 import 'imports.dart';
 
 /*
@@ -21,6 +23,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GachaProvider()),
         ChangeNotifierProvider(
             create: (_) => SkinsEnemicsPersonatgesProvider()),
+        ChangeNotifierProvider(create: (_) => PerfilProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

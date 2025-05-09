@@ -11,7 +11,8 @@ S'ha de canviar l'IP del servidor per a que funcioni correctament.
 class UserProvider with ChangeNotifier {
   int _coinCount = 0;
   String _username = 'Usuari';
-
+  int _userId = 0;
+  int get userId => _userId;
   int get coinCount => _coinCount;
   String get username => _username;
 
@@ -24,6 +25,7 @@ class UserProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _coinCount = prefs.getInt('userPunts') ?? 0;
     _username = prefs.getString('userName') ?? 'Usuari';
+    _userId = prefs.getInt('userId') ?? 0;
     notifyListeners();
     fetchUserPoints();
   
