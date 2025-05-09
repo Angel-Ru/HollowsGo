@@ -451,6 +451,14 @@ exports.crearUsuariNormalToken = async (req, res) => {
 
         const newUserId = insertResult.recordset[0].id;
 
+        // Crear el registre en la taula PERFIL_USUARI
+        await pool.request()
+            .input('userId', sql.Int, newUserId)
+            .query(`
+                INSERT INTO PERFIL_USUARI (usuari)
+                VALUES (@userId)
+            `);
+
         // Generar el token JWT sense expiració
         const token = jwt.sign(
             { id: newUserId, tipo: tipo },
@@ -474,6 +482,7 @@ exports.crearUsuariNormalToken = async (req, res) => {
         res.status(500).send("Error al crear l'usuari");
     }
 };
+
 
 /**
  * @swagger
@@ -710,5 +719,68 @@ exports.modificarNomUsuari = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en actualitzar el nom d\'usuari.');
+    }
+};
+//Endpoint per quan jugues una partida actualitzar el nombre de partides jugades
+exports.SumarPartidaJugada = async (req, res) => {
+    try {
+        const pool = await connectDB();
+        await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query('UPDATE PERFIL_USUARI SET partides_jugades = partides_jugades + 1 WHERE usuari = @id');
+        res.send('Partida juagada sumada');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error alhora de sumar la partida jugada");
+    }
+};
+
+//Endpoint per quan jugues una partides i la guanyes
+exports.SumpartPartidaGuanyada = async (req, res) => {
+    try {
+        const pool = await connectDB();
+        await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query('UPDATE PERFIL_USUARI SET partides_guanyades = partides_guanyades + 1 WHERE usuari = @id');
+        res.send('Partida guanydada sumada');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error alhora de sumar la partida guanyada");
+    }
+};
+
+//Endpoint per quan vols seleccionar i mostrar les partides jugades i guanyades de l'usuari.
+exports.MostrarDadesPerfil = async (req, res) => {
+    try {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('id', sql.Int, req.params.id)
+            .query(`
+                SELECT 
+                    pu.partides_jugades, 
+                    pu.partides_guanyades,
+                    COUNT(DISTINCT b.personatge_id) AS nombre_personatges,
+                    SUM(
+                        CASE 
+                            WHEN b.skin_ids IS NULL OR b.skin_ids = '' THEN 0
+                            ELSE LEN(b.skin_ids) - LEN(REPLACE(b.skin_ids, ',', '')) + 1
+                        END
+                    ) AS nombre_skins
+                FROM 
+                    PERFIL_USUARI pu
+                JOIN 
+                    USUARIS u ON u.id = pu.usuari
+                JOIN 
+                    BIBLIOTECA b ON b.user_id = u.id
+                WHERE 
+                    u.id = @id
+                GROUP BY 
+                    pu.partides_jugades, pu.partides_guanyades
+            `);
+
+        res.json(result.recordset[0]);
+    } catch (error) {
+        console.error('Error al obtenir dades del perfil:', error);
+        res.status(500).json({ message: 'Error del servidor' });
     }
 };
