@@ -36,10 +36,11 @@ class PerfilProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        _partidesJugades = data['partides_jugades'] ?? 0;
-        _partidesGuanyades = data['partides_guanyades'] ?? 0;
+        _partidesJugades = int.tryParse(data['partides_jugades'].toString()) ?? 0;
+        _partidesGuanyades =int.tryParse(data['partides_guanyades'].toString()) ?? 0;
         _nombrePersonatges = data['nombre_personatges'] ?? 0;
-        _nombreSkins = data['nombre_skins'] ?? 0;
+        _nombreSkins = int.tryParse(data['nombre_skins'].toString()) ?? 0;
+
         notifyListeners();
       } else {
         print('Error carregant dades del perfil: ${response.body}');
