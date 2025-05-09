@@ -33,23 +33,31 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       _setRandomBackground();
-      _selectRandomSkin();
-      _resetHealth();
+      await _selectRandomSkinAndResetHealth();
     });
   }
 
-  void _resetHealth() {
+  Future<void> _selectRandomSkinAndResetHealth() async {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    await provider.selectRandomSkin();
+
     final skinAliat = provider.selectedSkinAliat;
     final skinEnemic = provider.selectedSkin;
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
 
-    provider.setMaxAllyHealth(skinAliat?.vida ?? 1000);
-    provider.setMaxEnemyHealth(skinEnemic?.vida ?? 1000);
-    combatProvider.resetCombat();
+    final maxAllyHealth = skinAliat?.vida ?? 1000;
+    final maxEnemyHealth = skinEnemic?.vida ?? 1000;
+
+    provider.setMaxAllyHealth(maxAllyHealth);
+    provider.setMaxEnemyHealth(maxEnemyHealth);
+
+    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+    combatProvider.resetCombat(
+      maxAllyHealth: maxAllyHealth.toDouble(),
+      maxEnemyHealth: maxEnemyHealth.toDouble(),
+    );
   }
 
   void _setRandomBackground() {
@@ -57,11 +65,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     int randomIndex = random.nextInt(5) + 1;
     _backgroundImage =
         'lib/images/combatscreen_images/fondo_combat_$randomIndex.png';
-  }
-
-  void _selectRandomSkin() {
-    Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false)
-        .selectRandomSkin();
   }
 
   void _showVictoryDialog() async {
@@ -144,11 +147,9 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     final skinEnemic = provider.selectedSkin;
     final skinAliat = provider.selectedSkinAliat;
 
-    // Actualizar datos basados en las skins
     _allyName = skinAliat?.nom ?? "Desconegut Aliat";
     _aliatDamage = skinAliat?.malTotal ?? 300;
-    _techniqueName = skinAliat?.atac ??
-        "Katen Kyokotsu: Karamatsu Shinju (Suicidi dels Pins Negres)";
+    _techniqueName = skinAliat?.atac ?? "Tècnica desconeguda";
     _enemyName = skinEnemic?.personatgeNom ?? "Desconegut Enemic";
     _enemicDamage = skinEnemic?.malTotal ?? 50;
 

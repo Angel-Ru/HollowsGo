@@ -1,6 +1,4 @@
-// combat_provider.dart
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class CombatProvider with ChangeNotifier {
   double _aliatHealth = 1000.0;
@@ -10,7 +8,6 @@ class CombatProvider with ChangeNotifier {
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
 
-  // Getters
   double get aliatHealth => _aliatHealth;
   double get enemicHealth => _enemicHealth;
   bool get isEnemyTurn => _isEnemyTurn;
@@ -18,7 +15,6 @@ class CombatProvider with ChangeNotifier {
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
 
-  // Setters
   void setAllyHealth(double value) {
     _aliatHealth = value;
     notifyListeners();
@@ -29,9 +25,10 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void resetCombat() {
-    _aliatHealth = 1000.0;
-    _enemicHealth = 1000.0;
+  void resetCombat(
+      {double maxAllyHealth = 1000.0, double maxEnemyHealth = 1000.0}) {
+    _aliatHealth = maxAllyHealth;
+    _enemicHealth = maxEnemyHealth;
     _isEnemyTurn = false;
     _isEnemyHit = false;
     _isAllyHit = false;
