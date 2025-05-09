@@ -790,4 +790,36 @@ INSERT INTO ATACS(nom, mal) VALUES ('Gàbia de Reishi', 120);
 INSERT INTO ATACS(nom, mal) VALUES ('Tret de la Mort', 110);
 INSERT INTO ATACS(nom, mal) VALUES ('Trencament del Futur', 200);
 
+UPDATES:
+UPDATE SKINS SET atac = 57 where personatge = 75;
+UPDATE SKINS SET atac = 58 where personatge = 77;
+UPDATE SKINS SET atac = 59 where personatge = 78;
+UPDATE SKINS SET atac = 60 where personatge = 81;
+UPDATE SKINS SET atac = 61 where personatge = 82;
+UPDATE SKINS SET atac = 62 where personatge = 85;
+UPDATE SKINS SET atac = 63 where personatge = 86;
+UPDATE SKINS SET atac = 64 where personatge = 87;
+UPDATE SKINS SET atac = 65 where personatge = 74;
+UPDATE SKINS SET atac = 66 where personatge = 88;
+UPDATE SKINS SET atac = 67 where personatge = 89;
+UPDATE SKINS SET atac = 68 where personatge = 61;
+UPDATE SKINS SET atac = 69 where personatge = 68;
+UPDATE SKINS SET atac = 70 where personatge = 63;
+UPDATE SKINS SET atac = 71 where personatge = 71;
+UPDATE SKINS SET atac = 72 where personatge = 60;
+UPDATE SKINS SET atac = 73 where personatge = 73;
+UPDATE SKINS SET atac = 74 where personatge = 66;
+UPDATE SKINS SET atac = 75 where personatge = 91;
+UPDATE SKINS SET atac = 76 where personatge = 79;
+UPDATE SKINS SET atac = 77 where personatge = 70;
+UPDATE SKINS SET atac = 78 where personatge = 62;
+UPDATE SKINS SET atac = 79 where personatge = 84;
+UPDATE SKINS SET atac = 80 where personatge = 83;
+UPDATE SKINS SET atac = 81 where personatge = 65;
+UPDATE SKINS SET atac = 82 where personatge = 69;
+UPDATE SKINS SET atac = 83 where personatge = 64;
+UPDATE SKINS SET atac = 84 where personatge = 80;
+UPDATE SKINS SET atac = 85 where personatge = 72;
+UPDATE SKINS SET atac = 86 where personatge = 76;
+UPDATE SKINS SET atac = 87 where personatge = 89;
 */
