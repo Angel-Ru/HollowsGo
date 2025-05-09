@@ -737,3 +737,57 @@ INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yamamoto (Jo
 --Yoruichi(Thousand Year War Blood)
 INSERT INTO SKINS(nom, categoria, imatge, personatge, atac) VALUES('Yoruichi (TYBW)', 4,'https://res.cloudinary.com/dkcgsfcky/image/upload/v1744276887/PERSONATGES/Yoruichi/a4b2dxwxzz7trkshowq6.png', 37, NULL)
 */
+
+
+/*
+INSERTS FETS PER ALBERT GALÁN
+INSERT INTO ATACS(nom, mal) VALUES ('Absorció Memètica', 150);
+INSERT INTO ATACS(nom, mal) VALUES ('Huracà Sagnant', 120);
+INSERT INTO ATACS(nom, mal) VALUES ('Ullal Salvatge', 130);
+INSERT INTO ATACS(nom, mal) VALUES ('Mort Inevitable', 200);
+INSERT INTO ATACS(nom, mal) VALUES ('Llops Cero', 160);
+INSERT INTO ATACS(nom, mal) VALUES ('Control Genètic', 110);
+INSERT INTO ATACS(nom, mal) VALUES ('Garra del Jaguar Blau', 170);
+INSERT INTO ATACS(nom, mal) VALUES ('Marea Asfixiant', 140);
+INSERT INTO ATACS(nom, mal) VALUES ('Bala Incontrolable', 90);
+INSERT INTO ATACS(nom, mal) VALUES ('Urpa Verinosa', 100);
+INSERT INTO ATACS(nom, mal) VALUES ('Cero Colossal', 160);
+INSERT INTO ATACS(nom, mal) VALUES ('Rugir Reial', 130);
+INSERT INTO ATACS(nom, mal) VALUES ('Tall Infinit', 150);
+INSERT INTO ATACS(nom, mal) VALUES ('Llança del Raig Negre', 180);
+INSERT INTO ATACS(nom, mal) VALUES ('Crit Primigeni', 100);
+INSERT INTO ATACS(nom, mal) VALUES ('Erupció de Fúria', 200);
+INSERT INTO ATACS(nom, mal) VALUES ('Mirada Absoluta', 140);
+INSERT INTO ATACS(nom, mal) VALUES ('Gàbia de Conillets', 70);
+INSERT INTO ATACS(nom, mal) VALUES ('Negre Absolut', 190);
+INSERT INTO ATACS(nom, mal) VALUES ('Cuina Espiritual', 80);
+INSERT INTO ATACS(nom, mal) VALUES ('Espasa de Tempesta', 150);
+INSERT INTO ATACS(nom, mal) VALUES ('Dispar Clínic', 100);
+INSERT INTO ATACS(nom, mal) VALUES ('Flama Paternal', 130);
+INSERT INTO ATACS(nom, mal) VALUES ('Joguina Sagnant', 120);
+INSERT INTO ATACS(nom, mal) VALUES ('Simfonia del Caos', 170);
+INSERT INTO ATACS(nom, mal) VALUES ('Tall Perfecte', 160);
+INSERT INTO ATACS(nom, mal) VALUES ('Espasa de l’Engany', 140);
+INSERT INTO ATACS(nom, mal) VALUES ('Cop de Brutícia', 60);
+INSERT INTO ATACS(nom, mal) VALUES ('Teixit Celestial', 150);
+INSERT INTO ATACS(nom, mal) VALUES ('Fulla Cronològica', 110);
+INSERT INTO ATACS(nom, mal) VALUES ('Terror Etern', 180);
+INSERT INTO ATACS(nom, mal) VALUES ('Quantitat Letal', 130);
+INSERT INTO ATACS(nom, mal) VALUES ('Explosió Desquiciada', 160);
+INSERT INTO ATACS(nom, mal) VALUES ('Cinc Dits Llamejants', 150);
+INSERT INTO ATACS(nom, mal) VALUES ('Tempesta Elèctrica', 140);
+INSERT INTO ATACS(nom, mal) VALUES ('Acer Glacial', 120);
+INSERT INTO ATACS(nom, mal) VALUES ('Robatori de Tècnica', 90);
+INSERT INTO ATACS(nom, mal) VALUES ('Dispar Fosc', 100);
+INSERT INTO ATACS(nom, mal) VALUES ('Sang Infectada', 110);
+INSERT INTO ATACS(nom, mal) VALUES ('Imaginació Mortal', 190);
+INSERT INTO ATACS(nom, mal) VALUES ('Justícia Bifurcada', 160);
+INSERT INTO ATACS(nom, mal) VALUES ('Dispar Diví', 170);
+INSERT INTO ATACS(nom, mal) VALUES ('Purificació Cero', 130);
+INSERT INTO ATACS(nom, mal) VALUES ('Estrella Justiciera', 140);
+INSERT INTO ATACS(nom, mal) VALUES ('Força Delicada', 100);
+INSERT INTO ATACS(nom, mal) VALUES ('Gàbia de Reishi', 120);
+INSERT INTO ATACS(nom, mal) VALUES ('Tret de la Mort', 110);
+INSERT INTO ATACS(nom, mal) VALUES ('Trencament del Futur', 200);
+
+*/
