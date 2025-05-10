@@ -1,5 +1,6 @@
 // combat_screen.dart
 import 'package:hollows_go/providers/combat_provider.dart';
+import 'package:hollows_go/providers/perfil_provider.dart';
 import 'package:hollows_go/widgets/characterdisplaywidget.dart';
 
 import '../imports.dart';
@@ -76,7 +77,9 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.fetchEnemyPoints();
-
+    final partidaguanyda = Provider.of<PerfilProvider>(context, listen: false);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);;
+    partidaguanyda.sumarPartidaGuanyada(userProvider.userId);
     showDialog(
       barrierDismissible: false,
       context: context,

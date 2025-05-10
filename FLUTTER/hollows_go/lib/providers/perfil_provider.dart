@@ -49,4 +49,62 @@ class PerfilProvider with ChangeNotifier {
       print('Error a fetchPerfilData: $e');
     }
   }
+  Future<void> sumarPartidaJugada(int userId) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("Token no disponible a SharedPreferences");
+      return;
+    }
+
+    final response = await http.put(
+      Uri.parse('https://${Config.ip}/usuaris/sumarPartidaJugada/$userId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      _partidesJugades += 1;
+      notifyListeners();
+    } else {
+      print('Error sumant partida jugada: ${response.body}');
+    }
+  } catch (e) {
+    print('Error a sumarPartidaJugada: $e');
+  }
+}
+
+Future<void> sumarPartidaGuanyada(int userId) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("Token no disponible a SharedPreferences");
+      return;
+    }
+
+    final response = await http.put(
+      Uri.parse('https://${Config.ip}/usuaris/sumarPartidaGuanyada/$userId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      _partidesGuanyades += 1;
+      notifyListeners();
+    } else {
+      print('Error sumant partida guanyada: ${response.body}');
+    }
+  } catch (e) {
+    print('Error a sumarPartidaGuanyada: $e');
+  }
+}
+
 }

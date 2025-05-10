@@ -34,10 +34,10 @@ router.put('/nom', verificacioUsuari.verifyToken, userController.modificarNomUsu
 router.put('/contrasenya', verificacioUsuari.verifyToken, userController.modificarContrasenyaUsuari);
 
 //Ruta per sumar una partida guanyada al perfil d'usuari
-router.put('/partida_guanyada', verificacioUsuari.verifyToken, userController.sumartPartidaGuanyada);
+router.put('/partida_guanyada/:id', verificacioUsuari.verifyToken, userController.sumartPartidaGuanyada);
 
 //Ruta per sumar una partida jugada al perfil d'usuari
-router.put('/partida_jugada', verificacioUsuari.verifyToken, userController.sumarPartidaJugada);
+router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.sumarPartidaJugada);
 
 
 module.exports = router;
