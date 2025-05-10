@@ -89,7 +89,7 @@ Future<void> sumarPartidaGuanyada(int userId) async {
     }
 
     final response = await http.put(
-      Uri.parse('https://${Config.ip}/usuaris/sumarPartidaGuanyada/$userId'),
+      Uri.parse('https://${Config.ip}/usuaris/partida_guanyada/$userId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
