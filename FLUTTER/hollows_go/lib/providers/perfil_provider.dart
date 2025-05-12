@@ -60,7 +60,7 @@ class PerfilProvider with ChangeNotifier {
     }
 
     final response = await http.put(
-      Uri.parse('https://${Config.ip}/usuaris/sumarPartidaJugada/$userId'),
+      Uri.parse('https://${Config.ip}/usuaris/partida_jugada/$userId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

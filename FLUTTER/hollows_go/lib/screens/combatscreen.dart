@@ -30,6 +30,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
   late String _allyName;
   late String _enemyName;
 
+  bool _partidaJugadaSumada = false;  // Variable per controlar la crida
+
   @override
   void initState() {
     super.initState();
@@ -37,12 +39,19 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _setRandomBackground();
       await _selectRandomSkinAndResetHealth();
+
+      // Comprovem si la variable ha estat reiniciada abans de sumar la partida
+      if (!_partidaJugadaSumada) {
+        final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        perfilProvider.sumarPartidaJugada(userProvider.userId);
+        _partidaJugadaSumada = true;  // Marquem la funció com a ja cridada
+      }
     });
   }
 
   Future<void> _selectRandomSkinAndResetHealth() async {
-    final provider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await provider.selectRandomSkin();
 
     final aliat = 
@@ -64,6 +73,9 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
       maxAllyHealth: maxAllyHealth.toDouble(),
       maxEnemyHealth: maxEnemyHealth.toDouble(),
     );
+
+    // Reiniciem la variable per permetre una nova crida en el proper combat
+    _partidaJugadaSumada = false;  // Reiniciem la variable aquí
   }
 
   void _setRandomBackground() {
@@ -152,10 +164,12 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
   Widget build(BuildContext context) {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
     final combatProvider = Provider.of<CombatProvider>(context);
+    
+
     final skinEnemic = provider.selectedSkin;
     final aliat = 
-    provider.selectedSkinAliat ??
-    provider.selectedSkinQuincy ??
+    provider.selectedSkinAliat ?? 
+    provider.selectedSkinQuincy ?? 
     provider.selectedSkinEnemic;
     final skinAliat = aliat;
 
@@ -163,7 +177,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     _aliatDamage = skinAliat?.malTotal ?? 300;
     _techniqueName = skinAliat?.atac ?? "Tècnica desconeguda";
     _enemyName = skinEnemic?.personatgeNom ?? "Desconegut Enemic";
-    _enemicDamage = skinEnemic?.malTotal ?? 50;
+    _enemicDamage = (skinEnemic?.malTotal ?? 50) * 2;
 
     return Scaffold(
       body: Stack(
