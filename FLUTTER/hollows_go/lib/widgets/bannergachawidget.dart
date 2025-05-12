@@ -99,11 +99,11 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   final success = await typePull;
 
   if (success) {
-  final imageUrl = gachaProvider.latestSkin?['imatge']; // ← Assegura't que aquest és el camp correcte
+  final imageUrl = gachaProvider.latestSkin?['imatge']; 
 
   if (imageUrl != null && imageUrl is String) {
     final image = NetworkImage(imageUrl);
-    await precacheImage(image, context); // Precarrega la imatge abans del vídeo
+    await precacheImage(image, context); 
   }
 
   await showDialog(
