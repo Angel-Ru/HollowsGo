@@ -99,22 +99,30 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   final success = await typePull;
 
   if (success) {
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => GachaVideoPopup(
-        onVideoEnd: () {
-          showDialog(
-            context: context,
-            builder: (_) => SkinRewardDialog(
-              skin: gachaProvider.latestSkin,
-              isDuplicate: gachaProvider.isDuplicateSkin,
-            ),
-          );
-        },
-      ),
-    );
+  final imageUrl = gachaProvider.latestSkin?['imatge']; // ← Assegura't que aquest és el camp correcte
+
+  if (imageUrl != null && imageUrl is String) {
+    final image = NetworkImage(imageUrl);
+    await precacheImage(image, context); // Precarrega la imatge abans del vídeo
   }
+
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => GachaVideoPopup(
+      onVideoEnd: () {
+        showDialog(
+          context: context,
+          builder: (_) => SkinRewardDialog(
+            skin: gachaProvider.latestSkin,
+            isDuplicate: gachaProvider.isDuplicateSkin,
+          ),
+        );
+      },
+    ),
+  );
+}
+
 }
 
 
