@@ -59,35 +59,33 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Skin> selectRandomUserSkin() async {
-    try {
-      // Combinar personatges i quincys
-      final allCharacters = [..._personatges, ..._quincys];
+  Future<void> selectRandomUserSkinAliat() async {
+  if (_personatges.isEmpty) return;
+  final allSkins = _personatges.expand((p) => p.skins).toList();
+  if (allSkins.isEmpty) return;
+  final random = Random();
+  _selectedSkinAliat = allSkins[random.nextInt(allSkins.length)];
+  notifyListeners();
+}
 
-      if (allCharacters.isEmpty) {
-        throw Exception(
-            'No hi ha personatges disponibles (ni aliats ni quincys)');
-      }
+Future<void> selectRandomUserSkinQuincy() async {
+  if (_quincys.isEmpty) return;
+  final allSkins = _quincys.expand((p) => p.skins).toList();
+  if (allSkins.isEmpty) return;
+  final random = Random();
+  _selectedSkinQuincy = allSkins[random.nextInt(allSkins.length)];
+  notifyListeners();
+}
 
-      // Obtenir totes les skins de tots els personatges
-      final allUserSkins = allCharacters.expand((p) => p.skins).toList();
+Future<void> selectRandomUserSkinEnemic() async {
+  if (_characterEnemies.isEmpty) return;
+  final allSkins = _characterEnemies.expand((p) => p.skins).toList();
+  if (allSkins.isEmpty) return;
+  final random = Random();
+  _selectedSkinEnemic = allSkins[random.nextInt(allSkins.length)];
+  notifyListeners();
+}
 
-      if (allUserSkins.isEmpty) {
-        throw Exception('No hi ha skins disponibles per als aliats o quincys');
-      }
-
-      final random = Random();
-      final randomSkin = allUserSkins[random.nextInt(allUserSkins.length)];
-
-      _selectedSkinAliat = randomSkin;
-      notifyListeners();
-
-      return randomSkin; // Retorna la skin seleccionada
-    } catch (e) {
-      print('Error al seleccionar skin aleatòria: $e');
-      throw e;
-    }
-  }
 
   void setSelectedSkinAliat(Skin skin) {
     _selectedSkinAliat = skin;

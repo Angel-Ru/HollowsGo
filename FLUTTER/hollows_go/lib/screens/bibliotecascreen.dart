@@ -43,23 +43,26 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
   }
 
   Future<void> _selectRandomSkin() async {
-    final provider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    await provider.selectRandomUserSkin();
+  final provider =
+      Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
+  if (_currentMode == 0) {
+    await provider.selectRandomUserSkinAliat();
     setState(() {
       _randomSkinName = provider.selectedSkinAliat?.nom ?? '';
     });
-  }
-
-  void _selectSkinAliat(Skin skin) {
-    final provider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.setSelectedSkinAliat(skin);
+  } else if (_currentMode == 1) {
+    await provider.selectRandomUserSkinQuincy();
     setState(() {
-      _randomSkinName = skin.nom;
+      _randomSkinName = provider.selectedSkinQuincy?.nom ?? '';
+    });
+  } else if (_currentMode == 2) {
+    await provider.selectRandomUserSkinEnemic();
+    setState(() {
+      _randomSkinName = provider.selectedSkinEnemic?.nom ?? '';
     });
   }
+}
 
   String _getModeTitle() {
     switch (_currentMode) {

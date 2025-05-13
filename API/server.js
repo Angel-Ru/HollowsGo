@@ -47,7 +47,7 @@ const armesRoutes = require('routes/armesRoutes');
 const habilitatsRoutes = require('routes/habilitatsRoutes');
 const atacsRoutes = require('routes/atacsRoutes');
 const userRoutes = require('routes/userRoutes');
-
+const perfilRoutes = require('routes/perfilroutes');
 
 
 app.use('/personatges', characterRoutes);// Ruta para personajes
@@ -56,7 +56,7 @@ app.use('/armes', armesRoutes);             // Ruta para armas
 app.use('/habilitats', habilitatsRoutes);   // Ruta para habilidades legendarias
 app.use('/atacs', atacsRoutes);             // Ruta para ataques
 app.use('/usuaris', userRoutes);            // Ruta para usuarios
-
+app.use('/perfils', perfilRoutes)
 
 
 const port = process.env.PORT || 3000;

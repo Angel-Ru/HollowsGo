@@ -98,6 +98,7 @@ class UserProvider with ChangeNotifier {
           _personatgePreferitId = data['personatge_preferit'];
           notifyListeners();
         }
+        print(personatgePreferitId);
       } else {
         print('Error en fetchFavoritePersonatge: ${response.statusCode}');
       }

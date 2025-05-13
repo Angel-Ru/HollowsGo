@@ -23,7 +23,7 @@ class PersonatgesCardSwiper extends StatefulWidget {
 class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context, listen: true);
     final isFavorite =
         userProvider.personatgePreferitId == widget.personatge.id;
 
@@ -82,26 +82,29 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
   }
 
   Future<void> _toggleFavorite(UserProvider userProvider) async {
-    final isCurrentlyFavorite =
-        userProvider.personatgePreferitId == widget.personatge.id;
+  final isCurrentlyFavorite =
+      userProvider.personatgePreferitId == widget.personatge.id;
 
-    final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
+  final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
 
-    final success = await userProvider.updatePersonatgePreferit(newId);
+  final success = await userProvider.updatePersonatgePreferit(newId);
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            isCurrentlyFavorite
-                ? '${widget.personatge.nom} desmarcat com a preferit.'
-                : '${widget.personatge.nom} marcat com a preferit.',
-          ),
-          duration: Duration(seconds: 2),
+  if (success) {
+    setState(() {}); // Esto forzará la reconstrucción del widget
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          isCurrentlyFavorite
+              ? '${widget.personatge.nom} desmarcat com a preferit.'
+              : '${widget.personatge.nom} marcat com a preferit.',
         ),
-      );
-    }
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
+}
+
 
   double _calculateMaxSkinCardHeight(List<Skin> skins) {
     return skins.fold<double>(0.0, (max, skin) {
