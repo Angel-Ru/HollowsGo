@@ -75,7 +75,6 @@ class UserProvider with ChangeNotifier {
     fetchUserPoints();
   }
 
-  // FETCH THE USER'S FAVORITE CHARACTER
   Future<void> fetchFavoritePersonatge() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -86,7 +85,8 @@ class UserProvider with ChangeNotifier {
         return;
       }
 
-      final url = Uri.parse('https://${Config.ip}/preferit/:id');
+      final url =
+          Uri.parse('https://${Config.ip}/perfil_usuari/preferit/$_userId');
       final headers = {
         'Authorization': 'Bearer $token',
       };
@@ -107,7 +107,6 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  // UPDATE THE USER'S FAVORITE CHARACTER
   Future<void> updatepersonatgepreferit(Personatge? personatge) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -119,7 +118,6 @@ class UserProvider with ChangeNotifier {
         return;
       }
 
-      // Verificamos si el personaje es nulo antes de enviarlo al backend
       if (personatge == null) {
         print('No se ha seleccionado un personaje.');
         return;
@@ -128,14 +126,14 @@ class UserProvider with ChangeNotifier {
       _personatge = personatge;
       notifyListeners();
 
-      final url = Uri.parse('https://${Config.ip}/preferit/update/:id');
+      final url =
+          Uri.parse('https://${Config.ip}/perfil_usuari/preferit/$_userId');
       final headers = {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       };
 
-      final body = json.encode(
-          personatge.toJson()); // Convertimos el personaje a formato JSON
+      final body = json.encode(personatge.toJson());
 
       final response = await http.put(url, headers: headers, body: body);
 
