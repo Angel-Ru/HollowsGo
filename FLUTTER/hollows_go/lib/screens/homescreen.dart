@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     await provider.fetchPersonatgesAmbSkins(userId.toString());
     precargarImagenes(provider.personatges);
+    precargarImagenes(provider.quincys);
 
     await provider.fetchEnemicsAmbSkins(userId.toString());
     precargarImagenes(provider.characterEnemies);

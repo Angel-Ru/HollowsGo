@@ -34,8 +34,7 @@ class _MapaScreenState extends State<Mapscreen> {
   }
 
   void _checkSkinSelection() {
-    final provider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     if (provider.selectedSkinAliat == null) {
       PersonatgeNoSeleccionatDialog.mostrar(context);
     }
@@ -50,29 +49,57 @@ class _MapaScreenState extends State<Mapscreen> {
   }
 
   Future<void> _loadMapData() async {
-    final location = await LocationHelper.getCurrentLocation();
-    if (location != null) {
+    try {
+      final location = await LocationHelper.getCurrentLocation();
+      if (location != null) {
+        setState(() {
+          _currentLocation = location;
+        });
+        await _updateMarkers();
+      } else {
+        // Gestiona el cas quan no es pot obtenir la ubicació
+        _showErrorDialog('No s\'ha pogut obtenir la ubicació.');
+      }
+    } catch (e) {
+      _showErrorDialog('Error en obtenir la ubicació: $e');
+    } finally {
       setState(() {
-        _currentLocation = location;
+        _isLoading = false;
       });
-      await _updateMarkers();
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   Future<void> _updateMarkers() async {
-    final newMarkers = await MarkerHelper.generateMarkers(
-      currentLocation: _currentLocation,
-      profileImagePath: widget.profileImagePath,
+    try {
+      final newMarkers = await MarkerHelper.generateMarkers(
+        currentLocation: _currentLocation,
+        profileImagePath: widget.profileImagePath,
+        context: context,
+        imagePaths: imagePaths,
+        radius: _radiusInMeters,
+      );
+      setState(() {
+        _markers = newMarkers;
+      });
+    } catch (e) {
+      _showErrorDialog('Error en carregar els marcadors: $e');
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
       context: context,
-      imagePaths: imagePaths,
-      radius: _radiusInMeters,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Tancar'),
+          ),
+        ],
+      ),
     );
-    setState(() {
-      _markers = newMarkers;
-    });
   }
 
   @override
