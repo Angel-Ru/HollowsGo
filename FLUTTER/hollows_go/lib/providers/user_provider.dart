@@ -96,9 +96,10 @@ class UserProvider with ChangeNotifier {
         final data = json.decode(response.body);
         if (data['personatge_preferit'] != null) {
           _personatgePreferitId = data['personatge_preferit'];
+          print(personatgePreferitId);
           notifyListeners();
         }
-        print(personatgePreferitId);
+        
       } else {
         print('Error en fetchFavoritePersonatge: ${response.statusCode}');
       }
@@ -110,7 +111,7 @@ class UserProvider with ChangeNotifier {
   Future<bool> updatePersonatgePreferit(int personatgeId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      int? userId = prefs.getInt('usuari');
+      int? userId = prefs.getInt('userId');
       String? token = prefs.getString('token');
 
       if (userId == null || token == null) return false;
@@ -122,18 +123,18 @@ class UserProvider with ChangeNotifier {
       };
 
       final body = json.encode({
-        'personatge_preferit': personatgeId, // Solo enviamos el ID
+        'personatge_preferit': personatgeId,
       });
 
       final response = await http.put(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
         _personatgePreferitId = personatgeId;
-        print(personatgeId);
+        print(_personatgePreferitId);
         notifyListeners();
         return true;
       } else {
-        print('Error en updatePersonatgePreferit: ${response.statusCode}');
+        print('Error en updatePersonatgePreferit: ${response.statusCode} + ${response}');
         return false;
       }
       

@@ -82,15 +82,17 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
   }
 
   Future<void> _toggleFavorite(UserProvider userProvider) async {
-  final isCurrentlyFavorite =
-      userProvider.personatgePreferitId == widget.personatge.id;
-
+  final isCurrentlyFavorite = userProvider.personatgePreferitId == widget.personatge.id;
   final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
+
+  // Imprimir el ID que se va a actualizar
+  print('Personatge ID: ${widget.personatge.id}');
+  print('Nuevo ID a actualizar: $newId');
 
   final success = await userProvider.updatePersonatgePreferit(newId);
 
   if (success) {
-    setState(() {}); // Esto forzará la reconstrucción del widget
+    setState(() {});  // Esto forzará la reconstrucción del widget
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -104,6 +106,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
     );
   }
 }
+
 
 
   double _calculateMaxSkinCardHeight(List<Skin> skins) {

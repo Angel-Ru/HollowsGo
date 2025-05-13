@@ -110,7 +110,7 @@ exports.updateFavoritePersonatge = async (req, res) => {
 
         const pool = await connectDB();
         const result = await pool.request()
-            .input('usuari', userId)
+            .input('userId', userId)
             .input('personatge_preferit', personatge_preferit)
             .query(`
                 UPDATE perfil_usuari
