@@ -1,20 +1,11 @@
 import '../imports.dart';
 
-class PersonatgesCardSwiper extends StatelessWidget {
+class PersonatgesCardSwiper extends StatefulWidget {
   final Personatge personatge;
   final bool isEnemyMode;
   final Function(Skin) onSkinSelected;
   final Function()? onSkinDeselected;
   final Skin? selectedSkin;
-
-  double _calculateMaxSkinCardHeight(List<Skin> skins) {
-    return skins.fold<double>(0.0, (max, skin) {
-      final nameLength = skin.nom.length;
-      final lines = (nameLength / 20).ceil();
-      final height = 180 + (lines * 18) + 20 + 20;
-      return height.toDouble() > max ? height.toDouble() : max;
-    });
-  }
 
   const PersonatgesCardSwiper({
     Key? key,
@@ -26,26 +17,47 @@ class PersonatgesCardSwiper extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _PersonatgesCardSwiperState createState() => _PersonatgesCardSwiperState();
+}
+
+class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
+  @override
   Widget build(BuildContext context) {
-    final maxHeight = _calculateMaxSkinCardHeight(personatge.skins);
+    final userProvider = Provider.of<UserProvider>(context);
+    final isFavorite = userProvider.personatge?.id == widget.personatge.id;
+
+    final maxHeight = _calculateMaxSkinCardHeight(widget.personatge.skins);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Título del personaje
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.7),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            personatge.nom,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+        // Título del personaje con estrella
+        Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                widget.personatge.nom,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          ),
+            SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => _toggleFavorite(userProvider),
+              child: Icon(
+                isFavorite ? Icons.star : Icons.star_border,
+                color: isFavorite ? Colors.yellow : Colors.grey,
+                size: 24,
+              ),
+            ),
+          ],
         ),
         SizedBox(height: 10),
 
@@ -53,11 +65,11 @@ class PersonatgesCardSwiper extends StatelessWidget {
         SizedBox(
           height: maxHeight,
           child: PageView.builder(
-            itemCount: personatge.skins.length,
+            itemCount: widget.personatge.skins.length,
             controller: PageController(viewportFraction: 0.7),
             itemBuilder: (context, index) {
-              final skin = personatge.skins[index];
-              final isSkinSelected = selectedSkin?.id == skin.id;
+              final skin = widget.personatge.skins[index];
+              final isSkinSelected = widget.selectedSkin?.id == skin.id;
 
               return _buildSkinCard(skin, isSkinSelected);
             },
@@ -67,22 +79,42 @@ class PersonatgesCardSwiper extends StatelessWidget {
     );
   }
 
+  Future<void> _toggleFavorite(UserProvider userProvider) async {
+    print('Toggling favorite for Personatge ID: ${widget.personatge.id}');
+    if (userProvider.personatge?.id == widget.personatge.id) {
+      // Si ya es favorito, lo desmarcamos
+      await userProvider.updatepersonatgepreferit(null);
+    } else {
+      // Marcamos este personaje como favorito
+      await userProvider.updatepersonatgepreferit(widget.personatge);
+    }
+  }
+
+  double _calculateMaxSkinCardHeight(List<Skin> skins) {
+    return skins.fold<double>(0.0, (max, skin) {
+      final nameLength = skin.nom.length;
+      final lines = (nameLength / 20).ceil();
+      final height = 180 + (lines * 18) + 20 + 20;
+      return height.toDouble() > max ? height.toDouble() : max;
+    });
+  }
+
   Widget _buildSkinCard(Skin skin, bool isSkinSelected) {
     return GestureDetector(
       onTap: () {
-        if (isEnemyMode) return;
+        if (widget.isEnemyMode) return;
 
         if (isSkinSelected) {
           return;
         } else {
-          onSkinSelected(skin);
+          widget.onSkinSelected(skin);
         }
       },
       onDoubleTap: () {
-        if (isEnemyMode) return;
+        if (widget.isEnemyMode) return;
 
-        if (isSkinSelected && onSkinDeselected != null) {
-          onSkinDeselected!();
+        if (isSkinSelected && widget.onSkinDeselected != null) {
+          widget.onSkinDeselected!();
         }
       },
       child: Padding(

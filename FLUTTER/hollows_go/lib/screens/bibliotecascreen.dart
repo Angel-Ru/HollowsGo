@@ -201,9 +201,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                 horizontal: 24, vertical: 12),
                           ),
                           child: Text(
-                            _randomSkinName.isEmpty
-                                ? 'Seleccionar Skin Aleatoria'
-                                : 'Skin seleccionada: $_randomSkinName',
+                            'Seleccionar Skin Aleatoria',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
