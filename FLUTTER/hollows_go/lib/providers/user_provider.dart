@@ -85,7 +85,7 @@ class UserProvider with ChangeNotifier {
 
       if (userId == null || token == null) return;
 
-      final url = Uri.parse('https://${Config.ip}/perfil/preferit/$userId');
+      final url = Uri.parse('https://${Config.ip}/perfils/preferit/$userId');
       final headers = {
         'Authorization': 'Bearer $token',
       };
@@ -115,7 +115,7 @@ class UserProvider with ChangeNotifier {
 
       if (userId == null || token == null) return false;
 
-      final url = Uri.parse('https://${Config.ip}/perfil/preferit/update/$userId');
+      final url = Uri.parse('https://${Config.ip}/perfils/preferit/update/$userId');
       final headers = {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

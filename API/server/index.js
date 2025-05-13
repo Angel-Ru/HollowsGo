@@ -47,7 +47,7 @@ const armesRoutes = require('../routes/armesRoutes');
 const habilitatsRoutes = require('../routes/habilitatsRoutes');
 const atacsRoutes = require('../routes/atacsRoutes');
 const userRoutes = require('../routes/userRoutes');
-const perfilRoutes = require('routes/perfilroutes');
+const perfilRoutes = require('../routes/perfilroutes');
 
 
 
