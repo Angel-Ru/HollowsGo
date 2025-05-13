@@ -85,7 +85,7 @@ class UserProvider with ChangeNotifier {
 
       if (userId == null || token == null) return;
 
-      final url = Uri.parse('https://${Config.ip}/preferit/$userId');
+      final url = Uri.parse('https://${Config.ip}/perfil/preferit/$userId');
       final headers = {
         'Authorization': 'Bearer $token',
       };
@@ -115,7 +115,7 @@ class UserProvider with ChangeNotifier {
 
       if (userId == null || token == null) return false;
 
-      final url = Uri.parse('https://${Config.ip}/preferit/update/$userId');
+      final url = Uri.parse('https://${Config.ip}/perfil/preferit/update/$userId');
       final headers = {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -129,12 +129,14 @@ class UserProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         _personatgePreferitId = personatgeId;
+        print(personatgeId);
         notifyListeners();
         return true;
       } else {
         print('Error en updatePersonatgePreferit: ${response.statusCode}');
         return false;
       }
+      
     } catch (error) {
       print('Error en updatePersonatgePreferit: $error');
       return false;
