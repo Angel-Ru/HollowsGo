@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const verificacioUsuari = require('../middlewares/verificacioUsuari');
-const perfilController = require("../controllers/perfilController"); // Verifica que esta ruta sea correcta
+const perfilController = require("../controllers/perfilController");
 
 
 // Obtenir el personatge preferit
-router.get('/preferit/:id', verificacioUsuari.verifyToken, perfilController.getFavoritePersonatge());
+router.get('/preferit/:userId', verificacioUsuari.verifyToken, perfilController.getFavoritePersonatge());
 
 // Actualitzar el personatge preferit
-router.put('/preferit/update/:id', verificacioUsuari.verifyToken, perfilController.updateFavoritePersonatge());
+router.put('/preferit/update/:userId', verificacioUsuari.verifyToken, perfilController.updateFavoritePersonatge());
 
 
 module.exports = router;
