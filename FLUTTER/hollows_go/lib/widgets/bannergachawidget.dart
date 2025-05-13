@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../imports.dart';
+import 'dart:async';
+import 'package:provider/provider.dart';
+import '../imports.dart'; // Assegura't que aquest import inclou GachaProvider i els diàlegs
 
 class GachaBannerWidget extends StatefulWidget {
   const GachaBannerWidget({super.key});
@@ -28,6 +30,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   int _currentBannerIndex = 0;
   late Timer _timer;
   final PageController _pageController = PageController();
+  bool _isGachaLoading = false; // NOVA VARIABLE
 
   @override
   void initState() {
@@ -46,19 +49,18 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
     _timer = Timer.periodic(const Duration(seconds: 8), (timer) {
       if (!mounted) return;
       setState(() {
-        _currentBannerIndex = (_currentBannerIndex + 1) % _allBannerSets[_currentSetIndex].length;
+        _currentBannerIndex =
+            (_currentBannerIndex + 1) % _allBannerSets[_currentSetIndex].length;
       });
     });
   }
 
   void _handleSwipe(DragEndDetails details) {
     if (!mounted) return;
-    
+
     if (details.primaryVelocity! > 0) {
-      
       _changeBannerSet((_currentSetIndex - 1) % _allBannerSets.length);
     } else if (details.primaryVelocity! < 0) {
-      
       _changeBannerSet((_currentSetIndex + 1) % _allBannerSets.length);
     }
   }
@@ -78,53 +80,58 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   }
 
   Future<void> _handleGachaPull(BuildContext context) async {
+    setState(() {
+      _isGachaLoading = true;
+    });
 
-  final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
-  late Future<bool> typePull;
+    final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+    late Future<bool> typePull;
 
-  switch (_currentSetIndex) {
-    case 0:
-      typePull = gachaProvider.gachaPull(context);
-      break;
-    case 1:
-      typePull = gachaProvider.gachaPullQuincy(context);
-      break;
-    case 2:
-      typePull = gachaProvider.gachaPullEnemics(context);
-      break;
-    default:
-      //typePull = gachaProvider.gachaPullSet0;
+    switch (_currentSetIndex) {
+      case 0:
+        typePull = gachaProvider.gachaPull(context);
+        break;
+      case 1:
+        typePull = gachaProvider.gachaPullQuincy(context);
+        break;
+      case 2:
+        typePull = gachaProvider.gachaPullEnemics(context);
+        break;
+      default:
+        return;
+    }
+
+    final success = await typePull;
+
+    if (success) {
+      final imageUrl = gachaProvider.latestSkin?['imatge'];
+
+      if (imageUrl != null && imageUrl is String) {
+        final image = NetworkImage(imageUrl);
+        await precacheImage(image, context);
+      }
+
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => GachaVideoPopup(
+          onVideoEnd: () {
+            showDialog(
+              context: context,
+              builder: (_) => SkinRewardDialog(
+                skin: gachaProvider.latestSkin,
+                isDuplicate: gachaProvider.isDuplicateSkin,
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    setState(() {
+      _isGachaLoading = false;
+    });
   }
-
-  final success = await typePull;
-
-  if (success) {
-  final imageUrl = gachaProvider.latestSkin?['imatge']; 
-
-  if (imageUrl != null && imageUrl is String) {
-    final image = NetworkImage(imageUrl);
-    await precacheImage(image, context); 
-  }
-
-  await showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => GachaVideoPopup(
-      onVideoEnd: () {
-        showDialog(
-          context: context,
-          builder: (_) => SkinRewardDialog(
-            skin: gachaProvider.latestSkin,
-            isDuplicate: gachaProvider.isDuplicateSkin,
-          ),
-        );
-      },
-    ),
-  );
-}
-
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +145,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
               Transform.scale(
                 scale: 1.3,
                 child: Container(
-                 height: 160,
+                  height: 160,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
@@ -165,7 +172,8 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                         child: child,
                       ),
                       child: Image.network(
-                        key: ValueKey(_allBannerSets[_currentSetIndex][_currentBannerIndex]),
+                        key: ValueKey(
+                            _allBannerSets[_currentSetIndex][_currentBannerIndex]),
                         _allBannerSets[_currentSetIndex][_currentBannerIndex],
                         width: MediaQuery.of(context).size.width * 0.8,
                         fit: BoxFit.cover,
@@ -174,7 +182,8 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                           return Center(
                             child: CircularProgressIndicator(
                               value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
                                   : null,
                             ),
                           );
@@ -206,28 +215,36 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
             ],
           ),
         ),
-        //Espai entre el banner i el botó de tirar el gacha(Ho he augmentat perque amb el tamany de banner més gross, no hi habia casi separació)
         const SizedBox(height: 30),
-        
         ElevatedButton(
-          onPressed: () => _handleGachaPull(context),
-          child: Text(
-            'Tirar Gacha',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              foreground: Paint()
-                ..color = Color(0xFFFF6A13)
-                ..style = PaintingStyle.stroke,
-              shadows: const [
-                Shadow(
-                  offset: Offset(1.5, 1.5),
-                  blurRadius: 3.0,
-                  color: Colors.black,
+          onPressed:
+              _isGachaLoading ? null : () => _handleGachaPull(context),
+          child: _isGachaLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              : Text(
+                  'Tirar Gacha',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    foreground: Paint()
+                      ..color = const Color(0xFFFF6A13)
+                      ..style = PaintingStyle.stroke,
+                    shadows: const [
+                      Shadow(
+                        offset: Offset(1.5, 1.5),
+                        blurRadius: 3.0,
+                        color: Colors.black,
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF8B400),
             padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
