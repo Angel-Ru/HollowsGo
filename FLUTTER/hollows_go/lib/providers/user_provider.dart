@@ -13,11 +13,13 @@ class UserProvider with ChangeNotifier {
   String _username = 'Usuari';
   int _userId = 0;
   Personatge? _personatge;
+  int? _personatgePreferitId;
 
   int get userId => _userId;
   int get coinCount => _coinCount;
   String get username => _username;
   Personatge? get personatge => _personatge;
+  int? get personatgePreferitId => _personatgePreferitId;
 
   UserProvider() {
     _loadUserData();
@@ -32,7 +34,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
     fetchUserPoints();
     fetchFavoritePersonatge();
-    updatepersonatgepreferit(personatge);
+    updatePersonatgePreferit(_personatgePreferitId ?? 0);
   }
 
   // GET USER COINS OR POINTS FROM THE API
@@ -78,15 +80,12 @@ class UserProvider with ChangeNotifier {
   Future<void> fetchFavoritePersonatge() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('usuari');
       String? token = prefs.getString('token');
 
-      if (token == null || _userId == 0) {
-        print('User ID or token missing!');
-        return;
-      }
+      if (userId == null || token == null) return;
 
-      final url =
-          Uri.parse('https://${Config.ip}/perfil_usuari/preferit/$_userId');
+      final url = Uri.parse('https://${Config.ip}/preferit/$userId');
       final headers = {
         'Authorization': 'Bearer $token',
       };
@@ -95,57 +94,49 @@ class UserProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data != null) {
-          _personatge = Personatge.fromJson(data);
+        if (data['personatge_preferit'] != null) {
+          _personatgePreferitId = data['personatge_preferit'];
           notifyListeners();
         }
       } else {
-        print('Error al obtener el personaje favorito: ${response.statusCode}');
+        print('Error en fetchFavoritePersonatge: ${response.statusCode}');
       }
     } catch (error) {
       print('Error en fetchFavoritePersonatge: $error');
     }
   }
 
-  Future<void> updatepersonatgepreferit(Personatge? personatge) async {
+  Future<bool> updatePersonatgePreferit(int personatgeId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('usuari');
       String? token = prefs.getString('token');
 
-      if (token == null || _userId == 0) {
-        print(
-            'Token o UserID no disponible. No se puede actualizar el personaje preferido.');
-        return;
-      }
+      if (userId == null || token == null) return false;
 
-      if (personatge == null) {
-        print('No se ha seleccionado un personaje.');
-        return;
-      }
-
-      _personatge = personatge;
-      notifyListeners();
-
-      final url =
-          Uri.parse('https://${Config.ip}/perfil_usuari/preferit/$_userId');
+      final url = Uri.parse('https://${Config.ip}/preferit/update/$userId');
       final headers = {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       };
 
-      final body = json.encode(personatge.toJson());
+      final body = json.encode({
+        'personatge_preferit': personatgeId, // Solo enviamos el ID
+      });
 
       final response = await http.put(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
-        print('Personaje preferido actualizado correctamente.');
+        _personatgePreferitId = personatgeId;
+        notifyListeners();
+        return true;
       } else {
-        print(
-            'Error al actualizar el personaje preferido: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
+        print('Error en updatePersonatgePreferit: ${response.statusCode}');
+        return false;
       }
     } catch (error) {
-      print('Error en updatepersonatgepreferit: $error');
+      print('Error en updatePersonatgePreferit: $error');
+      return false;
     }
   }
 }

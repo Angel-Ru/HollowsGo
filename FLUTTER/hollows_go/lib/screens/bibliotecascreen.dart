@@ -186,32 +186,31 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
                   SizedBox(height: 10),
 
-                  if (_currentMode == 0)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: Center(
-                        child: ElevatedButton(
-                          onPressed: _selectRandomSkin,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 12),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: Center(
+                      child: ElevatedButton(
+                        onPressed: _selectRandomSkin,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Text(
-                            'Seleccionar Skin Aleatoria',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                            textAlign: TextAlign.center,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                        ),
+                        child: Text(
+                          'Seleccionar Skin Aleatoria',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
+                  ),
 
                   SizedBox(height: 10),
 

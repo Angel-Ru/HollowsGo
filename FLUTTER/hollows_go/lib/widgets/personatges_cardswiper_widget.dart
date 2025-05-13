@@ -24,9 +24,11 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
-    final isFavorite = userProvider.personatge?.id == widget.personatge.id;
+    final isFavorite =
+        userProvider.personatgePreferitId == widget.personatge.id;
 
     final maxHeight = _calculateMaxSkinCardHeight(widget.personatge.skins);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -80,13 +82,24 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
   }
 
   Future<void> _toggleFavorite(UserProvider userProvider) async {
-    print('Toggling favorite for Personatge ID: ${widget.personatge.id}');
-    if (userProvider.personatge?.id == widget.personatge.id) {
-      // Si ya es favorito, lo desmarcamos
-      await userProvider.updatepersonatgepreferit(null);
-    } else {
-      // Marcamos este personaje como favorito
-      await userProvider.updatepersonatgepreferit(widget.personatge);
+    final isCurrentlyFavorite =
+        userProvider.personatgePreferitId == widget.personatge.id;
+
+    final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
+
+    final success = await userProvider.updatePersonatgePreferit(newId);
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isCurrentlyFavorite
+                ? '${widget.personatge.nom} desmarcat com a preferit.'
+                : '${widget.personatge.nom} marcat com a preferit.',
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
