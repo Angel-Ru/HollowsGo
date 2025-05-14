@@ -811,7 +811,7 @@ exports.actualitzarAvatar = async (req, res) => {
     await pool.request()
       .input('id', sql.Int, id)
       .input('avatar', sql.VarChar(255), avatar)
-      .query('UPDATE USUARIS SET avatar = @avatar WHERE id = @id');
+      .query('UPDATE USUARIS SET imatgeperfil = @avatar WHERE id = @id');
 
     res.status(200).json({ message: 'Avatar actualitzat correctament' });
   } catch (err) {
