@@ -523,6 +523,7 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
                        p.vida_base AS vida_personatge
                 FROM SKINS s
                          INNER JOIN PERSONATGES p ON s.personatge = p.id
+                         INNER JOIN ENEMICS e ON e.personatge_id = p.id
                 WHERE s.nom NOT LIKE '%bo%' AND s.raça = @raça
             `);
 
