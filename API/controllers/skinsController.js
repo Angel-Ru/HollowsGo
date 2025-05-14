@@ -502,8 +502,16 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
     try {
         const pool = await connectDB(); // Connexió a la base de dades
 
-        // 1. Obtenir totes les skins disponibles per als enemics
+        // Obtenir l'hora actual
+        const horaActual = new Date().getHours();
+
+        // Definir dia (de 7:00 a 16:59) i vespre (de 17:00 a 6:59)
+        const esDia = horaActual >= 7 && horaActual < 17;
+        const raçaSeleccionada = esDia ? 0 : 2;
+
+        // Obtenir les skins amb la raça corresponent
         const resultSkins = await pool.request()
+            .input('raça', sql.Int, raçaSeleccionada)
             .query(`
                 SELECT s.id,
                        s.nom,
@@ -516,19 +524,19 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
                 FROM SKINS s
                          INNER JOIN PERSONATGES p ON s.personatge = p.id
                          INNER JOIN ENEMICS e ON e.personatge_id = p.id
-                WHERE s.nom NOT LIKE '%bo%' -- Excloure les skins amb "bo" al nom
+                WHERE s.nom NOT LIKE '%bo%' AND s.raça = @raça
             `);
 
         if (resultSkins.recordset.length === 0) {
             return res.status(404).send('No hi ha skins disponibles per als enemics');
         }
 
-        const skinsDisponibles = resultSkins.recordset; // Llista de skins disponibles
+        const skinsDisponibles = resultSkins.recordset;
 
-        // 2. Seleccionar una skin aleatòria
+        // Seleccionar una skin aleatòria
         const skinAleatoria = skinsDisponibles[Math.floor(Math.random() * skinsDisponibles.length)];
 
-        // 3. Obtenir el mal base del personatge
+        // Obtenir el mal base
         const resultMalBase = await pool.request()
             .input('personatge_id', sql.Int, skinAleatoria.personatge)
             .query(`
@@ -541,29 +549,28 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
             return res.status(404).send('Personatge no trobat');
         }
 
-        const malBase = resultMalBase.recordset[0].mal_base; // Mal base del personatge
-
-        // 4. Calcular el mal total (només mal_base, ja que no hi ha armes)
+        const malBase = resultMalBase.recordset[0].mal_base;
         const malTotal = malBase;
 
-        // 5. Retornar les dades de la skin, el mal total i la vida del personatge
+        // Retornar la resposta
         res.status(200).json({
             skin: {
                 id: skinAleatoria.id,
                 nom: skinAleatoria.nom,
                 categoria: skinAleatoria.categoria,
                 imatge: skinAleatoria.imatge,
-                punts_donats: skinAleatoria.punts_donats, // Punts que dona l'enemic
+                punts_donats: skinAleatoria.punts_donats,
                 mal_total: malTotal,
-                personatge_nom: skinAleatoria.nom_personatge, // Nom del personatge associat
-                vida: skinAleatoria.vida_personatge // Vida del personatge associat
+                personatge_nom: skinAleatoria.nom_personatge,
+                vida: skinAleatoria.vida_personatge
             },
         });
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en el servidor');
     }
-}
+};
+
 
 /**
  * @swagger
