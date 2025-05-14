@@ -135,7 +135,7 @@ exports.updateFavoriteSkin = async (req, res) => {
         const { userId } = req.params;
         const { skin_preferida_id } = req.body;
 
-        if (!personatge_preferit) {
+        if (!skin_preferida_id) {
             return res.status(400).send('Dades incorrectes: Skin preferida mancant');
         }
 
