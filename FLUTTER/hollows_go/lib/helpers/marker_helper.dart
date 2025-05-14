@@ -28,7 +28,7 @@ class MarkerHelper {
     }
   }
 
-  /// FOR IMAGES FROM CLOUDINARY (ENEMYS)
+  /// Cargar una imatge des d'una URL (p. ex., des de Cloudinary)
   static Future<Uint8List> getMarkerIconFromUrl(String imageUrl, {bool shouldRound = false}) async {
     try {
       final response = await http.get(Uri.parse(imageUrl));
@@ -63,14 +63,17 @@ class MarkerHelper {
 
   static Future<Set<Marker>> generateMarkers({
     required LatLng currentLocation,
-    required String profileImagePath,
+    required String profileImagePath, // Cambiar a URL de la imatge
     required BuildContext context,
     required List<String> imagePaths,
     required double radius,
   }) async {
     Set<Marker> newMarkers = {};
-    final Uint8List markerIcon = await getMarkerIcon(profileImagePath, shouldRound: true);
 
+    // Carregar la imatge de perfil des de la URL
+    final Uint8List markerIcon = await getMarkerIconFromUrl(profileImagePath, shouldRound: true);
+
+    // Crear un marcador amb la imatge de perfil
     newMarkers.add(
       Marker(
         markerId: const MarkerId('currentLocation'),
@@ -80,6 +83,7 @@ class MarkerHelper {
       ),
     );
 
+    // Afegir més marcadors aleatoris
     final Random random = Random();
     const double earthRadius = 6371000;
     int numRandomPoints = random.nextInt(5) + 3;

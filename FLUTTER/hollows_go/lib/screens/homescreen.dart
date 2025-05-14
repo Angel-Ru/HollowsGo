@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:hollows_go/providers/map_provider.dart';
 import 'package:hollows_go/screens/prefilscreen.dart';
 import '../imports.dart';
 
@@ -9,8 +10,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // CHARACTER IMAGES AND DIALOGUES
-  String _imagePath =
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
+  String _imagePath = 'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png';  
+  
   final String _coinImagePath =
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png';
 
@@ -33,6 +34,19 @@ class _HomeScreenState extends State<HomeScreen> {
       dialogueProvider.loadDialogueFromJson("ichigo");
     });
     _loadUserData();
+    final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
+  mapProvider.preloadMapData(
+  profileImagePath: _imagePath,
+  context: context,
+  imagePaths: [
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rf9vbqlqbpza3inl5syo.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/au1f1y75qc1aguz4nzze.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
+    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
+  ],
+);
+
   }
 
   Future<void> _loadUserData() async {
