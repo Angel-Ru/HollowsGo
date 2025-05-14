@@ -34,7 +34,6 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
     fetchUserPoints();
     fetchFavoritePersonatge();
-    updatePersonatgePreferit(_personatgePreferitId ?? 0);
   }
 
   // GET USER COINS OR POINTS FROM THE API
@@ -80,7 +79,7 @@ class UserProvider with ChangeNotifier {
   Future<void> fetchFavoritePersonatge() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      int? userId = prefs.getInt('usuari');
+      int? userId = prefs.getInt('userId');
       String? token = prefs.getString('token');
 
       if (userId == null || token == null) return;
@@ -99,7 +98,6 @@ class UserProvider with ChangeNotifier {
           print(personatgePreferitId);
           notifyListeners();
         }
-        
       } else {
         print('Error en fetchFavoritePersonatge: ${response.statusCode}');
       }
@@ -116,7 +114,8 @@ class UserProvider with ChangeNotifier {
 
       if (userId == null || token == null) return false;
 
-      final url = Uri.parse('https://${Config.ip}/perfils/preferit/update/$userId');
+      final url =
+          Uri.parse('https://${Config.ip}/perfils/preferit/update/$userId');
       final headers = {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -134,10 +133,10 @@ class UserProvider with ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        print('Error en updatePersonatgePreferit: ${response.statusCode} + ${response}');
+        print(
+            'Error en updatePersonatgePreferit: ${response.statusCode} + ${response}');
         return false;
       }
-      
     } catch (error) {
       print('Error en updatePersonatgePreferit: $error');
       return false;
