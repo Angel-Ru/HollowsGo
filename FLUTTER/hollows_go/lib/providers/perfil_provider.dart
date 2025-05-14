@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/models/avatar.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -104,6 +105,71 @@ Future<void> sumarPartidaGuanyada(int userId) async {
     }
   } catch (e) {
     print('Error a sumarPartidaGuanyada: $e');
+  }
+}
+
+Future<List<Avatar>> getAvatars() async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  final url = Uri.parse('https://${Config.ip}/usuaris/avatars');
+
+  final response = await http.get(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final List data = jsonDecode(response.body);
+    return data.map((e) => Avatar.fromJson(e)).toList();
+  } else {
+    throw Exception('Error al carregar els avatars');
+  }
+}
+
+
+Future<void> actualitzarAvatar(int avatarId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  final userId = prefs.getInt('userId');
+  final url = Uri.parse('https://${Config.ip}/usuaris/actualitzaravatar');
+
+  final response = await http.put(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'id': userId,
+      'avatarId': avatarId,
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('No s\'ha pogut actualitzar l\'avatar: ${response.body}');
+  }
+}
+Future<String> obtenirAvatar(int userId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  final url = Uri.parse('https://${Config.ip}/usuaris/avatar/$userId');  // Ruta per obtenir l'avatar de l'usuari
+  final response = await http.get(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',  // Afegir token d'autenticació
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['avatarUrl'];  // Retorna l'URL de l'avatar
+  } else {
+    throw Exception('No s\'ha pogut carregar l\'avatar');
   }
 }
 
