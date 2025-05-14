@@ -819,4 +819,28 @@ exports.actualitzarAvatar = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 };
+// Ruta per obtenir l'avatar d'un usuari per ID
+exports.obtenirAvatar = async (req, res) => {
+  try {
+    const { id } = req.params;  // Obtenir l'ID de l'usuari des de la URL
+
+    const pool = await connectDB();
+    const result = await pool.request()
+      .input('id', sql.Int, id)
+      .query('SELECT a.url FROM USUARIS u JOIN AVATARS a ON a.id = u.imatgeperfil WHERE u.id = @id');  // Consulta per obtenir l'avatar
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'Usuari no trobat' });  // Si no troba l'usuari
+    }
+
+    const avatarUrl = result.recordset[0].url;  // Obtenir l'URL de l'avatar de la consulta
+    res.json({ avatarUrl });  // Retornar l'avatar URL com a resposta
+
+  } catch (error) {
+    console.error('Error al obtenir l\'avatar:', error);
+    res.status(500).json({ message: 'Error al carregar l\'avatar' });
+  }
+};
+
+
 

@@ -152,4 +152,25 @@ Future<void> actualitzarAvatar(int avatarId) async {
     throw Exception('No s\'ha pogut actualitzar l\'avatar: ${response.body}');
   }
 }
+Future<String> obtenirAvatar(int userId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  final url = Uri.parse('https://${Config.ip}/usuaris/avatar/$userId');  // Ruta per obtenir l'avatar de l'usuari
+  final response = await http.get(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',  // Afegir token d'autenticació
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['avatarUrl'];  // Retorna l'URL de l'avatar
+  } else {
+    throw Exception('No s\'ha pogut carregar l\'avatar');
+  }
+}
+
 }
