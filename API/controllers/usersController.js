@@ -784,19 +784,38 @@ exports.mostrarDadesPerfil = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor' });
     }
 };
+// Obtenir la llista d'avatares
 exports.llistarAvatars = async (req, res) => {
-    try
-    {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .query(
-                'SELECT url from AVATARS'
-            )
-        
-            res.json(result.recordset);
+  try {
+    const pool = await connectDB();
+    const result = await pool.request()
+      .query('SELECT * FROM AVATARS');
+    
+    res.json(result.recordset);
+  } catch (error) {
+    console.error('Error al obtenir els avatars:', error);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
+};
+
+// Actualitzar l'avatar d'un usuari
+exports.actualitzarAvatar = async (req, res) => {
+  try {
+    const { id, avatar } = req.body;
+
+    if (!id || !avatar) {
+      return res.status(400).json({ message: 'Falten dades requerides' });
     }
-    catch (error) {
-        console.error('Error al obtenir els avatars:', error);
-        res.status(500).json({ message: 'Error del servidor' });
-    }
+
+    const pool = await connectDB();
+    await pool.request()
+      .input('id', sql.Int, id)
+      .input('avatar', sql.VarChar(255), avatar)
+      .query('UPDATE USUARIS SET avatar = @avatar WHERE id = @id');
+
+    res.status(200).json({ message: 'Avatar actualitzat correctament' });
+  } catch (err) {
+    console.error('Error en actualitzar l\'avatar:', err);
+    res.status(500).json({ message: 'Error del servidor' });
+  }
 };

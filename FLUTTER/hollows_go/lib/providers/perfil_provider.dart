@@ -108,15 +108,47 @@ Future<void> sumarPartidaGuanyada(int userId) async {
 }
 
 Future<List<String>> getAvatars() async {
-    final url = Uri.parse('https://${Config.ip}/usuaris/avatars');
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
 
-    final response = await http.get(url);
+  final url = Uri.parse('https://${Config.ip}/usuaris/avatars');
+  final response = await http.get(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-      return data.map<String>((item) => item['url'].toString()).toList();
-    } else {
-      throw Exception('Error al carregar els avatars');
-    }
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.map<String>((item) => item['url'].toString()).toList();
+  } else {
+    throw Exception('Error al carregar els avatars: ${response.statusCode}');
   }
+}
+Future<void> actualitzarAvatar(String avatarUrl) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+  final userId = prefs.getInt('userId');
+  final url = Uri.parse('https://${Config.ip}/usuaris/actualitzaravatar');
+  
+  final response = await http.put(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'id': userId,
+      'avatar': avatarUrl,
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('No s\'ha pogut actualitzar l\'avatar: ${response.body}');
+  }
+}
+
+
 }

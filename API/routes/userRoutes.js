@@ -30,6 +30,10 @@ router.post('/admin/', verificacioUsuari.verifyToken, verificacioUsuari.verifyAd
 // Ruta per eliminar un usuari per ID (només accessible per a administradors)
 router.delete('/:id', verificacioUsuari.verifyToken, verificacioUsuari.verifyAdminDB, userController.borrarUsuari);
 
+
+//Ruta per modificar la imatge de perfil de l'usuari
+router.put('/actualitzaravatar', verificacioUsuari.verifyToken, userController.actualitzarAvatar);
+
 // Ruta per modificar el nom d'un usuari (només accessible per a l'usuari), ja que ha de posar la seva contrasenya actual.
 router.put('/nom', verificacioUsuari.verifyToken, userController.modificarNomUsuari);
 
