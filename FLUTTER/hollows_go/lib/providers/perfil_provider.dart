@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/models/avatar.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -107,11 +108,11 @@ Future<void> sumarPartidaGuanyada(int userId) async {
   }
 }
 
-Future<List<String>> getAvatars() async {
+Future<List<Avatar>> getAvatars() async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
-
   final url = Uri.parse('https://${Config.ip}/usuaris/avatars');
+
   final response = await http.get(
     url,
     headers: {
@@ -121,18 +122,20 @@ Future<List<String>> getAvatars() async {
   );
 
   if (response.statusCode == 200) {
-    final List<dynamic> data = jsonDecode(response.body);
-    return data.map<String>((item) => item['url'].toString()).toList();
+    final List data = jsonDecode(response.body);
+    return data.map((e) => Avatar.fromJson(e)).toList();
   } else {
-    throw Exception('Error al carregar els avatars: ${response.statusCode}');
+    throw Exception('Error al carregar els avatars');
   }
 }
-Future<void> actualitzarAvatar(String avatarUrl) async {
+
+
+Future<void> actualitzarAvatar(int avatarId) async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token');
   final userId = prefs.getInt('userId');
   final url = Uri.parse('https://${Config.ip}/usuaris/actualitzaravatar');
-  
+
   final response = await http.put(
     url,
     headers: {
@@ -141,7 +144,7 @@ Future<void> actualitzarAvatar(String avatarUrl) async {
     },
     body: jsonEncode({
       'id': userId,
-      'avatar': avatarUrl,
+      'avatarId': avatarId,
     }),
   );
 
@@ -149,6 +152,4 @@ Future<void> actualitzarAvatar(String avatarUrl) async {
     throw Exception('No s\'ha pogut actualitzar l\'avatar: ${response.body}');
   }
 }
-
-
 }

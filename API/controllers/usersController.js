@@ -801,17 +801,17 @@ exports.llistarAvatars = async (req, res) => {
 // Actualitzar l'avatar d'un usuari
 exports.actualitzarAvatar = async (req, res) => {
   try {
-    const { id, avatar } = req.body;
+    const { id, avatarId } = req.body;
 
-    if (!id || !avatar) {
+    if (!id || !avatarId) {
       return res.status(400).json({ message: 'Falten dades requerides' });
     }
 
     const pool = await connectDB();
     await pool.request()
       .input('id', sql.Int, id)
-      .input('avatar', sql.VarChar(255), avatar)
-      .query('UPDATE USUARIS SET imatgeperfil = @avatar WHERE id = @id');
+      .input('avatarId', sql.Int, avatarId)
+      .query('UPDATE USUARIS SET imatgeperfil = @avatarId WHERE id = @id');
 
     res.status(200).json({ message: 'Avatar actualitzat correctament' });
   } catch (err) {
@@ -819,3 +819,4 @@ exports.actualitzarAvatar = async (req, res) => {
     res.status(500).json({ message: 'Error del servidor' });
   }
 };
+
