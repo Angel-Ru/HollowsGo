@@ -104,6 +104,12 @@ flutter:
     - lib/images/skinrepetida.gif
     - lib/images/imatges_prehomescreen/
     - lib/special_attack/shinji/
+    - lib/special_attack/shinji/yokoso.mp3
+    - lib/special_attack/shinji/marco_prova.png
+    - lib/special_attack/shinji/shinji_vid.mp4
+    - assets/special_attack/shinji/yokoso.mp3
+    - assets/special_attack/shinji/marco_prova.png
+    - assets/special_attack/shinji/shinji_vid.mp4
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see

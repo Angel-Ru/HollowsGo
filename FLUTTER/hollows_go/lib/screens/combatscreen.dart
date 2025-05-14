@@ -6,12 +6,21 @@ import 'package:hollows_go/widgets/combat/combat_action_buttons.dart';
 import 'package:hollows_go/widgets/combat/combat_background.dart';
 import 'package:hollows_go/widgets/combat/defeat_dialog.dart';
 import 'package:hollows_go/widgets/combat/turn_indicator.dart';
+import 'package:hollows_go/widgets/combat/ultimate_service.dart';
 import 'package:hollows_go/widgets/combat/victory_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
 import 'package:hollows_go/providers/perfil_provider.dart';
 import 'package:hollows_go/providers/user_provider.dart';
 import 'package:hollows_go/widgets/characterdisplaywidget.dart';
+
+import 'package:flutter/material.dart';
+import 'package:hollows_go/providers/combat_provider.dart';
+import 'package:hollows_go/widgets/combat/combat_action_buttons.dart';
+import 'package:hollows_go/widgets/combat/turn_indicator.dart';
+import 'package:hollows_go/widgets/combat/combat_background.dart';
+import 'package:hollows_go/widgets/characterdisplaywidget.dart';
+import 'package:provider/provider.dart';
 
 class CombatScreen extends StatelessWidget {
   @override
@@ -41,7 +50,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _verifyAndResetCombat();
       if (!_partidaJugadaSumada) {
-        final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+        final perfilProvider =
+            Provider.of<PerfilProvider>(context, listen: false);
         final userProvider = Provider.of<UserProvider>(context, listen: false);
         perfilProvider.sumarPartidaJugada(userProvider.userId);
         _partidaJugadaSumada = true;
@@ -56,7 +66,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
   }
 
   Future<void> _verifyAndResetCombat() async {
-    final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final skinsProvider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
     if (skinsProvider.selectedSkin == null ||
         (skinsProvider.selectedSkinAliat == null &&
@@ -65,7 +76,9 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
       await skinsProvider.selectRandomSkin();
     }
 
-    final aliat = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
+    final aliat = skinsProvider.selectedSkinAliat ??
+        skinsProvider.selectedSkinQuincy ??
+        skinsProvider.selectedSkinEnemic;
     final enemic = skinsProvider.selectedSkin;
 
     final maxAllyHealth = aliat?.vida ?? 1000;
@@ -84,7 +97,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
   }
 
   void _showVictoryDialog() async {
-    final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final skinsProvider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await skinsProvider.fetchEnemyPoints();
 
     final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
@@ -97,7 +111,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
       builder: (_) => VictoryDialog(
         coins: skinsProvider.coinEnemies,
         onContinue: () {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => HomeScreen()));
         },
       ),
     );
@@ -109,17 +124,26 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
       barrierDismissible: false,
       builder: (_) => DefeatDialog(
         onContinue: () {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (_) => HomeScreen()));
         },
       ),
     );
+  }
+
+  // Método para aplicar daño al enemigo desde el UltimateService
+  void _applyDamageToEnemy(int damage) {
+    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+    combatProvider.setEnemyHealth(combatProvider.enemicHealth - damage);
   }
 
   @override
   Widget build(BuildContext context) {
     return Selector<SkinsEnemicsPersonatgesProvider, SelectedSkinsModel>(
       selector: (_, provider) => SelectedSkinsModel(
-        aliat: provider.selectedSkinAliat ?? provider.selectedSkinQuincy ?? provider.selectedSkinEnemic,
+        aliat: provider.selectedSkinAliat ??
+            provider.selectedSkinQuincy ??
+            provider.selectedSkinEnemic,
         enemic: provider.selectedSkin,
       ),
       builder: (context, skins, _) {
@@ -128,7 +152,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
         final String allyName = skins.aliat?.nom ?? "Desconegut Aliat";
         final int aliatDamage = skins.aliat?.malTotal ?? 300;
         final String techniqueName = skins.aliat?.atac ?? "Tècnica desconeguda";
-        final String enemyName = skins.enemic?.personatgeNom ?? "Desconegut Enemic";
+        final String enemyName =
+            skins.enemic?.personatgeNom ?? "Desconegut Enemic";
         final int enemicDamage = (skins.enemic?.malTotal ?? 50) * 2;
 
         return Scaffold(
@@ -145,7 +170,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
                 child: Column(
                   children: [
                     CharacterDisplayWidget(
-                      imageUrl: skins.enemic?.imatge ?? 'lib/images/combatscreen_images/aizen_combat.png',
+                      imageUrl: skins.enemic?.imatge ??
+                          'lib/images/combatscreen_images/aizen_combat.png',
                       name: enemyName,
                       health: combatProvider.enemicHealth,
                       maxHealth: skins.enemic?.vida ?? 1000,
@@ -154,7 +180,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
                     ),
                     Spacer(),
                     CharacterDisplayWidget(
-                      imageUrl: skins.aliat?.imatge ?? 'lib/images/combatscreen_images/bleach_combat.png',
+                      imageUrl: skins.aliat?.imatge ??
+                          'lib/images/combatscreen_images/bleach_combat.png',
                       name: allyName,
                       health: combatProvider.aliatHealth,
                       maxHealth: skins.aliat?.vida ?? 1000,

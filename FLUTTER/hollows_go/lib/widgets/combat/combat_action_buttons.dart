@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
+import 'package:hollows_go/widgets/combat/ultimate_service.dart';
 
 class CombatActionButtons extends StatelessWidget {
   final CombatProvider combatProvider;
@@ -44,7 +45,8 @@ class CombatActionButtons extends StatelessWidget {
                       ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               ),
               child: Column(
                 children: [
@@ -94,9 +96,20 @@ class CombatActionButtons extends StatelessWidget {
               ),
               child: IconButton(
                 icon: const Icon(Icons.auto_awesome, color: Colors.black),
-                onPressed: () {
-                  // Acción del botón especial
-                },
+                onPressed: combatProvider.isEnemyTurn ||
+                        combatProvider.isAttackInProgress ||
+                        combatProvider.enemicHealth <= 0
+                    ? null
+                    : () {
+                        // Cambié la llamada a setEnemyHealth
+                        UltimateService().executeShinjiUlti(
+                          context,
+                          (damage) {
+                            combatProvider.setEnemyHealth(
+                                combatProvider.enemicHealth - damage);
+                          },
+                        );
+                      },
               ),
             ),
           ),

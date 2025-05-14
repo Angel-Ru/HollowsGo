@@ -25,7 +25,8 @@ class TurnIndicator extends StatelessWidget {
         ),
         child: Text(
           "Torn: ${isEnemyTurn ? enemyName : allyName}",
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
     );

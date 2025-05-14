@@ -13,7 +13,7 @@ class VictoryDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Has guanyat"),
+      title: const Text("Has guanyat!"),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -24,9 +24,13 @@ class VictoryDialog extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Text(
-            "+$coins",
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          TweenAnimationBuilder<int>(
+            tween: IntTween(begin: 0, end: coins),
+            duration: const Duration(seconds: 2),
+            builder: (context, value, child) => Text(
+              "+$value",
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
