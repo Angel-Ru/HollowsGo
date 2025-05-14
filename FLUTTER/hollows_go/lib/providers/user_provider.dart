@@ -98,7 +98,7 @@ class UserProvider with ChangeNotifier {
 
         // Actualizar ambos valores (personaje y skin preferidos)
         _personatgePreferitId = data['personatge_preferit'] ?? 0;
-        _skinPreferidaId = data['skin_preferida'] ?? 0;
+        _skinPreferidaId = data['skin_preferida_id'] ?? 0;
 
         print('Personaje favorito actualizado: $_personatgePreferitId');
         print('Skin favorita actualizada: $_skinPreferidaId');
