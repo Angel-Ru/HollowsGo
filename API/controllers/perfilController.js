@@ -45,7 +45,7 @@ exports.getFavoritePersonatge = async (req, res) => {
         const { userId } = req.params;
         const pool = await connectDB();
         const result = await pool.request()
-            .input('usuari', userId)
+            .input('userId', userId)
             .query('SELECT personatge_preferit FROM perfil_usuari WHERE usuari = @userId');
 
         if (result.recordset.length === 0) {
