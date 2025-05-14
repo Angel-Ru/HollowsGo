@@ -784,3 +784,19 @@ exports.mostrarDadesPerfil = async (req, res) => {
         res.status(500).json({ message: 'Error del servidor' });
     }
 };
+exports.llistarAvatars = async (req, res) => {
+    try
+    {
+        const pool = await connectDB();
+        const result = await pool.request()
+            .query(
+                'SELECT url from AVATARS'
+            )
+        
+            res.json(result.recordset);
+    }
+    catch (error) {
+        console.error('Error al obtenir els avatars:', error);
+        res.status(500).json({ message: 'Error del servidor' });
+    }
+};

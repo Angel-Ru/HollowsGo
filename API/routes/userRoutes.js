@@ -15,6 +15,9 @@ router.get('/:id', verificacioUsuari.verifyToken, userController.getUsuariPerId)
 // Ruta per obtenir els punts d'un usuari per nom (accessible per a tots, però requereix token)
 router.get('/punts/:nom', verificacioUsuari.verifyToken, userController.getPuntsUsuari);
 
+//Ruta per obtenir els avatars
+router.get('/avatars', verificacioUsuari.verifyToken, userController.llistarAvatars);
+
 // Ruta per crear un usuari de tipus 0 (usuari normal) (accessible per a tots, no requereix token)
 router.post('/', userController.crearUsuariNormalToken);
 
