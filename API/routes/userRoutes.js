@@ -16,7 +16,7 @@ router.get('/punts/:nom', verificacioUsuari.verifyToken, userController.getPunts
 router.get('/avatars', verificacioUsuari.verifyToken, userController.llistarAvatars);
 
 //Ruta per obtenir el avatar de l'usuari
-router.get('/avatar/:id', verificacioUsuari.verifyToken, userController.getAvatarUsuari);
+router.get('/avatar/:id', verificacioUsuari.verifyToken, userController.obtenirAvatar);
 
 // Ruta per obtenir un usuari per ID (aquesta ha d'anar al final!)
 router.get('/:id', verificacioUsuari.verifyToken, userController.getUsuariPerId);
