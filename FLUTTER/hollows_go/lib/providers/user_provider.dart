@@ -35,7 +35,7 @@ class UserProvider with ChangeNotifier {
     _userId = prefs.getInt('userId') ?? 0;
     notifyListeners();
     fetchUserPoints();
-    fetchFavoritePersonatge();
+    fetchFavoritePersonatgeSkin();
   }
 
   // GET USER COINS OR POINTS FROM THE API
@@ -78,7 +78,7 @@ class UserProvider with ChangeNotifier {
     fetchUserPoints();
   }
 
-  Future<void> fetchFavoritePersonatge() async {
+  Future<void> fetchFavoritePersonatgeSkin() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       int? userId = prefs.getInt('userId');
@@ -172,7 +172,7 @@ class UserProvider with ChangeNotifier {
       };
 
       final body = json.encode({
-        'skin_preferida': skinId,
+        'skin_preferida_id': skinId,
       });
 
       final response = await http.put(url, headers: headers, body: body);
