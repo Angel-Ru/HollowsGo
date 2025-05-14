@@ -14,12 +14,14 @@ class UserProvider with ChangeNotifier {
   int _userId = 0;
   Personatge? _personatge;
   int? _personatgePreferitId;
+  int? _skinPreferidaId;
 
   int get userId => _userId;
   int get coinCount => _coinCount;
   String get username => _username;
   Personatge? get personatge => _personatge;
   int? get personatgePreferitId => _personatgePreferitId;
+  int? get skinPreferidaId => _skinPreferidaId;
 
   UserProvider() {
     _loadUserData();
@@ -93,16 +95,28 @@ class UserProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['personatge_preferit'] != null) {
-          _personatgePreferitId = data['personatge_preferit'];
-          print(personatgePreferitId);
-          notifyListeners();
-        }
+
+        // Actualizar ambos valores (personaje y skin preferidos)
+        _personatgePreferitId = data['personatge_preferit'] ?? 0;
+        _skinPreferidaId = data['skin_preferida'] ?? 0;
+
+        print('Personaje favorito actualizado: $_personatgePreferitId');
+        print('Skin favorita actualizada: $_skinPreferidaId');
+
+        notifyListeners();
       } else {
         print('Error en fetchFavoritePersonatge: ${response.statusCode}');
+        // Opcional: resetear valores si hay error
+        _personatgePreferitId = 0;
+        _skinPreferidaId = 0;
+        notifyListeners();
       }
     } catch (error) {
       print('Error en fetchFavoritePersonatge: $error');
+      // Opcional: resetear valores si hay excepción
+      _personatgePreferitId = 0;
+      _skinPreferidaId = 0;
+      notifyListeners();
     }
   }
 
@@ -139,6 +153,42 @@ class UserProvider with ChangeNotifier {
       }
     } catch (error) {
       print('Error en updatePersonatgePreferit: $error');
+      return false;
+    }
+  }
+
+  Future<bool> updateSkinPreferida(int skinId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      String? token = prefs.getString('token');
+
+      if (userId == null || token == null) return false;
+
+      final url = Uri.parse('https://${Config.ip}/perfils/skin/update/$userId');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final body = json.encode({
+        'skin_preferida': skinId,
+      });
+
+      final response = await http.put(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        _skinPreferidaId = skinId;
+        print(_skinPreferidaId);
+        notifyListeners();
+        return true;
+      } else {
+        print(
+            'Error en updateSkinPreferida: ${response.statusCode} + ${response}');
+        return false;
+      }
+    } catch (error) {
+      print('Error en updateSkinPreferida: $error');
       return false;
     }
   }

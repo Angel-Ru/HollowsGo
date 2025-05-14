@@ -46,16 +46,17 @@ exports.getFavoritePersonatge = async (req, res) => {
         const pool = await connectDB();
         const result = await pool.request()
             .input('userId', userId)
-            .query('SELECT personatge_preferit FROM perfil_usuari WHERE usuari = @userId');
+            .query('SELECT personatge_preferit, skin_preferida_id FROM perfil_usuari WHERE usuari = @userId');
 
         if (result.recordset.length === 0) {
             return res.status(404).send('Usuari no trobat');
         }
 
-        const { personatge_preferit } = result.recordset[0];
+        const { personatge_preferit, skin_preferida_id } = result.recordset[0];
         res.send({
             userId,
-            personatge_preferit
+            personatge_preferit: personatge_preferit || null,
+            skin_preferida_id: skin_preferida_id || null
         });
     } catch (err) {
         console.error(err);
@@ -129,3 +130,32 @@ exports.updateFavoritePersonatge = async (req, res) => {
     }
 };
 
+exports.updateFavoriteSkin = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { skin_preferida_id } = req.body;
+
+        if (!skin_preferida_id) {
+            return res.status(400).send('Dades incorrectes: Skin preferida mancant');
+        }
+
+        const pool = await connectDB();
+        const result = await pool.request()
+            .input('userId', userId)
+            .input('skin_preferida_id', skin_preferida_id)
+            .query(`
+                UPDATE perfil_usuari
+                SET skin_preferida_id = @skin_preferida_id
+                WHERE usuari = @userId
+            `);
+
+        if (result.rowsAffected[0] === 0) {
+            return res.status(404).send('Usuari no trobat');
+        }
+
+        res.send('Skin preferida actualitzat correctament');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+};

@@ -10,5 +10,8 @@ router.get('/preferit/:userId', verificacioUsuari.verifyToken, perfilController.
 // Actualitzar el personatge preferit
 router.put('/preferit/update/:userId', verificacioUsuari.verifyToken, perfilController.updateFavoritePersonatge);
 
+// Actualitzar l'skin preferida
+router.put('/skin/update/:userId', verificacioUsuari.verifyToken, perfilController.updateFavoriteSkin);
+
 
 module.exports = router;

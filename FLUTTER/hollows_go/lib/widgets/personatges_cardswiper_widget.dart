@@ -72,8 +72,10 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
             itemBuilder: (context, index) {
               final skin = widget.personatge.skins[index];
               final isSkinSelected = widget.selectedSkin?.id == skin.id;
+              final isSkinFavorite = userProvider.skinPreferidaId == skin.id;
 
-              return _buildSkinCard(skin, isSkinSelected);
+              return _buildSkinCard(
+                  skin, isSkinSelected, isSkinFavorite, userProvider);
             },
           ),
         ),
@@ -82,32 +84,18 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
   }
 
   Future<void> _toggleFavorite(UserProvider userProvider) async {
-  final isCurrentlyFavorite = userProvider.personatgePreferitId == widget.personatge.id;
-  final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
-
-  // Imprimir el ID que se va a actualizar
-  print('Personatge ID: ${widget.personatge.id}');
-  print('Nuevo ID a actualizar: $newId');
-
-  final success = await userProvider.updatePersonatgePreferit(newId);
-
-  if (success) {
-    setState(() {});  // Esto forzará la reconstrucción del widget
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          isCurrentlyFavorite
-              ? '${widget.personatge.nom} desmarcat com a preferit.'
-              : '${widget.personatge.nom} marcat com a preferit.',
-        ),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    final isCurrentlyFavorite =
+        userProvider.personatgePreferitId == widget.personatge.id;
+    final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
+    final success = await userProvider.updatePersonatgePreferit(newId);
   }
-}
 
-
+  Future<void> _toggleFavoriteSkin(UserProvider userProvider, Skin skin) async {
+    final isCurrentlyFavorite = userProvider.skinPreferidaId == skin.id;
+    final newId = isCurrentlyFavorite ? 0 : skin.id;
+    final success = await userProvider.updateSkinPreferida(newId);
+    setState(() {});
+  }
 
   double _calculateMaxSkinCardHeight(List<Skin> skins) {
     return skins.fold<double>(0.0, (max, skin) {
@@ -118,7 +106,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
     });
   }
 
-  Widget _buildSkinCard(Skin skin, bool isSkinSelected) {
+  Widget _buildSkinCard(Skin skin, bool isSkinSelected, bool isSkinFavorite,
+      UserProvider userProvider) {
     return GestureDetector(
       onTap: () {
         if (widget.isEnemyMode) return;
@@ -174,20 +163,34 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
               ],
             ),
             SizedBox(height: 5),
-            Container(
-              padding: EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.8),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                '${skin.nom} (Mal: ${skin.malTotal})',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    '${skin.nom} (Mal: ${skin.malTotal})',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => _toggleFavoriteSkin(userProvider, skin),
+                  child: Icon(
+                    isSkinFavorite ? Icons.star : Icons.star_border,
+                    color: isSkinFavorite ? Colors.yellow : Colors.grey,
+                    size: 20,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 3),
             Row(
