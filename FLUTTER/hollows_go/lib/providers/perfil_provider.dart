@@ -107,4 +107,16 @@ Future<void> sumarPartidaGuanyada(int userId) async {
   }
 }
 
+Future<List<String>> getAvatars() async {
+    final url = Uri.parse('https://${Config.ip}/usuaris/avatars');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      return data.map<String>((item) => item['url'].toString()).toList();
+    } else {
+      throw Exception('Error al carregar els avatars');
+    }
+  }
 }

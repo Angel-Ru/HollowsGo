@@ -6,17 +6,17 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifi
 // Ruta per obtenir tots els usuaris (accessible per a tots, però requereix token)
 router.get('/', verificacioUsuari.verifyToken, userController.getUsuaris);
 
-//Ruta per obtenir les dades del perfil d'usuari
-router.get('/perfil/:id', verificacioUsuari.verifyToken, userController.mostrarDadesPerfil)
-
-// Ruta per obtenir un usuari per ID (accessible per a tots, però requereix token)
-router.get('/:id', verificacioUsuari.verifyToken, userController.getUsuariPerId);
+// Ruta per obtenir les dades del perfil d'usuari
+router.get('/perfil/:id', verificacioUsuari.verifyToken, userController.mostrarDadesPerfil);
 
 // Ruta per obtenir els punts d'un usuari per nom (accessible per a tots, però requereix token)
 router.get('/punts/:nom', verificacioUsuari.verifyToken, userController.getPuntsUsuari);
 
-//Ruta per obtenir els avatars
+// Ruta per obtenir els avatars
 router.get('/avatars', verificacioUsuari.verifyToken, userController.llistarAvatars);
+
+// Ruta per obtenir un usuari per ID (aquesta ha d'anar al final!)
+router.get('/:id', verificacioUsuari.verifyToken, userController.getUsuariPerId);
 
 // Ruta per crear un usuari de tipus 0 (usuari normal) (accessible per a tots, no requereix token)
 router.post('/', userController.crearUsuariNormalToken);

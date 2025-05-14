@@ -1,11 +1,5 @@
 import '../imports.dart';
-
-/*
-L'ImageSelectionPage és una pàgina que permet seleccionar una imatge de perfil.
-En aquesta classe s'hi pot arribar des del menú desplegable que surt quan es fa clic a la imatge de perfil de l'AppBar.
-La imatge de perfil seleccionada es guarda a les Shared Preferences.
-Per ajudar l'usuari a escollir una imatge, la pàgina mostra un diàleg amb en Kyoraku que et dona consells per a poder-ne escollir una.
-*/
+import '../providers/perfil_provider.dart'; // Assegura't que existeix
 
 class ImageSelectionPage extends StatefulWidget {
   final Function(String) onImageSelected;
@@ -17,31 +11,10 @@ class ImageSelectionPage extends StatefulWidget {
 }
 
 class _ImageSelectionPageState extends State<ImageSelectionPage> {
-  final List<String> imagePaths = [
-    'lib/images/profile_photos/chad.png',
-    'lib/images/profile_photos/kon.png',
-    'lib/images/profile_photos/kenpachi.png',
-    'lib/images/profile_photos/grimmjaw.png',
-    'lib/images/profile_photos/komamura_goty.jpg',
-    'lib/images/urahara_character/urahara_1.png',
-    'lib/images/urahara_character/urahara_2.png',
-    'lib/images/urahara_character/urahara_3.png',
-    'lib/images/urahara_character/urahara_4.png',
-    'lib/images/urahara_character/urahara_5.png',
-    'lib/images/mayuri_character/mayuri_1.png',
-    'lib/images/mayuri_character/mayuri_2.png',
-    'lib/images/mayuri_character/mayuri_3.png',
-    'lib/images/mayuri_character/mayuri_4.png',
-    'lib/images/mayuri_character/mayuri_5.png',
-    'lib/images/mayuri_character/mayuri_6.png',
-    'lib/images/mayuri_character/mayuri_7.png',
-    'lib/images/mayuri_character/mayuri_8.png',
-    'lib/images/kyoraku_character/kyoraku_1.png',
-    'lib/images/kyoraku_character/kyoraku_2.png',
-    'lib/images/kyoraku_character/kyoraku_3.png',
-    'lib/images/kyoraku_character/kyoraku_4.png',
-    'lib/images/kyoraku_character/kyoraku_5.png',
-  ];
+  List<String> imagePaths = [];
+  bool isLoading = true;
+
+  final PerfilProvider perfilProvider = PerfilProvider();
 
   final List<String> _dialogues = [
     "Escollir perfil? Si vols, jo t’ajudo… amb una cervesa a la mà!",
@@ -60,12 +33,27 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
 
   int _dialogIndex = 0;
   late String _currentImage;
-  late String _previousImage;
 
   @override
   void initState() {
     super.initState();
     _currentImage = _kyorakuImages[0];
+    _loadAvatars();
+  }
+
+  Future<void> _loadAvatars() async {
+    try {
+      final avatars = await perfilProvider.getAvatars();
+      setState(() {
+        imagePaths = avatars;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error carregant avatars: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _nextDialogue() {
@@ -75,7 +63,6 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
       do {
         newImage = _kyorakuImages[Random().nextInt(_kyorakuImages.length)];
       } while (newImage == _currentImage);
-      _previousImage = _currentImage;
       _currentImage = newImage;
     });
   }
@@ -94,107 +81,115 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
         appBar: AppBar(
           title: const Text('Selecciona una imatge'),
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.all(8.0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 10.0,
-                ),
-                itemCount: imagePaths.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      widget.onImageSelected(imagePaths[index]);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: Image.asset(
-                        imagePaths[index],
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
                 children: [
-                  GestureDetector(
-                      onTap: _nextDialogue,
-                      child: CircleAvatar(
-                        radius: 50,
-                        backgroundImage: AssetImage(_currentImage),
-                        backgroundColor: Color.fromARGB(255, 245, 181, 234),
-                      )),
-                  SizedBox(width: 16),
                   Expanded(
-                    child: GestureDetector(
-                      onTap: _nextDialogue,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(243, 194, 194, 194),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                topRight: Radius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              'Shunsui Kyoraku',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: const Color.fromARGB(255, 6, 7, 6),
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 245, 181, 234),
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              _dialogues[_dialogIndex],
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
+                    child: GridView.builder(
+                      padding: const EdgeInsets.all(8.0),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 10.0,
+                        mainAxisSpacing: 10.0,
                       ),
+                      itemCount: imagePaths.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            widget.onImageSelected(imagePaths[index]);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomeScreen()),
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.network(
+                              imagePaths[index],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.broken_image),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: _nextDialogue,
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: AssetImage(_currentImage),
+                            backgroundColor:
+                                const Color.fromARGB(255, 245, 181, 234),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: _nextDialogue,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromARGB(243, 194, 194, 194),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(8),
+                                      topRight: Radius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Shunsui Kyoraku',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 6, 7, 6),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromARGB(255, 245, 181, 234),
+                                    borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(8),
+                                      bottomRight: Radius.circular(8),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    _dialogues[_dialogIndex],
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
