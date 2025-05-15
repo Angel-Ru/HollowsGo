@@ -134,7 +134,7 @@ exports.updateFavoritePersonatge = async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).send('Usuari no trobat');
         }
-
+        console.log(result);
         res.send('Personatge preferit actualitzat correctament');
     } catch (err) {
         console.error(err);
@@ -163,7 +163,7 @@ exports.updateFavoriteSkin = async (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).send('Usuari no trobat');
         }
-
+        console.log(result);
         res.send('Skin preferida actualitzada correctament');
     } catch (err) {
         console.error(err);
