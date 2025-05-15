@@ -52,11 +52,13 @@ exports.getFavoritePersonatge = async (req, res) => {
             return res.status(404).send('Usuari no trobat');
         }
 
-        const { personatge_preferit, skin_preferida_id } = result.recordset[0];
+        const { personatge_preferit, skin_preferida_id, nom, imatge } = result.recordset[0];
         res.send({
             userId,
             personatge_preferit: personatge_preferit || null,
-            skin_preferida_id: skin_preferida_id || null
+            skin_preferida_id: skin_preferida_id || null,
+            nom: nom || null,
+            imatge: imatge || null
         });
     } catch (err) {
         console.error(err);

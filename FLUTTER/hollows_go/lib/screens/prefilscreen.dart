@@ -311,6 +311,62 @@ class _PerfilScreenState extends State<PerfilScreen> {
                               ),
                             ],
                           ),
+                          // Sección de Preferits correctamente colocada fuera del Row principal
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 40, vertical: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Preferits',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(height: 15),
+                                if (userProvider.personatgepreferitnom != null)
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Personatge favorit:',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                      Text(
+                                        userProvider.personatgepreferitnom ??
+                                            'No seleccionat',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                SizedBox(height: 10),
+                                if (userProvider.skinPreferidaimatge != null)
+                                  Container(
+                                    height: 100,
+                                    width: 100,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                            userProvider.skinPreferidaimatge!),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

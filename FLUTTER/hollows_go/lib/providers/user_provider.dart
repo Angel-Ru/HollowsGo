@@ -15,6 +15,8 @@ class UserProvider with ChangeNotifier {
   Personatge? _personatge;
   int? _personatgePreferitId;
   int? _skinPreferidaId;
+  String? _personatgepreferitnom;
+  String? _skinPreferidaimatge;
 
   int get userId => _userId;
   int get coinCount => _coinCount;
@@ -22,6 +24,8 @@ class UserProvider with ChangeNotifier {
   Personatge? get personatge => _personatge;
   int? get personatgePreferitId => _personatgePreferitId;
   int? get skinPreferidaId => _skinPreferidaId;
+  String? get personatgepreferitnom => _personatgepreferitnom;
+  String? get skinPreferidaimatge => _skinPreferidaimatge;
 
   UserProvider() {
     _loadUserData();
@@ -99,6 +103,8 @@ class UserProvider with ChangeNotifier {
         // Actualizar ambos valores (personaje y skin preferidos)
         _personatgePreferitId = data['personatge_preferit'] ?? 0;
         _skinPreferidaId = data['skin_preferida_id'] ?? 0;
+        _personatgepreferitnom = data['nom'];
+        _skinPreferidaimatge = data['imatge'];
 
         print('Personaje favorito actualizado: $_personatgePreferitId');
         print('Skin favorita actualizada: $_skinPreferidaId');
