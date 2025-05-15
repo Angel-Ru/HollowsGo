@@ -633,8 +633,7 @@ exports.modificarContrasenyaUsuari = async (req, res) => {
  *                   type: string
  *                   example: "Error en actualitzar el nom d'usuari."
  */
-const bcrypt = require('bcrypt');
-const connectDB = require('../config/db');
+
 
 // Modificar nom d’usuari
 exports.modificarNomUsuari = async (req, res) => {
