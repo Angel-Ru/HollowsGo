@@ -86,6 +86,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
   Future<void> _toggleFavorite(UserProvider userProvider) async {
     final isCurrentlyFavorite =
         userProvider.personatgePreferitId == widget.personatge.id;
+        print(widget.personatge.id);
     final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
     final success = await userProvider.updatePersonatgePreferit(newId);
   }

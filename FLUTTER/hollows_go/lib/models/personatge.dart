@@ -24,8 +24,8 @@ class Personatge {
     }
 
     return Personatge(
-      id: parseInt(json['personatge_id']),
-      nom: json['personatge_nom'] ?? '',
+      id: parseInt(json['id']),
+      nom: json['nom'] ?? '',
       vidaBase: parseInt(json['vida_base']),
       malBase: parseInt(json['mal_base']),
       skins: [],

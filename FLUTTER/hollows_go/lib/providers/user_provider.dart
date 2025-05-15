@@ -148,7 +148,7 @@ class UserProvider with ChangeNotifier {
       });
 
       final response = await http.put(url, headers: headers, body: body);
-
+      print('Response: ${response.body}');
       if (response.statusCode == 200) {
         _personatgePreferitId = personatgeId;
         print(_personatgePreferitId);
