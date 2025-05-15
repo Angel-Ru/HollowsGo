@@ -1059,47 +1059,37 @@ exports.gachaTiradaEnemics = async (req, res) => {
         const email = req.body.email;
 
         if (!email) {
-            return res.status(400).send('Email no proporcionado.');
+            return res.status(400).send('Email no proporcionat.');
         }
 
-        const pool = await connectDB();
-        const userRecord = await pool.request()
-            .input('email', sql.VarChar(255), email)
-            .query('SELECT id FROM USUARIS WHERE email = @email');
+        const connection = await connectDB();
 
-        if (userRecord.recordset.length === 0) {
-            return res.status(400).send('No se encuentra un usuario con ese correo electrónico.');
+        // Obtenir usuari per email
+        const [userRows] = await connection.execute(
+            'SELECT id, punts_emmagatzemats FROM USUARIS WHERE email = ?',
+            [email]
+        );
+
+        if (userRows.length === 0) {
+            return res.status(400).send('No es troba cap usuari amb aquest correu electrònic.');
         }
 
-        const userId = userRecord.recordset[0].id;
+        const user = userRows[0];
 
-        const userBalance = await pool.request()
-            .input('userId', sql.Int, userId)
-            .query('SELECT punts_emmagatzemats FROM USUARIS WHERE id = @userId');
-
-        if (userBalance.recordset.length === 0 || userBalance.recordset[0].punts_emmagatzemats < 100) {
-            return res.status(400).send('No tienes suficientes monedas para hacer el tiro.');
+        if (user.punts_emmagatzemats < 100) {
+            return res.status(400).send('No tens suficients monedes per fer la tirada.');
         }
-
-        // Descontar 100 punts
-        await pool.request()
-            .input('userId', sql.Int, userId)
-            .input('newBalance', sql.Int, userBalance.recordset[0].punts_emmagatzemats - 100)
-            .query('UPDATE USUARIS SET punts_emmagatzemats = @newBalance WHERE id = @userId');
 
         // Obtenir totes les skins enemigues disponibles (raça 2)
-        const availableSkins = await pool.request()
-            .query(`
-                SELECT *
-                FROM SKINS s
-                WHERE s.raça = 2
-            `);
+        const [skinsRows] = await connection.execute(
+            'SELECT * FROM SKINS WHERE raça = 2'
+        );
 
-        if (availableSkins.recordset.length === 0) {
-            return res.status(400).send('No hi ha skins disponibles.');
+        if (skinsRows.length === 0) {
+            return res.status(400).send('No hi ha skins enemigues disponibles.');
         }
 
-        // Classificar skins per categoria (estrelles)
+        // Agrupar per categoria
         const starGroups = {
             1: [],
             2: [],
@@ -1107,13 +1097,13 @@ exports.gachaTiradaEnemics = async (req, res) => {
             4: []
         };
 
-        availableSkins.recordset.forEach(skin => {
+        skinsRows.forEach(skin => {
             if (starGroups[skin.categoria]) {
                 starGroups[skin.categoria].push(skin);
             }
         });
 
-        // Probabilitats acumulades per categoria
+        // Probabilitats
         const probabilities = [
             { stars: 1, threshold: 0.6 },
             { stars: 2, threshold: 0.7 },
@@ -1131,7 +1121,6 @@ exports.gachaTiradaEnemics = async (req, res) => {
             }
         }
 
-        // Si no hi ha skins d'aquest nivell, baixar a nivells inferiors
         while (starGroups[chosenStars].length === 0 && chosenStars > 1) {
             chosenStars--;
         }
@@ -1139,54 +1128,58 @@ exports.gachaTiradaEnemics = async (req, res) => {
         const selectedGroup = starGroups[chosenStars];
         const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
 
-        // Comprovar si l'usuari ja té aquesta skin per aquest personatge
-        const userSkins = await pool.request()
-            .input('userId', sql.Int, userId)
-            .input('personatgeId', sql.Int, randomSkin.personatge)
-            .query('SELECT skin_ids FROM BIBLIOTECA WHERE user_id = @userId AND personatge_id = @personatgeId');
+        // Comprovar si ja té la skin
+        const [userSkinRows] = await connection.execute(
+            'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
+            [user.id, randomSkin.personatge]
+        );
 
-        let userSkinIds = userSkins.recordset.length > 0 ? userSkins.recordset[0].skin_ids.split(',') : [];
+        let userSkinIds = [];
 
-        if (userSkinIds.includes(randomSkin.id.toString())) {
-            // Si ja la té, no cobrar i enviar missatge
-            await pool.request()
-                .input('userId', sql.Int, userId)
-                .input('newBalance', sql.Int, userBalance.recordset[0].punts_emmagatzemats)
-                .query('UPDATE USUARIS SET punts_emmagatzemats = @newBalance WHERE id = @userId');
-            return res.status(200).send({message: "Ja tens aquesta skin."});
+        if (userSkinRows.length > 0 && userSkinRows[0].skin_ids) {
+            userSkinIds = userSkinRows[0].skin_ids.split(',');
         }
 
-        // Afegir la nova skin a la biblioteca
+        const skinAlreadyOwned = userSkinIds.includes(randomSkin.id.toString());
+
+        if (skinAlreadyOwned) {
+            // Retornar les monedes
+            await connection.execute(
+                'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+                [user.punts_emmagatzemats, user.id]
+            );
+
+            return res.status(200).send({ message: 'Ja tens aquesta skin.' });
+        }
+
+        // Descomptar les monedes
+        const newBalance = user.punts_emmagatzemats - 100;
+
+        await connection.execute(
+            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+            [newBalance, user.id]
+        );
+
+        // Afegir skin
         userSkinIds.push(randomSkin.id);
         const updatedSkinIds = userSkinIds.join(',');
 
-        if (userSkins.recordset.length === 0) {
-            await pool.request()
-                .input('userId', sql.Int, userId)
-                .input('personatgeId', sql.Int, randomSkin.personatge)
-                .input('updatedSkinIds', sql.NVarChar, updatedSkinIds)
-                .input('date', sql.DateTime, new Date())
-                .query(`
-                    INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
-                    VALUES (@userId, @personatgeId, @date, @updatedSkinIds)
-                `);
+        if (userSkinRows.length === 0) {
+            await connection.execute(
+                'INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids) VALUES (?, ?, ?, ?)',
+                [user.id, randomSkin.personatge, new Date(), updatedSkinIds]
+            );
         } else {
-            await pool.request()
-                .input('userId', sql.Int, userId)
-                .input('personatgeId', sql.Int, randomSkin.personatge)
-                .input('updatedSkinIds', sql.NVarChar, updatedSkinIds)
-                .query(`
-                    UPDATE BIBLIOTECA
-                    SET skin_ids = @updatedSkinIds
-                    WHERE user_id = @userId
-                      AND personatge_id = @personatgeId
-                `);
+            await connection.execute(
+                'UPDATE BIBLIOTECA SET skin_ids = ? WHERE user_id = ? AND personatge_id = ?',
+                [updatedSkinIds, user.id, randomSkin.personatge]
+            );
         }
 
         res.status(200).send({
-            message: '¡Tirada gacha realitzada amb éxit!',
+            message: '¡Tirada gacha realitzada amb èxit!',
             skin: randomSkin,
-            remainingCoins: userBalance.recordset[0].punts_emmagatzemats - 100,
+            remainingCoins: newBalance,
         });
 
     } catch (err) {
@@ -1194,6 +1187,7 @@ exports.gachaTiradaEnemics = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
