@@ -1,8 +1,12 @@
-import 'dart:ui';
-import 'package:hollows_go/providers/map_provider.dart';
-import 'package:hollows_go/providers/perfil_provider.dart';
+import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/screens/prefilscreen.dart';
-import '../imports.dart';
+import 'package:hollows_go/widgets/home/dialogue_section.dart';
+import 'package:hollows_go/widgets/home/home_app_bar.dart';
+import 'package:hollows_go/widgets/home/home_background.dart';
+import 'package:hollows_go/widgets/home/home_screen_controller.dart';
+
+
+
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,52 +14,30 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // CHARACTER IMAGES AND DIALOGUES
-  String _imagePath = '';  
-  
-  final String _coinImagePath =
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png';
-
+  late final HomeScreenController _controller;
+  String _imagePath = '';
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _loadProfileImage();
+    _controller = HomeScreenController(context);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        final avatarUrl = await _controller.loadProfileImage();
+        setState(() => _imagePath = avatarUrl);
+      } catch (e) {
+        print("Error al carregar avatar: $e");
+      }
+
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.fetchUserPoints();
-      _timer = Timer.periodic(Duration(seconds: 5), (timer) {
-        userProvider.fetchUserPoints();
-      });
+      _timer = Timer.periodic(Duration(seconds: 5), (_) => userProvider.fetchUserPoints());
 
-      final dialogueProvider =
-          Provider.of<DialogueProvider>(context, listen: false);
-      dialogueProvider.loadDialogueFromJson("ichigo");
+      Provider.of<DialogueProvider>(context, listen: false).loadDialogueFromJson("ichigo");
+      await _controller.loadUserData();
     });
-    _loadUserData();
-
-  }
-
-  Future<void> _loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getInt('userId');
-
-    if (userId == null) {
-      print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
-      return;
-    }
-
-    final provider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-
-    await provider.fetchPersonatgesAmbSkins(userId.toString());
-    precargarImagenes(provider.personatges);
-    precargarImagenes(provider.quincys);
-
-    await provider.fetchEnemicsAmbSkins(userId.toString());
-    precargarImagenes(provider.characterEnemies);
   }
 
   @override
@@ -64,65 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  Future<void> _loadProfileImage() async {
-  final prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getInt('userId');
-
-  if (userId == null) {
-    print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
-    return;
-  }
-
-  final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-
-  try {
-    final avatarUrl = await perfilProvider.obtenirAvatar(userId);
-    setState(() {
-      _imagePath = avatarUrl;
-    });
-
-    final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
-    mapProvider.preloadMapData(
-      profileImagePath: avatarUrl,
-      context: context,
-      imagePaths: [
-        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
-        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rf9vbqlqbpza3inl5syo.png',
-        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/au1f1y75qc1aguz4nzze.png',
-        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
-        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
-      ],
-    );
-  } catch (e) {
-    print('Error obtenint avatar: $e');
-  }
-}
-
-
-  void precargarImagenes(List<Personatge> personatges) {
-    for (var personatge in personatges) {
-      for (var skin in personatge.skins) {
-        final imageUrl = skin.imatge;
-        if (imageUrl != null && imageUrl.isNotEmpty) {
-          CachedNetworkImageProvider(imageUrl).resolve(ImageConfiguration());
-        }
-      }
-    }
-  }
-
-  // INFERIOR NAVIGATION BAR
-  Widget _getSelectedScreen(int selectedIndex) {
-    switch (selectedIndex) {
-      case 1:
-        return Mapscreen(profileImagePath: _imagePath);
-      case 2:
-        return TendaScreen();
-      case 3:
-        return BibliotecaScreen();
-      case 4:
-        return PerfilScreen();
-      default:
-        return Center(child: Text(''));
+  Widget _getSelectedScreen(int index) {
+    switch (index) {
+      case 1: return Mapscreen(profileImagePath: _imagePath);
+      case 2: return TendaScreen();
+      case 3: return BibliotecaScreen();
+      case 4: return PerfilScreen();
+      default: return SizedBox.shrink();
     }
   }
 
@@ -132,124 +62,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: const Color.fromARGB(255, 61, 61, 61),
-              elevation: 0,
-              title: Consumer<UserProvider>(
-                builder: (context, userProvider, child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 20,
-                            backgroundImage: NetworkImage(_coinImagePath),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            '${userProvider.coinCount}',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Text(userProvider.username,
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontWeight: FontWeight.normal,
-                              )),
-                          SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () {
-                              uiProvider.selectedMenuOpt =
-                                  4; // Navega al perfil
-                            },
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundImage: NetworkImage(_imagePath),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
+      appBar: HomeAppBar(imagePath: _imagePath),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'lib/images/homescreen_images/background.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(height: 250),
-                Image.network(
-                  "https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708246/PREHOMESCREEN/ee9hwiaahvn6mj2dcnov.png",
-                  width: 300,
-                ),
-              ],
-            ),
-          ),
-          if (uiProvider.selectedMenuOpt == 0)
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: 0,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(height: 20),
-                  DialogueWidget(
-                    characterName: 'Ichigo Kurosaki',
-                    nameColor: Colors.orange,
-                    bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                  ),
-                ],
-              ),
-            ),
+          HomeBackground(),
+          if (uiProvider.selectedMenuOpt == 0) DialogueSection(),
           _getSelectedScreen(uiProvider.selectedMenuOpt),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CombatScreen()),
-          );
-        },
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CombatScreen())),
         backgroundColor: Colors.red,
-        child: Icon(Icons.sports_martial_arts, color: Colors.white),
+        child: Icon(Icons.sports_martial_arts),
         tooltip: 'Anar a CombatScreen (proves)',
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: uiProvider.selectedMenuOpt,
-        onTap: (index) {
-          uiProvider.selectedMenuOpt = index;
-        },
+        onTap: (i) => uiProvider.selectedMenuOpt = i,
       ),
     );
   }
-
 }

@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'package:hollows_go/providers/map_provider.dart';
-
 import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
@@ -18,6 +18,7 @@ class _MapaScreenState extends State<Mapscreen> {
   bool _isLoading = true;
   Set<Marker> _markers = {};
   final double _radiusInMeters = 250;
+  StreamSubscription<Position>? _positionStream;
 
   final List<String> imagePaths = [
     'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
@@ -30,9 +31,7 @@ class _MapaScreenState extends State<Mapscreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkSkinSelection();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkSkinSelection());
     _initialize();
   }
 
@@ -47,63 +46,72 @@ class _MapaScreenState extends State<Mapscreen> {
     final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
 
     if (mapProvider.isReady && mapProvider.currentLocation != null) {
-      // Ja està tot carregat en segon pla
-      setState(() {
-        _currentLocation = mapProvider.currentLocation;
-        _markers = mapProvider.cachedMarkers;
-        _isLoading = false;
-      });
-    } 
-  }
-
-  Future<void> _updateMarkers(LatLng location) async {
-    try {
-      final newMarkers = await MarkerHelper.generateMarkers(
-        currentLocation: location,
-        profileImagePath: widget.profileImagePath,
+      _currentLocation = mapProvider.currentLocation;
+      _startLocationUpdates();
+      final enemyMarkers = await MarkerHelper.generateEnemyMarkers(
+        currentLocation: _currentLocation!,
         context: context,
         imagePaths: imagePaths,
         radius: _radiusInMeters,
       );
 
       setState(() {
-        _markers = newMarkers;
+        _markers.addAll(enemyMarkers);
+        _isLoading = false;
       });
-    } catch (e) {
-      _showErrorDialog('Error en carregar els marcadors: $e');
     }
   }
 
-  void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Tancar'),
-          ),
-        ],
-      ),
-    );
+  void _startLocationUpdates() {
+    _positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    ).listen((Position position) async {
+      final LatLng newLocation = LatLng(position.latitude, position.longitude);
+      final Marker userMarker = await MarkerHelper.buildCurrentUserMarker(
+        location: newLocation,
+        profileImageUrl: widget.profileImagePath,
+      );
+
+      setState(() {
+        _currentLocation = newLocation;
+        _markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+        _markers.add(userMarker);
+      });
+    });
   }
 
   @override
   void didUpdateWidget(Mapscreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.profileImagePath != widget.profileImagePath && _currentLocation != null) {
-      _updateMarkers(_currentLocation!);
+      _updateUserMarker();
     }
+  }
+
+  Future<void> _updateUserMarker() async {
+    if (_currentLocation == null) return;
+
+    final Marker updatedMarker = await MarkerHelper.buildCurrentUserMarker(
+      location: _currentLocation!,
+      profileImageUrl: widget.profileImagePath,
+    );
+
+    setState(() {
+      _markers.removeWhere((m) => m.markerId.value == 'currentLocation');
+      _markers.add(updatedMarker);
+    });
+  }
+
+  @override
+  void dispose() {
+    _positionStream?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading || _currentLocation == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final CameraPosition _puntInicial = CameraPosition(
@@ -116,7 +124,7 @@ class _MapaScreenState extends State<Mapscreen> {
       body: Stack(
         children: [
           GoogleMap(
-            myLocationEnabled: true,
+            myLocationEnabled: true, 
             myLocationButtonEnabled: true,
             markers: _markers,
             mapType: _currentMapType,
