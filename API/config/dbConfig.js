@@ -1,29 +1,26 @@
-const sql = require('mssql');
+const mysql = require('mysql2/promise');
 
 const dbConfig = {
-    server: 'hollowsho.database.windows.net',
-    user: 'angel',
-    password: 'CalaClara21.',
-    database: 'hollowsgo',
-    options: {
-        encrypt: true,
-        trustServerCertificate: true
-    }
+    host: 'turntable.proxy.rlwy.net',
+    port: 10233,
+    user: 'root',
+    password: 'MNVyvLmZogsxlkmHKzsztJFowEvoIDZN',
+    database: 'hollowsgo' // Asegúrate de que esta base de datos exista
 };
 
-let poolPromise;
+let pool;
 
 async function connectDB() {
-    if (!poolPromise) {
-        poolPromise = sql.connect(dbConfig).then(pool => {
-            console.log('Connexió a la base de dades establerta correctament');
-            return pool;
-        }).catch(err => {
-            console.error('Error amb la connexió a la base de dades:', err);
+    if (!pool) {
+        try {
+            pool = await mysql.createPool(dbConfig);
+            console.log('Conexión a la base de datos MySQL establecida correctamente');
+        } catch (err) {
+            console.error('Error al conectar con la base de datos MySQL:', err);
             throw err;
-        });
+        }
     }
-    return poolPromise;
+    return pool;
 }
 
-module.exports = { connectDB, sql };
+module.exports = { connectDB };
