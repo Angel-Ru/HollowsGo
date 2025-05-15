@@ -633,36 +633,40 @@ exports.modificarContrasenyaUsuari = async (req, res) => {
  *                   type: string
  *                   example: "Error en actualitzar el nom d'usuari."
  */
+const bcrypt = require('bcrypt');
+const connectDB = require('../config/db');
+
+// Modificar nom d’usuari
 exports.modificarNomUsuari = async (req, res) => {
     try {
         const { id, nouNom, contrasenyaActual } = req.body;
+        const connection = await connectDB();
 
-        const pool = await connectDB();
+        // Obtenir la contrasenya actual
+        const [userRows] = await connection.execute(
+            'SELECT contrassenya FROM USUARIS WHERE id = ?',
+            [id]
+        );
 
-        // Obtenir la contrasenya actual de l'usuari
-        const userResult = await pool.request()
-            .input('id', sql.Int, id)
-            .query('SELECT contrassenya FROM USUARIS WHERE id = @id');
-
-        if (userResult.recordset.length === 0) {
+        if (userRows.length === 0) {
             return res.status(404).send('Usuari no trobat.');
         }
 
-        const contrasenyaHash = userResult.recordset[0].contrassenya;
+        const contrasenyaHash = userRows[0].contrassenya;
 
         // Verificar la contrasenya actual
-        const contrasenyaCorrecta = await bcrypt.compare(contrasenyaActual, contrasenyaHash);
+        const contrasenyaCorrecta = await bcrypt.compare(contrasenyaActual, contrassenyaHash);
         if (!contrasenyaCorrecta) {
             return res.status(400).send('Contrasenya actual incorrecta.');
         }
 
-        // Actualitzar el nom de l'usuari
-        const result = await pool.request()
-            .input('id', sql.Int, id)
-            .input('nouNom', sql.VarChar(50), nouNom)
-            .query('UPDATE USUARIS SET nom = @nouNom WHERE id = @id');
+        // Actualitzar el nom
+        const [updateResult] = await connection.execute(
+            'UPDATE USUARIS SET nom = ? WHERE id = ?',
+            [nouNom, id]
+        );
 
-        if (result.rowsAffected[0] === 0) {
+        if (updateResult.affectedRows === 0) {
             return res.status(404).send('Usuari no trobat.');
         }
 
@@ -672,13 +676,18 @@ exports.modificarNomUsuari = async (req, res) => {
         res.status(500).send('Error en actualitzar el nom d\'usuari.');
     }
 };
-//Endpoint per quan jugues una partida actualitzar el nombre de partides jugades
+
+// Sumar partida jugada
 exports.sumarPartidaJugada = async (req, res) => {
     try {
-        const pool = await connectDB();
-        await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('UPDATE PERFIL_USUARI SET partides_jugades = partides_jugades + 1 WHERE usuari = @id');
+        const connection = await connectDB();
+        const userId = req.params.id;
+
+        await connection.execute(
+            'UPDATE PERFIL_USUARI SET partides_jugades = partides_jugades + 1 WHERE usuari = ?',
+            [userId]
+        );
+
         res.send('Partida jugada sumada');
     } catch (err) {
         console.error(err);
@@ -686,19 +695,24 @@ exports.sumarPartidaJugada = async (req, res) => {
     }
 };
 
-//Endpoint per quan jugues una partides i la guanyes
+// Sumar partida guanyada
 exports.sumartPartidaGuanyada = async (req, res) => {
     try {
-        const pool = await connectDB();
-        await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('UPDATE PERFIL_USUARI SET partides_guanyades = partides_guanyades + 1 WHERE usuari = @id');
+        const connection = await connectDB();
+        const userId = req.params.id;
+
+        await connection.execute(
+            'UPDATE PERFIL_USUARI SET partides_guanyades = partides_guanyades + 1 WHERE usuari = ?',
+            [userId]
+        );
+
         res.send('Partida guanyada sumada');
     } catch (err) {
         console.error(err);
         res.status(500).send("Error alhora de sumar la partida guanyada");
     }
 };
+
 // Endpoint per mostrar dades del perfil de l'usuari
 exports.mostrarDadesPerfil = async (req, res) => {
     try {
