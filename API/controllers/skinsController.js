@@ -660,7 +660,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                    b.personatge_id
             FROM SKINS s
             JOIN BIBLIOTECA b ON FIND_IN_SET(s.id, b.skin_ids) > 0
-            LEFT JOIN skins_armes sa ON s.id = sa.skin
+            LEFT JOIN SKINS_ARMES sa ON s.id = sa.skin
             LEFT JOIN ARMES ar ON sa.arma = ar.id
             LEFT JOIN ATACS a ON s.atac = a.id
             WHERE b.user_id = ? AND s.raça = 1
@@ -1011,7 +1011,7 @@ exports.getPersonatgesAmbSkinsPerUsuariQuincy = async (req, res) => {
                        b.personatge_id
                 FROM SKINS s
                          JOIN BIBLIOTECA b ON s.id IN (SELECT value FROM STRING_SPLIT(b.skin_ids, ','))
-                         LEFT JOIN skins_armes sa ON s.id = sa.skin
+                         LEFT JOIN SKINS_ARMES sa ON s.id = sa.skin
                          LEFT JOIN ARMES ar ON sa.arma = ar.id
                          LEFT JOIN ATACS a ON s.atac = a.id
                 WHERE b.user_id = @userId and s.raça = 0
@@ -1243,7 +1243,7 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
                        b.personatge_id
                 FROM SKINS s
                          JOIN BIBLIOTECA b ON s.id IN (SELECT value FROM STRING_SPLIT(b.skin_ids, ','))
-                         LEFT JOIN skins_armes sa ON s.id = sa.skin
+                         LEFT JOIN SKINS_ARMES sa ON s.id = sa.skin
                          LEFT JOIN ARMES ar ON sa.arma = ar.id
                          LEFT JOIN ATACS a ON s.atac = a.id
                 WHERE b.user_id = @userId and s.raça = 2
