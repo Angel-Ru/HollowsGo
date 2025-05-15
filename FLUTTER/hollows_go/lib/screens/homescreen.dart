@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:hollows_go/providers/map_provider.dart';
+import 'package:hollows_go/providers/perfil_provider.dart';
 import 'package:hollows_go/screens/prefilscreen.dart';
 import '../imports.dart';
 
@@ -10,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // CHARACTER IMAGES AND DIALOGUES
-  String _imagePath = 'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png';  
+  String _imagePath = '';  
   
   final String _coinImagePath =
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png';
@@ -34,18 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
       dialogueProvider.loadDialogueFromJson("ichigo");
     });
     _loadUserData();
-    final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
-  mapProvider.preloadMapData(
-  profileImagePath: _imagePath,
-  context: context,
-  imagePaths: [
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rf9vbqlqbpza3inl5syo.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/au1f1y75qc1aguz4nzze.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
-  ],
-);
 
   }
 
@@ -75,17 +64,40 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  // USER PERFIL IMAGE
   Future<void> _loadProfileImage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final imagePath = prefs.getString('profileImagePath');
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getInt('userId');
 
-    setState(() {
-      _imagePath = (imagePath != null && imagePath.isNotEmpty)
-          ? imagePath
-          : 'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
-    });
+  if (userId == null) {
+    print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
+    return;
   }
+
+  final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+
+  try {
+    final avatarUrl = await perfilProvider.obtenirAvatar(userId);
+    setState(() {
+      _imagePath = avatarUrl;
+    });
+
+    final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
+    mapProvider.preloadMapData(
+      profileImagePath: avatarUrl,
+      context: context,
+      imagePaths: [
+        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
+        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rf9vbqlqbpza3inl5syo.png',
+        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/au1f1y75qc1aguz4nzze.png',
+        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
+        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
+      ],
+    );
+  } catch (e) {
+    print('Error obtenint avatar: $e');
+  }
+}
+
 
   void precargarImagenes(List<Personatge> personatges) {
     for (var personatge in personatges) {
@@ -240,25 +252,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // PICK IMAGE METHOD
-  Future<void> _pickImage(BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ImageSelectionPage(
-          onImageSelected: (String imagePath) {
-            setState(() {
-              _imagePath = imagePath;
-            });
-            Navigator.of(context).pop(imagePath);
-          },
-        ),
-      ),
-    ).then((imagePath) async {
-      if (imagePath != null) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('profileImagePath', _imagePath);
-      }
-    });
-  }
 }

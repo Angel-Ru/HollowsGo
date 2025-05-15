@@ -16,29 +16,29 @@ class _PerfilScreenState extends State<PerfilScreen> {
   String _imagePath =
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
 
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileImage();
+@override
+void initState() {
+  super.initState();
 
-    // Cargar datos de perfil
-    Future.microtask(() async {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getInt('userId');
-      print('User ID: $userId');
-      final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-      perfilProvider.fetchPerfilData(userId!);
-    });
-  }
-
-  Future<void> _loadProfileImage() async {
+  Future.microtask(() async {
     final prefs = await SharedPreferences.getInstance();
-    final imagePath = prefs.getString('profileImagePath');
-    setState(() {
-      _imagePath =
-          (imagePath != null && imagePath.isNotEmpty) ? imagePath : _imagePath;
-    });
-  }
+    final userId = prefs.getInt('userId');
+    if (userId == null) return;
+
+    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+
+    // Cargar datos del perfil y avatar
+    await perfilProvider.fetchPerfilData(userId);
+    try {
+      final avatarUrl = await perfilProvider.obtenirAvatar(userId);
+      setState(() {
+        _imagePath = avatarUrl;
+      });
+    } catch (e) {
+      print('Error obtenint avatar: $e');
+    }
+  });
+}
 
   Future<void> _pickImage(BuildContext context) async {
     await Navigator.push(
