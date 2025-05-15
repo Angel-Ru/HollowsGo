@@ -1,11 +1,4 @@
-import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../providers/user_provider.dart';
-import '../providers/perfil_provider.dart';
-import 'imageselectionpage.dart';
-import 'settingsscreen.dart';
+import '../imports.dart';
 
 class PerfilScreen extends StatefulWidget {
   @override
@@ -19,26 +12,37 @@ class _PerfilScreenState extends State<PerfilScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeData();
+  }
 
-    Future.microtask(() async {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getInt('userId');
-      if (userId == null) return;
+  Future<void> _initializeData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId');
+    if (userId == null) return;
 
-      final perfilProvider =
-          Provider.of<PerfilProvider>(context, listen: false);
+    // Obtener providers
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
 
-      // Cargar datos del perfil y avatar
-      await perfilProvider.fetchPerfilData(userId);
-      try {
-        final avatarUrl = await perfilProvider.obtenirAvatar(userId);
+    // Cargar todos los datos necesarios
+    await Future.wait([
+      userProvider.fetchFavoritePersonatgeSkin(), // <-- Añade esta línea
+      perfilProvider.fetchPerfilData(userId),
+      _loadAvatar(userId, perfilProvider),
+    ]);
+  }
+
+  Future<void> _loadAvatar(int userId, PerfilProvider perfilProvider) async {
+    try {
+      final avatarUrl = await perfilProvider.obtenirAvatar(userId);
+      if (mounted) {
         setState(() {
           _imagePath = avatarUrl;
         });
-      } catch (e) {
-        print('Error obtenint avatar: $e');
       }
-    });
+    } catch (e) {
+      print('Error obtenint avatar: $e');
+    }
   }
 
   Future<void> _pickImage(BuildContext context) async {
@@ -71,8 +75,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final perfilProvider = Provider.of<PerfilProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context, listen: true);
+    final perfilProvider = Provider.of<PerfilProvider>(context, listen: true);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -235,137 +239,131 @@ class _PerfilScreenState extends State<PerfilScreen> {
                           ),
                           SizedBox(height: 15),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Jugades:',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
+                              // Columna izquierda: Partidas + Personatge favorit
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Jugades',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white70)),
+                                    Text('${perfilProvider.partidesJugades}',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                    SizedBox(height: 8),
+                                    Text('Guanyades',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white70)),
+                                    Text('${perfilProvider.partidesGuanyades}',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                    SizedBox(height: 12),
+                                    Text(
+                                      'Preferits',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    '${perfilProvider.partidesJugades}',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Guanyades:',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${perfilProvider.partidesGuanyades}',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                                    SizedBox(height: 6),
+                                    if (userProvider.personatgepreferitnom !=
+                                        null)
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Personatge preferit',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white70)),
+                                          Text(
+                                              userProvider
+                                                      .personatgepreferitnom ??
+                                                  'No seleccionat',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white)),
+                                        ],
+                                      ),
+                                  ],
+                                ),
                               ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    'En possessió:',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${perfilProvider.nombrePersonatges}',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  Text(
-                                    'Skins:',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${perfilProvider.nombreSkins}',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+
+                              // Columna derecha: Personatges + Skin preferida
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text('En possessió',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white70)),
+                                    Text('${perfilProvider.nombrePersonatges}',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                    SizedBox(height: 8),
+                                    Text('Skins',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white70)),
+                                    Text('${perfilProvider.nombreSkins}',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white)),
+                                    SizedBox(height: 45),
+                                    if (userProvider.skinPreferidaimatge !=
+                                        null)
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: [
+                                          Text('Skin preferida',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white70)),
+                                          SizedBox(height: 6),
+                                          Container(
+                                            height: 130,
+                                            width: 130,
+                                            margin: EdgeInsets.only(right: 4),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              image: DecorationImage(
+                                                image: NetworkImage(userProvider
+                                                    .skinPreferidaimatge!),
+                                                fit: BoxFit.cover,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.3),
+                                                  blurRadius: 4,
+                                                  offset: Offset(2, 2),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
+                                ),
                               ),
                             ],
-                          ),
-                          // Sección de Preferits correctamente colocada fuera del Row principal
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 40, vertical: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Preferits',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(height: 15),
-                                if (userProvider.personatgepreferitnom != null)
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Personatge favorit:',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white70,
-                                        ),
-                                      ),
-                                      Text(
-                                        userProvider.personatgepreferitnom ??
-                                            'No seleccionat',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                SizedBox(height: 10),
-                                if (userProvider.skinPreferidaimatge != null)
-                                  Container(
-                                    height: 100,
-                                    width: 100,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                            userProvider.skinPreferidaimatge!),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
                           ),
                         ],
                       ),

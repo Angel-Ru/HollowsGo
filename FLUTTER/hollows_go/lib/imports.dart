@@ -11,6 +11,7 @@ export '/screens/bibliotecascreen.dart';
 export '/screens/registerdialog.dart';
 export '/screens/combatscreen.dart';
 export '/screens/mapscreen.dart';
+export '/screens/settingsscreen.dart';
 
 export '/providers/loginprovider.dart';
 export '/providers/ui_provider.dart';
@@ -18,6 +19,7 @@ export '/providers/dialeg_provider.dart';
 export '/providers/user_provider.dart';
 export '/providers/skins_enemics_personatges.dart';
 export '/providers/gacha_provider.dart';
+export '/providers/perfil_provider.dart';
 
 export '../config.dart';
 

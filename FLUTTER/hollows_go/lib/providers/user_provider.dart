@@ -31,6 +31,8 @@ class UserProvider with ChangeNotifier {
     _loadUserData();
   }
 
+  get skinPreferidaNom => null;
+
   // LOAD ALL USER DATA
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
