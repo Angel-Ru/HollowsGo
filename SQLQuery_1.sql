@@ -823,3 +823,1010 @@ UPDATE SKINS SET atac = 85 where personatge = 72;
 UPDATE SKINS SET atac = 86 where personatge = 76;
 UPDATE SKINS SET atac = 87 where personatge = 89;
 */
+
+/*
+
+--Updates Miquel
+-- Aizen
+UPDATE personatges SET 
+    Classe = '�nima', 
+    descripcio = N'Un geni manipulador amb un poder hipn�tic absolut, l''antic Capit� del 5� Escamot del Gotei 13. La seva Zanpakuto, Kyoka Suigetsu, controla els sentits dels seus enemics. Ambiti�s i fred, cerca trascendir els l�mits de shinigamis i d�us.',
+    altura = 186, 
+    pes = 74.0, 
+    G�nere = 'M', 
+    aniversari = '2000-05-29' 
+WHERE id = 1;
+
+-- Byakuya
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Capit� del 6� Escamot del Gotei 13 i germ� de la Rukia Kuchiki. El seu Senbonzakura es descompon en milers de fulles afilades que simulen p�tals d''un cirerer. Orgullos i elegant, sota la seva fredor, amaga un profund sentit d''honor i lleialtat.',
+    altura = 180,
+    pes = 64.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-01-31' AS DATE)
+WHERE id = 2;
+
+-- Chad
+UPDATE personatges
+SET 
+    Classe = 'Hum�',
+    descripcio = N'Un hum� amic de l''Ichigo Kurosaki, que t� una for�a sobrehumana als bra�os. El seu poder prov� de la sang i el cor, protegint als seus amics sense dubtar. I encara que intimidi i sigui poc xerrador, t� un cor gegant.',
+    altura = 196,
+    pes = 112.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-04-07' AS DATE)
+WHERE id = 3;
+
+-- Dondochakka
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'�s un Hollow germ� de la Nel i el Pesche, i amic de l''Ichigo, amb una m�scara peculiar i un cor innocent. La seva relaci� amb Pesche es c�mica.',
+    altura = 204,
+    pes = 162.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-06-30' AS DATE)
+WHERE id = 4;
+
+--Ganju
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Un shinigami rebel i bromista, germ� de la Kukaku Shiba, i membre del propi clan Shiba, �s un expert en explosions i t�cniques. Encara que sembla poc seri�s t� un gran sentit de la justicia i la familia.',
+    altura = 182,
+    pes = 106.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-10-15' AS DATE)
+WHERE id = 5;
+
+-- Gin
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'L''antic Capit� del 3er Escamot del Gotei 13, fred i enigm�tic, amb un somriure que amaga les seves veritables intencions. La seva Zanpakuto, Shinso, s''est�n a velocitat letal. Mai se sap si es amic o enemic.',
+    altura = 185,
+    pes = 69.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-09-10' AS DATE)
+WHERE id = 6;
+
+-- Hitsugaya
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'El Capit� m�s Jove del Gotei 13, sent Capit� del 10� Escamot, t� un poder gelat devastador. La seva Zanpakuto, Hyorinmaru, invoca un drac de gel que congela tot al seu pas. Madur m�s enll� dels seus anys.',
+    altura = 133,
+    pes = 26.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-12-20' AS DATE)
+WHERE id = 7;
+
+-- Hiyori
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    descripcio = N'Ex-shinigami rebel i membre dels Visored. Malcarada i violenta, per� lleial als seus. La seva m�scara Hollow augmenta la seva velocitat i for�a bruta.',
+    altura = 133,
+    pes = 26.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-08-01' AS DATE)
+WHERE id = 8;
+
+-- Ichigo
+UPDATE personatges
+SET 
+    Classe = 'Hum�',
+    descripcio = N'Un adolescent amb habilitats de Shinigami, Hollow i Quincy alhora. La seva Zanpakuto, Zangetsu, t� un gran poder. Lluita per protegir a tothom, sense importar el perill.',
+    altura = 181,
+    pes = 66.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-07-15' AS DATE)
+WHERE id = 9;
+
+-- Kenpachi
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Un guerrer nat que viu nom�s per la lluita. Sent el Capit� del 11� Escamot del Gotei 13, no t� por ni segueix una t�ctica, nom�s busca enemics forts amb qui lluitar a mort. La seva energia espiritual �s aterridora, fins i tot sense alliberar la seva Zanpakuto. Porta un pegat a l''ull que suprimeix el seu poder real. La seva �nica regla �s: "Diverteix-te en la batalla".',
+    altura = 202,
+    pes = 90.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-11-19' AS DATE)
+WHERE id = 12;
+
+--  Ikkaku
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Membre de l''11� Escamot del Gotei 13 i fidel a Kenpachi. La seva Zanpakuto Hozukimaru es transforma en una llan�a destructora. Encara que sembla un lluitador brut, t� un codi d''honor irrompible.',
+    altura = 182,
+    pes = 76.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-11-09' AS DATE)
+WHERE id = 10;
+
+--Ishida Uryu
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Un Quincy orgull�s i intel�ligent, expert en el tir prec�s amb arc. Rival inicial de l''Ichigo, que despr�s acaba sent un aliat clau. La seva t�cnica Letzt Stil el fa gaireb� invencible.',
+    altura = 176,
+    pes = 55.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-11-06' AS DATE)
+WHERE id = 11;
+
+-- Kensei
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    descripcio = N'Capit� del 9� Escamot i ex-Visored. La seva Zanpakuto, Tachikaze, controla explosions d''aire. Un l�der dur, per� davant tot, just, que valora la for�a i la lleialtat.',
+    altura = 179,
+    pes = 75.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-07-30' AS DATE)
+WHERE id = 13;
+
+-- Kira
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Tinent del 3er Escamot, melanc�lic i culpat despr�s de la tra�ci� del seu capit� i l''Aizen, troba la redempci� en la lluita. La seva Zanpakuto Wabisuke augmenta el pes dels objectius fins a esclafar-los.',
+    altura = 173,
+    pes = 56.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-03-27' AS DATE)
+WHERE id = 14;
+
+-- Kira
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Un Shinigami amb aparen�a de llop gegant, i Capit� del 7� Escamot, creu fermament en la justicia i l''honor. La seva Zanpakuto Tengen Myo''o invoca un guerrer gegant que reflecteix els seus moviments.',
+    altura = 288,
+    pes = 301.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-08-23' AS DATE)
+WHERE id = 15;
+
+-- Kon
+UPDATE personatges
+SET 
+    Classe = '�nima Modificada',
+    descripcio = N'Un Gikon(�nima Artificial) que substitueix al Ichigo quan assumeix la seva feina de Shinigami Substitut, i que la resta del temps est� dins un peluix amb aparen�a de lle�, t� una naturalesa pervertida, que dona peu a situacions c�miques.',
+    altura = 27,
+    pes = 0.182,
+    G�nere = 'M',
+    aniversari = CAST('2000-12-30' AS DATE)
+WHERE id = 16;
+
+-- Kyoraku
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Capit� del 1er Escamot del Gotei 13 despr�s de Yamamoto. Li agrada relaxar-se i beure sake en el temps lliure. Considera com un germ� al Ukitake. T� una Zanpakuto doble, la Katen Kyokotsu, una especialitzada en atacs r�pids i l''altre en atacs d''energia.',
+    altura = 192,
+    pes = 87.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-07-11' AS DATE)
+WHERE id = 18;
+
+-- Lisa
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    descripcio = N'Ex-Shinigami i Visored, �s una pervertida obsessionada amb les revistes per adults. La seva Zanpakuto �s una guillotina gegant. R�pida i sarc�stica, per� tamb� una lluitadora formidable.',
+    altura = 162,
+    pes = 52.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-02-03' AS DATE)
+WHERE id = 19;
+
+-- Mayuri
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Capit� del 12� Escamot del Gotei 13 i el m�s marginat de tots. Les seves accions son les m�s q�estionables, �s un cient�fic sense escr�pols que experimenta amb amics i enemics. La seva Zanpakuto Ashisogi Jizo injecta verins letals. Gaudir del caos �s el que m�s li agrada, i sempre porta un �s davall la m�niga.',
+    altura = 174,
+    pes = 54.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-03-30' AS DATE)
+WHERE id = 23;
+
+-- Nel
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'En el seu dia port� el nombre 3 dels "Espada", ara �s una arrancar amb una personalitat infantil per� amb un poder devastador. �s amiga de l''Ichigo. Protegeix als febles amb dol�esa i for�a, encara que es passa el dia plorant pels seus amics.',
+    altura = 176,
+    pes = 63.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-04-24' AS DATE)
+WHERE id = 24;
+
+-- Ulquiorra
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Fred i filos�fic, porta el nombre 4 dels "Espada", i �s un dels m�s poderosos. Creu que l''exist�ncia no t� sentit. En la seva Segona Etapa es converteix en un �sser quasi invencible.',
+    altura = 169,
+    pes = 55.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-12-01' AS DATE)
+WHERE id = 53;
+
+-- Yhwach
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'El l�der del Wandenreich i pare de tots els Quincies, un d�u ambici�s que vol remodelar el m�n. Poder�s i calculador, absorbeix les �nimes dels seus seguidors per augmentar el seu poder.',
+    altura = 200,
+    pes = 110.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-01-01' AS DATE)
+WHERE id = 76;
+
+-- Yoruichi
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Mestra en velocitat i arts marcials, �s l''anterior Capitana del 2on Escamot del Gotei 13, i es pot transformar en un gat negre. Elegant, enigm�tica i una de les guerreres m�s fortes de la Societat d''�nimes.',
+    altura = 156,
+    pes = 42.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-01-01' AS DATE)
+WHERE id = 37;
+
+-- Orihime
+UPDATE personatges
+SET 
+    Classe = 'Hum�',
+    descripcio = N'Una noia dol�a i compassiva amb habilitats de curaci� i protecci� �niques. Els seus Shun Shun Rikka li permeten rebutjar qualsevol atac. Encara que odia la viol�ncia, lluitar� pels seus amics sense dubtar si cal, sent molt d''afecte cap a l''Ichigo.',
+    altura = 157,
+    pes = 45.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-09-03' AS DATE)
+WHERE id = 25;
+
+-- Bambietta
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy capa� de convertir qualsevol objecte en una bomba. �s violenta, impacient e inestable, odia ser menyspreada pels altres.',
+    altura = 156,
+    pes = 49.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-08-06' AS DATE)
+WHERE id = 71;
+
+-- Ichibe
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'El Shinigami m�s antic, i l�der de l''Escamot Zero, es capa� de controlar els noms de totes les coses, el seu poder es gaireb� div�. Es el responsable de nomenar totes les t�cniques i armes de la Societat d''�nimes.',
+    altura = 181,
+    pes = 105.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-01-01' AS DATE)
+WHERE id = 77;
+
+-- Isshin
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'En el passat fou Capit� del Gotei 13, concretament del 10� Escamot, �s el pare de l''Ichigo i t� un petit Centre M�dic al Barri on viuen, es despreocupat i graci�s, per� un guerrer formidable quan cal protegir a la familia.',
+    altura = 186,
+    pes = 80.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-12-10' AS DATE)
+WHERE id = 85;
+
+-- Yachiru
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'La Tinent del 11� Escamot del Gotei 13, el Kenpachi la considera com una "filla", aquesta t� un p�ssim sentit de l''orientaci�, �s amorosa i bromista amb els amics, per� aterridora en combat.',
+    altura = 109,
+    pes = 15.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-02-12' AS DATE)
+WHERE id = 86;
+
+-- Halibel
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Membre dels "Espada" portant el numero 3, lidera amb serenitat i for�a, pot controlar l''aigua a un nivell devastador. Protegeix a les seves subordinades com una matriarca, mostrant el costat m�s noble dels Arrancar.',
+    altura = 175,
+    pes = 65.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-07-25' AS DATE)
+WHERE id = 47;
+
+-- Wonderweiss
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Creaci� especial de l''Aizen dissenyada per contrarestar al Yamamoto. �s molt poder�s per� a canvi ha perdut la capacitat de parlar i raonar, obeint cegament les ordres de l''Aizen.',
+    altura = 155,
+    pes = 42.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-07-06' AS DATE)
+WHERE id = 54;
+
+--Updates Àngel
+--Askin
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Un membre del Wandenreich amb una actitud relaxada i burleta. El seu poder, "The Deathdealing", li permet manipular la dosi letal de qualsevol subst�ncia dins el cos de l''enemic, fent-lo un adversari gaireb� invulnerable si sap amb qui lluita. Encara que sembla desinteressat, �s un estratega letal que nom�s actua quan li conv�.',
+    altura = 187,
+    pes = 59.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-06-06' AS DATE)
+WHERE id = 63;
+
+-- Gremmy
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Un dels Quincies m�s perillosos, capa� de materialitzar els seus pensaments. La seva imaginaci� sense l�mits �s a la seva vegada el seu major avantatge per� tamb� el seu punt feble.',
+    altura = 155,
+    pes = 49.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-06-30' AS DATE)
+WHERE id = 62;
+
+-- Masaki
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Mare de l''Ichigo Kurosaki i Quincy pura. Mostra el costat m�s hum� dels Quincy, capa� d''estimar i protegir malgrat les tradicions del seu poble en respecte als Shinigami.',
+    altura = 161,
+    pes = 51.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-06-09' AS DATE)
+WHERE id = 65;
+
+-- Oh - Etsu
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Membre de l''Escamot Zero, i creador de les Zanpakutos, amb un coneixement sobre les mateixes absolut, t� una personalitat exc�ntrica i li agrada rapejar a ritme de Hip Hop mentre parla.',
+    altura = 172,
+    pes = 62.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-08-18' AS DATE)
+WHERE id = 74;
+
+-- Ryuken
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Pare de l''Ishida Uryu i �ltim Quincy pur. Mant� una actitud freda i pragm�tica, rebutjant les tradicions radicals del seu poble.',
+    altura = 178,
+    pes = 68.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-03-14' AS DATE)
+WHERE id = 82;
+
+-- Lille
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'El primer Quincy triat per Yhwach. �s un francotirador implacable que dispara trets impossibles.',
+    altura = 182,
+    pes = 84.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-04-11' AS DATE)
+WHERE id = 83;
+
+-- Shukuro
+UPDATE personatges
+SET 
+    Classe = 'Fullbringer',
+    descripcio = N'Fullbringer que manipul� el grup per benefici propi. El seu poder mostra com els m�s febles poden ser els m�s perillosos quan juguen brut.',
+    altura = 198,
+    pes = 73.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-02-04' AS DATE)
+WHERE id = 90;
+
+-- Meninas
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy que posseeix una for�a f�sica descomunal. La seva aparen�a innocent contrasta amb la seva capacitat de destruir edificis amb un sol cop de puny.',
+    altura = 191,
+    pes = 76.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-03-09' AS DATE)
+WHERE id = 64;
+
+-- Cang du
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy amb un poder que li permet endurir la seva pell com a metall indestructible. Un estrateg fred que prefereix esperar i analitzar abans d''actuar. Li pren el Bankai al Hitsugaya.',
+    altura = 177,
+    pes = 70.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-05-27' AS DATE)
+WHERE id = 66;
+
+-- NaNaNa
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy amb una habilitat que li permet detectar i explotar els punts febles dels seus oponents. La seva actitud relaxada i observadora el fa un ca�ador pacient.',
+    altura = 192,
+    pes = 65.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-02-27' AS DATE)
+WHERE id = 67;
+
+--Mask The Masculine
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy que augmenta el seu poder amb les mamballetes dels seus fans. Un personatge exc�ntric i teatral, la seva for�a creix exponencialment mentre m�s espectadors el segueixen.',
+    altura = 200,
+    pes = 120.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-10-20' AS DATE)
+WHERE id = 69;
+
+-- Robert Accutrone
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy amb una habilitat similar a Lille, per� m�s enfocada en la velocitat i precisi� dels seus trets. �s un veter�, que mostra el costat m�s pragm�tic i experimentat dels soldats del Yhwach.',
+    altura = 176,
+    pes = 70.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-10-04' AS DATE)
+WHERE id = 72;
+
+-- Candice Catnip
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy amb el poder de manipular els llamps a voluntat i amb una agressivitat sense igual. La seva personalitat �s explosiva i competitiva, sempre volent demostrar que �s la m�s forta.',
+    altura = 166,
+    pes = 57.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-06-07' AS DATE)
+WHERE id = 73;
+
+-- Barragan
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Quincy amb un poder que li permet augmentar la for�a dels seus atacs cada vegada que mata alg�. Un assass� sense escr�pols que representa la brutalitat pura dels Quincy m�s radicals.',
+    altura = 235,
+    pes = 135.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-03-25' AS DATE)
+WHERE id = 91;
+
+--Abirama
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Arrancar amb habilitats de control de vent. Les seves plomes es transformen en fulles tallants que destrossen els enemics. Un combatent arrogant que sol subestimar als seus oponents.',
+    altura = 183,
+    pes = 92.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-08-19' AS DATE)
+WHERE id = 41;
+
+--Apache
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Membre de les Tres B�sties de Halibel. Ataca amb urpes afilades i una agressivitat animal. Encara que �s poc parladora, la seva pres�ncia en combat �s intimidat�ria.',
+    altura = 156,
+    pes = 42.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-05-17' AS DATE)
+WHERE id = 42;
+
+
+--Asguiaro
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Creat pel Wandenreich, aquest combina atributs de Hollow i Quincy amb t�cniques no convencionals. Representa els horrors de l''experimentaci� descontrolada del Hueco Mundo.',
+    altura = 181,
+    pes = 76.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-06-18' AS DATE)
+WHERE id = 79;
+
+-- Kirio
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio =N'Antiga Capitana del 12� Escamot, i actual integrant de l''Escamot 0, el seu menjar augmenta el poder dels aliats. T� una personalitat exc�ntrica i un coneixement profund de l''energia espiritual.',
+    altura = 174,
+    pes = 67.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-12-16' AS DATE)
+WHERE id = 78;
+
+-- Chojiro
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Tinent del Yamamoto durant m�s de 1000 anys. La seva Zanpakuto Gonryomaru controla els llamps, per� sempre ha estat a l''ombra del seu Capit� sent el seu soldat m�s lleial.',
+    altura = 179,
+    pes = 66.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-11-04' AS DATE)
+WHERE id = 81;
+
+-- Rojuro
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    descripcio = N'Ex-Visored i Capit� del 3er Escamot del Gotei 13. La seva Zanpakuto musical causa il�lusions auditives devastadores pels seus contrincants. Elegant i calculador, t� un estil de combat quasi coreografiat.',
+    altura = 187,
+    pes = 73.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-03-17' AS DATE)
+WHERE id = 87;
+
+--Kugo Ginjo
+UPDATE personatges
+SET 
+    Classe = 'Fullbringer',
+    descripcio = N'L�der dels Fullbringers. I que anteriorment, fou el Primer Shinigami Substitut, t� l''habilitat de manipular l''�nima dels objectes, vol recuperar a tota costa el que li van prendre.',
+    altura = 187,
+    pes = 90.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-11-15' AS DATE)
+WHERE id = 88;
+
+-- Jackie Tristan
+UPDATE personatges
+SET 
+    Classe = 'Fullbringer',
+    descripcio = N'Fullbringer que augmenta el poder caminant sobre superf�cies brutes. Representa la lluita dels marginats. T� un guant de metall que es carrega amb la brut�cia com a font de poder.',
+    altura = 180,
+    pes = 71.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-09-05' AS DATE)
+WHERE id = 89;
+
+--Granz
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'El 8� membre dels "Espada", un geni cient�fic obsessiu. T� una habilitat que li permet analitzar i replicar les habilitats dels enemics. Un psic�pata calculador que gaudeix dissectant els seus oponents vius.',
+    altura = 185,
+    pes = 67.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-06-22' AS DATE)
+WHERE id = 45;
+
+-- Loly
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Ex-Subordinada de l''Aizen que canalitza el seu odi cap a qualsevol que l''amenaci, t� un especial resentiment cap a la Orihime.',
+    altura = 155,
+    pes = 42.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-01-27' AS DATE)
+WHERE id = 49;
+
+--Menos Grande
+UPDATE personatges
+SET 
+    Classe = 'Hollow',
+    descripcio = N'Es una classe de Hollow gegant que act�a amb for�a bruta. Encara que s�n limitats intel�lectualment, la seva pres�ncia massiva sumat al seu atac "Cero destructiu", el fan una amena�a per qualsevol Shinigami novell.',
+    altura = 3000,
+    pes = 1000.0,
+    G�nere = '?',
+    aniversari = NULL
+WHERE id = 50;
+
+-- Senjumaru
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Membre de l''Escamot 0, i teixidora de destins. La seva aparen�a fr�gil amaga un poder que manipula la realitat com si fos tela. Els seus estendards cerimonials s�n en realitat armes letals.',
+    altura = 158,
+    pes = 48.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-11-01' AS DATE)
+WHERE id = 61;
+
+-- Kotetsu
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Tinent del 7� Escamot del Gotei 13. La seva al�ada inusual per una dona Shinigami li dona pres�ncia en camp de batalla, encara que prefereix la curaci� al combat.',
+    altura = 187,
+    pes = 70.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-08-02' AS DATE)
+WHERE id = 17;
+
+-- Love
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    descripcio = N'Ex-Capit� del 7� Escamot. El seu aspecte intimidant combina amb la seva Zanpakuto de foc.',
+    altura = 189,
+    pes = 86.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-10-10' AS DATE)
+WHERE id = 20;
+
+-- Mashiro
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    descripcio = N'Antiga Tinent del 9� Escamot. La seva estatura contrasta amb cops de punys devastadors sent ella, especialista en arts marcials.',
+    altura = 153,
+    pes = 44.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-04-01' AS DATE)
+WHERE id = 21;
+
+-- Matsumoto
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Tinent 10� Escamot del Gotei 13, t� una relaci� c�mica amb el Hitsugaya, el seu capit�. La Hiyori sempre li retreu el seu pes, per� la seva agilitat amb la seva Zanpakuto Hianeko, demostra que les xifres enganyen.',
+    altura = 172,
+    pes = 57.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-09-29' AS DATE)
+WHERE id = 22;
+
+--Updates Albert
+--Ushoda
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    descripcio = N'Gegant dels Visored, es un expert en kido i barreres. Antic membre de la Divisi� del Kido, sorpr�n amb la seva delicadesa en l''artesania.',
+    altura = 257,
+    pes = 377.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-09-08' AS DATE)
+WHERE id = 35;
+
+--  Lilynette
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'Mitja �nima del Coyote Starrk, amb energia inesgotable. La seva petita grand�ria li permet atacar amb rapidesa sorprenent. Porta sempre una pistola proporcionalment gran per a la seva al�ada.',
+    altura = 142,
+    pes = 31.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-01-19' AS DATE)
+WHERE id = 48;
+
+-- Zommari
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    descripcio = N'7� membre dels "Espada" obs�s amb la "gr�cia de D�u". El seu cos esculpit mostra la perfecci� dels arrancar, i el seu poder li permet controlar els moviments amb ulls m�stics.',
+    altura = 196,
+    pes = 100.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-10-13' AS DATE)
+WHERE id = 56;
+
+-- Riruka
+UPDATE personatges
+SET 
+    Classe = 'Fullbringer',
+    descripcio = N'Fullbringer que es fusiona amb nines de joguina. El seu complex d''inferioritat la porta a actuar de manera infantil. T� una obsessi� amb l''Ichigo Kurosaki.',
+    altura = 156,
+    pes = 43.0,
+    G�nere = 'F',
+    aniversari = CAST('2000-04-14' AS DATE)
+WHERE id = 75;
+
+-- Quilge
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    descripcio = N'Inquisidor esvelt com una fulla. La seva constituci� lleugera li dona velocitat letal, el seu poder de "Jail" li permet empresonar als seus contrincants a dins una g�bia inexpugnable.',
+    altura = 178,
+    pes = 59.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-09-01' AS DATE)
+WHERE id = 80;
+
+-- Tenjiro Kirinji
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    descripcio = N'Membre de l''Escamot 0, tamb� anomenat "Deu de les Termes", �s la persona amb majors coneixements m�dics de la Societat d''�nimes, i fou el mestre de la Unohana.',
+    altura = 193,
+    pes = 88.0,
+    G�nere = 'M',
+    aniversari = CAST('2000-05-31' AS DATE)
+WHERE id = 92;
+
+-- Pesche
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-05-25' AS DATE),
+    G�nere = 'M',
+    altura = 175,
+    pes = 54.0,
+    descripcio = N'Un cavaller Hollow lleial i exc�ntric, company de la Nel i el Dondochakka. El seu atac "Cero Sincr�tico" �s poder�s, encara que la seva personalitat despistada el fa menyspreable als enemics ocultant la seva vertadera intel�lig�ncia per protegir als seus. S''ho passa b� fent-li bromes pesades a l''Ishida Uryu.'
+WHERE id = 26;
+
+-- Renji
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-08-31' AS DATE),
+    G�nere = 'M',
+    altura = 188,
+    pes = 78.0,
+    descripcio = N'Tinent del 6� Escamot del Gotei 13, i rival de l''Ichigo. La seva Zanpakuto, Zabimaru, �s una espassa que es transforma en una serp ossuda. Brutal en combat i de cor lleial cap al Byakuya i la Rukia.'
+WHERE id = 27;
+
+-- Rukia
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-01-14' AS DATE),
+    G�nere = 'F',
+    altura = 144,
+    pes = 33.0,
+    descripcio = N'Tinent del 13� Escamot del Gotei 13, germana del Byakuya Kuchiki i fou la Shinigami que li don� poders a l''Ichigo, tinguent una gran amistat amb aquest. La seva Zanpakuto, Sode no Shirayuki, �s una de les espasses m�s belles, capa� de congelar tot al seu pas. Elegant i seriosa, per� amb un sentit de l''humor sec.'
+WHERE id = 28;
+
+-- Soi Fon
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-02-11' AS DATE),
+    G�nere = 'F',
+    altura = 150,
+    pes = 38.0,
+    descripcio = N'Capitana del 2on Escamot del Gotei 13 i l�der dels Onmitsukido. Mant� una rivalitat amb la Yoruichi, qui fou la seva antiga capitana. La seva Zanpakuto, Suzumebachi, mata amb dos cops al mateix lloc. T� una personalitat estricta i sense paci�ncia.'
+WHERE id = 30;
+
+-- Unohana
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-04-21' AS DATE),
+    G�nere = 'F',
+    altura = 159,
+    pes = 45.0,
+    descripcio = N'Capitana del 4t Escamot del Gotei 13 i la millor curandera de tot el Seretei, amb un passat misteri�s que oculta una sed de sang. �s una persona amable i propera. La seva Zanpakuto, Minazuki, pot curar... o destruir amb sang freda.'
+WHERE id = 33;
+
+--Grimmjow
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-07-31' AS DATE),
+    G�nere = 'M',
+    altura = 186,
+    pes = 80.0,
+    descripcio = N'Un Arrancar que forma part dels "Espada", portant el n�mero 6, rival de l''Ichigo. �s un guerrer nat que desitja batalles honorables. La seva "Pantera" el fa m�s r�pid i letal. Odia perdre contra els seus contrincants.'
+WHERE id = 46;
+
+-- Yamamoto
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-01-21' AS DATE),
+    G�nere = 'M',
+    altura = 168,
+    pes = 52.0,
+    descripcio = N'Capit� General del Gotei 13 i el membre m�s vell del Seretei. Estricte i implacable, per� amb profund sentit de just�cia. La seva Zanpakuto, Ryujin Jakka, deixa nom�s cendres al seu pas.'
+WHERE id = 36;
+
+-- Ukitake
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-12-21' AS DATE),
+    G�nere = 'M',
+    altura = 187,
+    pes = 72.0,
+    descripcio = N'Capit� del 13� Escamot del Gotei 13, malalt�s per� amb un cor noble, considera al Kyoraku Shunsui com el seu germ�. Sempre actua amb compassi�, fins hi tot en els moments m�s foscos.'
+WHERE id = 32;
+
+-- Urahara
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-12-31' AS DATE),
+    G�nere = 'M',
+    altura = 183,
+    pes = 69.0,
+    descripcio = N'Antic membre del 12� Escamot del Gotei 13 i primer mestre de l''Ichigo, viu una vida tranquil�la al m�n hum� com a dependent d''una tenda de barri. Sempre est� de broma, encara que �s molt intel�ligent i mai mostra totes les seves cartes fins que �s massa tard pels enemics. La seva Zanpakuto Benihime t� t�cniques vers�tils i impredictibles.'
+WHERE id = 34;
+
+-- Yumichika
+UPDATE personatges
+SET 
+    Classe = '�nima',
+    aniversari = CAST('2000-09-19' AS DATE),
+    G�nere = 'M',
+    altura = 169,
+    pes = 50.0,
+    descripcio = N'Membre del 11� Escamot del Gotei 13 i gran amic del Ikkaku, est� obsessionat amb la bellesa fins i tot en combat. La seva Zanpakuto, Fuji Kujaku, drena l''energia espiritual dels rivals.'
+WHERE id = 38;
+
+-- Aaroniero
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-04-23' AS DATE),
+    G�nere = 'M',
+    altura = 205,
+    pes = 91.0,
+    descripcio = N'Membre dels "Espada" portant el n�mero 9. �s capa� d''absorbir habilitats d''altres Hollows, i emprar aparences d''altres. �s un monstre que disfruta amb el patiment dels altres.'
+WHERE id = 40;
+
+-- Abirama
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-08-19' AS DATE),
+    G�nere = 'M',
+    altura = 183,
+    pes = 92.0,
+    descripcio = N'Arrancar amb habilitats de control de vent. Les seves plomes es transformen en fulles tallants que destrossen els enemics. Un combatent arrogant que sol subestimar als seus oponents.'
+WHERE id = 41;
+
+-- Barragan
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-02-09' AS DATE),
+    G�nere = 'M',
+    altura = 166,
+    pes = 90.0,
+    descripcio = N'Membre dels "Espada" portant el n�mero 2, �s l''antic rei del Hueco Mundo i es pos� a les ordres de l''Aizen. El seu poder de vellesa accelerada desintegra qualsevol cosa al seu voltant. �s arrogant i cruel.'
+WHERE id = 43;
+
+--Coyote
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-01-19' AS DATE),
+    G�nere = 'M',
+    altura = 187,
+    pes = 77.0,
+    descripcio = N'Membre dels "Espada" portant el n�mero 1, un �sser tan poder�s que va dividir la seva �nima per evitar la soledat. Les seves pistoles espirituals s�n devastadores, per� prefereix evitar les lluites.'
+WHERE id = 44;
+
+--Mila
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-08-17' AS DATE),
+    G�nere = 'F',
+    altura = 177,
+    pes = 68.0,
+    descripcio =  N'L�der de les Tres B�sties de Halibel. La seva llan�a espiritual t� un abast impressionant. Lleial fins a la mort cap a la seva capitana, mostra el costat m�s noble dels Arrancar.'
+WHERE id = 51;
+
+-- Nnoitra
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-11-11' AS DATE),
+    G�nere = 'M',
+    altura = 215,
+    pes = 93.0,
+    descripcio = N'Membre dels "Espada" portant el n�mero 5. Menysprea als febles i la seva "Santa Teresa" li dona quatre bra�os. Est� obsessionat amb provar la seva superioritat.'
+WHERE id = 52;
+
+--Zommari
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-10-13' AS DATE),
+    G�nere = 'M',
+    altura = 196,
+    pes = 100.0,
+    descripcio = N'7� membre dels "Espada" obsessionat amb la "gr�cia de D�u". El seu cos esculpit mostra la perfecci� dels arrancar, i el seu poder li permet controlar els moviments amb ulls m�stics.'
+WHERE id = 56;
+
+--Bazz-B
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    aniversari = CAST('2000-07-14' AS DATE),
+    G�nere = 'M',
+    altura = 179,
+    pes = 69.0,
+    descripcio = N'Quincy arrogant amb control sobre flames explosives. El seu poder crema fins l''�nima, i no dubtar� en lluitar per la seva pr�pia superviv�ncia.'
+WHERE id = 60;
+
+-- As Nodt
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    aniversari = CAST('2000-12-29' AS DATE),
+    G�nere = 'M',
+    altura = 179,
+    pes = 59.0,
+    descripcio = N'Un Quincy que manipula la por, i fa que les seves v�ctimes sentin el vertader terror pur. La seva aparen�a fantasmal el fa encara m�s aterridor.'
+WHERE id = 68;
+
+-- Giselle
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    aniversari = CAST('2000-12-24' AS DATE),
+    G�nere = 'MF',
+    altura = 160,
+    pes = 54.0,
+    descripcio = N'Quincy que pot transformar els cad�vers en zombis emprant la seva sang. �s s�dica i impredictible, i guarda un gran secret. Gaudeix convertint als seus enemics en titelles. La seva relaci� amb la Bambietta �s perturbadora.'
+WHERE id = 70;
+
+-- Jugram Haschvalt
+UPDATE personatges
+SET 
+    Classe = 'Quincy',
+    aniversari = CAST('2000-11-05' AS DATE),
+    G�nere = 'M',
+    altura = 189,
+    pes = 80.0,
+    descripcio = N'Amb una aura de misteri, �s el m�xim confident del Yhwach. El seu poder inverteix la sort, convertint la mala sort dels enemics en el seu avantatge. Un estratega fred i calculador.'
+WHERE id = 84;
+
+-- Shinji
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    aniversari = CAST('2000-05-10' AS DATE),
+    G�nere = 'M',
+    altura = 176,
+    pes = 60.0,
+    descripcio = N'L�der dels Visored i Capit� del 5� Escamot del Gotei 13, la seva Zanpakuto, Sakanade, inverteix els sentits als enemics creant el seu "M�n Invertit". La seva actitud relaxada amaga una ment estrat�gica brillant. T� un profund odi cap a l''Aizen.'
+WHERE id = 29;
+
+-- Tosen
+UPDATE personatges
+SET 
+    Classe = 'Visored',
+    aniversari = CAST('2000-11-13' AS DATE),
+    G�nere = 'M',
+    altura = 176,
+    pes = 61.0,
+    descripcio = N'Ex-Capit� del 9� Escamot del Gotei 13 que pateix ceguera i que abra�� el poder Hollow. La seva Zanpakuto t� l''habilitat de privar de tots els sentits als seus rivals. La seva trag�dia el converteix en un home obsessionat amb una just�cia distorsionada.'
+WHERE id = 31;
+
+-- Zommari
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-10-13' AS DATE),
+    G�nere = 'M',
+    altura = 196,
+    pes = 100.0,
+    descripcio = N'7� membre dels "Espada" obsessionat amb la "gr�cia de D�u". El seu cos esculpit mostra la perfecci� dels arrancar, i el seu poder li permet controlar els moviments amb ulls m�stics.'
+WHERE id = 56;
+
+--Yammy
+UPDATE personatges
+SET 
+    Classe = 'Arrancar',
+    aniversari = CAST('2000-04-03' AS DATE),
+    G�nere = 'M',
+    altura = 230,
+    pes = 303.0,
+    descripcio = N'Membre dels "Espada" portant el n�mero 10, aquest augmenta de mida i poder segons el seu nivell de r�bia. El m�s f�sic dels "Espada", per� tamb� el menys intel�ligent i impulsiu. La seva for�a bruta �s letal.'
+WHERE id = 55;
+*/
