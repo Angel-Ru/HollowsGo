@@ -31,6 +31,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     CircleAvatar(
                       radius: 20,
+                      backgroundColor: Colors.transparent,
                       backgroundImage: NetworkImage(
                         'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png',
                       ),
@@ -44,12 +45,14 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Row(
                   children: [
-                    Text(userProvider.username, style: TextStyle(color: Colors.grey)),
+                    Text(userProvider.username,
+                        style: TextStyle(color: Colors.grey)),
                     SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => uiProvider.selectedMenuOpt = 4,
                       child: CircleAvatar(
                         radius: 20,
+                        backgroundColor: Colors.white,
                         backgroundImage: NetworkImage(imagePath),
                       ),
                     ),

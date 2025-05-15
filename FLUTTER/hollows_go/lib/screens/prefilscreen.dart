@@ -16,29 +16,30 @@ class _PerfilScreenState extends State<PerfilScreen> {
   String _imagePath =
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
 
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  Future.microtask(() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getInt('userId');
-    if (userId == null) return;
+    Future.microtask(() async {
+      final prefs = await SharedPreferences.getInstance();
+      final userId = prefs.getInt('userId');
+      if (userId == null) return;
 
-    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+      final perfilProvider =
+          Provider.of<PerfilProvider>(context, listen: false);
 
-    // Cargar datos del perfil y avatar
-    await perfilProvider.fetchPerfilData(userId);
-    try {
-      final avatarUrl = await perfilProvider.obtenirAvatar(userId);
-      setState(() {
-        _imagePath = avatarUrl;
-      });
-    } catch (e) {
-      print('Error obtenint avatar: $e');
-    }
-  });
-}
+      // Cargar datos del perfil y avatar
+      await perfilProvider.fetchPerfilData(userId);
+      try {
+        final avatarUrl = await perfilProvider.obtenirAvatar(userId);
+        setState(() {
+          _imagePath = avatarUrl;
+        });
+      } catch (e) {
+        print('Error obtenint avatar: $e');
+      }
+    });
+  }
 
   Future<void> _pickImage(BuildContext context) async {
     await Navigator.push(
@@ -88,7 +89,6 @@ void initState() {
                 icon: Container(
                   padding: EdgeInsets.all(8),
                   color: Colors.grey.withOpacity(0.1),
-
                   child: Icon(
                     Icons.settings,
                     color: Colors.grey[600],
@@ -114,12 +114,12 @@ void initState() {
                 ),
               ),
             ),
-            
+
             // Filtro para mejorar legibilidad del contenido
             Container(
               color: Colors.black.withOpacity(0.3),
             ),
-            
+
             // Contenido principal
             SingleChildScrollView(
               child: Padding(
@@ -133,6 +133,7 @@ void initState() {
                       children: [
                         CircleAvatar(
                           radius: 60,
+                          backgroundColor: Colors.white,
                           backgroundImage: NetworkImage(_imagePath),
                         ),
                         Positioned(
