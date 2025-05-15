@@ -699,98 +699,94 @@ exports.sumartPartidaGuanyada = async (req, res) => {
         res.status(500).send("Error alhora de sumar la partida guanyada");
     }
 };
-
-//Endpoint per quan vols seleccionar i mostrar les partides jugades i guanyades de l'usuari.
+// Endpoint per mostrar dades del perfil de l'usuari
 exports.mostrarDadesPerfil = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query(`
-                SELECT 
-                    pu.partides_jugades, 
-                    pu.partides_guanyades,
-                    COUNT(DISTINCT b.personatge_id) AS nombre_personatges,
-                    SUM(
-                        CASE 
-                            WHEN b.skin_ids IS NULL OR b.skin_ids = '' THEN 0
-                            ELSE LEN(b.skin_ids) - LEN(REPLACE(b.skin_ids, ',', '')) + 1
-                        END
-                    ) AS nombre_skins
-                FROM 
-                    PERFIL_USUARI pu
-                JOIN 
-                    USUARIS u ON u.id = pu.usuari
-                JOIN 
-                    BIBLIOTECA b ON b.user_id = u.id
-                WHERE 
-                    u.id = @id
-                GROUP BY 
-                    pu.partides_jugades, pu.partides_guanyades
-            `);
+        const connection = await connectDB();
+        const userId = req.params.id;
 
-        res.json(result.recordset[0]);
+        const [rows] = await connection.execute(`
+            SELECT 
+                pu.partides_jugades, 
+                pu.partides_guanyades,
+                COUNT(DISTINCT b.personatge_id) AS nombre_personatges,
+                SUM(
+                    CASE 
+                        WHEN b.skin_ids IS NULL OR b.skin_ids = '' THEN 0
+                        ELSE CHAR_LENGTH(b.skin_ids) - CHAR_LENGTH(REPLACE(b.skin_ids, ',', '')) + 1
+                    END
+                ) AS nombre_skins
+            FROM PERFIL_USUARI pu
+            JOIN USUARIS u ON u.id = pu.usuari
+            JOIN BIBLIOTECA b ON b.user_id = u.id
+            WHERE u.id = ?
+            GROUP BY pu.partides_jugades, pu.partides_guanyades
+        `, [userId]);
+
+        res.json(rows[0]);
     } catch (error) {
         console.error('Error al obtenir dades del perfil:', error);
         res.status(500).json({ message: 'Error del servidor' });
     }
 };
+
 // Obtenir la llista d'avatares
 exports.llistarAvatars = async (req, res) => {
-  try {
-    const pool = await connectDB();
-    const result = await pool.request()
-      .query('SELECT * FROM AVATARS');
-    
-    res.json(result.recordset);
-  } catch (error) {
-    console.error('Error al obtenir els avatars:', error);
-    res.status(500).json({ message: 'Error del servidor' });
-  }
+    try {
+        const connection = await connectDB();
+        const [rows] = await connection.execute('SELECT * FROM AVATARS');
+        res.json(rows);
+    } catch (error) {
+        console.error('Error al obtenir els avatars:', error);
+        res.status(500).json({ message: 'Error del servidor' });
+    }
 };
 
 // Actualitzar l'avatar d'un usuari
 exports.actualitzarAvatar = async (req, res) => {
-  try {
-    const { id, avatarId } = req.body;
+    try {
+        const { id, avatarId } = req.body;
 
-    if (!id || !avatarId) {
-      return res.status(400).json({ message: 'Falten dades requerides' });
+        if (!id || !avatarId) {
+            return res.status(400).json({ message: 'Falten dades requerides' });
+        }
+
+        const connection = await connectDB();
+        await connection.execute(
+            'UPDATE USUARIS SET imatgeperfil = ? WHERE id = ?',
+            [avatarId, id]
+        );
+
+        res.status(200).json({ message: 'Avatar actualitzat correctament' });
+    } catch (err) {
+        console.error('Error en actualitzar l\'avatar:', err);
+        res.status(500).json({ message: 'Error del servidor' });
     }
-
-    const pool = await connectDB();
-    await pool.request()
-      .input('id', sql.Int, id)
-      .input('avatarId', sql.Int, avatarId)
-      .query('UPDATE USUARIS SET imatgeperfil = @avatarId WHERE id = @id');
-
-    res.status(200).json({ message: 'Avatar actualitzat correctament' });
-  } catch (err) {
-    console.error('Error en actualitzar l\'avatar:', err);
-    res.status(500).json({ message: 'Error del servidor' });
-  }
 };
-// Ruta per obtenir l'avatar d'un usuari per ID
+
+// Obtenir l'avatar d’un usuari per ID
 exports.obtenirAvatar = async (req, res) => {
-  try {
-    const { id } = req.params;  // Obtenir l'ID de l'usuari des de la URL
+    try {
+        const userId = req.params.id;
+        const connection = await connectDB();
 
-    const pool = await connectDB();
-    const result = await pool.request()
-      .input('id', sql.Int, id)
-      .query('SELECT a.url FROM USUARIS u JOIN AVATARS a ON a.id = u.imatgeperfil WHERE u.id = @id');  // Consulta per obtenir l'avatar
+        const [rows] = await connection.execute(
+            `SELECT a.url
+             FROM USUARIS u
+             JOIN AVATARS a ON a.id = u.imatgeperfil
+             WHERE u.id = ?`,
+            [userId]
+        );
 
-    if (result.recordset.length === 0) {
-      return res.status(404).json({ message: 'Usuari no trobat' });  // Si no troba l'usuari
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Usuari no trobat' });
+        }
+
+        res.json({ avatarUrl: rows[0].url });
+    } catch (error) {
+        console.error('Error al obtenir l\'avatar:', error);
+        res.status(500).json({ message: 'Error al carregar l\'avatar' });
     }
-
-    const avatarUrl = result.recordset[0].url;  // Obtenir l'URL de l'avatar de la consulta
-    res.json({ avatarUrl });  // Retornar l'avatar URL com a resposta
-
-  } catch (error) {
-    console.error('Error al obtenir l\'avatar:', error);
-    res.status(500).json({ message: 'Error al carregar l\'avatar' });
-  }
 };
 
 
