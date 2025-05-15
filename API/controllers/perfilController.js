@@ -43,16 +43,27 @@ const { connectDB, sql } = require('../config/dbConfig');
 exports.getFavoritePersonatge = async (req, res) => {
     try {
         const { userId } = req.params;
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('userId', userId)
-            .query('SELECT p.personatge_preferit, per.nom, p.skin_preferida_id, s.imatge FROM perfil_usuari p join SKINS s on s.id = p.skin_preferida_id join PERSONATGES per on per.id = p.personatge_preferit WHERE usuari = @userId');
+        const connection = await connectDB();
 
-        if (result.recordset.length === 0) {
+        const [rows] = await connection.execute(
+            `SELECT 
+                p.personatge_preferit, 
+                per.nom, 
+                p.skin_preferida_id, 
+                s.imatge 
+             FROM perfil_usuari p
+             JOIN SKINS s ON s.id = p.skin_preferida_id
+             JOIN PERSONATGES per ON per.id = p.personatge_preferit
+             WHERE p.usuari = ?`,
+            [userId]
+        );
+
+        if (rows.length === 0) {
             return res.status(404).send('Usuari no trobat');
         }
 
-        const { personatge_preferit, skin_preferida_id, nom, imatge } = result.recordset[0];
+        const { personatge_preferit, skin_preferida_id, nom, imatge } = rows[0];
+
         res.send({
             userId,
             personatge_preferit: personatge_preferit || null,
@@ -65,6 +76,7 @@ exports.getFavoritePersonatge = async (req, res) => {
         res.status(500).send('Error en la consulta');
     }
 };
+
 
 
 /**
@@ -111,17 +123,15 @@ exports.updateFavoritePersonatge = async (req, res) => {
             return res.status(400).send('Dades incorrectes: Personatge preferit mancant');
         }
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('userId', userId)
-            .input('personatge_preferit', personatge_preferit)
-            .query(`
-                UPDATE perfil_usuari
-                SET personatge_preferit = @personatge_preferit
-                WHERE usuari = @userId
-            `);
+        const connection = await connectDB();
+        const [result] = await connection.execute(
+            `UPDATE perfil_usuari
+             SET personatge_preferit = ?
+             WHERE usuari = ?`,
+            [personatge_preferit, userId]
+        );
 
-        if (result.rowsAffected[0] === 0) {
+        if (result.affectedRows === 0) {
             return res.status(404).send('Usuari no trobat');
         }
 
@@ -132,6 +142,7 @@ exports.updateFavoritePersonatge = async (req, res) => {
     }
 };
 
+
 exports.updateFavoriteSkin = async (req, res) => {
     try {
         const { userId } = req.params;
@@ -141,21 +152,19 @@ exports.updateFavoriteSkin = async (req, res) => {
             return res.status(400).send('Dades incorrectes: Skin preferida mancant');
         }
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('userId', userId)
-            .input('skin_preferida_id', skin_preferida_id)
-            .query(`
-                UPDATE perfil_usuari
-                SET skin_preferida_id = @skin_preferida_id
-                WHERE usuari = @userId
-            `);
+        const connection = await connectDB();
+        const [result] = await connection.execute(
+            `UPDATE perfil_usuari
+             SET skin_preferida_id = ?
+             WHERE usuari = ?`,
+            [skin_preferida_id, userId]
+        );
 
-        if (result.rowsAffected[0] === 0) {
+        if (result.affectedRows === 0) {
             return res.status(404).send('Usuari no trobat');
         }
 
-        res.send('Skin preferida actualitzat correctament');
+        res.send('Skin preferida actualitzada correctament');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en la consulta');
