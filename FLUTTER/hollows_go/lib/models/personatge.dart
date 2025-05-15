@@ -16,19 +16,26 @@ class Personatge {
   });
 
   factory Personatge.fromJson(Map<String, dynamic> json) {
+    int parseInt(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
     return Personatge(
-      id: json['id'],
-      nom: json['nom'],
-      vidaBase: json['vida_base'],
-      malBase: json['mal_base'],
+      id: parseInt(json['personatge_id']),
+      nom: json['personatge_nom'] ?? '',
+      vidaBase: parseInt(json['vida_base']),
+      malBase: parseInt(json['mal_base']),
       skins: [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'nom': nom,
+      'personatge_id': id,
+      'personatge_nom': nom,
       'vida_base': vidaBase,
       'mal_base': malBase,
       'skins': skins.map((skin) => skin.toJson()).toList(),

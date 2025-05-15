@@ -647,7 +647,6 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         const personatgeIds = personatgesResult.map(p => p.personatge_id);
 
         // Obtenir les skins en una sola consulta
-        // MySQL no té STRING_SPLIT, però podem utilitzar FIND_IN_SET per buscar dins de la cadena de skin_ids
         const [skinsResult] = await connection.execute(`
             SELECT s.id AS skin_id,
                    s.nom AS skin_nom,
@@ -699,6 +698,8 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
             };
         });
 
+        console.log('Resposta personatges amb skins:', JSON.stringify(personatgesAmbSkins, null, 2)); // Aquí veuràs la resposta
+
         res.status(200).json(personatgesAmbSkins);
 
     } catch (err) {
@@ -706,6 +707,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         res.status(500).send('Error en la consulta');
     }
 };
+
 
 
 /**
