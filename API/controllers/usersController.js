@@ -23,11 +23,12 @@ require('dotenv').config();
  *       500:
  *         description: Error en la consulta
  */
+// GET: Tots els usuaris
 exports.getUsuaris = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request().query('SELECT * FROM USUARIS');
-        res.send(result.recordset);
+        const connection = await connectDB();
+        const [rows] = await connection.execute('SELECT * FROM USUARIS');
+        res.send(rows);
     } catch (err) {
         console.error(err);
         res.status(500).send('Error amb la consulta');
@@ -56,11 +57,9 @@ exports.getUsuaris = async (req, res) => {
  */
 exports.getUsuariPerId = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('SELECT * FROM USUARIS WHERE id = @id');
-        res.send(result.recordset);
+        const connection = await connectDB();
+        const [rows] = await connection.execute('SELECT * FROM USUARIS WHERE id = ?', [req.params.id]);
+        res.send(rows);
     } catch (err) {
         console.error(err);
         res.status(500).send('Error amb la consulta');
@@ -91,22 +90,17 @@ exports.getUsuariPerId = async (req, res) => {
  */
 exports.getPuntsUsuari = async (req, res) => {
     try {
-        console.log("Nom rebut:", req.params.nom); // 🟢 Debug
-
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('nom', sql.VarChar(50), req.params.nom)
-            .query('SELECT punts_emmagatzemats, nom FROM USUARIS WHERE nom = @nom');
-
-        console.log("Resultat de la consulta:", result.recordset); // 🟢 Debug
-
-        if (result.recordset.length === 0) {
-            console.log("No s'ha trobat cap usuari amb aquest nom.");
+        const connection = await connectDB();
+        const [rows] = await connection.execute(
+            'SELECT punts_emmagatzemats, nom FROM USUARIS WHERE nom = ?',
+            [req.params.nom]
+        );
+        if (rows.length === 0) {
+            return res.status(404).send("No s'ha trobat cap usuari amb aquest nom.");
         }
-
-        res.send(result.recordset);
+        res.send(rows);
     } catch (err) {
-        console.error("Error amb la consulta:", err);
+        console.error(err);
         res.status(500).send('Error amb la consulta');
     }
 };
@@ -184,17 +178,14 @@ exports.crearUsuariNormal = async (req, res) => {
  */
 exports.borrarUsuari = async (req, res) => {
     try {
-        const pool = await connectDB();
-        await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('DELETE FROM USUARIS WHERE id = @id');
+        const connection = await connectDB();
+        await connection.execute('DELETE FROM USUARIS WHERE id = ?', [req.params.id]);
         res.send('Usuari eliminat correctament');
     } catch (err) {
         console.error(err);
         res.status(500).send("Error alhora d'eliminar l'usuari");
     }
 };
-
 /**
  * @swagger
  * /usuaris/admin/:
@@ -234,22 +225,14 @@ exports.borrarUsuari = async (req, res) => {
  */
 exports.crearUsuariAdmin = async (req, res) => {
     try {
-        const { nom, email, contrassenya = 0 } = req.body;
-        const punts_emmagatzemats = 100;
-        const tipo = 1;
+        const { nom, email, contrassenya } = req.body;
         const hashedPassword = await bcrypt.hash(contrassenya, 10);
-
-        const pool = await connectDB();
-        await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .input('email', sql.VarChar(50), email)
-            .input('contrassenya', sql.VarChar(255), hashedPassword)
-            .input('punts_emmagatzemats', sql.Int, punts_emmagatzemats)
-            .input('tipo', sql.TinyInt, tipo)
-            .query(`
-                INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo)
-                VALUES (@nom, @email, @contrassenya, @punts_emmagatzemats, @tipo)
-            `);
+        const connection = await connectDB();
+        await connection.execute(
+            `INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo)
+             VALUES (?, ?, ?, ?, ?)`,
+            [nom, email, hashedPassword, 100, 1]
+        );
         res.status(201).send('Usuari afegit correctament');
     } catch (err) {
         console.error(err);
@@ -294,31 +277,25 @@ exports.crearUsuariAdmin = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { email, contrassenya } = req.body;
+        const connection = await connectDB();
+        const [rows] = await connection.execute(
+            'SELECT * FROM USUARIS WHERE email = ?',
+            [email]
+        );
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('email', sql.VarChar(50), email)
-            .query(`SELECT * FROM USUARIS WHERE email = @email`);
-
-        if (result.recordset.length === 0) {
+        if (rows.length === 0) {
             return res.status(401).json({ message: "L'usuari no existeix" });
         }
 
-        const user = result.recordset[0]; // Usuari trobat
+        const user = rows[0];
         const passwordMatch = await bcrypt.compare(contrassenya, user.contrassenya);
 
         if (!passwordMatch) {
             return res.status(401).json({ message: "Contrasenya incorrecta" });
         }
 
-        // Generar el token JWT
-        const token = jwt.sign(
-            { id: user.id, tipo: user.tipo },
-            process.env.JWT_SECRET
-        );
-
+        const token = jwt.sign({ id: user.id, tipo: user.tipo }, process.env.JWT_SECRET);
         res.status(200).json({ message: 'Login correcte', user, token });
-
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Error en el servidor" });
@@ -418,64 +395,45 @@ exports.login = async (req, res) => {
 exports.crearUsuariNormalToken = async (req, res) => {
     try {
         const { nom, email, contrassenya } = req.body;
-
         if (!nom || !email || !contrassenya) {
             return res.status(400).send('Tots els camps són obligatoris.');
         }
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('email', sql.VarChar(50), email)
-            .input('nom', sql.VarChar(50), nom)
-            .query('SELECT COUNT(*) AS count FROM USUARIS WHERE email = @email OR nom = @nom');
+        const connection = await connectDB();
+        const [existents] = await connection.execute(
+            'SELECT COUNT(*) AS count FROM USUARIS WHERE email = ? OR nom = ?',
+            [email, nom]
+        );
 
-        if (result.recordset[0].count > 0) {
+        if (existents[0].count > 0) {
             return res.status(400).send("El correu electrònic o el nom d'usuari ja està registrat.");
         }
 
-        const punts_emmagatzemats = 100;
-        const tipo = 0;
         const hashedPassword = await bcrypt.hash(contrassenya, 10);
-
-        const insertResult = await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .input('email', sql.VarChar(50), email)
-            .input('contrassenya', sql.VarChar(255), hashedPassword)
-            .input('punts_emmagatzemats', sql.Int, punts_emmagatzemats)
-            .input('tipo', sql.TinyInt, tipo)
-            .query(`
-                INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo)
-                    OUTPUT INSERTED.id
-                VALUES (@nom, @email, @contrassenya, @punts_emmagatzemats, @tipo)
-            `);
-
-        const newUserId = insertResult.recordset[0].id;
-
-        // Crear el registre en la taula PERFIL_USUARI
-        await pool.request()
-            .input('userId', sql.Int, newUserId)
-            .query(`
-                INSERT INTO PERFIL_USUARI (usuari)
-                VALUES (@userId)
-            `);
-
-        // Generar el token JWT sense expiració
-        const token = jwt.sign(
-            { id: newUserId, tipo: tipo },
-            process.env.JWT_SECRET
+        const [result] = await connection.execute(
+            `INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo)
+             VALUES (?, ?, ?, ?, ?)`,
+            [nom, email, hashedPassword, 100, 0]
         );
 
-        const newUser = {
-            id: newUserId,
-            nom: nom,
-            email: email,
-            punts_emmagatzemats: punts_emmagatzemats,
-            tipo: tipo
-        };
+        const newUserId = result.insertId;
+
+        await connection.execute(
+            'INSERT INTO PERFIL_USUARI (usuari) VALUES (?)',
+            [newUserId]
+        );
+
+        const token = jwt.sign({ id: newUserId, tipo: 0 }, process.env.JWT_SECRET);
 
         res.status(201).json({
-            user: newUser,
-            token: token
+            user: {
+                id: newUserId,
+                nom,
+                email,
+                punts_emmagatzemats: 100,
+                tipo: 0
+            },
+            token
         });
     } catch (err) {
         console.error(err);
@@ -567,39 +525,32 @@ exports.crearUsuariNormalToken = async (req, res) => {
 exports.modificarContrasenyaUsuari = async (req, res) => {
     try {
         const { id, contrasenyaActual, novaContrasenya } = req.body;
+        const connection = await connectDB();
 
-        const pool = await connectDB();
+        const [rows] = await connection.execute(
+            'SELECT contrassenya FROM USUARIS WHERE id = ?',
+            [id]
+        );
 
-        // Obtenir la contrasenya actual de l'usuari
-        const userResult = await pool.request()
-            .input('id', sql.Int, id)
-            .query('SELECT contrassenya FROM USUARIS WHERE id = @id');
-
-        if (userResult.recordset.length === 0) {
+        if (rows.length === 0) {
             return res.status(404).send('Usuari no trobat.');
         }
 
-        const contrasenyaHash = userResult.recordset[0].contrassenya;
-
-        // Verificar la contrasenya actual
-        const contrasenyaCorrecta = await bcrypt.compare(contrasenyaActual, contrasenyaHash);
-        if (!contrasenyaCorrecta) {
+        const passwordMatch = await bcrypt.compare(contrasenyaActual, rows[0].contrassenya);
+        if (!passwordMatch) {
             return res.status(400).send('Contrasenya actual incorrecta.');
         }
 
-        // Generar el hash de la nova contrasenya
-        const novaContrasenyaHash = await bcrypt.hash(novaContrasenya, 10);
+        const hashedNew = await bcrypt.hash(novaContrasenya, 10);
+        await connection.execute(
+            'UPDATE USUARIS SET contrassenya = ? WHERE id = ?',
+            [hashedNew, id]
+        );
 
-        // Actualitzar la contrasenya
-        await pool.request()
-            .input('id', sql.Int, id)
-            .input('novaContrasenya', sql.VarChar(255), novaContrasenyaHash)
-            .query('UPDATE USUARIS SET contrassenya = @novaContrasenya WHERE id = @id');
-
-        res.status(200).send('Contrasenya actualitzada correctament.');
+        res.status(200).json({ message: "Contrasenya actualitzada correctament." });
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en actualitzar la contrasenya.');
+        res.status(500).send("Error en actualitzar la contrasenya.");
     }
 };
 

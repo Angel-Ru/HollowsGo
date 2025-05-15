@@ -5,7 +5,7 @@ const dbConfig = {
     port: 10233,
     user: 'root',
     password: 'MNVyvLmZogsxlkmHKzsztJFowEvoIDZN',
-    database: 'hollowsgo' // Asegúrate de que esta base de datos exista
+    database: 'hollowsgo'
 };
 
 let pool;
