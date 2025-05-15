@@ -51,7 +51,7 @@ exports.getFavoritePersonatge = async (req, res) => {
                 per.nom, 
                 p.skin_preferida_id, 
                 s.imatge 
-             FROM perfil_usuari p
+             FROM PERFIL_USUARI p
              JOIN SKINS s ON s.id = p.skin_preferida_id
              JOIN PERSONATGES per ON per.id = p.personatge_preferit
              WHERE p.usuari = ?`,
@@ -125,7 +125,7 @@ exports.updateFavoritePersonatge = async (req, res) => {
 
         const connection = await connectDB();
         const [result] = await connection.execute(
-            `UPDATE perfil_usuari
+            `UPDATE PERFIL_USUARI
              SET personatge_preferit = ?
              WHERE usuari = ?`,
             [personatge_preferit, userId]
@@ -154,7 +154,7 @@ exports.updateFavoriteSkin = async (req, res) => {
 
         const connection = await connectDB();
         const [result] = await connection.execute(
-            `UPDATE perfil_usuari
+            `UPDATE PERFIL_USUARI
              SET skin_preferida_id = ?
              WHERE usuari = ?`,
             [skin_preferida_id, userId]
