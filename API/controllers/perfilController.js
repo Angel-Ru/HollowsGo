@@ -46,7 +46,7 @@ exports.getFavoritePersonatge = async (req, res) => {
         const pool = await connectDB();
         const result = await pool.request()
             .input('userId', userId)
-            .query('SELECT personatge_preferit, skin_preferida_id FROM perfil_usuari WHERE usuari = @userId');
+            .query('SELECT p.personatge_preferit, per.nom, p.skin_preferida_id, s.imatge FROM perfil_usuari p join SKINS s on s.id = p.skin_preferida_id join PERSONATGES per on per.id = p.personatge_preferit WHERE usuari = @userId');
 
         if (result.recordset.length === 0) {
             return res.status(404).send('Usuari no trobat');
