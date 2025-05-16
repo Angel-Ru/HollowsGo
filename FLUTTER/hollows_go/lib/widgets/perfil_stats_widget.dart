@@ -102,8 +102,10 @@ class PerfilStats extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          _buildStatItem('En possessió', nombrePersonatges.toString()),
-          _buildStatItem('Skins', nombreSkins.toString()),
+          _buildStatItem('En possessió', nombrePersonatges.toString(),
+              alignment: CrossAxisAlignment.end),
+          _buildStatItem('Skins', nombreSkins.toString(),
+              alignment: CrossAxisAlignment.end),
           SizedBox(height: 45),
           if (skinPreferidaImatge != null)
             Column(
@@ -119,9 +121,10 @@ class PerfilStats extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
+  Widget _buildStatItem(String label, String value,
+      {CrossAxisAlignment alignment = CrossAxisAlignment.start}) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: alignment,
       children: [
         _buildStatLabel(label),
         _buildStatValue(value),
