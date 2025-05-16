@@ -41,6 +41,7 @@ class UserProvider with ChangeNotifier {
     _userId = prefs.getInt('userId') ?? 0;
     notifyListeners();
     fetchUserPoints();
+    fetchUserexp();
     fetchFavoritePersonatgeSkin();
   }
 
@@ -198,6 +199,80 @@ class UserProvider with ChangeNotifier {
     } catch (error) {
       print('Error en updateSkinPreferida: $error');
       return false;
+    }
+  }
+
+  Future<void> fetchUserexp() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final String? nomUsuari = prefs.getString('userName');
+      final String? token = prefs.getString('token');
+
+      if (nomUsuari == null || token == null) return;
+
+      final url = Uri.parse('https://${Config.ip}/exp/$nomUsuari');
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        if (data.isNotEmpty) {
+          final int exp = data[0]['exp_emmagatzemada'] ?? 0;
+          final String nom = data[0]['nom'] ?? nomUsuari;
+
+          _coinCount =
+              exp; // Aquí podrías renombrar a _exp si quieres más claridad
+          _username = nom;
+
+          await prefs.setInt('userPunts', exp);
+          await prefs.setString('userName', nom);
+
+          notifyListeners();
+        }
+      } else if (response.statusCode == 404) {
+        print('Usuari no trobat.');
+      } else {
+        print('Error del servidor: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error a fetchUserexp: $error');
+    }
+  }
+
+  Future<void> sumarExperiencia(String nomEnemic) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? nomUsuari = prefs.getString('userName');
+      String? token = prefs.getString('token');
+
+      if (nomUsuari == null || token == null) return;
+
+      final url = Uri.parse('https://${Config.ip}/sumar_exp/$nomUsuari');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.put(
+        url,
+        headers: headers,
+        body: jsonEncode({'nom': nomEnemic}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        int puntsSumats = data['punts_sumats'];
+        print('Experiència sumada: $puntsSumats');
+        await fetchUserexp(); // Opcional: refrescar la exp local
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error a sumarExperiencia: $error');
     }
   }
 }

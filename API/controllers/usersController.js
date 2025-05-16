@@ -860,4 +860,3 @@ exports.sumar_exp = async (req, res) => {
         res.status(500).send("Error alhora de sumar l'experiència");
     }
 };
-
