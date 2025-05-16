@@ -49,10 +49,4 @@ router.put('/partida_guanyada/:id', verificacioUsuari.verifyToken, userControlle
 //Ruta per sumar una partida jugada al perfil d'usuari
 router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.sumarPartidaJugada);
 
-// Ruta per obtenir l'exp de l'usuari
-router.get('/exp/:nom', verificacioUsuari.verifyToken, userController.get_exp);
-
-// Ruta per sumar l'exp de l'usuari
-router.put('/sumar_exp/:nom', verificacioUsuari.verifyToken, userController.sumar_exp);
-
 module.exports = router;

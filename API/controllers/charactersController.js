@@ -283,7 +283,8 @@ exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
         //Sumar els punts de l'enemic als punts emmagatzemats de l'usuari
         await connection.execute(`
             UPDATE USUARIS
-            SET punts_emmagatzemats = punts_emmagatzemats + ?
+            SET punts_emmagatzemats = punts_emmagatzemats + ?,
+                exp_emmagatzemada = exp_emmagatzemada + ?
             WHERE id = ?
         `, [puntsEnemic, usuari_id]);
 
