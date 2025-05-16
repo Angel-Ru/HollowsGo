@@ -1,7 +1,4 @@
 import '../imports.dart';
-import '../widgets/perfil_avatar_widget.dart';
-import '../widgets/perfil_header_widget.dart';
-import '../widgets/perfil_stats_widget.dart';
 
 class PerfilScreen extends StatefulWidget {
   @override
@@ -86,26 +83,61 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return PreferredSize(
-      preferredSize: Size.fromHeight(56),
-      child: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: IconButton(
-              icon: Container(
-                padding: EdgeInsets.all(8),
-                color: Colors.grey.withOpacity(0.1),
-                child: Icon(
-                  Icons.settings,
-                  color: Colors.grey[600],
-                  size: 28,
+      preferredSize:
+          Size.fromHeight(100), // Ajustamos altura para incluir ambos botones
+      child: Stack(
+        children: [
+          AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            actions: [
+              Padding(
+                padding: EdgeInsets.only(right: 12),
+                child: IconButton(
+                  icon: Container(
+                    padding: EdgeInsets.all(8),
+                    color: Colors.grey.withOpacity(0.1),
+                    child: Icon(
+                      Icons.settings,
+                      color: Colors.grey[600],
+                      size: 28,
+                    ),
+                  ),
+                  iconSize: 36,
+                  onPressed: () => _navigateToSettings(context),
                 ),
               ),
-              iconSize: 36,
-              onPressed: () => _navigateToSettings(context),
+            ],
+          ),
+          Positioned(
+            top: 56, // Debajo del AppBar
+            right: 16,
+            child: GestureDetector(
+              onTap: () => _pickImage(context),
+              child: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue[700],
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.edit,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],

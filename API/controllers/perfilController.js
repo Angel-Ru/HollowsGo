@@ -170,3 +170,37 @@ exports.updateFavoriteSkin = async (req, res) => {
         res.status(500).send('Error en la consulta');
     }
 };
+
+// Endpoint per obtenir el nivel d'un usuari, l'exp_maxima i l'exp_emmagatzamada
+exports.getallExp = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const connection = await connectDB();
+
+        const [rows] = await connection.execute(
+            `SELECT 
+                p.nivell, 
+                p.exp_maxima, 
+                p.exp_emmagatzemada 
+             FROM PERFIL_USUARI p
+             WHERE p.usuari = ?`,
+            [userId]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).send('Usuari no trobat');
+        }
+
+        const { nivell, exp_maxima, exp_emmagatzemada } = rows[0];
+
+        res.send({
+            userId,
+            nivell: nivell || null,
+            exp_maxima: exp_maxima || null,
+            exp_emmagatzemada: exp_emmagatzemada || null
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+}

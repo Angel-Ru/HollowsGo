@@ -286,7 +286,7 @@ exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
             SET punts_emmagatzemats = punts_emmagatzemats + ?,
                 exp_emmagatzemada = exp_emmagatzemada + ?
             WHERE id = ?
-        `, [puntsEnemic, usuari_id]);
+        `, [puntsEnemic, puntsEnemic, usuari_id]);
 
         await connection.end();
 

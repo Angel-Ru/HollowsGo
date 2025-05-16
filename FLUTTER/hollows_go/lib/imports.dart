@@ -27,6 +27,7 @@ export '../config.dart';
 export '/models/user.dart';
 export '/models/skin.dart';
 export '/models/personatge.dart';
+export '/models/avatar.dart';
 
 export '/widgets/bannergachawidget.dart';
 export '/widgets/dialogue_widget.dart';
@@ -42,6 +43,9 @@ export '/widgets/combat/defeat_dialog.dart';
 export '/widgets/combat/turn_indicator.dart';
 export '/widgets/combat/victory_dialog.dart';
 export '/widgets/characterdisplaywidget.dart';
+export '/widgets/profile/perfil_avatar_widget.dart';
+export '/widgets/profile/perfil_header_widget.dart';
+export '/widgets/profile/perfil_stats_widget.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';

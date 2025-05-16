@@ -1,21 +1,22 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:hollows_go/models/avatar.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../config.dart';
+import '../imports.dart';
 
 class PerfilProvider with ChangeNotifier {
   int _partidesJugades = 0;
   int _partidesGuanyades = 0;
   int _nombrePersonatges = 0;
   int _nombreSkins = 0;
+  int exp_emmagatzemada = 0;
+  int exp_maxima = 0;
+  int nivell = 0;
 
   int get partidesJugades => _partidesJugades;
   int get partidesGuanyades => _partidesGuanyades;
   int get nombrePersonatges => _nombrePersonatges;
   int get nombreSkins => _nombreSkins;
+  int get exp => exp_emmagatzemada;
+  int get expMaxima => exp_maxima;
+  int get nivellusuari => nivell;
 
   Future<void> fetchPerfilData(int userId) async {
     try {
@@ -172,6 +173,32 @@ class PerfilProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return data['avatarUrl']; // Retorna l'URL de l'avatar
+    } else {
+      throw Exception('No s\'ha pogut carregar l\'avatar');
+    }
+  }
+
+  Future<void> getexpuser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final userId = prefs.getInt('userId');
+
+    final url = Uri.parse(
+        'https://${Config.ip}/exp/$userId'); // Ruta per obtenir l'avatar de l'usuari
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token', // Afegir token d'autenticació
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      exp_emmagatzemada = data['exp_emmagatzemada'];
+      exp_maxima = data['exp_maxima'];
+      nivell = data['nivell'];
+      notifyListeners();
     } else {
       throw Exception('No s\'ha pogut carregar l\'avatar');
     }

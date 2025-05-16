@@ -1,4 +1,4 @@
-import '../imports.dart';
+import '../../../imports.dart';
 
 class PerfilHeader extends StatelessWidget {
   final String username;
