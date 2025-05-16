@@ -17,8 +17,9 @@ class _MultiSkinRewardDialogState extends State<MultiSkinRewardDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Container(
-        constraints: const BoxConstraints(maxHeight: 500),
+      insetPadding: const EdgeInsets.all(16),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 550),
         child: Stack(
           alignment: Alignment.center,
           children: [

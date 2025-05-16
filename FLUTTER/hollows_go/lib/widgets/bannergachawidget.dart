@@ -135,50 +135,70 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   }
 
   Future<void> _handleGachaPullMultiple(BuildContext context) async {
-    setState(() {
-      _isGachaLoading = true;
-    });
+  setState(() {
+    _isGachaLoading = true;
+  });
 
-    final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
-    late Future<bool> typePull;
+  final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+  late Future<bool> typePull;
 
-    switch (_currentSetIndex) {
-      case 0:
-        typePull = gachaProvider.gachaPullMultiple(context);
-        break;
-      case 1:
-       // typePull = gachaProvider.gachaPullQuincyMultiple(context);
-        break;
-      case 2:
-       // typePull = gachaProvider.gachaPullEnemicsMultiple(context);
-        break;
-      default:
-        return;
-    }
-
-    final success = await typePull;
-
-    if (success && gachaProvider.latestMultipleSkins.isNotEmpty) {
-      await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => GachaVideoPopup(
-          onVideoEnd: () {
-            showDialog(
-              context: context,
-              builder: (_) => MultiSkinRewardDialog(
-                results: gachaProvider.latestMultipleSkins,
-              ),
-            );
-          },
-        ),
-      );
-    }
-
-    setState(() {
-      _isGachaLoading = false;
-    });
+  switch (_currentSetIndex) {
+    case 0:
+      typePull = gachaProvider.gachaPullMultiple(context);
+      break;
+    case 1:
+      // typePull = gachaProvider.gachaPullQuincyMultiple(context);
+      break;
+    case 2:
+      // typePull = gachaProvider.gachaPullEnemicsMultiple(context);
+      break;
+    default:
+      setState(() {
+        _isGachaLoading = false;
+      });
+      return;
   }
+
+  final success = await typePull;
+
+  if (success && gachaProvider.latestMultipleSkins.isNotEmpty) {
+
+    final futures = gachaProvider.latestMultipleSkins.map((skin) async {
+      final imageUrl = skin['imatge'];
+      if (imageUrl != null && imageUrl is String) {
+        try {
+          await precacheImage(NetworkImage(imageUrl), context);
+        } catch (e) {
+          
+          debugPrint('Error precargando imagen: $imageUrl, $e');
+        }
+      }
+    }).toList();
+
+    final videoDialog = showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => GachaVideoPopup(
+        onVideoEnd: () {
+          showDialog(
+            context: context,
+            builder: (_) => MultiSkinRewardDialog(
+              results: gachaProvider.latestMultipleSkins,
+            ),
+          );
+        },
+      ),
+    );
+
+    await Future.wait([videoDialog, Future.wait(futures)]);
+  }
+
+  setState(() {
+    _isGachaLoading = false;
+  });
+}
+
+
 
   @override
   Widget build(BuildContext context) {
