@@ -1,4 +1,4 @@
-import '../imports.dart';
+import '../../imports.dart';
 
 class PerfilStats extends StatelessWidget {
   final int partidesJugades;
