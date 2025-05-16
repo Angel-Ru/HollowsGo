@@ -98,6 +98,7 @@ exports.getPuntsUsuari = async (req, res) => {
         if (rows.length === 0) {
             return res.status(404).send("No s'ha trobat cap usuari amb aquest nom.");
         }
+        console.log(res);
         res.send(rows);
     } catch (err) {
         console.error(err);
