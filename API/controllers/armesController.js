@@ -62,19 +62,17 @@ exports.getArmesPerSkinId = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, id)
-            .query(`
-                SELECT a.*
-                FROM ARMES a
-                         JOIN SKINS_ARMES sa ON a.id = sa.arma
-                         JOIN SKINS s ON sa.skin = s.id
-                WHERE s.id = @id
-            `);
+        const pool = await connectDB(); // Asegúrate que connectDB devuelve una conexión MySQL válida
+        const [rows] = await pool.execute(`
+            SELECT a.*
+            FROM ARMES a
+                     JOIN SKINS_ARMES sa ON a.id = sa.arma
+                     JOIN SKINS s ON sa.skin = s.id
+            WHERE s.id = ?
+        `, [id]);
 
-        if (result.recordset.length > 0) {
-            res.status(200).json(result.recordset);
+        if (rows.length > 0) {
+            res.status(200).json(rows);
         } else {
             res.status(404).send("No s'han trobat armes per a aquesta skin");
         }
@@ -83,6 +81,7 @@ exports.getArmesPerSkinId = async (req, res) => {
         res.status(500).send("Error en la consulta");
     }
 };
+
 
 /**
  * @swagger
@@ -139,19 +138,17 @@ exports.getArmesPerSkinNom = async (req, res) => {
     try {
         const { nom } = req.params;
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .query(`
-                SELECT a.*
-                FROM ARMES a
-                         JOIN SKINS_ARMES sa ON a.id = sa.arma
-                         JOIN SKINS s ON sa.skin = s.id
-                WHERE s.nom = @nom
-            `);
+        const pool = await connectDB(); // conexión con MySQL
+        const [rows] = await pool.execute(`
+            SELECT a.*
+            FROM ARMES a
+                     JOIN SKINS_ARMES sa ON a.id = sa.arma
+                     JOIN SKINS s ON sa.skin = s.id
+            WHERE s.nom = ?
+        `, [nom]);
 
-        if (result.recordset.length > 0) {
-            res.status(200).json(result.recordset);
+        if (rows.length > 0) {
+            res.status(200).json(rows);
         } else {
             res.status(404).send("No s'han trobat armes per a aquesta skin");
         }
@@ -160,6 +157,7 @@ exports.getArmesPerSkinNom = async (req, res) => {
         res.status(500).send("Error en la consulta");
     }
 };
+
 
 /**
  * @swagger
@@ -220,20 +218,17 @@ exports.getArmaSkinId = async (req, res) => {
     try {
         const { id, arma_id } = req.params;
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, id)
-            .input('arma_id', sql.Int, arma_id)
-            .query(`
-                SELECT a.*
-                FROM ARMES a
-                         JOIN SKINS_ARMES sa ON a.id = sa.arma
-                         JOIN SKINS s ON sa.skin = s.id
-                WHERE s.id = @id AND a.id = @arma_id
-            `);
+        const pool = await connectDB(); // conexión a MySQL
+        const [rows] = await pool.execute(`
+            SELECT a.*
+            FROM ARMES a
+                     JOIN SKINS_ARMES sa ON a.id = sa.arma
+                     JOIN SKINS s ON sa.skin = s.id
+            WHERE s.id = ? AND a.id = ?
+        `, [id, arma_id]);
 
-        if (result.recordset.length > 0) {
-            res.status(200).json(result.recordset[0]);
+        if (rows.length > 0) {
+            res.status(200).json(rows[0]); // solo una arma esperada
         } else {
             res.status(404).send("No s'ha trobat l'arma per a aquesta skin");
         }
@@ -242,6 +237,7 @@ exports.getArmaSkinId = async (req, res) => {
         res.status(500).send("Error en la consulta");
     }
 };
+
 
 /**
  * @swagger
@@ -302,20 +298,17 @@ exports.getArmaSkinNom = async (req, res) => {
     try {
         const { nom, arma_nom } = req.params;
 
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .input('arma_nom', sql.VarChar(50), arma_nom)
-            .query(`
-                SELECT a.*
-                FROM ARMES a
-                         JOIN SKINS_ARMES sa ON a.id = sa.arma
-                         JOIN SKINS s ON sa.skin = s.id
-                WHERE s.nom = @nom AND a.nom = @arma_nom
-            `);
+        const pool = await connectDB(); // conexión a MySQL
+        const [rows] = await pool.execute(`
+            SELECT a.*
+            FROM ARMES a
+                     JOIN SKINS_ARMES sa ON a.id = sa.arma
+                     JOIN SKINS s ON sa.skin = s.id
+            WHERE s.nom = ? AND a.nom = ?
+        `, [nom, arma_nom]);
 
-        if (result.recordset.length > 0) {
-            res.status(200).json(result.recordset[0]);
+        if (rows.length > 0) {
+            res.status(200).json(rows[0]); // se espera un solo resultado
         } else {
             res.status(404).send("No s'ha trobat l'arma per a aquesta skin");
         }
@@ -324,6 +317,7 @@ exports.getArmaSkinNom = async (req, res) => {
         res.status(500).send("Error en la consulta");
     }
 };
+
 
 /**
  * @swagger
@@ -377,21 +371,20 @@ exports.getArmaSkinNom = async (req, res) => {
 exports.crearArma = async (req, res) => {
     try {
         const { nom, categoria, buff_atac } = req.body;
-        const pool = await connectDB();
-        await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .input('categoria', sql.Int, categoria)
-            .input('buff_atac', sql.Int, buff_atac)
-            .query(`
-                INSERT INTO ARMES (nom, buff_atac, categoria)
-                VALUES (@nom, @buff_atac, @categoria)
-            `);
+
+        const pool = await connectDB(); // conexión a MySQL
+        await pool.execute(`
+            INSERT INTO ARMES (nom, buff_atac, categoria)
+            VALUES (?, ?, ?)
+        `, [nom, buff_atac, categoria]);
+
         res.status(201).send('Arma afegida correctament');
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en inserir l\'arma');
+        res.status(500).send("Error en inserir l'arma");
     }
 };
+
 
 /**
  * @swagger
@@ -420,18 +413,21 @@ exports.crearArma = async (req, res) => {
  */
 exports.borrarArmaPerId = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('DELETE FROM ARMES WHERE id = @id');
+        const { id } = req.params;
 
-        if (result.rowsAffected[0] === 0) {
+        const pool = await connectDB(); // conexión a MySQL
+        const [result] = await pool.execute(
+            'DELETE FROM ARMES WHERE id = ?',
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
             return res.status(404).send('Arma no trobada');
         }
 
         res.send('Arma eliminada correctament');
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en eliminar l\'arma');
+        res.status(500).send("Error en eliminar l'arma");
     }
 };
