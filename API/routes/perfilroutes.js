@@ -13,5 +13,8 @@ router.put('/preferit/update/:userId', verificacioUsuari.verifyToken, perfilCont
 // Actualitzar l'skin preferida
 router.put('/skin/update/:userId', verificacioUsuari.verifyToken, perfilController.updateFavoriteSkin);
 
+// Obtenir tot lo de l'exp de l'usuari
+router.get('/exp/:userId', verificacioUsuari.verifyToken, perfilController.getallExp());
+
 
 module.exports = router;
