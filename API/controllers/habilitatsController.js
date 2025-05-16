@@ -31,16 +31,17 @@ const { connectDB, sql } = require('../config/dbConfig');
  */
 exports.getHabilitatId = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query(`
-                SELECT h.*
-                FROM HABILITAT_LLEGENDARIA h
-                         JOIN SKINS s ON h.skin_personatge = s.id
-                WHERE s.id = @id
-            `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
+        const { id } = req.params;
+
+        const pool = await connectDB(); // conexión MySQL
+        const [rows] = await pool.execute(`
+            SELECT h.*
+            FROM HABILITAT_LLEGENDARIA h
+                     JOIN SKINS s ON h.skin_personatge = s.id
+            WHERE s.id = ?
+        `, [id]);
+
+        res.send(rows.length > 0 ? rows : 'No s\'ha trobat la habilitat per a aquesta skin');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en la consulta');
@@ -71,21 +72,23 @@ exports.getHabilitatId = async (req, res) => {
  */
 exports.getHabilitatSkinNom = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('nom', sql.VarChar(50), req.params.nom)
-            .query(`
-                SELECT h.*
-                FROM HABILITAT_LLEGENDARIA h
-                         JOIN SKINS s ON h.skin_personatge = s.id
-                WHERE s.nom = @nom
-            `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat la habilitat per a aquesta skin');
+        const { nom } = req.params;
+
+        const pool = await connectDB(); // conexión MySQL
+        const [rows] = await pool.execute(`
+            SELECT h.*
+            FROM HABILITAT_LLEGENDARIA h
+                     JOIN SKINS s ON h.skin_personatge = s.id
+            WHERE s.nom = ?
+        `, [nom]);
+
+        res.send(rows.length > 0 ? rows : 'No s\'ha trobat la habilitat per a aquesta skin');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en la consulta');
     }
 };
+
 
 /**
  * @swagger
@@ -168,22 +171,16 @@ exports.crearHabilitat = async (req, res) => {
     try {
         const { nom, descripcio, video, musica_combat, skin_personatge } = req.body;
 
-        // Validació bàsica de les dades
+        // Validación básica
         if (!nom || !descripcio || !video || !musica_combat || !skin_personatge) {
             return res.status(400).json({ error: "Falten dades obligatòries." });
         }
 
         const pool = await connectDB();
-        await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .input('descripcio', sql.VarChar(255), descripcio)
-            .input('video', sql.VarChar(255), video)
-            .input('musica_combat', sql.VarChar(255), musica_combat)
-            .input('skin_personatge', sql.Int, skin_personatge)
-            .query(`
-                INSERT INTO HABILITAT_LLEGENDARIA (nom, descripcio, video, musica_combat, skin_personatge)
-                VALUES (@nom, @descripcio, @video, @musica_combat, @skin_personatge)
-            `);
+        await pool.execute(`
+            INSERT INTO HABILITAT_LLEGENDARIA (nom, descripcio, video, musica_combat, skin_personatge)
+            VALUES (?, ?, ?, ?, ?)
+        `, [nom, descripcio, video, musica_combat, skin_personatge]);
 
         res.status(201).json({ message: "Habilitat afegida correctament." });
     } catch (err) {
@@ -191,6 +188,7 @@ exports.crearHabilitat = async (req, res) => {
         res.status(500).json({ error: "Error en inserir l'habilitat." });
     }
 };
+
 
 /**
  * @swagger
@@ -219,18 +217,21 @@ exports.crearHabilitat = async (req, res) => {
  */
 exports.borrarHabilitatId = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('DELETE FROM HABILITAT_LLEGENDARIA WHERE id = @id');
+        const { id } = req.params;
 
-        if (result.rowsAffected[0] === 0) {
+        const pool = await connectDB();
+        const [result] = await pool.execute(
+            'DELETE FROM HABILITAT_LLEGENDARIA WHERE id = ?',
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
             return res.status(404).send('Habilitat no trobada');
         }
 
         res.send('Habilitat eliminada correctament');
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en eliminar l\'habilitat');
+        res.status(500).send("Error en eliminar l'habilitat");
     }
 };
