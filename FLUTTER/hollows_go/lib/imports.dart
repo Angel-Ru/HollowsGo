@@ -20,6 +20,7 @@ export '/providers/user_provider.dart';
 export '/providers/skins_enemics_personatges.dart';
 export '/providers/gacha_provider.dart';
 export '/providers/perfil_provider.dart';
+export '/providers/combat_provider.dart';
 
 export '../config.dart';
 
@@ -35,6 +36,12 @@ export '/widgets/personatges_cardswiper_widget.dart';
 export '/widgets/selectedskincard_widget.dart';
 export '/widgets/custom_bottom_nav_bar.dart';
 export '/widgets/personatge_no_seleccionat_widget.dart';
+export '/widgets/combat/combat_action_buttons.dart';
+export '/widgets/combat/combat_background.dart';
+export '/widgets/combat/defeat_dialog.dart';
+export '/widgets/combat/turn_indicator.dart';
+export '/widgets/combat/victory_dialog.dart';
+export '/widgets/characterdisplaywidget.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';

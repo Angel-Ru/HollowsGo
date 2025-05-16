@@ -1,26 +1,4 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:hollows_go/providers/skins_enemics_personatges.dart';
-import 'package:hollows_go/screens/homescreen.dart';
-import 'package:hollows_go/widgets/combat/combat_action_buttons.dart';
-import 'package:hollows_go/widgets/combat/combat_background.dart';
-import 'package:hollows_go/widgets/combat/defeat_dialog.dart';
-import 'package:hollows_go/widgets/combat/turn_indicator.dart';
-import 'package:hollows_go/widgets/combat/ultimate_service.dart';
-import 'package:hollows_go/widgets/combat/victory_dialog.dart';
-import 'package:provider/provider.dart';
-import 'package:hollows_go/providers/combat_provider.dart';
-import 'package:hollows_go/providers/perfil_provider.dart';
-import 'package:hollows_go/providers/user_provider.dart';
-import 'package:hollows_go/widgets/characterdisplaywidget.dart';
-
-import 'package:flutter/material.dart';
-import 'package:hollows_go/providers/combat_provider.dart';
-import 'package:hollows_go/widgets/combat/combat_action_buttons.dart';
-import 'package:hollows_go/widgets/combat/turn_indicator.dart';
-import 'package:hollows_go/widgets/combat/combat_background.dart';
-import 'package:hollows_go/widgets/characterdisplaywidget.dart';
-import 'package:provider/provider.dart';
+import '../imports.dart';
 
 class CombatScreen extends StatelessWidget {
   @override
@@ -110,6 +88,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
       barrierDismissible: false,
       builder: (_) => VictoryDialog(
         coins: skinsProvider.coinEnemies,
+        //exp: skinsProvider.coinEnemies,
         onContinue: () {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => HomeScreen()));
@@ -129,12 +108,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
         },
       ),
     );
-  }
-
-  // Método para aplicar daño al enemigo desde el UltimateService
-  void _applyDamageToEnemy(int damage) {
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    combatProvider.setEnemyHealth(combatProvider.enemicHealth - damage);
   }
 
   @override
