@@ -10,6 +10,9 @@ class GachaProvider extends ChangeNotifier {
   bool _isDuplicateSkin = false;
   bool get isDuplicateSkin => _isDuplicateSkin;
 
+  List<Map<String, dynamic>> _latestMultipleSkins = [];
+  List<Map<String, dynamic>> get latestMultipleSkins => _latestMultipleSkins;
+
   Map<String, dynamic>? _latestSkin;
   Map<String, dynamic>? get latestSkin => _latestSkin;
 
@@ -149,6 +152,56 @@ class GachaProvider extends ChangeNotifier {
       _setLoading(false);
     }
   }
+
+  Future<bool> gachaPullMultiple(BuildContext context) async {
+  _setLoading(true);
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('userEmail');
+    final token = prefs.getString('token');
+
+    if (email == null || token == null) {
+      _showError(context, "No s'ha pogut obtenir el correu o el token.");
+      _setLoading(false);
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('https://${Config.ip}/skins/gacha/multiSH'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'email': email}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> tirades = data['skins'];
+
+      // Guardar les tirades amb info si són duplicades o no
+      _latestMultipleSkins = tirades.map<Map<String, dynamic>>((entry) {
+        return {
+          'skin': entry['skin'],
+          'jaTenia': entry['jaTenia'],
+        };
+      }).toList();
+
+      notifyListeners();
+      return true;
+    } else {
+      _showError(context, 'Error: ${response.body}');
+      return false;
+    }
+  } catch (e) {
+    _showError(context, 'Error amb la tirada múltiple: $e');
+    return false;
+  } finally {
+    _setLoading(false);
+  }
+}
+
 
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,4 @@
 import 'package:hollows_go/providers/map_provider.dart';
-import 'package:hollows_go/providers/perfil_provider.dart';
 
 import 'imports.dart';
 

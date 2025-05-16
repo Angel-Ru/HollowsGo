@@ -40,8 +40,10 @@ router.post('/gacha',verificacioUsuari.verifyToken, skinsController.gachaTirada)
 router.post('/gacha/quincys', verificacioUsuari.verifyToken, skinsController.gachaTiradaQuincy);
 
 //Ruta per a la tirada de gacha dels enemics
-router.post('/gacha/enemics', verificacioUsuari.verifyToken, skinsController.gachaTiradaEnemics)
+router.post('/gacha/enemics', verificacioUsuari.verifyToken, skinsController.gachaTiradaEnemics);
 
+//Ruta per tirar una multi al banner de shinigamis
+router.post('/gacha/multish', verificacioUsuari.verifyToken, skinsController.gachaMultiSH);
 //Ruta per crear una skin
 router.post('/', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, skinsController.crearSkin);
 
