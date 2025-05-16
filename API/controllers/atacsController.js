@@ -31,21 +31,23 @@ const { connectDB, sql } = require('../config/dbConfig');
  */
 exports.getAtacSkinPerId = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query(`
-                SELECT a.*
-                FROM ATACS a
-                         JOIN SKINS s ON a.id = s.atac
-                WHERE s.id = @id
-            `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'atac per a aquesta skin');
+        const { id } = req.params;
+
+        const pool = await connectDB(); // conexión a MySQL
+        const [rows] = await pool.execute(`
+            SELECT a.*
+            FROM ATACS a
+                     JOIN SKINS s ON a.id = s.atac
+            WHERE s.id = ?
+        `, [id]);
+
+        res.send(rows.length > 0 ? rows : 'No s\'ha trobat l\'atac per a aquesta skin');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en la consulta');
     }
 };
+
 
 /**
  * @swagger
@@ -71,16 +73,17 @@ exports.getAtacSkinPerId = async (req, res) => {
  */
 exports.getAtacSkinPerNom = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('nom', sql.VarChar(50), req.params.nom)
-            .query(`
-                SELECT a.*
-                FROM ATACS a
-                         JOIN SKINS s ON a.id = s.atac
-                WHERE s.nom = @nom
-            `);
-        res.send(result.recordset.length > 0 ? result.recordset : 'No s\'ha trobat l\'atac per a aquesta skin');
+        const { nom } = req.params;
+
+        const pool = await connectDB(); // conexión MySQL
+        const [rows] = await pool.execute(`
+            SELECT a.*
+            FROM ATACS a
+                     JOIN SKINS s ON a.id = s.atac
+            WHERE s.nom = ?
+        `, [nom]);
+
+        res.send(rows.length > 0 ? rows : 'No s\'ha trobat l\'atac per a aquesta skin');
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en la consulta');
@@ -133,18 +136,17 @@ exports.getAtacSkinPerNom = async (req, res) => {
 exports.crearAtac = async (req, res) => {
     try {
         const { nom, mal } = req.body;
-        const pool = await connectDB();
-        await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .input('mal', sql.Int, mal)
-            .query(`
-                INSERT INTO ATACS (nom, mal)
-                VALUES (@nom, @mal)
-            `);
+
+        const pool = await connectDB(); // conexión MySQL
+        await pool.execute(`
+            INSERT INTO ATACS (nom, mal)
+            VALUES (?, ?)
+        `, [nom, mal]);
+
         res.status(201).send('Atac afegit correctament');
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en inserir l\'atac');
+        res.status(500).send("Error en inserir l'atac");
     }
 };
 
@@ -175,18 +177,21 @@ exports.crearAtac = async (req, res) => {
  */
 exports.borrarAtacPerId = async (req, res) => {
     try {
-        const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('DELETE FROM ATACS WHERE id = @id');
+        const { id } = req.params;
 
-        if (result.rowsAffected[0] === 0) {
+        const pool = await connectDB(); // conexión a MySQL
+        const [result] = await pool.execute(
+            'DELETE FROM ATACS WHERE id = ?',
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
             return res.status(404).send('Atac no trobat');
         }
 
         res.send('Atac eliminat correctament');
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en eliminar l\'atac');
+        res.status(500).send("Error en eliminar l'atac");
     }
 };

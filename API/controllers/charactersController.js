@@ -251,43 +251,45 @@ exports.obtenirPuntsEnemicISumarAUsuari = async (req, res) => {
         const {email} = req.body; // Email de l'usuari
 
         //Obtenir els punts que dona l'enemic
-        const pool = await connectDB();
+        const connection = await connectDB();
 
         // Primer, obtenir l'ID de l'enemic a través del nom de la taula PERSONATGES
-        const resultEnemic = await pool.request()
-            .input('nom', sql.VarChar(50), nom)
-            .query(`
-                SELECT e.punts_donats
-                FROM ENEMICS e
-                         INNER JOIN PERSONATGES p ON e.personatge_id = p.id
-                WHERE p.nom = @nom
-            `);
+        const [rowsEnemic] = await connection.execute(`
+            SELECT e.punts_donats
+            FROM ENEMICS e
+            INNER JOIN PERSONATGES p ON e.personatge_id = p.id
+            WHERE p.nom = ?
+        `, [nom]);
 
-        if (resultEnemic.recordset.length === 0) {
+        if (rowsEnemic.length === 0) {
+            await connection.end();
             return res.status(404).send('Enemic no trobat');
         }
 
-        const puntsEnemic = resultEnemic.recordset[0].punts_donats; // Punts que dona l'enemic
+        const puntsEnemic = rowsEnemic[0].punts_donats; // Punts que dona l'enemic
 
         //Verificar si l'usuari existeix
-        const resultUsuari = await pool.request()
-            .input('email', sql.VarChar(50), email)
-            .query('SELECT id FROM USUARIS WHERE email = @email');
+        const [rowsUsuari] = await connection.execute(`
+            SELECT id FROM USUARIS WHERE email = ?
+        `, [email]);
 
-        if (resultUsuari.recordset.length === 0) {
+        if (rowsUsuari.length === 0) {
+            await connection.end();
             return res.status(404).send('Usuari no trobat');
         }
 
-        const usuari_id = resultUsuari.recordset[0].id;
+        const usuari_id = rowsUsuari[0].id;
 
         //Sumar els punts de l'enemic als punts emmagatzemats de l'usuari
-        await pool.request()
-            .input('usuari_id', sql.Int, usuari_id)
-            .input('punts', sql.Int, puntsEnemic)
-            .query('UPDATE USUARIS SET punts_emmagatzemats = punts_emmagatzemats + @punts WHERE id = @usuari_id');
+        await connection.execute(`
+            UPDATE USUARIS
+            SET punts_emmagatzemats = punts_emmagatzemats + ?
+            WHERE id = ?
+        `, [puntsEnemic, usuari_id]);
 
-        // Retornar només els punts que dona l'enemic
-        res.status(200).json({punts_enemic: puntsEnemic});
+        await connection.end();
+
+        res.status(200).json({ punts_enemic: puntsEnemic });
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en el servidor');
