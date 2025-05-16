@@ -50,9 +50,9 @@ router.put('/partida_guanyada/:id', verificacioUsuari.verifyToken, userControlle
 router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.sumarPartidaJugada);
 
 // Ruta per obtenir l'exp de l'usuari
-router.get('/exp/:id', verificacioUsuari.verifyToken, userController.get_exp);
+router.get('/exp/:nom', verificacioUsuari.verifyToken, userController.get_exp);
 
 // Ruta per sumar l'exp de l'usuari
-router.put('/exp/:id', verificacioUsuari.verifyToken, userController.sumar_exp);
+router.put('/sumar_exp/:nom', verificacioUsuari.verifyToken, userController.sumar_exp);
 
 module.exports = router;
