@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class VictoryDialog extends StatelessWidget {
   final int coins;
-  //final int exp;
+  final int exp;
   final VoidCallback onContinue;
 
   const VictoryDialog({
     required this.coins,
-    //required this.exp,
+    required this.exp,
     required this.onContinue,
     super.key,
   });
@@ -34,7 +34,7 @@ class VictoryDialog extends StatelessWidget {
               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
           ),
-          /*const SizedBox(height: 10),
+          const SizedBox(height: 10),
           TweenAnimationBuilder<int>(
             tween: IntTween(begin: 0, end: exp),
             duration: const Duration(seconds: 2),
@@ -45,7 +45,7 @@ class VictoryDialog extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: Colors.green),
             ),
-          ),*/
+          ),
         ],
       ),
       actions: [

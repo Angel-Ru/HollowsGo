@@ -88,7 +88,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
       barrierDismissible: false,
       builder: (_) => VictoryDialog(
         coins: skinsProvider.coinEnemies,
-        //exp: skinsProvider.coinEnemies,
+        exp: skinsProvider.coinEnemies,
         onContinue: () {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (_) => HomeScreen()));
