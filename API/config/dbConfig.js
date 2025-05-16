@@ -10,14 +10,27 @@ const dbConfig = {
 
 let pool;
 
+async function createNewPool() {
+    try {
+        const newPool = await mysql.createPool(dbConfig);
+        console.log('✅ Conexión a la base de datos MySQL establecida correctamente');
+        return newPool;
+    } catch (err) {
+        console.error('❌ Error al crear el pool:', err);
+        throw err;
+    }
+}
+
 async function connectDB() {
     if (!pool) {
+        pool = await createNewPool();
+    } else {
         try {
-            pool = await mysql.createPool(dbConfig);
-            console.log('Conexión a la base de datos MySQL establecida correctamente');
+            // Verificamos si el pool sigue vivo
+            await pool.query('SELECT 1');
         } catch (err) {
-            console.error('Error al conectar con la base de datos MySQL:', err);
-            throw err;
+            console.warn('⚠️ Pool cerrado o inválido. Se creará uno nuevo...');
+            pool = await createNewPool();
         }
     }
     return pool;
