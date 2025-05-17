@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/usersController');
+const equipamentController = require('../controllers/equipamentController');
 const verificacioUsuari = require('../middlewares/verificacioUsuari');
 
 
-// Ruta per obtenir les armes predefinides per a una skin
-router.get('/armes/:skin_id', verificacioUsuari.verifyToken, userController.getArmesPredefinidesPerSkin);
+// Endpoint per obtenir les armes predefinides d’una skin
+router.get('/skins/:skin_id/armes', verificacioUsuari.verifyToken, equipamentController.getArmesPredefinidesPerSkin);
 
-// Ruta per equipar una arma a una skin
-router.post('/equipar', verificacioUsuari.verifyToken, userController.equiparArmaASkin);
+// Endpoint per equipar una arma
+router.post('/equipament', verificacioUsuari.verifyToken, equipamentController.equiparArmaASkin);
 
 module.exports = router;
