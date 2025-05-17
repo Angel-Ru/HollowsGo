@@ -9,3 +9,5 @@ router.get('/armes/:skin_id', verificacioUsuari.verifyToken, userController.getA
 
 // Ruta per equipar una arma a una skin
 router.post('/equipar', verificacioUsuari.verifyToken, userController.equiparArmaASkin);
+
+module.exports = router;
