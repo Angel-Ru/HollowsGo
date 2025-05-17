@@ -180,9 +180,9 @@ exports.getallExp = async (req, res) => {
         const [rows] = await connection.execute(
             `SELECT 
                 p.nivell, 
-                p.exp_maxima, 
+                p.exp_max, 
                 p.exp_emmagatzemada 
-             FROM PERFIL_USUARI p
+             FROM USUARIS p
              WHERE p.usuari = ?`,
             [userId]
         );
