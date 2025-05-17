@@ -48,17 +48,17 @@ const habilitatsRoutes = require('../routes/habilitatsRoutes');
 const atacsRoutes = require('../routes/atacsRoutes');
 const userRoutes = require('../routes/userRoutes');
 const perfilRoutes = require('../routes/perfilroutes');
+const equipamentRoutes = require('../routes/equipamentRoutes');
 
 
-
-app.use('/personatges', characterRoutes);// Ruta para personajes
-app.use('/skins', skinRoutes);             // Ruta para skins
+app.use('/personatges', characterRoutes);   // Ruta para personajes
+app.use('/skins', skinRoutes);              // Ruta para skins
 app.use('/armes', armesRoutes);             // Ruta para armas
 app.use('/habilitats', habilitatsRoutes);   // Ruta para habilidades legendarias
 app.use('/atacs', atacsRoutes);             // Ruta para ataques
 app.use('/usuaris', userRoutes);            // Ruta para usuarios
-app.use('/perfils', perfilRoutes)
-
+app.use('/perfils', perfilRoutes)           // Ruta per perfils
+app.use('/equipaments',equipamentRoutes);   // Ruta per equipar armes a skins
 
 
 const port = process.env.PORT || 3000;

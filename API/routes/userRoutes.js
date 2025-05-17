@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/usersController');
-const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifica que esta ruta sea correcta
+const verificacioUsuari = require('../middlewares/verificacioUsuari');
 
 // Ruta per obtenir tots els usuaris (accessible per a tots, però requereix token)
 router.get('/', verificacioUsuari.verifyToken, userController.getUsuaris);
