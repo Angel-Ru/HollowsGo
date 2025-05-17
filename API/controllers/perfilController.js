@@ -196,7 +196,7 @@ exports.getallExp = async (req, res) => {
         res.send({
             userId,
             nivell: nivell || null,
-            exp_maxima: exp_max || null,
+            exp_max: exp_max || null,
             exp_emmagatzemada: exp_emmagatzemada || null
         });
     } catch (err) {
