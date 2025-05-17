@@ -7,6 +7,7 @@ class TendaScreen extends StatefulWidget {
 }
 
 class _TendaScreenState extends State<TendaScreen> {
+  final PageController _pageController = PageController();
   final List<String> _backgroundImages = [
     'lib/images/fondo_tendascreen/Aizen.jpg',
     'lib/images/fondo_tendascreen/Aporro.jpg',
@@ -65,6 +66,12 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final gachaProvider = Provider.of<GachaProvider>(context);
 
@@ -79,13 +86,13 @@ class _TendaScreenState extends State<TendaScreen> {
               automaticallyImplyLeading: false,
               backgroundColor: Colors.white.withOpacity(0.5),
               elevation: 0,
-              title: null,
             ),
           ),
         ),
       ),
       body: Stack(
         children: [
+          // 🔹 Fons rotatiu
           Positioned.fill(
             child: AnimatedSwitcher(
               duration: Duration(seconds: 2),
@@ -100,24 +107,21 @@ class _TendaScreenState extends State<TendaScreen> {
               ),
             ),
           ),
-          Positioned(
-            top: 150,
-            left: MediaQuery.of(context).size.width * 0.15,
-            right: MediaQuery.of(context).size.width * 0.15,
-            child: Column(
+
+          // 🔹 Contingut deslliçable
+          Positioned.fill(
+            child: PageView(
+              controller: _pageController,
               children: [
-                GachaBannerWidget(),
-                SizedBox(height: 10),
+                _buildGachaContent(gachaProvider),
+                _buildMonedesPage(),
               ],
             ),
           ),
+
+          // 🔹 Diàleg i loader a la part inferior
           Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-              bottom:
-                  0, // Reducido de 16 a 8 (o incluso 0 si quieres pegado al borde)
-            ),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -126,7 +130,6 @@ class _TendaScreenState extends State<TendaScreen> {
                   characterName: 'Kisuke Urahara',
                   nameColor: Colors.green,
                   bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                  //backgroundColor: Color.fromARGB(255, 151, 250, 173),
                 ),
                 if (gachaProvider.isLoading)
                   Center(child: CircularProgressIndicator()),
@@ -134,6 +137,66 @@ class _TendaScreenState extends State<TendaScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildGachaContent(GachaProvider gachaProvider) {
+    return Column(
+      children: [
+        SizedBox(height: 150),
+        Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.15,
+          ),
+          child: Column(
+            children: [
+              GachaBannerWidget(),
+              SizedBox(height: 10),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMonedesPage() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 150, left: 24, right: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Compra de monedes',
+            style: TextStyle(
+              fontSize: 28,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: 30),
+          _monedaOption("100 monedes", "0,99 €"),
+          _monedaOption("550 monedes", "4,49 €"),
+          _monedaOption("1200 monedes", "9,99 €"),
+          _monedaOption("2500 monedes", "19,99 €"),
+        ],
+      ),
+    );
+  }
+
+  Widget _monedaOption(String title, String price) {
+    return Card(
+      color: Colors.white.withOpacity(0.85),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: EdgeInsets.only(bottom: 16),
+      child: ListTile(
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+        trailing: Text(price, style: TextStyle(color: Colors.green, fontSize: 16)),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Funció de compra encara no implementada')),
+          );
+        },
       ),
     );
   }
