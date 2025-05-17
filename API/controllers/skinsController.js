@@ -698,7 +698,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
             };
         });
 
-        console.log('Resposta personatges amb skins:', JSON.stringify(personatgesAmbSkins, null, 2)); // Aquí veuràs la resposta
+       
 
         res.status(200).json(personatgesAmbSkins);
 

@@ -15,9 +15,10 @@ exports.getArmesPredefinidesPerSkin = async (req, res) => {
         );
 
         if (armes.length === 0) {
+            console.log(res);
             return res.status(404).send('No s’han trobat armes per a aquesta skin.');
         }
-        console.log("Armes del personatge" + armes);
+        
         res.status(200).json(armes);
     } catch (err) {
         console.error(err);
