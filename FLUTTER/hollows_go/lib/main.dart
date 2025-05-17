@@ -1,3 +1,4 @@
+import 'package:hollows_go/providers/equipament_provider.dart';
 import 'package:hollows_go/providers/map_provider.dart';
 
 import 'imports.dart';
@@ -24,7 +25,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
             create: (_) => SkinsEnemicsPersonatgesProvider()),
         ChangeNotifierProvider(create: (_) => PerfilProvider()),
-        ChangeNotifierProvider(create: (_) => MapDataProvider())
+        ChangeNotifierProvider(create: (_) => MapDataProvider()),
+        ChangeNotifierProvider(create: (_) => ArmesProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
