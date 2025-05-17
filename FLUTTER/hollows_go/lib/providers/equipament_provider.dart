@@ -27,7 +27,7 @@ class ArmesProvider extends ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('https://${Config.ip}/armes/skin/$skinId'),
+        Uri.parse('https://${Config.ip}/equipaments/skins/$skinId/armes/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -71,7 +71,7 @@ class ArmesProvider extends ChangeNotifier {
       });
 
       final response = await http.post(
-        Uri.parse('https://${Config.ip}/armes/equipar'),
+        Uri.parse('https://${Config.ip}/equipaments/equipament'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

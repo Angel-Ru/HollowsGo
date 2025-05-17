@@ -122,7 +122,7 @@ onLongPress: () async {
   final armesProvider =
       Provider.of<ArmesProvider>(context, listen: false);
   final usuariId = userProvider.userId;
-
+  print(skin.id);
   await mostrarDialegArmesPredefinides(
     context: context,
     skinId: skin.id,

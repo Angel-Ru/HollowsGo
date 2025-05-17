@@ -41,18 +41,18 @@ exports.equiparArmaASkin = async (req, res) => {
         }
 
         const [existing] = await connection.execute(
-            'SELECT 1 FROM USUARI_SKIN_ARMA WHERE usuari = ? AND skin = ?',
+            'SELECT 1 FROM USUARI_SKIN_ARMES WHERE usuari = ? AND skin = ?',
             [usuari_id, skin_id]
         );
 
         if (existing.length > 0) {
             await connection.execute(
-                'UPDATE USUARI_SKIN_ARMA SET arma = ? WHERE usuari = ? AND skin = ?',
+                'UPDATE USUARI_SKIN_ARMES SET arma = ? WHERE usuari = ? AND skin = ?',
                 [arma_id, usuari_id, skin_id]
             );
         } else {
             await connection.execute(
-                'INSERT INTO USUARI_SKIN_ARMA (usuari, skin, arma) VALUES (?, ?, ?)',
+                'INSERT INTO USUARI_SKIN_ARMES (usuari, skin, arma) VALUES (?, ?, ?)',
                 [usuari_id, skin_id, arma_id]
             );
         }
