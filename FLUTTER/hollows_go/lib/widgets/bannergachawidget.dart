@@ -147,10 +147,10 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
       typePull = gachaProvider.gachaPullMultiple(context);
       break;
     case 1:
-      // typePull = gachaProvider.gachaPullQuincyMultiple(context);
+       typePull = gachaProvider.gachaPullMultipleQuincys(context);
       break;
     case 2:
-      // typePull = gachaProvider.gachaPullEnemicsMultiple(context);
+      typePull = gachaProvider.gachaPullMultipleEnemics(context);
       break;
     default:
       setState(() {
