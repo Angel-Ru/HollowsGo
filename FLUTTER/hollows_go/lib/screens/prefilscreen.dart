@@ -9,6 +9,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
   String _imagePath =
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
   int _nivell = 1;
+  int _expEmmagatzemada = 0;
+  int _expMaxima = 100;
 
   @override
   void initState() {
@@ -27,17 +29,25 @@ class _PerfilScreenState extends State<PerfilScreen> {
     userProvider.fetchFavoritePersonatgeSkin();
     perfilProvider.fetchPerfilData(userId);
     _loadAvatar(userId, perfilProvider);
-    _loadUserLevel(
-        userId, perfilProvider); // Nueva función para cargar el nivel
+    _loadUserLevel(userId, perfilProvider);
   }
 
   Future<void> _loadUserLevel(int userId, PerfilProvider perfilProvider) async {
     try {
+      print('Obteniendo datos de experiencia para usuario: $userId');
       final expData = await perfilProvider.getexpuser(userId);
+      print('Datos crudos recibidos: ${expData.toString()}');
+
       if (mounted) {
         setState(() {
-          _nivell = expData['nivell'] ??
-              1; // Asignamos el nivel, con valor por defecto 1
+          _nivell = expData['nivell'] ?? 1;
+          _expEmmagatzemada = expData['exp_emmagatzemada'] ?? 0;
+          _expMaxima = expData['exp_max'] ?? 200;
+
+          print('Valores asignados:');
+          print('Nivel: $_nivell');
+          print('Exp almacenada: $_expEmmagatzemada');
+          print('Exp máxima: $_expMaxima');
         });
       }
     } catch (e) {
@@ -185,7 +195,9 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   SizedBox(height: 30),
                   PerfilAvatar(
                     imagePath: _imagePath,
-                    nivell: _nivell, // Pasamos el nivel al widget PerfilAvatar
+                    nivell: _nivell,
+                    expEmmagatzemada: _expEmmagatzemada,
+                    expMaxima: _expMaxima,
                   ),
                   SizedBox(height: 20),
                   PerfilHeader(username: userProvider.username),
