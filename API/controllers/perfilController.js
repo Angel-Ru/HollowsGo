@@ -183,7 +183,7 @@ exports.getallExp = async (req, res) => {
                 p.exp_max, 
                 p.exp_emmagatzemada 
              FROM USUARIS p
-             WHERE p.usuari = ?`,
+             WHERE p.id = ?`,
             [userId]
         );
 
