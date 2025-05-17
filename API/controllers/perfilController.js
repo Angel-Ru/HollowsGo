@@ -191,12 +191,12 @@ exports.getallExp = async (req, res) => {
             return res.status(404).send('Usuari no trobat');
         }
 
-        const { nivell, exp_maxima, exp_emmagatzemada } = rows[0];
+        const { nivell, exp_max, exp_emmagatzemada } = rows[0];
 
         res.send({
             userId,
             nivell: nivell || null,
-            exp_maxima: exp_maxima || null,
+            exp_max: exp_max || null,
             exp_emmagatzemada: exp_emmagatzemada || null
         });
     } catch (err) {

@@ -198,7 +198,7 @@ class PerfilProvider with ChangeNotifier {
         return {
           'userId': userId,
           'nivell': data['nivell'] ?? 1,
-          'exp_maxima': data['exp_maxima'] ?? 100,
+          'exp_max': data['exp_max'] ?? 100,
           'exp_emmagatzemada': data['exp_emmagatzemada'] ?? 0,
         };
       } else if (response.statusCode == 404) {
