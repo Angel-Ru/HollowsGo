@@ -8,6 +8,7 @@ class PerfilScreen extends StatefulWidget {
 class _PerfilScreenState extends State<PerfilScreen> {
   String _imagePath =
       'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254001/CONFIGURATIONSCREEN/PROFILE_IMAGES/xj2epvx8tylh5qea2yic.jpg';
+  int _nivell = 1;
 
   @override
   void initState() {
@@ -26,6 +27,22 @@ class _PerfilScreenState extends State<PerfilScreen> {
     userProvider.fetchFavoritePersonatgeSkin();
     perfilProvider.fetchPerfilData(userId);
     _loadAvatar(userId, perfilProvider);
+    _loadUserLevel(
+        userId, perfilProvider); // Nueva función para cargar el nivel
+  }
+
+  Future<void> _loadUserLevel(int userId, PerfilProvider perfilProvider) async {
+    try {
+      final expData = await perfilProvider.getexpuser(userId);
+      if (mounted) {
+        setState(() {
+          _nivell = expData['nivell'] ??
+              1; // Asignamos el nivel, con valor por defecto 1
+        });
+      }
+    } catch (e) {
+      print('Error obteniendo nivel del usuario: $e');
+    }
   }
 
   Future<void> _loadAvatar(int userId, PerfilProvider perfilProvider) async {
@@ -83,9 +100,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return PreferredSize(
-      preferredSize:
-          Size.fromHeight(100), // Ajustamos altura para incluir ambos botones
-      child: Stack(
+      preferredSize: Size.fromHeight(100),
+      child: Column(
         children: [
           AppBar(
             automaticallyImplyLeading: false,
@@ -93,49 +109,59 @@ class _PerfilScreenState extends State<PerfilScreen> {
             elevation: 0,
             actions: [
               Padding(
-                padding: EdgeInsets.only(right: 12),
-                child: IconButton(
-                  icon: Container(
-                    padding: EdgeInsets.all(8),
-                    color: Colors.grey.withOpacity(0.1),
-                    child: Icon(
-                      Icons.settings,
-                      color: Colors.grey[600],
-                      size: 28,
+                padding: const EdgeInsets.only(right: 16, top: 12),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: () => _navigateToSettings(context),
+                    child: Container(
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.settings,
+                        size: 20,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  iconSize: 36,
-                  onPressed: () => _navigateToSettings(context),
                 ),
               ),
             ],
           ),
-          Positioned(
-            top: 56, // Debajo del AppBar
-            right: 16,
-            child: GestureDetector(
-              onTap: () => _pickImage(context),
-              child: Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue[700],
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 2,
+          Padding(
+            padding: const EdgeInsets.only(right: 16, bottom: 8),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () => _pickImage(context),
+                child: Container(
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.edit,
-                  size: 20,
-                  color: Colors.white,
+                  child: Icon(
+                    Icons.edit,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -156,14 +182,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
               padding: const EdgeInsets.only(top: 80),
               child: Column(
                 children: [
-                  SizedBox(height: 20),
+                  SizedBox(height: 30),
                   PerfilAvatar(
                     imagePath: _imagePath,
-                    onEditPressed: () => _pickImage(context),
+                    nivell: _nivell, // Pasamos el nivel al widget PerfilAvatar
                   ),
                   SizedBox(height: 20),
                   PerfilHeader(username: userProvider.username),
-                  SizedBox(height: 40),
+                  SizedBox(height: 30),
                   PerfilStats(
                     partidesJugades: perfilProvider.partidesJugades,
                     partidesGuanyades: perfilProvider.partidesGuanyades,
