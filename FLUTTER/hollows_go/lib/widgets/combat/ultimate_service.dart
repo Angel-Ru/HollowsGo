@@ -1,102 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:hollows_go/screens/combatscreen.dart';
 import 'dart:async';
 
+import 'ultimate_animation.dart';
+import 'ultimate_video.dart';
+
 class UltimateService {
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  late VideoPlayerController _videoController;
+  OverlayEntry? _overlayEntry;
 
   Future<void> executeShinjiUlti(
       BuildContext context, Function onDamageApplied) async {
-    // Mostrar imagen horizontal y reproducir audio
-    _showUltimateFrame(context);
-    await _playUltimateSound();
+    // Mostrar animación + audio con overlay
+    final completer = Completer();
 
-    // Espera 5 segundos
-    await Future.delayed(Duration(seconds: 5));
+    _overlayEntry = OverlayEntry(
+      builder: (context) => UltimateAnimation(
+        onCompleted: () {
+          _overlayEntry?.remove();
+          _overlayEntry = null;
+          completer.complete();
+        },
+      ),
+    );
 
-    // Cierra imagen
-    Navigator.of(context).pop();
+    Overlay.of(context).insert(_overlayEntry!);
 
-    // Reproduce video en un dialogo
-    await _playUltimateVideo(context);
+    // Esperar a que termine la animación + audio
+    await completer.future;
+
+    // Mostrar video en diálogo
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => UltimateVideo(
+        onVideoEnd: () {
+          // Se puede hacer algo al acabar video si quieres
+        },
+      ),
+    );
 
     // Inflige daño
     onDamageApplied(100);
 
-    // Rota sin perder estado
+    // Rota pantalla sin perder estado
     await _rotateScreen(context);
   }
 
-  void _showUltimateFrame(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: SizedBox(
-            width: double.infinity,
-            height: 100,
-            child: Image.asset(
-              'assets/special_attack/shinji/marco_prova.png',
-              width: MediaQuery.of(context).size.width,
-              height: 100,
-              fit: BoxFit.fill,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _playUltimateSound() async {
-    try {
-      await _audioPlayer.play(AssetSource('special_attack/shinji/yokoso.mp3'));
-    } catch (e) {
-      print("Error al reproducir el audio: $e");
-    }
-  }
-
-  Future<void> _playUltimateVideo(BuildContext context) async {
-    _videoController = VideoPlayerController.asset(
-        'assets/special_attack/shinji/shinji_vid.mp4');
-
-    await _videoController.initialize();
-    _videoController.play();
-
-    final completer = Completer();
-
-    _videoController.addListener(() {
-      if (_videoController.value.position >= _videoController.value.duration &&
-          !_videoController.value.isPlaying &&
-          !completer.isCompleted) {
-        Navigator.of(context).pop(); // Cierra el diálogo del video
-        completer.complete();
-      }
-    });
-
-    // Mostrar el video
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: AspectRatio(
-          aspectRatio: _videoController.value.aspectRatio,
-          child: VideoPlayer(_videoController),
-        ),
-      ),
-    );
-
-    await completer.future;
-    await _videoController.dispose();
-  }
-
   Future<void> _rotateScreen(BuildContext context) async {
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CombatScreenWrapper(isRotated: true),
@@ -107,7 +58,8 @@ class UltimateService {
 
 class CombatScreenWrapper extends StatelessWidget {
   final bool isRotated;
-  const CombatScreenWrapper({required this.isRotated});
+  const CombatScreenWrapper({required this.isRotated, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
