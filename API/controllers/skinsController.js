@@ -661,7 +661,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                    b.personatge_id
             FROM SKINS s
             JOIN BIBLIOTECA b ON FIND_IN_SET(s.id, b.skin_ids) > 0
-            LEFT JOIN USUARI_SKIN_ARMA usa ON usa.skin = s.id AND usa.usuari = ?
+            LEFT JOIN USUARI_SKIN_ARMES usa ON usa.skin = s.id AND usa.usuari = ?
             LEFT JOIN ARMES ar ON usa.arma = ar.id
             LEFT JOIN ATACS a ON s.atac = a.id
             WHERE b.user_id = ? AND s.raça = 1
