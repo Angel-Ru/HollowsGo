@@ -48,6 +48,7 @@ dependencies:
   cool_alert: ^2.0.1
   screen_brightness: ^2.1.3
   flutter_volume_controller: ^1.3.3
+  font_awesome_flutter: ^10.5.0
 
 
 dev_dependencies:

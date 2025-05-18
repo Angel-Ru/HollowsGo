@@ -1,5 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/providers/armes_provider.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 
 Future<void> mostrarDialegArmesPredefinides({
   required BuildContext context,
@@ -8,42 +11,48 @@ Future<void> mostrarDialegArmesPredefinides({
   required ArmesProvider armesProvider,
 }) async {
   await armesProvider.fetchArmesPerSkin(skinId, usuariId);
-  final provider =
-      Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+  final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+
   showDialog(
     context: context,
     builder: (context) {
       return Dialog(
-        backgroundColor: Colors.black.withOpacity(0.5),
+        backgroundColor: Colors.transparent,
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(
-                'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg',
-              ),
-              fit: BoxFit.cover,
-              colorFilter:
-                  ColorFilter.mode(Colors.black.withOpacity(0.3), BlendMode.darken),
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withOpacity(0.7),
+                Colors.orange.shade700.withOpacity(0.7),
+              ],
+              stops: [0.75, 1.0],  // 75% negre, 25% taronja
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.withOpacity(0.8), width: 1),
+            border: Border.all(color: Colors.orange.shade300.withOpacity(0.8), width: 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                "Selecciona una arma",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.orange.shade300,
-                  letterSpacing: 1.2,
-                ),
-                textAlign: TextAlign.center,
+             
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [  
+                  const SizedBox(width: 12),
+                  Text(
+                    "Selector d'armes",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade300,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ],
               ),
 
-              // Afegeixo la part d'arma equipada
               if (armesProvider.armaEquipada != null) ...[
                 const SizedBox(height: 12),
                 Text(
@@ -70,7 +79,7 @@ Future<void> mostrarDialegArmesPredefinides({
                 ),
               ],
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               if (armesProvider.isLoading)
                 const Center(child: CircularProgressIndicator())
               else if (armesProvider.armesDisponibles.isEmpty)
@@ -89,6 +98,7 @@ Future<void> mostrarDialegArmesPredefinides({
                     itemCount: armesProvider.armesDisponibles.length,
                     itemBuilder: (context, index) {
                       final arma = armesProvider.armesDisponibles[index];
+                      final isEquipada = armesProvider.armaEquipada?.id == arma.id;
                       return Card(
                         color: Colors.black.withOpacity(0.4),
                         shape: RoundedRectangleBorder(
@@ -105,47 +115,81 @@ Future<void> mostrarDialegArmesPredefinides({
                               color: Colors.orange,
                             ),
                           ),
-                          subtitle: Text(
-                            'Categoria: ${arma.categoria} - +${arma.buffAtac} ATK',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                          trailing: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent.shade200,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                          subtitle: Row(
+                            children: [
+                              Icon(
+                                FontAwesomeIcons.bolt,
+                                color: Colors.orangeAccent,
+                                size: 16,
                               ),
-                            ),
-                            child: Text(
-                              "Equipar",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                              const SizedBox(width: 6,),
+                              Text(
+                                '+${arma.buffAtac} d\'atac',
+                                style: TextStyle(
+                                  color: Colors.orangeAccent.shade100,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                ),
                               ),
-                            ),
-                            onPressed: () async {
-                              final ok = await armesProvider.equiparArma(
-                                usuariId: usuariId,
-                                skinId: skinId,
-                                armaId: arma.id,
-                              );
-                              provider.fetchPersonatgesAmbSkins(usuariId.toString());
-                              if (ok) {
-                                Navigator.of(context).pop();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text("Arma equipada amb èxit!"),
-                                      backgroundColor: Colors.green),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text("Error en equipar l'arma."),
-                                      backgroundColor: Colors.red),
-                                );
-                              }
-                            },
+                              SizedBox(height: 12)
+                            ],
                           ),
+                          trailing: isEquipada
+                              ? Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.transparent,
+                                    border: Border.all(color: Colors.orangeAccent.shade200, width: 1.5),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    "Equipada",
+                                    style: TextStyle(
+                                      color: Colors.orangeAccent.shade200,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                )
+                              : ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orangeAccent.shade200,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "Equipar",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    final ok = await armesProvider.equiparArma(
+                                      usuariId: usuariId,
+                                      skinId: skinId,
+                                      armaId: arma.id,
+                                    );
+                                    provider.fetchPersonatgesAmbSkins(usuariId.toString());
+                                    if (ok) {
+                                      Navigator.of(context).pop();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text("Arma equipada amb èxit!"),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text("Error en equipar l'arma."),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
                         ),
                       );
                     },
