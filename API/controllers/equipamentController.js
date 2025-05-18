@@ -2,29 +2,44 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 
 exports.getArmesPredefinidesPerSkin = async (req, res) => {
-    try {
-        const { skin_id } = req.params;
-        const connection = await connectDB();
+  try {
+    const { skin_id, usuari_id } = req.params;  // Ara agafem usuari_id també
+    const connection = await connectDB();
 
-        const [armes] = await connection.execute(
-            `SELECT a.id, a.nom, a.categoria, a.buff_atac
-             FROM SKINS_ARMES sa
-             JOIN ARMES a ON sa.arma = a.id
-             WHERE sa.skin = ?`,
-            [skin_id]
-        );
+    // Obtenim les armes predefinides per la skin
+    const [armes] = await connection.execute(
+      `SELECT a.id, a.nom, a.categoria, a.buff_atac
+       FROM SKINS_ARMES sa
+       JOIN ARMES a ON sa.arma = a.id
+       WHERE sa.skin = ?`,
+      [skin_id]
+    );
 
-        if (armes.length === 0) {
-            console.log(res);
-            return res.status(404).send('No s’han trobat armes per a aquesta skin.');
-        }
-        
-        res.status(200).json(armes);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error en obtenir les armes predefinides.");
+    if (armes.length === 0) {
+      return res.status(404).send('No s’han trobat armes per a aquesta skin.');
     }
+
+    // Obtenim l'arma equipada (si n'hi ha) per l'usuari i la skin
+    const [armaEquipadaRows] = await connection.execute(
+      `SELECT a.id, a.nom, a.categoria, a.buff_atac
+       FROM USUARI_SKIN_ARMES ae
+       JOIN ARMES a ON ae.arma_id = a.id
+       WHERE ae.usuari_id = ? AND ae.skin_id = ?`,
+      [usuari_id, skin_id]
+    );
+
+    const armaEquipada = armaEquipadaRows.length > 0 ? armaEquipadaRows[0] : null;
+
+    return res.status(200).json({
+      armesPredefinides: armes,
+      armaEquipada,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error en obtenir les armes predefinides.");
+  }
 };
+
 
 exports.equiparArmaASkin = async (req, res) => {
     try {
