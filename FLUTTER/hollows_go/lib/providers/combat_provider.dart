@@ -8,12 +8,17 @@ class CombatProvider with ChangeNotifier {
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
 
+  // Nuevo flag para controlar uso de ulti
+  bool _ultiUsed = false;
+
   double get aliatHealth => _aliatHealth;
   double get enemicHealth => _enemicHealth;
   bool get isEnemyTurn => _isEnemyTurn;
   bool get isEnemyHit => _isEnemyHit;
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
+
+  bool get ultiUsed => _ultiUsed; // getter para ultiUsed
 
   void setAllyHealth(double value) {
     _aliatHealth = value;
@@ -25,6 +30,17 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setAttackInProgress(bool value) {
+    _isAttackInProgress = value;
+    notifyListeners();
+  }
+
+  // Setter para ultiUsed con notificación
+  void setUltiUsed(bool value) {
+    _ultiUsed = value;
+    notifyListeners();
+  }
+
   void resetCombat(
       {double maxAllyHealth = 1000.0, double maxEnemyHealth = 1000.0}) {
     _aliatHealth = maxAllyHealth;
@@ -33,6 +49,7 @@ class CombatProvider with ChangeNotifier {
     _isEnemyHit = false;
     _isAllyHit = false;
     _isAttackInProgress = false;
+    _ultiUsed = false; // resetear ulti cuando reinicies combate
     notifyListeners();
   }
 
@@ -43,7 +60,7 @@ class CombatProvider with ChangeNotifier {
       _isEnemyHit = true;
       notifyListeners();
 
-      await Future.delayed(Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 300));
 
       _enemicHealth -= allyDamage;
       if (_enemicHealth < 0) _enemicHealth = 0;
@@ -63,7 +80,7 @@ class CombatProvider with ChangeNotifier {
 
   Future<void> _performEnemyAttack(
       int enemyDamage, VoidCallback onDefeat) async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
 
     _isAllyHit = true;
     notifyListeners();
@@ -71,7 +88,7 @@ class CombatProvider with ChangeNotifier {
     _aliatHealth -= enemyDamage;
     if (_aliatHealth < 0) _aliatHealth = 0;
 
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     _isAllyHit = false;
     _isEnemyTurn = false;

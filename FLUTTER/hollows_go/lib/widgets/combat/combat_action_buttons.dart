@@ -22,6 +22,9 @@ class CombatActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool ultiUsed =
+        combatProvider.ultiUsed; // Suponiendo que existe en el provider
+
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -84,7 +87,7 @@ class CombatActionButtons extends StatelessWidget {
             child: Container(
               height: 60,
               decoration: BoxDecoration(
-                color: Colors.yellow,
+                color: ultiUsed ? Colors.grey : Colors.yellow,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -95,19 +98,25 @@ class CombatActionButtons extends StatelessWidget {
                 ],
               ),
               child: IconButton(
-                icon: const Icon(Icons.auto_awesome, color: Colors.black),
-                onPressed: combatProvider.isEnemyTurn ||
+                icon: Icon(Icons.auto_awesome,
+                    color: ultiUsed ? Colors.black54 : Colors.black),
+                onPressed: (combatProvider.isEnemyTurn ||
                         combatProvider.isAttackInProgress ||
-                        combatProvider.enemicHealth <= 0
+                        combatProvider.enemicHealth <= 0 ||
+                        ultiUsed)
                     ? null
-                    : () {
-                        // Cambié la llamada a setEnemyHealth
-                        UltimateService().executeShinjiUlti(
+                    : () async {
+                        // Marca que ulti fue usada
+                        combatProvider.setUltiUsed(true);
+
+                        // Ejecuta ulti
+                        await UltimateService().executeShinjiUlti(
                           context,
                           (damage) {
                             combatProvider.setEnemyHealth(
                                 combatProvider.enemicHealth - damage);
                           },
+                          onVictory,
                         );
                       },
               ),
