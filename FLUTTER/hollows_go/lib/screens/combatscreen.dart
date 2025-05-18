@@ -110,6 +110,92 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
     );
   }
 
+  Future<bool> _onWillPop() async {
+    final salir = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7), BlendMode.darken),
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.orangeAccent, // color del borde naranja
+                  width: 3, // grosor del borde
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Estás a un combat en curs',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade300,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Estàs segur que vols sortir de l\'aplicació?',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text(
+                          'No',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orangeAccent,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Sí'),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (salir == true) {
+      SystemNavigator.pop();
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Selector<SkinsEnemicsPersonatgesProvider, SelectedSkinsModel>(
@@ -129,50 +215,53 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
             skins.enemic?.personatgeNom ?? "Desconegut Enemic";
         final int enemicDamage = (skins.enemic?.malTotal ?? 50) * 2;
 
-        return Scaffold(
-          body: Stack(
-            children: [
-              CombatBackground(_backgroundImage),
-              TurnIndicator(
-                isEnemyTurn: combatProvider.isEnemyTurn,
-                allyName: allyName,
-                enemyName: enemyName,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    CharacterDisplayWidget(
-                      imageUrl: skins.enemic?.imatge ??
-                          'lib/images/combatscreen_images/aizen_combat.png',
-                      name: enemyName,
-                      health: combatProvider.enemicHealth,
-                      maxHealth: skins.enemic?.vida ?? 1000,
-                      isHit: combatProvider.isEnemyHit,
-                      isEnemy: true,
-                    ),
-                    Spacer(),
-                    CharacterDisplayWidget(
-                      imageUrl: skins.aliat?.imatge ??
-                          'lib/images/combatscreen_images/bleach_combat.png',
-                      name: allyName,
-                      health: combatProvider.aliatHealth,
-                      maxHealth: skins.aliat?.vida ?? 1000,
-                      isHit: combatProvider.isAllyHit,
-                    ),
-                    SizedBox(height: 20),
-                    CombatActionButtons(
-                      combatProvider: combatProvider,
-                      techniqueName: techniqueName,
-                      aliatDamage: aliatDamage,
-                      enemicDamage: enemicDamage,
-                      onVictory: _showVictoryDialog,
-                      onDefeat: _showDefeatDialog,
-                    ),
-                  ],
+        return WillPopScope(
+          onWillPop: _onWillPop,
+          child: Scaffold(
+            body: Stack(
+              children: [
+                CombatBackground(_backgroundImage),
+                TurnIndicator(
+                  isEnemyTurn: combatProvider.isEnemyTurn,
+                  allyName: allyName,
+                  enemyName: enemyName,
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      CharacterDisplayWidget(
+                        imageUrl: skins.enemic?.imatge ??
+                            'lib/images/combatscreen_images/aizen_combat.png',
+                        name: enemyName,
+                        health: combatProvider.enemicHealth,
+                        maxHealth: skins.enemic?.vida ?? 1000,
+                        isHit: combatProvider.isEnemyHit,
+                        isEnemy: true,
+                      ),
+                      Spacer(),
+                      CharacterDisplayWidget(
+                        imageUrl: skins.aliat?.imatge ??
+                            'lib/images/combatscreen_images/bleach_combat.png',
+                        name: allyName,
+                        health: combatProvider.aliatHealth,
+                        maxHealth: skins.aliat?.vida ?? 1000,
+                        isHit: combatProvider.isAllyHit,
+                      ),
+                      SizedBox(height: 20),
+                      CombatActionButtons(
+                        combatProvider: combatProvider,
+                        techniqueName: techniqueName,
+                        aliatDamage: aliatDamage,
+                        enemicDamage: enemicDamage,
+                        onVictory: _showVictoryDialog,
+                        onDefeat: _showDefeatDialog,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
