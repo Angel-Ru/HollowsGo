@@ -646,7 +646,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
 
         const personatgeIds = personatgesResult.map(p => p.personatge_id);
 
-        // Obtenir les skins en una sola consulta
+        // Obtenir les skins amb l’arma equipada per l’usuari
         const [skinsResult] = await connection.execute(`
             SELECT s.id AS skin_id,
                    s.nom AS skin_nom,
@@ -656,14 +656,16 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                    a.mal AS mal_arma,
                    a.nom AS atac_nom,
                    ar.buff_atac AS atac,
+                   ar.id AS arma_id,
+                   ar.nom AS arma_nom,
                    b.personatge_id
             FROM SKINS s
             JOIN BIBLIOTECA b ON FIND_IN_SET(s.id, b.skin_ids) > 0
-            LEFT JOIN SKINS_ARMES sa ON s.id = sa.skin
-            LEFT JOIN ARMES ar ON sa.arma = ar.id
+            LEFT JOIN USUARI_SKIN_ARMA usa ON usa.skin = s.id AND usa.usuari = ?
+            LEFT JOIN ARMES ar ON usa.arma = ar.id
             LEFT JOIN ATACS a ON s.atac = a.id
             WHERE b.user_id = ? AND s.raça = 1
-        `, [userId]);
+        `, [userId, userId]);
 
         // Agrupar les skins per personatge
         const skinsPerPersonatge = {};
@@ -684,7 +686,12 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
                 categoria: skin.categoria,
                 mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
                 vida: personatge.vida_base,
-                atac_nom: skin.atac_nom
+                atac_nom: skin.atac_nom,
+                arma: {
+                    id: skin.arma_id || null,
+                    nom: skin.arma_nom || null,
+                    buff_atac: skin.atac || 0
+                }
             }));
 
             return {
@@ -698,8 +705,6 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
             };
         });
 
-       
-
         res.status(200).json(personatgesAmbSkins);
 
     } catch (err) {
@@ -707,6 +712,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         res.status(500).send('Error en la consulta');
     }
 };
+
 
 
 
