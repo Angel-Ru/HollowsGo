@@ -1,4 +1,6 @@
+// victory_dialog.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class VictoryDialog extends StatelessWidget {
   final int coins;
@@ -11,6 +13,12 @@ class VictoryDialog extends StatelessWidget {
     required this.onContinue,
     super.key,
   });
+
+  Future<void> _restorePortrait() async {
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +58,10 @@ class VictoryDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: onContinue,
+          onPressed: () async {
+            await _restorePortrait();
+            onContinue();
+          },
           child: const Text("Continuar"),
         ),
       ],

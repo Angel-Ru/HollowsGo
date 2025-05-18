@@ -3,10 +3,9 @@ import '../imports.dart';
 class CombatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => CombatProvider()),
-      ],
+    // Proveedor solo creado 1 vez aquí para que no se pierda estado al girar pantalla
+    return ChangeNotifierProvider(
+      create: (_) => CombatProvider(),
       child: _CombatScreenContent(),
     );
   }
@@ -17,9 +16,13 @@ class _CombatScreenContent extends StatefulWidget {
   State<_CombatScreenContent> createState() => _CombatScreenContentState();
 }
 
-class _CombatScreenContentState extends State<_CombatScreenContent> {
+class _CombatScreenContentState extends State<_CombatScreenContent>
+    with AutomaticKeepAliveClientMixin {
   late String _backgroundImage;
   bool _partidaJugadaSumada = false;
+
+  @override
+  bool get wantKeepAlive => true; // Aquí mantienes el estado vivo
 
   @override
   void initState() {
@@ -129,8 +132,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.orangeAccent, // color del borde naranja
-                  width: 3, // grosor del borde
+                  color: Colors.orangeAccent,
+                  width: 3,
                 ),
               ),
               child: Column(
@@ -198,6 +201,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // para AutomaticKeepAliveClientMixin
+
     return Selector<SkinsEnemicsPersonatgesProvider, SelectedSkinsModel>(
       selector: (_, provider) => SelectedSkinsModel(
         aliat: provider.selectedSkinAliat ??
