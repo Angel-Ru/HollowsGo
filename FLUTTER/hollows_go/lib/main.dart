@@ -1,4 +1,4 @@
-import 'package:hollows_go/providers/equipament_provider.dart';
+import 'package:hollows_go/providers/armes_provider.dart';
 import 'package:hollows_go/providers/map_provider.dart';
 
 import 'imports.dart';

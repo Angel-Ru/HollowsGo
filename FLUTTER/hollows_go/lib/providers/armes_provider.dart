@@ -5,12 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ArmesProvider extends ChangeNotifier {
   List<Arma> _armesDisponibles = [];
+  Arma? _armaEquipada;
   bool _isLoading = false;
 
   List<Arma> get armesDisponibles => _armesDisponibles;
+  Arma? get armaEquipada => _armaEquipada;
   bool get isLoading => _isLoading;
 
-  Future<void> fetchArmesPerSkin(int skinId) async {
+  Future<void> fetchArmesPerSkin(int skinId, int usuariId) async {
     _isLoading = true;
     notifyListeners();
 
@@ -21,13 +23,14 @@ class ArmesProvider extends ChangeNotifier {
       if (token == null) {
         print("Token no disponible a SharedPreferences");
         _armesDisponibles = [];
+        _armaEquipada = null;
         _isLoading = false;
         notifyListeners();
         return;
       }
 
       final response = await http.get(
-        Uri.parse('https://${Config.ip}/equipaments/skins/$skinId/armes/'),
+        Uri.parse('https://${Config.ip}/equipaments/skins/$skinId/armes/$usuariId'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -35,20 +38,29 @@ class ArmesProvider extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        final List jsonData = jsonDecode(response.body);
-        _armesDisponibles = jsonData.map((a) => Arma.fromJson(a)).toList();
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+        final List armesJson = jsonData['armesPredefinides'] ?? [];
+        _armesDisponibles = armesJson.map((a) => Arma.fromJson(a)).toList();
+
+        final armaEquipadaJson = jsonData['armaEquipada'];
+        _armaEquipada = armaEquipadaJson != null ? Arma.fromJson(armaEquipadaJson) : null;
       } else {
         _armesDisponibles = [];
+        _armaEquipada = null;
         print('Error carregant armes: ${response.statusCode}');
       }
     } catch (e) {
       _armesDisponibles = [];
+      _armaEquipada = null;
       print('Error a fetchArmesPerSkin: $e');
     }
 
     _isLoading = false;
     notifyListeners();
   }
+
+
 
   Future<bool> equiparArma({
     required int usuariId,

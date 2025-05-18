@@ -23,8 +23,8 @@ exports.getArmesPredefinidesPerSkin = async (req, res) => {
     const [armaEquipadaRows] = await connection.execute(
       `SELECT a.id, a.nom, a.categoria, a.buff_atac
        FROM USUARI_SKIN_ARMES ae
-       JOIN ARMES a ON ae.arma_id = a.id
-       WHERE ae.usuari_id = ? AND ae.skin_id = ?`,
+       JOIN ARMES a ON ae.arma = a.id
+       WHERE ae.usuari = ? AND ae.skin = ?`,
       [usuari_id, skin_id]
     );
 

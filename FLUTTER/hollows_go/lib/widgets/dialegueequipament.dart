@@ -1,5 +1,5 @@
 import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/providers/equipament_provider.dart';
+import 'package:hollows_go/providers/armes_provider.dart';
 
 Future<void> mostrarDialegArmesPredefinides({
   required BuildContext context,
@@ -7,7 +7,7 @@ Future<void> mostrarDialegArmesPredefinides({
   required int usuariId,
   required ArmesProvider armesProvider,
 }) async {
-  await armesProvider.fetchArmesPerSkin(skinId);
+  await armesProvider.fetchArmesPerSkin(skinId, usuariId);
   final provider =
       Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
   showDialog(
@@ -42,6 +42,34 @@ Future<void> mostrarDialegArmesPredefinides({
                 ),
                 textAlign: TextAlign.center,
               ),
+
+              // Afegeixo la part d'arma equipada
+              if (armesProvider.armaEquipada != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  "Arma equipada:",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  armesProvider.armaEquipada!.nom,
+                  style: TextStyle(
+                    color: Colors.orangeAccent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                const Divider(
+                  color: Colors.orangeAccent,
+                  thickness: 1,
+                  height: 24,
+                ),
+              ],
+
               const SizedBox(height: 20),
               if (armesProvider.isLoading)
                 const Center(child: CircularProgressIndicator())

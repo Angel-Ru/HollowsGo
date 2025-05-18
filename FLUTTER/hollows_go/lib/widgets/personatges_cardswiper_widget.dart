@@ -1,4 +1,4 @@
-import 'package:hollows_go/providers/equipament_provider.dart';
+import 'package:hollows_go/providers/armes_provider.dart';
 import 'package:hollows_go/widgets/dialegueequipament.dart';
 
 import '../imports.dart';
