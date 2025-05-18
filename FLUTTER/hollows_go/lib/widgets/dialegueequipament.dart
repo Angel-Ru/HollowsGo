@@ -8,7 +8,8 @@ Future<void> mostrarDialegArmesPredefinides({
   required ArmesProvider armesProvider,
 }) async {
   await armesProvider.fetchArmesPerSkin(skinId);
-
+  final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
   showDialog(
     context: context,
     builder: (context) {
@@ -32,6 +33,7 @@ Future<void> mostrarDialegArmesPredefinides({
                               skinId: skinId,
                               armaId: arma.id,
                             );
+                            provider.fetchPersonatgesAmbSkins(usuariId.toString());
                             if (ok) {
                               Navigator.of(context).pop();
                               ScaffoldMessenger.of(context).showSnackBar(
