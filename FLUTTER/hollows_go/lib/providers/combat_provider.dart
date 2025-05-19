@@ -149,7 +149,7 @@ class CombatProvider with ChangeNotifier {
     if (response.statusCode == 200) {
       print("Vida actualitzada correctament.");
     } else {
-      print("Error al actualitzar vida: ${response.statusCode}");
+      print("Error al actualitzar vida: ${response.statusCode}, ${response.body}");
     }
   } catch (e) {
     print("Error en updateSkinVidaActual: $e");
