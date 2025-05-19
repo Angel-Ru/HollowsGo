@@ -59,7 +59,7 @@ app.use('/atacs', atacsRoutes);             // Ruta para ataques
 app.use('/usuaris', userRoutes);            // Ruta para usuarios
 app.use('/perfils', perfilRoutes)           // Ruta per perfils
 app.use('/equipaments',equipamentRoutes);   // Ruta per equipar armes a skins
-app.use('/combat', combatRoutes);           // Ruta per el referent als combat
+app.use('/combats', combatRoutes);           // Ruta per el referent als combat
 
 const port = process.env.PORT || 3000;
 

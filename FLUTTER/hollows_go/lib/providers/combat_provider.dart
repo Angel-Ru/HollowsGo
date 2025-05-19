@@ -134,7 +134,7 @@ class CombatProvider with ChangeNotifier {
       }
 
       final response = await http.put(
-        Uri.parse('https://${Config.ip}/combat/vida/$skinId'),
+        Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
