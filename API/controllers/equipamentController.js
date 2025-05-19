@@ -155,7 +155,7 @@ exports.utilitzarVial = async (req, res) => {
 
     // 1. Comprovar vials disponibles
     const [vialRows] = await connection.execute(
-      'SELECT vials, ultima_actualitzacio FROM USUARIS_VIALS WHERE usuari = ?',
+      'SELECT vials, ultima_actualitzacio FROM USUARI_VIALS WHERE usuari = ?',
       [usuari_id]
     );
 
@@ -200,7 +200,7 @@ exports.utilitzarVial = async (req, res) => {
     // 5. Restar un vial i actualitzar la data
     const vials = vialRows[0].vials - 1;
     await connection.execute(
-      'UPDATE USUARIS_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari_id = ?',
+      'UPDATE USUARI_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari_id = ?',
       [vials, new Date(), usuari_id]
     );
 
