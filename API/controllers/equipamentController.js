@@ -175,7 +175,7 @@ exports.utilitzarVial = async (req, res) => {
       return res.status(404).send("No s’ha trobat el personatge associat a la skin.");
     }
 
-    const personatgeId = personatgeRows[0].personatge_id;
+    const personatgeId = personatgeRows[0].personatge;
 
     // 3. Obtenir la vida base del personatge
     const [vidaRows] = await connection.execute(
