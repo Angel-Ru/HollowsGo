@@ -1,4 +1,5 @@
 import 'package:hollows_go/imports.dart';
+import 'package:hollows_go/providers/vials_provider.dart';
 import 'package:hollows_go/screens/prefilscreen.dart';
 import 'package:hollows_go/widgets/home/dialogue_section.dart';
 import 'package:hollows_go/widgets/home/home_app_bar.dart';
@@ -19,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _controller = HomeScreenController(context);
-
+      
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final avatarUrl = await _controller.loadProfileImage();
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
       userProvider.fetchUserPoints();
       _timer = Timer.periodic(
           Duration(seconds: 5), (_) => userProvider.fetchUserPoints());
-
+      Provider.of<VialsProvider>(context, listen: false).fetchVials(userProvider.userId);
       Provider.of<DialogueProvider>(context, listen: false)
           .loadDialogueFromJson("ichigo");
       await _controller.loadUserData();

@@ -66,10 +66,32 @@ exports.equiparArmaASkin = async (req, res) => {
                 [arma_id, usuari_id, skin_id]
             );
         } else {
+            // Fem l'insert
             await connection.execute(
                 'INSERT INTO USUARI_SKIN_ARMES (usuari, skin, arma) VALUES (?, ?, ?)',
                 [usuari_id, skin_id, arma_id]
             );
+
+            // Obtenim la vida_base del personatge associat a la skin
+            const [result] = await connection.execute(
+                `SELECT p.vida_base
+                 FROM SKINS s
+                 JOIN PERSONATGES p ON s.personatge_id = p.id
+                 WHERE s.id = ?`,
+                [skin_id]
+            );
+
+            if (result.length > 0) {
+                const vidaBase = result[0].vida_base;
+
+                // Suposant que USUARI_SKIN_ARMES té una columna vida_actual
+                await connection.execute(
+                    `UPDATE USUARI_SKIN_ARMES
+                     SET vida_actual = ?
+                     WHERE usuari = ? AND skin = ?`,
+                    [vidaBase, usuari_id, skin_id]
+                );
+            }
         }
 
         res.status(200).json({ message: "Arma equipada correctament a la skin." });
@@ -77,5 +99,120 @@ exports.equiparArmaASkin = async (req, res) => {
         console.error(err);
         res.status(500).send("Error en equipar l'arma.");
     }
+};
+
+
+exports.getVialsUsuari = async (req, res) => {
+  try {
+    const { usuari_id } = req.params;
+    const connection = await connectDB();
+
+    const [rows] = await connection.execute(
+      'SELECT vials, ultima_actualitzacio FROM USUARIS_VIALS WHERE usuari_id = ?',
+      [usuari_id]
+    );
+
+    if (rows.length === 0) {
+      
+      await connection.execute(
+        'INSERT INTO USUARIS_VIALS (usuari_id, vials, ultima_actualitzacio) VALUES (?, 3, NOW())',
+        [usuari_id]
+      );
+      return res.status(200).json({ vials: 3 });
+    }
+
+    let { vials, ultima_actualitzacio } = rows[0];
+    const lastDate = new Date(ultima_actualitzacio);
+    const now = new Date();
+
+    const diffMs = now - lastDate;
+    const hoursPassed = Math.floor(diffMs / (1000 * 60 * 60));
+    const vialsToAdd = Math.floor(hoursPassed / 5);
+
+    if (vials < 3 && vialsToAdd > 0) {
+      const newVials = Math.min(3, vials + vialsToAdd);
+      const newDate = new Date(lastDate.getTime() + vialsToAdd * 5 * 60 * 60 * 1000);
+
+      await connection.execute(
+        'UPDATE USUARIS_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari_id = ?',
+        [newVials, newDate, usuari_id]
+      );
+
+      vials = newVials;
+    }
+
+    return res.status(200).json({ vials });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error en obtenir els vials.");
+  }
+};
+
+exports.utilitzarVial = async (req, res) => {
+  try {
+    const { usuari_id, skin_id } = req.body;
+    const connection = await connectDB();
+
+    // 1. Comprovar vials disponibles
+    const [vialRows] = await connection.execute(
+      'SELECT vials, ultima_actualitzacio FROM USUARIS_VIALS WHERE usuari_id = ?',
+      [usuari_id]
+    );
+
+    if (vialRows.length === 0 || vialRows[0].vials <= 0) {
+      return res.status(400).send("No tens vials disponibles.");
+    }
+
+    // 2. Obtenir personatge associat a la skin
+    const [personatgeRows] = await connection.execute(
+      `SELECT s.personatge
+       FROM SKINS s
+       WHERE s.id = ?`,
+      [skin_id]
+    );
+
+    if (personatgeRows.length === 0) {
+      return res.status(404).send("No s’ha trobat el personatge associat a la skin.");
+    }
+
+    const personatgeId = personatgeRows[0].personatge_id;
+
+    // 3. Obtenir la vida base del personatge
+    const [vidaRows] = await connection.execute(
+      'SELECT vida_base FROM PERSONATGES WHERE id = ?',
+      [personatgeId]
+    );
+
+    if (vidaRows.length === 0) {
+      return res.status(404).send("No s’ha trobat la vida base del personatge.");
+    }
+
+    const vidaBase = vidaRows[0].vida_base;
+
+    // 4. Actualitzar la vida_actual a la taula USUARI_SKIN_ARMES
+    await connection.execute(
+      `UPDATE USUARI_SKIN_ARMES
+       SET vida_actual = ?
+       WHERE usuari = ? AND skin = ?`,
+      [vidaBase, usuari_id, skin_id]
+    );
+
+    // 5. Restar un vial i actualitzar la data
+    const vials = vialRows[0].vials - 1;
+    await connection.execute(
+      'UPDATE USUARIS_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari_id = ?',
+      [vials, new Date(), usuari_id]
+    );
+
+    return res.status(200).json({
+      message: "Vial utilitzat. Vida restaurada!",
+      vialsRestants: vials,
+      vida_actual: vidaBase
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error en fer servir el vial.");
+  }
 };
 

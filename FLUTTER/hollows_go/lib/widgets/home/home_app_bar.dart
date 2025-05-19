@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/ui_provider.dart';
+import '../../providers/vials_provider.dart'; // <- Assegura't que existeix
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String imagePath;
@@ -23,12 +24,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           automaticallyImplyLeading: false,
           backgroundColor: Color.fromARGB(255, 61, 61, 61),
           elevation: 0,
-          title: Consumer<UserProvider>(
-            builder: (context, userProvider, _) => Row(
+          title: Consumer2<UserProvider, VialsProvider>(
+            builder: (context, userProvider, vialsProvider, _) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
+                    // Moneda
                     CircleAvatar(
                       radius: 20,
                       backgroundColor: Colors.transparent,
@@ -36,13 +38,30 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                         'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png',
                       ),
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: 6),
                     Text(
                       '${userProvider.coinCount}',
                       style: TextStyle(color: Colors.grey),
                     ),
+                    SizedBox(width: 16),
+
+                    // Vials
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.transparent,
+                      backgroundImage: NetworkImage(
+                        'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/VIAL/w9h0t4ugeq8pn84kc1pd',
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      '${vialsProvider.vials}',
+                      style: TextStyle(color: Colors.grey),
+                    ),
                   ],
                 ),
+
+                // Usuari
                 Row(
                   children: [
                     Text(userProvider.username,

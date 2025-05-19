@@ -1,6 +1,7 @@
 import 'package:hollows_go/providers/armes_provider.dart';
 import 'package:hollows_go/providers/map_provider.dart';
-import 'package:hollows_go/providers/combat_provider.dart'; // Asegúrate de importar tu provider
+import 'package:hollows_go/providers/vials_provider.dart';
+
 
 import 'imports.dart';
 
@@ -23,12 +24,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DialogueProvider()),
         ChangeNotifierProvider(create: (_) => GachaProvider()),
-        ChangeNotifierProvider(
-            create: (_) => SkinsEnemicsPersonatgesProvider()),
+        ChangeNotifierProvider(create: (_) => SkinsEnemicsPersonatgesProvider()),
         ChangeNotifierProvider(create: (_) => PerfilProvider()),
         ChangeNotifierProvider(create: (_) => MapDataProvider()),
         ChangeNotifierProvider(create: (_) => ArmesProvider()),
         ChangeNotifierProvider(create: (_) => CombatProvider()),
+        ChangeNotifierProvider(create: (_) => VialsProvider()),
+
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

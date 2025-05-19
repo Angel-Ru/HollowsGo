@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/providers/armes_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
+
 
 Future<void> mostrarDialegArmesPredefinides({
   required BuildContext context,
