@@ -175,7 +175,7 @@ exports.utilitzarVial = async (req, res) => {
       return res.status(404).send("No s’ha trobat el personatge associat a la skin.");
     }
 
-    const personatgeId = personatgeRows[0].personatge_id;
+    const personatgeId = personatgeRows[0].personatge;
 
     // 3. Obtenir la vida base del personatge
     const [vidaRows] = await connection.execute(
@@ -200,7 +200,7 @@ exports.utilitzarVial = async (req, res) => {
     // 5. Restar un vial i actualitzar la data
     const vials = vialRows[0].vials - 1;
     await connection.execute(
-      'UPDATE USUARI_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari_id = ?',
+      'UPDATE USUARI_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari = ?',
       [vials, new Date(), usuari_id]
     );
 

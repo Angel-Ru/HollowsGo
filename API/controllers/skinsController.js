@@ -388,13 +388,6 @@ exports.gachaTirada = async (req, res) => {
             return res.status(400).send('No tens prou monedes per fer la tirada.');
         }
 
-        // Restar 100 monedes a l'usuari
-        const newBalance = currentBalance - 100;
-        await connection.execute(
-            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
-            [newBalance, userId]
-        );
-
         // Obtenir les skins disponibles segons la condició
         const [availableSkins] = await connection.execute(`
             SELECT *
@@ -447,7 +440,7 @@ exports.gachaTirada = async (req, res) => {
         const selectedGroup = starGroups[chosenStars];
         const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
 
-        // Obtenir les skins que ja té l'usuari per aquest personatge
+        // Comprovar si l'usuari ja té la skin
         const [userSkins] = await connection.execute(
             'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
             [userId, randomSkin.personatge]
@@ -458,12 +451,21 @@ exports.gachaTirada = async (req, res) => {
             : [];
 
         if (userSkinIds.includes(String(randomSkin.id))) {
-            // Ja té aquesta skin: retornar la tirada però sense restar monedes (o restar i tornar a sumar?)
-            // Aquí mantenim el saldo com està, no restem monedes
-            return res.status(200).send({ message: "Ja tens aquesta skin." });
+            // Ja té aquesta skin: NO restem monedes
+            return res.status(200).send({
+                message: "Ja tens aquesta skin.",
+                skin: randomSkin,
+                remainingCoins: currentBalance,
+            });
         }
 
-        // Afegir la nova skin i actualitzar la BIBLIOTECA
+        // Afegir la nova skin i restar les monedes
+        const newBalance = currentBalance - 100;
+        await connection.execute(
+            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+            [newBalance, userId]
+        );
+
         userSkinIds.push(String(randomSkin.id));
         const updatedSkinIds = userSkinIds.join(',');
 
@@ -493,6 +495,7 @@ exports.gachaTirada = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 exports.seleccionarSkinAleatoria = async (req, res) => {
@@ -622,7 +625,7 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
  *       500:
  *         description: Error en la consulta.
  */
-exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
+    exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
     try {
         const connection = await connectDB();
         const userId = req.params.id;
@@ -641,24 +644,23 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         `, [userId]);
 
         if (personatgesResult.length === 0) {
-            return res.status(404).send('No s\'han trobat personatges per a aquest usuari');
+        return res.status(404).send('No s\'han trobat personatges per a aquest usuari');
         }
-
-        const personatgeIds = personatgesResult.map(p => p.personatge_id);
 
         // Obtenir les skins amb l’arma equipada per l’usuari
         const [skinsResult] = await connection.execute(`
             SELECT s.id AS skin_id,
-                   s.nom AS skin_nom,
-                   s.categoria,
-                   s.imatge,
-                   s.raça,
-                   a.mal AS mal_arma,
-                   a.nom AS atac_nom,
-                   ar.buff_atac AS atac,
-                   ar.id AS arma_id,
-                   ar.nom AS arma_nom,
-                   b.personatge_id
+                s.nom AS skin_nom,
+                s.categoria,
+                s.imatge,
+                s.raça,
+                a.mal AS mal_arma,
+                a.nom AS atac_nom,
+                ar.buff_atac AS atac,
+                ar.id AS arma_id,
+                ar.nom AS arma_nom,
+                b.personatge_id,
+                usa.vida_actual
             FROM SKINS s
             JOIN BIBLIOTECA b ON FIND_IN_SET(s.id, b.skin_ids) > 0
             LEFT JOIN USUARI_SKIN_ARMES usa ON usa.skin = s.id AND usa.usuari = ?
@@ -670,39 +672,41 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         // Agrupar les skins per personatge
         const skinsPerPersonatge = {};
         skinsResult.forEach(skin => {
-            if (!skinsPerPersonatge[skin.personatge_id]) {
-                skinsPerPersonatge[skin.personatge_id] = [];
-            }
-            skinsPerPersonatge[skin.personatge_id].push(skin);
+        if (!skinsPerPersonatge[skin.personatge_id]) {
+            skinsPerPersonatge[skin.personatge_id] = [];
+        }
+        skinsPerPersonatge[skin.personatge_id].push(skin);
         });
 
         // Construir la resposta final
         const personatgesAmbSkins = personatgesResult.map(personatge => {
-            const skins = (skinsPerPersonatge[personatge.personatge_id] || []).map(skin => ({
-                id: skin.skin_id,
-                nom: skin.skin_nom,
-                imatge: skin.imatge,
-                raça: skin.raça,
-                categoria: skin.categoria,
-                mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
-                vida: personatge.vida_base,
-                atac_nom: skin.atac_nom,
-                arma: {
-                    id: skin.arma_id || null,
-                    nom: skin.arma_nom || null,
-                    buff_atac: skin.atac || 0
-                }
-            }));
+        const skins = (skinsPerPersonatge[personatge.personatge_id] || []).map(skin => ({
+            id: skin.skin_id,
+            nom: skin.skin_nom,
+            imatge: skin.imatge,
+            raça: skin.raça,
+            categoria: skin.categoria,
+            mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
+            vida: skin.vida_actual !== null ? skin.vida_actual : personatge.vida_base,
+            vida_maxima: personatge.vida_base,
+            atac_nom: skin.atac_nom,
+            arma: {
+            id: skin.arma_id || null,
+            nom: skin.arma_nom || null,
+            buff_atac: skin.atac || 0
+  }
+}));
 
-            return {
-                personatge: {
-                    id: personatge.personatge_id,
-                    nom: personatge.personatge_nom,
-                    vida_base: personatge.vida_base,
-                    mal_base: personatge.mal_base,
-                },
-                skins: skins
-            };
+
+        return {
+            personatge: {
+            id: personatge.personatge_id,
+            nom: personatge.personatge_nom,
+            vida_base: personatge.vida_base,
+            mal_base: personatge.mal_base,
+            },
+            skins: skins
+        };
         });
 
         res.status(200).json(personatgesAmbSkins);
@@ -711,7 +715,8 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         console.error(err);
         res.status(500).send('Error en la consulta');
     }
-};
+    };
+
 
 
 
