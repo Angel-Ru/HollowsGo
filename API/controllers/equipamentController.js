@@ -76,7 +76,7 @@ exports.equiparArmaASkin = async (req, res) => {
             const [result] = await connection.execute(
                 `SELECT p.vida_base
                  FROM SKINS s
-                 JOIN PERSONATGES p ON s.personatge_id = p.id
+                 JOIN PERSONATGES p ON s.personatge = p.id
                  WHERE s.id = ?`,
                 [skin_id]
             );
