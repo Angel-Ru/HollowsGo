@@ -250,7 +250,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                             'lib/images/combatscreen_images/bleach_combat.png',
                         name: allyName,
                         health: combatProvider.aliatHealth,
-                        maxHealth: skins.aliat?.vida ?? 1000,
+                        maxHealth: skins.aliat?.vidaMaxima?? 1000,
                         isHit: combatProvider.isAllyHit,
                       ),
                       SizedBox(height: 20),

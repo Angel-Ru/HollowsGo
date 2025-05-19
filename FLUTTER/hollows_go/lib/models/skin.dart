@@ -7,6 +7,7 @@ class Skin {
   int? malTotal;
   String? personatgeNom;
   int? vida;
+  int? vidaMaxima;
   int? currentHealth;
   String? atac;
   int? raca;
@@ -20,6 +21,7 @@ class Skin {
     this.malTotal,
     this.personatgeNom,
     this.vida,
+    this.vidaMaxima,
     this.atac,
     this.raca,
   }) : currentHealth = vida ?? 0;
@@ -41,6 +43,7 @@ class Skin {
       malTotal: parseNullableInt(json['mal_total']),
       personatgeNom: json['personatge_nom'],
       vida: parseNullableInt(json['vida']),
+      vidaMaxima: parseNullableInt(json['vida_maxima']),
       atac: json['atac_nom'],
       raca: parseNullableInt(json['raça']),
     );
@@ -55,6 +58,7 @@ class Skin {
         'mal_total': malTotal,
         'personatge_nom': personatgeNom,
         'vida': vida,
+        'vida_maxima': vidaMaxima,
         'atac_nom': atac,
         'raça': raca,
       };
