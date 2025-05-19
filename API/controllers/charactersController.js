@@ -54,16 +54,18 @@ exports.getPersonatges = async (req, res) => {
 exports.getPersonatgeId = async (req, res) => {
     try {
         const pool = await connectDB();
-        const result = await pool.request()
-            .input('id', sql.Int, req.params.id)
-            .query('SELECT * FROM PERSONATGES WHERE id = @id');
-        res.send(result.recordset);
+        const [rows] = await pool.execute(
+            'SELECT * FROM PERSONATGES WHERE id = ?',
+            [req.params.id]
+        );
+
+        res.send(rows);
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en la consulta');
-        console.log(res);
     }
 };
+
 
 /**
  * @swagger
