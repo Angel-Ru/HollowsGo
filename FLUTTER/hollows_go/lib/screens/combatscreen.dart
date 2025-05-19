@@ -47,35 +47,43 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
   }
 
   Future<void> _verifyAndResetCombat() async {
-    final skinsProvider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+  final skinsProvider =
+      Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-    if (skinsProvider.selectedSkin == null ||
-        (skinsProvider.selectedSkinAliat == null &&
-            skinsProvider.selectedSkinQuincy == null &&
-            skinsProvider.selectedSkinEnemic == null)) {
-      await skinsProvider.selectRandomSkin();
-    }
-
-    final aliat = skinsProvider.selectedSkinAliat ??
-        skinsProvider.selectedSkinQuincy ??
-        skinsProvider.selectedSkinEnemic;
-    final enemic = skinsProvider.selectedSkin;
-
-    final maxAllyHealth = aliat?.vida ?? 1000;
-    final maxEnemyHealth = enemic?.vida ?? 1000;
-
-    skinsProvider.setMaxAllyHealth(maxAllyHealth);
-    skinsProvider.setMaxEnemyHealth(maxEnemyHealth);
-
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    combatProvider.resetCombat(
-      maxAllyHealth: maxAllyHealth.toDouble(),
-      maxEnemyHealth: maxEnemyHealth.toDouble(),
-    );
-
-    _partidaJugadaSumada = false;
+  if (skinsProvider.selectedSkin == null ||
+      (skinsProvider.selectedSkinAliat == null &&
+          skinsProvider.selectedSkinQuincy == null &&
+          skinsProvider.selectedSkinEnemic == null)) {
+    await skinsProvider.selectRandomSkin();
   }
+
+  final aliat = skinsProvider.selectedSkinAliat ??
+      skinsProvider.selectedSkinQuincy ??
+      skinsProvider.selectedSkinEnemic;
+  final enemic = skinsProvider.selectedSkin;
+
+  final maxAllyHealth = aliat?.vida ?? 1000;
+  final maxEnemyHealth = enemic?.vida ?? 1000;
+
+  skinsProvider.setMaxAllyHealth(maxAllyHealth);
+  skinsProvider.setMaxEnemyHealth(maxEnemyHealth);
+
+  final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+
+  
+  if (aliat?.id != null) {
+    await combatProvider.fetchSkinVidaActual(aliat!.id);
+  }
+
+  
+  combatProvider.resetCombat(
+    maxAllyHealth: maxAllyHealth.toDouble(),
+    maxEnemyHealth: maxEnemyHealth.toDouble(),
+  );
+
+  _partidaJugadaSumada = false;
+}
+
 
   void _showVictoryDialog() async {
     final skinsProvider =
