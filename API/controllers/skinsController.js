@@ -625,95 +625,97 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
  *       500:
  *         description: Error en la consulta.
  */
-exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
-  try {
-    const connection = await connectDB();
-    const userId = req.params.id;
+    exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
+    try {
+        const connection = await connectDB();
+        const userId = req.params.id;
 
-    // Obtenir els personatges de l'usuari
-    const [personatgesResult] = await connection.execute(`
-        SELECT DISTINCT p.id AS personatge_id,
-                        p.nom AS personatge_nom,
-                        p.vida_base,
-                        p.mal_base
-        FROM PERSONATGES p
-        JOIN BIBLIOTECA b ON p.id = b.personatge_id
-        JOIN SKINS s ON s.personatge = p.id
-        WHERE b.user_id = ? AND s.raça = 1
-        ORDER BY p.nom
-    `, [userId]);
+        // Obtenir els personatges de l'usuari
+        const [personatgesResult] = await connection.execute(`
+            SELECT DISTINCT p.id AS personatge_id,
+                            p.nom AS personatge_nom,
+                            p.vida_base,
+                            p.mal_base
+            FROM PERSONATGES p
+            JOIN BIBLIOTECA b ON p.id = b.personatge_id
+            JOIN SKINS s ON s.personatge = p.id
+            WHERE b.user_id = ? AND s.raça = 1
+            ORDER BY p.nom
+        `, [userId]);
 
-    if (personatgesResult.length === 0) {
-      return res.status(404).send('No s\'han trobat personatges per a aquest usuari');
-    }
-
-    // Obtenir les skins amb l’arma equipada per l’usuari
-    const [skinsResult] = await connection.execute(`
-        SELECT s.id AS skin_id,
-               s.nom AS skin_nom,
-               s.categoria,
-               s.imatge,
-               s.raça,
-               a.mal AS mal_arma,
-               a.nom AS atac_nom,
-               ar.buff_atac AS atac,
-               ar.id AS arma_id,
-               ar.nom AS arma_nom,
-               b.personatge_id,
-               usa.vida_actual
-        FROM SKINS s
-        JOIN BIBLIOTECA b ON FIND_IN_SET(s.id, b.skin_ids) > 0
-        LEFT JOIN USUARI_SKIN_ARMES usa ON usa.skin = s.id AND usa.usuari = ?
-        LEFT JOIN ARMES ar ON usa.arma = ar.id
-        LEFT JOIN ATACS a ON s.atac = a.id
-        WHERE b.user_id = ? AND s.raça = 1
-    `, [userId, userId]);
-
-    // Agrupar les skins per personatge
-    const skinsPerPersonatge = {};
-    skinsResult.forEach(skin => {
-      if (!skinsPerPersonatge[skin.personatge_id]) {
-        skinsPerPersonatge[skin.personatge_id] = [];
-      }
-      skinsPerPersonatge[skin.personatge_id].push(skin);
-    });
-
-    // Construir la resposta final
-    const personatgesAmbSkins = personatgesResult.map(personatge => {
-      const skins = (skinsPerPersonatge[personatge.personatge_id] || []).map(skin => ({
-        id: skin.skin_id,
-        nom: skin.skin_nom,
-        imatge: skin.imatge,
-        raça: skin.raça,
-        categoria: skin.categoria,
-        mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
-        vida: skin.vida_actual !== null ? skin.vida_actual : personatge.vida_base,
-        atac_nom: skin.atac_nom,
-        arma: {
-          id: skin.arma_id || null,
-          nom: skin.arma_nom || null,
-          buff_atac: skin.atac || 0
+        if (personatgesResult.length === 0) {
+        return res.status(404).send('No s\'han trobat personatges per a aquest usuari');
         }
-      }));
 
-      return {
-        personatge: {
-          id: personatge.personatge_id,
-          nom: personatge.personatge_nom,
-          vida_base: personatge.vida_base,
-          mal_base: personatge.mal_base,
-        },
-        skins: skins
-      };
-    });
+        // Obtenir les skins amb l’arma equipada per l’usuari
+        const [skinsResult] = await connection.execute(`
+            SELECT s.id AS skin_id,
+                s.nom AS skin_nom,
+                s.categoria,
+                s.imatge,
+                s.raça,
+                a.mal AS mal_arma,
+                a.nom AS atac_nom,
+                ar.buff_atac AS atac,
+                ar.id AS arma_id,
+                ar.nom AS arma_nom,
+                b.personatge_id,
+                usa.vida_actual
+            FROM SKINS s
+            JOIN BIBLIOTECA b ON FIND_IN_SET(s.id, b.skin_ids) > 0
+            LEFT JOIN USUARI_SKIN_ARMES usa ON usa.skin = s.id AND usa.usuari = ?
+            LEFT JOIN ARMES ar ON usa.arma = ar.id
+            LEFT JOIN ATACS a ON s.atac = a.id
+            WHERE b.user_id = ? AND s.raça = 1
+        `, [userId, userId]);
 
-    res.status(200).json(personatgesAmbSkins);
+        // Agrupar les skins per personatge
+        const skinsPerPersonatge = {};
+        skinsResult.forEach(skin => {
+        if (!skinsPerPersonatge[skin.personatge_id]) {
+            skinsPerPersonatge[skin.personatge_id] = [];
+        }
+        skinsPerPersonatge[skin.personatge_id].push(skin);
+        });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error en la consulta');
+        // Construir la resposta final
+        const personatgesAmbSkins = personatgesResult.map(personatge => {
+        const skins = (skinsPerPersonatge[personatge.personatge_id] || []).map(skin => ({
+            id: skin.skin_id,
+            nom: skin.skin_nom,
+            imatge: skin.imatge,
+            raça: skin.raça,
+            categoria: skin.categoria,
+            mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
+            vida: skin.vida_actual !== null ? skin.vida_actual : personatge.vida_base,
+            vida_maxima: personatge.vida_base,
+            atac_nom: skin.atac_nom,
+            arma: {
+            id: skin.arma_id || null,
+            nom: skin.arma_nom || null,
+            buff_atac: skin.atac || 0
   }
-};
+}));
+
+
+        return {
+            personatge: {
+            id: personatge.personatge_id,
+            nom: personatge.personatge_nom,
+            vida_base: personatge.vida_base,
+            mal_base: personatge.mal_base,
+            },
+            skins: skins
+        };
+        });
+
+        res.status(200).json(personatgesAmbSkins);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la consulta');
+    }
+    };
 
 
 
