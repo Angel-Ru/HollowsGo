@@ -57,7 +57,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                       onTap: () => uiProvider.selectedMenuOpt = 4,
                       child: CircleAvatar(
                         radius: 20,
-                        backgroundColor: Colors.white,
+                        backgroundColor: Colors.transparent,
                         backgroundImage: NetworkImage(imagePath),
                       ),
                     ),
