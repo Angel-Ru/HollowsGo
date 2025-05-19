@@ -25,7 +25,7 @@ class PerfilStats extends StatelessWidget {
       child: Column(
         children: [
           _buildStatsHeader(),
-          SizedBox(height: 15),
+          SizedBox(height: 5),
           _buildStatsContent(),
         ],
       ),

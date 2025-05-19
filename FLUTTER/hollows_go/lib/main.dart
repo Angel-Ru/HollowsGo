@@ -19,13 +19,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DialogueProvider()),
         ChangeNotifierProvider(create: (_) => GachaProvider()),
-        ChangeNotifierProvider(create: (_) => SkinsEnemicsPersonatgesProvider()),
+        ChangeNotifierProvider(
+            create: (_) => SkinsEnemicsPersonatgesProvider()),
         ChangeNotifierProvider(create: (_) => PerfilProvider()),
         ChangeNotifierProvider(create: (_) => MapDataProvider()),
         ChangeNotifierProvider(create: (_) => ArmesProvider()),
         ChangeNotifierProvider(create: (_) => CombatProvider()),
         ChangeNotifierProvider(create: (_) => VialsProvider()),
-
+        ChangeNotifierProvider(create: (_) => PersonatgesProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
