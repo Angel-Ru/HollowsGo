@@ -6,12 +6,24 @@ class Personatge {
   int? vidaBase;
   int? malBase;
   List<Skin> skins;
+  String? classe;
+  String? descripcio;
+  int? altura;
+  double? pes;
+  String? genere;
+  DateTime? aniversari;
 
   Personatge({
     required this.id,
     required this.nom,
     this.vidaBase,
     this.malBase,
+    this.classe,
+    this.descripcio,
+    this.altura,
+    this.pes,
+    this.genere,
+    this.aniversari,
     required this.skins,
   });
 
@@ -20,7 +32,17 @@ class Personatge {
       if (value == null) return 0;
       if (value is int) return value;
       if (value is String) return int.tryParse(value) ?? 0;
+      if (value is double) return value.toInt();
+      if (value is DateTime) return value.day;
       return 0;
+    }
+
+    double? parseDouble(dynamic value) {
+      if (value == null) return null;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) return double.tryParse(value);
+      return null;
     }
 
     return Personatge(
@@ -28,6 +50,14 @@ class Personatge {
       nom: json['nom'] ?? '',
       vidaBase: parseInt(json['vida_base']),
       malBase: parseInt(json['mal_base']),
+      classe: json['classe']?.toString(),
+      descripcio: json['descripcio']?.toString(),
+      altura: parseInt(json['altura']),
+      pes: parseDouble(json['pes']),
+      genere: json['genere']?.toString(),
+      aniversari: json['aniversari'] != null
+          ? DateTime.tryParse(json['aniversari'])
+          : null,
       skins: [],
     );
   }
@@ -38,6 +68,12 @@ class Personatge {
       'personatge_nom': nom,
       'vida_base': vidaBase,
       'mal_base': malBase,
+      'classe': classe,
+      'descripcio': descripcio,
+      'altura': altura,
+      'pes': pes,
+      'genere': genere,
+      'aniversari': aniversari?.toIso8601String(),
       'skins': skins.map((skin) => skin.toJson()).toList(),
     };
   }

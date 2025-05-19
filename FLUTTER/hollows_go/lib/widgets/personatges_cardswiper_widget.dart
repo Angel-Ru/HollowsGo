@@ -1,6 +1,3 @@
-import 'package:hollows_go/providers/armes_provider.dart';
-import 'package:hollows_go/widgets/dialegueequipament.dart';
-
 import '../imports.dart';
 
 class PersonatgesCardSwiper extends StatefulWidget {
@@ -61,6 +58,24 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
                 size: 24,
               ),
             ),
+            SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailScreen(
+                      personatgeId: widget.personatge.id,
+                    ),
+                  ),
+                );
+              },
+              child: Icon(
+                Icons.help_outline,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
           ],
         ),
         SizedBox(height: 10),
@@ -72,8 +87,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
             itemBuilder: (context, index) {
               final skin = widget.personatge.skins[index];
               final isSkinSelected = widget.selectedSkin?.id == skin.id;
-              final isSkinFavorite =
-                  userProvider.skinPreferidaId == skin.id;
+              final isSkinFavorite = userProvider.skinPreferidaId == skin.id;
 
               return _buildSkinCard(
                   skin, isSkinSelected, isSkinFavorite, userProvider);
@@ -91,8 +105,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
     await userProvider.updatePersonatgePreferit(newId);
   }
 
-  Future<void> _toggleFavoriteSkin(
-      UserProvider userProvider, Skin skin) async {
+  Future<void> _toggleFavoriteSkin(UserProvider userProvider, Skin skin) async {
     final isCurrentlyFavorite = userProvider.skinPreferidaId == skin.id;
     final newId = isCurrentlyFavorite ? 0 : skin.id;
     await userProvider.updateSkinPreferida(newId);
@@ -112,25 +125,24 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
       UserProvider userProvider) {
     return GestureDetector(
       onTap: () {
-  if (widget.isEnemyMode) return;
-  if (!isSkinSelected) {
-    widget.onSkinSelected(skin);
-  }
-},
-onLongPress: () async {
-  if (widget.isEnemyMode) return;
-  final armesProvider =
-      Provider.of<ArmesProvider>(context, listen: false);
-  final usuariId = userProvider.userId;
-  print(skin.id);
-  await mostrarDialegArmesPredefinides(
-    context: context,
-    skinId: skin.id,
-    usuariId: usuariId,
-    armesProvider: armesProvider,
-  );
-},
-
+        if (widget.isEnemyMode) return;
+        if (!isSkinSelected) {
+          widget.onSkinSelected(skin);
+        }
+      },
+      onLongPress: () async {
+        if (widget.isEnemyMode) return;
+        final armesProvider =
+            Provider.of<ArmesProvider>(context, listen: false);
+        final usuariId = userProvider.userId;
+        print(skin.id);
+        await mostrarDialegArmesPredefinides(
+          context: context,
+          skinId: skin.id,
+          usuariId: usuariId,
+          armesProvider: armesProvider,
+        );
+      },
       onDoubleTap: () {
         if (widget.isEnemyMode) return;
 
