@@ -121,36 +121,39 @@ class CombatProvider with ChangeNotifier {
   }
 
   Future<void> updateSkinVidaActual({
-    required int skinId,
-    required double vidaActual,
-  }) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
+  required int skinId,
+  required double vidaActual,
+}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final usuariId = prefs.getInt('userId');
 
-      if (token == null) {
-        print("Token no disponible");
-        return;
-      }
-
-      final response = await http.put(
-        Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'vida_actual': vidaActual.round(),
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        print("Vida actualitzada correctament.");
-      } else {
-        print("Error al actualitzar vida: ${response.statusCode}");
-      }
-    } catch (e) {
-      print("Error en updateSkinVidaActual: $e");
+    if (token == null || usuariId == null) {
+      print("Token o usuari_id no disponible");
+      return;
     }
+
+    final response = await http.put(
+      Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'vida_actual': vidaActual.round(),
+        'usuari_id': usuariId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print("Vida actualitzada correctament.");
+    } else {
+      print("Error al actualitzar vida: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error en updateSkinVidaActual: $e");
   }
+}
+
 }
