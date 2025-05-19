@@ -388,13 +388,6 @@ exports.gachaTirada = async (req, res) => {
             return res.status(400).send('No tens prou monedes per fer la tirada.');
         }
 
-        // Restar 100 monedes a l'usuari
-        const newBalance = currentBalance - 100;
-        await connection.execute(
-            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
-            [newBalance, userId]
-        );
-
         // Obtenir les skins disponibles segons la condició
         const [availableSkins] = await connection.execute(`
             SELECT *
@@ -447,7 +440,7 @@ exports.gachaTirada = async (req, res) => {
         const selectedGroup = starGroups[chosenStars];
         const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
 
-        // Obtenir les skins que ja té l'usuari per aquest personatge
+        // Comprovar si l'usuari ja té la skin
         const [userSkins] = await connection.execute(
             'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
             [userId, randomSkin.personatge]
@@ -458,12 +451,21 @@ exports.gachaTirada = async (req, res) => {
             : [];
 
         if (userSkinIds.includes(String(randomSkin.id))) {
-            // Ja té aquesta skin: retornar la tirada però sense restar monedes (o restar i tornar a sumar?)
-            // Aquí mantenim el saldo com està, no restem monedes
-            return res.status(200).send({ message: "Ja tens aquesta skin." });
+            // Ja té aquesta skin: NO restem monedes
+            return res.status(200).send({
+                message: "Ja tens aquesta skin.",
+                skin: randomSkin,
+                remainingCoins: currentBalance,
+            });
         }
 
-        // Afegir la nova skin i actualitzar la BIBLIOTECA
+        // Afegir la nova skin i restar les monedes
+        const newBalance = currentBalance - 100;
+        await connection.execute(
+            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+            [newBalance, userId]
+        );
+
         userSkinIds.push(String(randomSkin.id));
         const updatedSkinIds = userSkinIds.join(',');
 
@@ -493,6 +495,7 @@ exports.gachaTirada = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 exports.seleccionarSkinAleatoria = async (req, res) => {

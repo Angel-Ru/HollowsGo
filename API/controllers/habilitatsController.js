@@ -33,7 +33,7 @@ exports.getHabilitatId = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const pool = await connectDB(); // conexión MySQL
+        const pool = await connectDB();
         const [rows] = await pool.execute(`
             SELECT h.*
             FROM HABILITAT_LLEGENDARIA h
