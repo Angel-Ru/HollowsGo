@@ -12,6 +12,7 @@ export '/screens/registerdialog.dart';
 export '/screens/combatscreen.dart';
 export '/screens/mapscreen.dart';
 export '/screens/settingsscreen.dart';
+export '/screens/detailsscreen.dart';
 
 export '/providers/loginprovider.dart';
 export '/providers/ui_provider.dart';
@@ -24,6 +25,8 @@ export '/providers/combat_provider.dart';
 export '/providers/armes_provider.dart';
 export '/providers/map_provider.dart';
 export '/providers/vials_provider.dart';
+export '/providers/personatges_provider.dart';
+
 export '../config.dart';
 
 export '/models/user.dart';
@@ -48,6 +51,7 @@ export '/widgets/characterdisplaywidget.dart';
 export '/widgets/profile/perfil_avatar_widget.dart';
 export '/widgets/profile/perfil_header_widget.dart';
 export '/widgets/profile/perfil_stats_widget.dart';
+export '/widgets/dialegueequipament.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
