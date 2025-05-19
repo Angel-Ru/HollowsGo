@@ -16,6 +16,6 @@ router.get('/skins/:skin_id/armes/:usuari_id', verificacioUsuari.verifyToken, eq
 router.post('/equipament', verificacioUsuari.verifyToken, equipamentController.equiparArmaASkin);
 
 //Endpoint per utilitzar un vial de recuperació i recuperar la vida de l'aliat caigut o amb baixa vida
-router.post('/vials/:usuari_id/skin_id', verificacioUsuari.verifyToken, equipamentController.utilitzarVial);
+router.post('/vials', verificacioUsuari.verifyToken, equipamentController.utilitzarVial);
 
 module.exports = router;

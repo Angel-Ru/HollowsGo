@@ -68,7 +68,7 @@ class VialsProvider extends ChangeNotifier {
       });
 
       final response = await http.post(
-        Uri.parse('https://${Config.ip}/equipaments/vials/utilitzar'),
+        Uri.parse('https://${Config.ip}/equipaments/vials/'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

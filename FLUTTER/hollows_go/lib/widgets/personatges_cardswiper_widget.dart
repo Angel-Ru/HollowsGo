@@ -191,18 +191,51 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  padding: EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(4),
+                GestureDetector(
+                  onTap: () async {
+                    if (widget.isEnemyMode) return;
+                    final success =
+                        await Provider.of<VialsProvider>(context, listen: false)
+                            .utilitzarVial(
+                      usuariId: userProvider.userId,
+                      skinId: skin.id,
+                    );
+                    if (success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Vial utilitzat per curar!')),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('No hi ha vials disponibles')),
+                      );
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Icon(Icons.local_hospital,
+                        color: Colors.redAccent, size: 22),
                   ),
-                  child: Text(
-                    '${skin.nom} (Mal: ${skin.malTotal})',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                ),
+                Flexible(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${skin.nom} (Mal: ${skin.malTotal})',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        softWrap: false,
+                        overflow: TextOverflow.visible,
+                      ),
                     ),
                   ),
                 ),
