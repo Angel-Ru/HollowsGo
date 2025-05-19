@@ -1,6 +1,4 @@
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../imports.dart';
 
 class CombatProvider with ChangeNotifier {
@@ -11,6 +9,7 @@ class CombatProvider with ChangeNotifier {
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
 
+  // Nuevo flag para controlar uso de ulti
   bool _ultiUsed = false;
 
   double get aliatHealth => _aliatHealth;
@@ -20,7 +19,7 @@ class CombatProvider with ChangeNotifier {
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
 
-  bool get ultiUsed => _ultiUsed;
+  bool get ultiUsed => _ultiUsed; // getter para ultiUsed
 
   void setAllyHealth(double value) {
     _aliatHealth = value;
@@ -37,6 +36,7 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Setter para ultiUsed con notificación
   void setUltiUsed(bool value) {
     _ultiUsed = value;
     notifyListeners();
@@ -50,7 +50,7 @@ class CombatProvider with ChangeNotifier {
     _isEnemyHit = false;
     _isAllyHit = false;
     _isAttackInProgress = false;
-    _ultiUsed = false;
+    _ultiUsed = false; // resetear ulti cuando reinicies combate
     notifyListeners();
   }
 
@@ -76,7 +76,7 @@ class CombatProvider with ChangeNotifier {
       notifyListeners();
 
       if (_enemicHealth > 0) {
-        await _performEnemyAttack(enemyDamage, skinId, onDefeat);
+        await _performEnemyAttack(enemyDamage, skinId,onDefeat);
       } else {
         _isAttackInProgress = false;
 
@@ -120,64 +120,40 @@ class CombatProvider with ChangeNotifier {
     }
   }
 
-  /// Actualitza la vida al servidor i la guarda localment
   Future<void> updateSkinVidaActual({
-    required int skinId,
-    required double vidaActual,
-  }) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      final usuariId = prefs.getInt('userId');
+  required int skinId,
+  required double vidaActual,
+}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final usuariId = prefs.getInt('userId');
 
-      if (token == null || usuariId == null) {
-        print("Token o usuari_id no disponible");
-        return;
-      }
-
-      final response = await http.put(
-        Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'vida_actual': vidaActual.round(),
-          'usuari_id': usuariId,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        print("Vida actualitzada correctament.");
-        _actualitzaVidaLocal(vidaActual);
-
-        // Guardar localment per evitar perdre la vida quan es torna a la pantalla
-        await prefs.setDouble('vida_aliat_$skinId', vidaActual);
-      } else {
-        print("Error al actualitzar vida: ${response.statusCode}, ${response.body}");
-      }
-    } catch (e) {
-      print("Error en updateSkinVidaActual: $e");
+    if (token == null || usuariId == null) {
+      print("Token o usuari_id no disponible");
+      return;
     }
-  }
 
-  /// Actualitza només la variable local i notifica
-  void _actualitzaVidaLocal(double novaVida) {
-    _aliatHealth = novaVida;
-    notifyListeners();
-  }
+    final response = await http.put(
+      Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'vida_actual': vidaActual.round(),
+        'usuari_id': usuariId,
+      }),
+    );
 
-  /// Carrega la vida aliada desada localment (SharedPreferences)
-  Future<void> loadAliatHealthFromStorage(int skinId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      double? vidaGuardada = prefs.getDouble('vida_aliat_$skinId');
-      if (vidaGuardada != null) {
-        _aliatHealth = vidaGuardada;
-        notifyListeners();
-      }
-    } catch (e) {
-      print("Error carregant vida aliat: $e");
+    if (response.statusCode == 200) {
+      print("Vida actualitzada correctament.");
+    } else {
+      print("Error al actualitzar vida: ${response.statusCode}, ${response.body}");
     }
+  } catch (e) {
+    print("Error en updateSkinVidaActual: $e");
   }
+}
+
 }

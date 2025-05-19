@@ -6,8 +6,8 @@ class Skin {
   int? puntsDonats;
   int? malTotal;
   String? personatgeNom;
-  int? vida;          // Vida actual
-  int? vidaMaxima;    // Vida màxima (vida_base del personatge)
+  int? vida;
+  int? currentHealth;
   String? atac;
   int? raca;
 
@@ -20,10 +20,9 @@ class Skin {
     this.malTotal,
     this.personatgeNom,
     this.vida,
-    this.vidaMaxima,
     this.atac,
     this.raca,
-  });
+  }) : currentHealth = vida ?? 0;
 
   factory Skin.fromJson(Map<String, dynamic> json) {
     int? parseNullableInt(dynamic value) {
@@ -42,7 +41,6 @@ class Skin {
       malTotal: parseNullableInt(json['mal_total']),
       personatgeNom: json['personatge_nom'],
       vida: parseNullableInt(json['vida']),
-      vidaMaxima: parseNullableInt(json['vida_maxima']),  // <-- nova propietat
       atac: json['atac_nom'],
       raca: parseNullableInt(json['raça']),
     );
@@ -57,7 +55,6 @@ class Skin {
         'mal_total': malTotal,
         'personatge_nom': personatgeNom,
         'vida': vida,
-        'vida_maxima': vidaMaxima,  // <-- nova propietat
         'atac_nom': atac,
         'raça': raca,
       };

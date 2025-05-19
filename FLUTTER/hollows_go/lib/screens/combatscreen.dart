@@ -21,9 +21,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
   late String _backgroundImage;
   bool _partidaJugadaSumada = false;
 
-  // Guardamos el skinId del aliat para cargar su vida guardada
-  int _aliatSkinId = 0;
-
   @override
   bool get wantKeepAlive => true; // Aquí mantienes el estado vivo
 
@@ -33,11 +30,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
     _setRandomBackground();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _verifyAndResetCombat();
-
-      // Cargamos la vida guardada del aliat usando su skinId
-      final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-      await combatProvider.loadAliatHealthFromStorage(_aliatSkinId);
-
       if (!_partidaJugadaSumada) {
         final perfilProvider =
             Provider.of<PerfilProvider>(context, listen: false);
@@ -75,9 +67,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
 
     skinsProvider.setMaxAllyHealth(maxAllyHealth);
     skinsProvider.setMaxEnemyHealth(maxEnemyHealth);
-
-    // Guardamos el skinId del aliat para usarlo luego
-    _aliatSkinId = aliat?.id ?? 0;
 
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
     combatProvider.resetCombat(
@@ -261,7 +250,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                             'lib/images/combatscreen_images/bleach_combat.png',
                         name: allyName,
                         health: combatProvider.aliatHealth,
-                        maxHealth: skins.aliat?.vidaMaxima ?? 1000,
+                        maxHealth: skins.aliat?.vida ?? 1000,
                         isHit: combatProvider.isAllyHit,
                       ),
                       SizedBox(height: 20),
@@ -272,7 +261,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         enemicDamage: enemicDamage,
                         onVictory: _showVictoryDialog,
                         onDefeat: _showDefeatDialog,
-                        skinId: skins.aliat?.id ?? 0,
+                        skinId: skins.aliat?.id ?? 0, // 👈 Afegit això
                       ),
                     ],
                   ),
