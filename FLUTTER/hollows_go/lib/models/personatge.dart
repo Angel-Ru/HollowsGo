@@ -50,11 +50,11 @@ class Personatge {
       nom: json['nom'] ?? '',
       vidaBase: parseInt(json['vida_base']),
       malBase: parseInt(json['mal_base']),
-      classe: json['classe']?.toString(),
+      classe: json['Classe']?.toString(),
       descripcio: json['descripcio']?.toString(),
       altura: parseInt(json['altura']),
       pes: parseDouble(json['pes']),
-      genere: json['genere']?.toString(),
+      genere: json['Genere']?.toString(),
       aniversari: json['aniversari'] != null
           ? DateTime.tryParse(json['aniversari'])
           : null,
@@ -68,11 +68,11 @@ class Personatge {
       'personatge_nom': nom,
       'vida_base': vidaBase,
       'mal_base': malBase,
-      'classe': classe,
+      'Classe': classe,
       'descripcio': descripcio,
       'altura': altura,
       'pes': pes,
-      'genere': genere,
+      'Genere': genere,
       'aniversari': aniversari?.toIso8601String(),
       'skins': skins.map((skin) => skin.toJson()).toList(),
     };

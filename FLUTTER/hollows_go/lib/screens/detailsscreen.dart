@@ -40,9 +40,7 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          _isLoading ? 'Carregant...' : (_personatge?.nom ?? 'Detalls'),
-        ),
+        title: Text(_personatge?.nom ?? ''),
         backgroundColor: Colors.deepPurple,
       ),
       body: _isLoading
@@ -72,7 +70,7 @@ class _DetailScreenState extends State<DetailScreen> {
                           style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 8),
-                      _buildStatRow('Classe', _personatge!.classe),
+                      _buildStatRow('Classe', _personatge!.classe.toString()),
                       _buildStatRow(
                           'Vida base', _personatge!.vidaBase?.toString()),
                       _buildStatRow(
