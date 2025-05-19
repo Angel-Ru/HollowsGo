@@ -23,7 +23,7 @@ exports.updateVidaActualSkin = async (req, res) => {
 
         // Actualitzar la vida actual
         await connection.execute(
-            'UPDATE USUARI_SKIN_ARMES SET vida_actual = ? WHERE id = ?',
+            'UPDATE USUARI_SKIN_ARMES SET vida_actual = ? WHERE skin = ?',
             [vida_actual, skinId]
         );
 

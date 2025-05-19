@@ -261,6 +261,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         enemicDamage: enemicDamage,
                         onVictory: _showVictoryDialog,
                         onDefeat: _showDefeatDialog,
+                        skinId: skins.aliat?.id ?? 0, // 👈 Afegit això
                       ),
                     ],
                   ),
