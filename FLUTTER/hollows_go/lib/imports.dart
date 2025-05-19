@@ -23,7 +23,7 @@ export '/providers/perfil_provider.dart';
 export '/providers/combat_provider.dart';
 export '/providers/armes_provider.dart';
 export '/providers/map_provider.dart';
-
+export '/providers/vials_provider.dart';
 export '../config.dart';
 
 export '/models/user.dart';
