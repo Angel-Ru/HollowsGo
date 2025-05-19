@@ -7,6 +7,7 @@ class CombatActionButtons extends StatelessWidget {
   final String techniqueName;
   final int aliatDamage;
   final int enemicDamage;
+  final int skinId;
   final VoidCallback onVictory;
   final VoidCallback onDefeat;
 
@@ -15,6 +16,7 @@ class CombatActionButtons extends StatelessWidget {
     required this.techniqueName,
     required this.aliatDamage,
     required this.enemicDamage,
+    required this.skinId,
     required this.onVictory,
     required this.onDefeat,
     super.key,
@@ -22,8 +24,11 @@ class CombatActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool ultiUsed =
-        combatProvider.ultiUsed; // Suponiendo que existe en el provider
+    final bool ultiUsed = combatProvider.ultiUsed;
+
+    final bool canAct = !combatProvider.isEnemyTurn &&
+        !combatProvider.isAttackInProgress &&
+        combatProvider.enemicHealth > 0;
 
     return Container(
       padding: const EdgeInsets.all(10),
@@ -33,19 +38,19 @@ class CombatActionButtons extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // Botó LLUITA
           Expanded(
             flex: 3,
             child: ElevatedButton(
-              onPressed: combatProvider.isEnemyTurn ||
-                      combatProvider.isAttackInProgress ||
-                      combatProvider.enemicHealth <= 0
-                  ? null
-                  : () => combatProvider.performAttack(
+              onPressed: canAct
+                  ? () => combatProvider.performAttack(
                         aliatDamage,
                         enemicDamage,
+                        skinId,
                         onVictory,
                         onDefeat,
-                      ),
+                      )
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 padding:
@@ -82,6 +87,7 @@ class CombatActionButtons extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
+          // Botó ULTI
           Expanded(
             flex: 1,
             child: Container(
@@ -100,21 +106,24 @@ class CombatActionButtons extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.auto_awesome,
                     color: ultiUsed ? Colors.black54 : Colors.black),
-                onPressed: (combatProvider.isEnemyTurn ||
-                        combatProvider.isAttackInProgress ||
-                        combatProvider.enemicHealth <= 0 ||
-                        ultiUsed)
+                onPressed: (!canAct || ultiUsed)
                     ? null
                     : () async {
-                        // Marca que ulti fue usada
                         combatProvider.setUltiUsed(true);
 
-                        // Ejecuta ulti
                         await UltimateService().executeShinjiUlti(
                           context,
-                          (damage) {
-                            combatProvider.setEnemyHealth(
-                                combatProvider.enemicHealth - damage);
+                          (damageDealt) async {
+                            final newHealth = combatProvider.enemicHealth - damageDealt;
+                            combatProvider.setEnemyHealth(newHealth);
+
+                            if (newHealth <= 0) {
+                              await combatProvider.updateSkinVidaActual(
+                                skinId: skinId,
+                                vidaActual: combatProvider.aliatHealth,
+                              );
+                              onVictory();
+                            }
                           },
                           onVictory,
                         );

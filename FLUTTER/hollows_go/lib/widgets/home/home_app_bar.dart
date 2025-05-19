@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/ui_provider.dart';
-import '../../providers/vials_provider.dart'; // <- Assegura't que existeix
+import '../../providers/vials_provider.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String imagePath;
@@ -28,35 +28,19 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             builder: (context, userProvider, vialsProvider, _) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Moneda i Vials (compactats)
                 Row(
                   children: [
-                    // Moneda
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: NetworkImage(
-                        'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png',
-                      ),
+                    _iconWithText(
+                      imageUrl:
+                          'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png',
+                      value: userProvider.coinCount,
                     ),
-                    SizedBox(width: 6),
-                    Text(
-                      '${userProvider.coinCount}',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    SizedBox(width: 16),
-
-                    // Vials
-                    CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: NetworkImage(
-                        'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/VIAL/w9h0t4ugeq8pn84kc1pd',
-                      ),
-                    ),
-                    SizedBox(width: 6),
-                    Text(
-                      '${vialsProvider.vials}',
-                      style: TextStyle(color: Colors.grey),
+                    SizedBox(width: 12),
+                    _iconWithText(
+                      imageUrl:
+                          'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/VIAL/w9h0t4ugeq8pn84kc1pd',
+                      value: vialsProvider.vials,
                     ),
                   ],
                 ),
@@ -64,8 +48,10 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                 // Usuari
                 Row(
                   children: [
-                    Text(userProvider.username,
-                        style: TextStyle(color: Colors.grey)),
+                    Text(
+                      userProvider.username,
+                      style: TextStyle(color: Colors.grey),
+                    ),
                     SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => uiProvider.selectedMenuOpt = 4,
@@ -81,6 +67,32 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // 🔹 Widget reutilitzable per icona + número
+  Widget _iconWithText({required String imageUrl, required int value}) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Image.network(
+            imageUrl,
+            width: 20,
+            height: 20,
+            fit: BoxFit.contain,
+          ),
+          SizedBox(width: 6),
+          Text(
+            '$value',
+            style: TextStyle(color: Colors.white70),
+          ),
+        ],
       ),
     );
   }

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../imports.dart';
 
 class CombatProvider with ChangeNotifier {
   double _aliatHealth = 1000.0;
@@ -53,8 +54,13 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> performAttack(int allyDamage, int enemyDamage,
-      VoidCallback onVictory, VoidCallback onDefeat) async {
+  Future<void> performAttack(
+    int allyDamage,
+    int enemyDamage,
+    int skinId,
+    VoidCallback onVictory,
+    VoidCallback onDefeat,
+  ) async {
     if (!_isEnemyTurn && !_isAttackInProgress && _enemicHealth > 0) {
       _isAttackInProgress = true;
       _isEnemyHit = true;
@@ -70,16 +76,25 @@ class CombatProvider with ChangeNotifier {
       notifyListeners();
 
       if (_enemicHealth > 0) {
-        await _performEnemyAttack(enemyDamage, onDefeat);
+        await _performEnemyAttack(enemyDamage, skinId,onDefeat);
       } else {
         _isAttackInProgress = false;
+
+        await updateSkinVidaActual(
+          skinId: skinId,
+          vidaActual: _aliatHealth,
+        );
+
         onVictory();
       }
     }
   }
 
   Future<void> _performEnemyAttack(
-      int enemyDamage, VoidCallback onDefeat) async {
+    int enemyDamage,
+    int skinId,
+    VoidCallback onDefeat,
+  ) async {
     await Future.delayed(const Duration(seconds: 1));
 
     _isAllyHit = true;
@@ -96,7 +111,46 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
 
     if (_aliatHealth <= 0) {
+      await updateSkinVidaActual(
+        skinId: skinId,
+        vidaActual: _aliatHealth,
+      );
+
       onDefeat();
+    }
+  }
+
+  Future<void> updateSkinVidaActual({
+    required int skinId,
+    required double vidaActual,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        print("Token no disponible");
+        return;
+      }
+
+      final response = await http.put(
+        Uri.parse('https://${Config.ip}/skins/$skinId/vida_actual'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'vida_actual': vidaActual.round(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Vida actualitzada correctament.");
+      } else {
+        print("Error al actualitzar vida: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error en updateSkinVidaActual: $e");
     }
   }
 }
