@@ -1,9 +1,18 @@
-import '../imports.dart';
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'package:hollows_go/providers/habilitat_provider.dart';
+import 'package:hollows_go/providers/perfil_provider.dart';
+import 'package:hollows_go/providers/user_provider.dart';
+import 'package:hollows_go/providers/combat_provider.dart';
+
+import '../imports.dart'; // asumo que tienes tus widgets importados aquí
 
 class CombatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Proveedor solo creado 1 vez aquí para que no se pierda estado al girar pantalla
     return ChangeNotifierProvider(
       create: (_) => CombatProvider(),
       child: _CombatScreenContent(),
@@ -22,7 +31,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
   bool _partidaJugadaSumada = false;
 
   @override
-  bool get wantKeepAlive => true; // Aquí mantienes el estado vivo
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -73,6 +82,17 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       maxAllyHealth: maxAllyHealth.toDouble(),
       maxEnemyHealth: maxEnemyHealth.toDouble(),
     );
+
+    // ✅ Cargar habilidad legendaria según el skin.id
+    final habilitatProvider =
+        Provider.of<HabilitatProvider>(context, listen: false);
+
+    if (aliat != null) {
+      await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
+    } else {
+      // No hay aliado: limpiamos habilidad para evitar mostrar datos obsoletos
+      habilitatProvider.clearHabilitat();
+    }
 
     _partidaJugadaSumada = false;
   }
@@ -201,7 +221,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // para AutomaticKeepAliveClientMixin
+    super.build(context);
 
     return Selector<SkinsEnemicsPersonatgesProvider, SelectedSkinsModel>(
       selector: (_, provider) => SelectedSkinsModel(
@@ -250,7 +270,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                             'lib/images/combatscreen_images/bleach_combat.png',
                         name: allyName,
                         health: combatProvider.aliatHealth,
-                        maxHealth: skins.aliat?.vidaMaxima?? 1000,
+                        maxHealth: skins.aliat?.vidaMaxima ?? 1000,
                         isHit: combatProvider.isAllyHit,
                       ),
                       SizedBox(height: 20),
@@ -261,7 +281,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         enemicDamage: enemicDamage,
                         onVictory: _showVictoryDialog,
                         onDefeat: _showDefeatDialog,
-                        skinId: skins.aliat?.id ?? 0, // 👈 Afegit això
+                        skinId: skins.aliat?.id ?? 0,
                       ),
                     ],
                   ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
+import 'package:hollows_go/providers/habilitat_provider.dart';
 import 'package:hollows_go/widgets/combat/ultimate_service.dart';
 
 class CombatActionButtons extends StatelessWidget {
@@ -30,6 +32,9 @@ class CombatActionButtons extends StatelessWidget {
         !combatProvider.isAttackInProgress &&
         combatProvider.enemicHealth > 0;
 
+    final habilitat = Provider.of<HabilitatProvider>(context).habilitat;
+    final bool hasUltimate = habilitat != null;
+
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -38,7 +43,7 @@ class CombatActionButtons extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Botó LLUITA
+          // Botón LLUITA
           Expanded(
             flex: 3,
             child: ElevatedButton(
@@ -87,13 +92,18 @@ class CombatActionButtons extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Botó ULTI
+
+          // Botón ULTI
           Expanded(
             flex: 1,
             child: Container(
               height: 60,
               decoration: BoxDecoration(
-                color: ultiUsed ? Colors.grey : Colors.yellow,
+                color: !hasUltimate
+                    ? Colors.brown
+                    : ultiUsed
+                        ? Colors.grey
+                        : Colors.yellow,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
@@ -104,17 +114,20 @@ class CombatActionButtons extends StatelessWidget {
                 ],
               ),
               child: IconButton(
-                icon: Icon(Icons.auto_awesome,
-                    color: ultiUsed ? Colors.black54 : Colors.black),
-                onPressed: (!canAct || ultiUsed)
+                icon: Icon(
+                  Icons.auto_awesome,
+                  color: ultiUsed ? Colors.black54 : Colors.black,
+                ),
+                onPressed: (!canAct || ultiUsed || !hasUltimate)
                     ? null
                     : () async {
                         combatProvider.setUltiUsed(true);
 
-                        await UltimateService().executeShinjiUlti(
-                          context,
-                          (damageDealt) async {
-                            final newHealth = combatProvider.enemicHealth - damageDealt;
+                        await UltimateService().executeUltimateForSkin(
+                          context: context,
+                          onDamageApplied: (damageDealt) async {
+                            final newHealth =
+                                combatProvider.enemicHealth - damageDealt;
                             combatProvider.setEnemyHealth(newHealth);
 
                             if (newHealth <= 0) {
@@ -125,7 +138,7 @@ class CombatActionButtons extends StatelessWidget {
                               onVictory();
                             }
                           },
-                          onVictory,
+                          onEnemyDefeated: onVictory,
                         );
                       },
               ),
