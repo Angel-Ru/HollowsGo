@@ -42,17 +42,23 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void resetCombat(
-      {double maxAllyHealth = 1000.0, double maxEnemyHealth = 1000.0}) {
+  void resetCombat({
+  double maxAllyHealth = 1000.0,
+  double maxEnemyHealth = 1000.0,
+  bool keepAllyHealth = false,  // canviat keepCurrentHealth per especificar millor
+}) {
+  if (!keepAllyHealth) {
     _aliatHealth = maxAllyHealth;
-    _enemicHealth = maxEnemyHealth;
-    _isEnemyTurn = false;
-    _isEnemyHit = false;
-    _isAllyHit = false;
-    _isAttackInProgress = false;
-    _ultiUsed = false; // resetear ulti cuando reinicies combate
-    notifyListeners();
   }
+  _enemicHealth = maxEnemyHealth;  // sempre reseteja enemic a màxim
+  _isEnemyTurn = false;
+  _isEnemyHit = false;
+  _isAllyHit = false;
+  _isAttackInProgress = false;
+  _ultiUsed = false;
+  notifyListeners();
+}
+
 
   Future<void> performAttack(
     int allyDamage,
