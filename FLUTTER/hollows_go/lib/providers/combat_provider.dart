@@ -155,5 +155,38 @@ class CombatProvider with ChangeNotifier {
     print("Error en updateSkinVidaActual: $e");
   }
 }
+Future<void> fetchSkinVidaActual(int skinId) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    final usuariId = prefs.getInt('userId');
+
+    if (token == null || usuariId == null) {
+      print("Token o usuari_id no disponible");
+      return;
+    }
+
+    final response = await http.get(
+      Uri.parse('https://${Config.ip}/combats/vida/$skinId?usuari_id=$usuariId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final vida = (data['vida_actual'] as num).toDouble();
+
+      setAllyHealth(vida); // Actualitza la vida a nivell local
+      print("Vida actual obtinguda: $vida");
+    } else {
+      print("Error al obtenir vida: ${response.statusCode}, ${response.body}");
+    }
+  } catch (e) {
+    print("Error en fetchSkinVidaActual: $e");
+  }
+}
+
+
 
 }

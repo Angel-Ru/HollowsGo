@@ -48,4 +48,42 @@ exports.updateVidaActualSkin = async (req, res) => {
         res.status(500).json({ error: 'Error intern del servidor.' });
     }
 };
+exports.getVidaActualSkin = async (req, res) => {
+    try {
+        const connection = await connectDB();
+        const skinId = req.params.id;
+        const usuari_id = req.query.usuari_id;
+
+        if (!usuari_id) {
+            return res.status(400).json({ error: 'Falta l\'usuari_id com a paràmetre.' });
+        }
+
+        // Comprovar que la skin existeix
+        const [skinCheck] = await connection.execute(
+            'SELECT id FROM SKINS WHERE id = ?',
+            [skinId]
+        );
+
+        if (skinCheck.length === 0) {
+            return res.status(404).json({ error: 'Skin no trobada.' });
+        }
+
+        // Comprovar que la relació entre usuari i skin existeix
+        const [result] = await connection.execute(
+            'SELECT vida_actual FROM USUARI_SKIN_ARMES WHERE usuari = ? AND skin = ?',
+            [usuari_id, skinId]
+        );
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Aquesta skin no està assignada a l\'usuari.' });
+        }
+
+        res.status(200).json({ vida_actual: result[0].vida_actual });
+
+    } catch (err) {
+        console.error('Error a getVidaActualSkin:', err);
+        res.status(500).json({ error: 'Error intern del servidor.' });
+    }
+};
+
 
