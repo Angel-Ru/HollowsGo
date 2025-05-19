@@ -1830,3 +1830,65 @@ SET
     descripcio = N'Membre dels "Espada" portant el n�mero 10, aquest augmenta de mida i poder segons el seu nivell de r�bia. El m�s f�sic dels "Espada", per� tamb� el menys intel�ligent i impulsiu. La seva for�a bruta �s letal.'
 WHERE id = 55;
 */
+
+/*
+select * from HABILITAT_LLEGENDARIA;
+
+select * from SKINS;
+select * from ATACS;
+alter table HABILITAT_LLEGENDARIA ADD efecte VARCHAR(100);
+UPDATE HABILITAT_LLEGENDARIA SET descripcio = 'Inverteix els sentits dels seus enemics i aplica 100 de mal al contrincant' where id = 3;
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Inflingeix 100 de mal i gira la pantalla)' where id = 3;
+
+UPDATE HABILITAT_LLEGENDARIA SET nom = 'Sakasama no Sekai (Món Invers)' where id = 3;
+
+-- YAMAMOTO
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Zanka no Tachi (Espasa de Brasa)', 'Tot el calor de les flames es retén a la punta de la Zanpakuto, fent que aquesta tengui un poder destructiu letal', NULL , NULL, 237);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Inflingeix 1000 de mal)' where id = 4;
+
+-- KENPACHI TYBW
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Nozarashi', 'Aumenta la força física del cop final amb la Zanpakuto, resultant en un cop letal', NULL , NULL, 224);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Inflingeix 1000 de mal)' where id = 6;
+
+
+-- KENPACHI AURA
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Alliberament de Reiatsu','El Kenpachi es lleva el pegat de l''ull alliberant una gran quantitat de reiatsu resultant en un creixement de poder exponencial', NULL , NULL, 41);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Potència els atacs amb 100 de mal la resta del combat)' where id = 7;
+
+-- ICHIGO
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Ultra Tensa Zangetsu',   'L''Ichigo utilitza el seu Bankai a màxima potència resultant en un cop molt poderós', NULL , NULL, 218);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Inflingeix 350 de mal)' where id = 8;
+
+-- YHWACH
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Blut Vene',    'Envia grans quantitats de reishi a través de les venes de l''usuari resultant en un gran poder defensiu', NULL , NULL, 217);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Escut permanent la resta del combat)' where id = 9;
+
+-- ICHIBE
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Ichimonji',   'Talla els noms per la meitat dels contrincants, reduint-los el poder', NULL , NULL, 170);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Xapa el nom a la meitat i li redueix a la meitat la vida màxima)' where id = 10;
+
+-- GRIMMJOW
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Desgarron',   'Les urpes del Grimmjow brillen i es transformen en fulles llargues i afilades que llença al contrincant', NULL , NULL, 140);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Inflingeix 350 de mal)' where id = 11;
+
+-- ULQUIORRA
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES ('Lanza del Relámpago', 'Reuneix energía espiritual creant una llança que poseeix un poder destructiu inimaginable', NULL, NULL, 157);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Inflingeix 350 de mal)' where id = 12;
+
+-- AIZEN
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge) VALUES('Explosió de Reiatsu','Utilitza el Reiatsu per llençar una quantitat de poder impresionant', NULL, NULL, 220);
+UPDATE HABILITAT_LLEGENDARIA SET efecte = '(Inflingeix 350 de mal)' where id = 13;
+
+-- SENJUMARU
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge, efecte) VALUES ('Shatatsu Karagara Shigarami no Tsuji', 'Desplega uns telars que desgasten als seus enemics', NULL, NULL, 187, 'Quan passen 3 torns porta la mort als seus enemics');
+
+-- UNOHANA
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge, efecte) VALUES ('Minazuki', 'Desplega un líquid semblant a la sang a la Zanpakuto que serveix de poder, tant ofensiu com defensiu', NULL, NULL, 235, 'Es cura 100 de vida e inflingeix 100 de mal que es va multiplicant per 1.2 cada torn');
+
+-- GIN
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge, efecte) VALUES ('Kamishini no Yari', 'La Zanpakuto pot transformar el seu tamany poguent arribar als 13km de llargària poguent anar a la velocitat de so', NULL, NULL, 19, 'Té la meitat de probabilitats de fer 10 de mal o 1000');
+
+-- TOSEN
+INSERT INTO HABILITAT_LLEGENDARIA(nom, descripcio, video, musica_combat, skin_personatge, efecte) VALUES ('Minazuki', 'Desplega un líquid semblant a la sang a la Zanpakuto que serveix de poder, tant ofensiu com defensiu', NULL, NULL, 97, 'Lleva 100 de mal ');
+
+*/
