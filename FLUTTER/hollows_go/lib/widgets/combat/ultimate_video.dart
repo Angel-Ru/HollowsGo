@@ -44,17 +44,30 @@ class _UltimateVideoState extends State<UltimateVideo> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (!_videoController.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: AspectRatio(
-        aspectRatio: _videoController.value.aspectRatio,
-        child: VideoPlayer(_videoController),
-      ),
-    );
+Widget build(BuildContext context) {
+  if (!_videoController.value.isInitialized) {
+    return const Center(child: CircularProgressIndicator());
   }
+
+  return Dialog(
+    backgroundColor: Colors.transparent,
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.black, // Puedes ajustarlo según necesites
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.orangeAccent,
+          width: 3,
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: AspectRatio(
+          aspectRatio: _videoController.value.aspectRatio,
+          child: VideoPlayer(_videoController),
+        ),
+      ),
+    ),
+  );
+}
 }

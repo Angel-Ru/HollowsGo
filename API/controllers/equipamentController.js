@@ -108,14 +108,14 @@ exports.getVialsUsuari = async (req, res) => {
     const connection = await connectDB();
 
     const [rows] = await connection.execute(
-      'SELECT vials, ultima_actualitzacio FROM USUARIS_VIALS WHERE usuari_id = ?',
+      'SELECT vials, ultima_actualitzacio FROM USUARI_VIALS WHERE usuari_id = ?',
       [usuari_id]
     );
 
     if (rows.length === 0) {
       
       await connection.execute(
-        'INSERT INTO USUARIS_VIALS (usuari_id, vials, ultima_actualitzacio) VALUES (?, 3, NOW())',
+        'INSERT INTO USUARI_VIALS (usuari_id, vials, ultima_actualitzacio) VALUES (?, 3, NOW())',
         [usuari_id]
       );
       return res.status(200).json({ vials: 3 });
@@ -134,7 +134,7 @@ exports.getVialsUsuari = async (req, res) => {
       const newDate = new Date(lastDate.getTime() + vialsToAdd * 5 * 60 * 60 * 1000);
 
       await connection.execute(
-        'UPDATE USUARIS_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari_id = ?',
+        'UPDATE USUARI_VIALS SET vials = ?, ultima_actualitzacio = ? WHERE usuari_id = ?',
         [newVials, newDate, usuari_id]
       );
 
