@@ -56,7 +56,15 @@ void initState() {
       maxEnemyHealth: maxEnemyHealth.toDouble(),
       keepAllyHealth: true,
     );
-
+    final habilitatProvider =
+        Provider.of<HabilitatProvider>(context, listen: false);
+        
+    if (aliat != null) {
+      await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
+    } else {
+      // No hay aliado: limpiamos habilidad para evitar mostrar datos obsoletos
+      habilitatProvider.clearHabilitat();
+    }
     // Ara marques que la partida s'ha sumat i altres coses
     if (!_partidaJugadaSumada) {
       final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
