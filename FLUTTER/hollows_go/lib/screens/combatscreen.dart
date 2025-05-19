@@ -1,9 +1,18 @@
-import '../imports.dart';
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'package:hollows_go/providers/habilitat_provider.dart';
+import 'package:hollows_go/providers/perfil_provider.dart';
+import 'package:hollows_go/providers/user_provider.dart';
+import 'package:hollows_go/providers/combat_provider.dart';
+
+import '../imports.dart'; // asumo que tienes tus widgets importados aquí
 
 class CombatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    
     return ChangeNotifierProvider(
       create: (_) => CombatProvider(),
       child: _CombatScreenContent(),
@@ -64,10 +73,6 @@ void initState() {
     int index = random.nextInt(5) + 1;
     _backgroundImage = 'lib/images/combatscreen_images/fondo_combat_$index.png';
   }
-
-  
-
-
 
 
   void _showVictoryDialog() async {
@@ -194,7 +199,7 @@ void initState() {
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // para AutomaticKeepAliveClientMixin
+    super.build(context);
 
     return Selector<SkinsEnemicsPersonatgesProvider, SelectedSkinsModel>(
       selector: (_, provider) => SelectedSkinsModel(
@@ -243,7 +248,7 @@ void initState() {
                             'lib/images/combatscreen_images/bleach_combat.png',
                         name: allyName,
                         health: combatProvider.aliatHealth,
-                        maxHealth: skins.aliat?.vidaMaxima?? 1000,
+                        maxHealth: skins.aliat?.vidaMaxima ?? 1000,
                         isHit: combatProvider.isAllyHit,
                       ),
                       SizedBox(height: 20),
@@ -254,7 +259,7 @@ void initState() {
                         enemicDamage: enemicDamage,
                         onVictory: _showVictoryDialog,
                         onDefeat: _showDefeatDialog,
-                        skinId: skins.aliat?.id ?? 0, // 👈 Afegit això
+                        skinId: skins.aliat?.id ?? 0,
                       ),
                     ],
                   ),

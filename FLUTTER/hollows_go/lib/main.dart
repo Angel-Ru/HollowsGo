@@ -1,3 +1,5 @@
+import 'package:hollows_go/providers/habilitat_provider.dart';
+
 import 'imports.dart';
 
 /*
@@ -5,11 +7,18 @@ Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l
 A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
 */
 
+/*
+Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l'aplicació i es defineix el tema.
+A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
+*/
+
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -27,6 +36,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CombatProvider()),
         ChangeNotifierProvider(create: (_) => VialsProvider()),
         ChangeNotifierProvider(create: (_) => PersonatgesProvider()),
+        ChangeNotifierProvider(create: (_) => HabilitatProvider()), // ✅ Añadido
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -37,9 +47,7 @@ class MyApp extends StatelessWidget {
         home: PreHomeScreen(),
         routes: {
           '/home': (context) => HomeScreen(),
-          '/map': (context) => Mapscreen(
-                profileImagePath: '',
-              ),
+          '/map': (context) => Mapscreen(profileImagePath: ''),
           '/biblioteca': (context) => BibliotecaScreen(),
         },
       ),
