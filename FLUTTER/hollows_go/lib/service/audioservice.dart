@@ -23,11 +23,11 @@ class AudioService {
     _isPlaying = true;
   }
 
-  /// Pausa la cançó i guarda la posició actual
+  /// Pausa l'àudio (fa stop per garantir que s'atura)
   Future<void> pause() async {
     if (_isPlaying) {
       _currentPosition = await _player.getCurrentPosition() ?? Duration.zero;
-      await _player.pause();
+      await _player.stop();  // Aquí parem del tot el player
       _isPlaying = false;
     }
   }
@@ -35,13 +35,13 @@ class AudioService {
   /// Reprèn la reproducció des de la darrera posició
   Future<void> resume() async {
     if (_currentUrl != null && !_isPlaying) {
-      await _player.seek(_currentPosition);
-      await _player.resume();
+      // Primer carreguem l'URL de nou, començant des de _currentPosition
+      await _player.play(UrlSource(_currentUrl!), position: _currentPosition);
       _isPlaying = true;
     }
   }
 
-  /// Atura completament l'àudio
+  /// Atura completament l'àudio i reinicia la posició
   Future<void> stop() async {
     await _player.stop();
     _currentPosition = Duration.zero;
