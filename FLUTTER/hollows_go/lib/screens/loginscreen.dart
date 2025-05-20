@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import '../imports.dart';
+import '../service/audioservice.dart';
 import '../widgets/animationdialeg.dart';
 import '../widgets/customtext_widget.dart';
 
@@ -109,11 +110,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: !_isPasswordVisible,
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: Color.fromARGB(233, 255, 255, 255),
                       ),
                       onPressed: () {
-                        setState(() => _isPasswordVisible = !_isPasswordVisible);
+                        setState(
+                            () => _isPasswordVisible = !_isPasswordVisible);
                       },
                     ),
                   ),
@@ -125,7 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () => Navigator.of(context).pop(false),
                         child: const Text(
                           'Cancel·la',
-                          style: TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
+                          style: TextStyle(
+                              color: Color.fromARGB(233, 255, 255, 255)),
                         ),
                       ),
                       ElevatedButton(
@@ -133,7 +138,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orangeAccent.shade200,
                           foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -142,7 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ? const SizedBox(
                                 height: 18,
                                 width: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
                               )
                             : const Text('Inicia sessió'),
                       ),
@@ -150,16 +157,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await AudioService.instance.pause();
                       Navigator.of(context).pop();
-                      showDialog(
+                      await showDialog(
                         context: context,
                         builder: (context) => RegisterDialog(),
                       );
                     },
                     child: const Text(
                       "Registra't",
-                      style: TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
+                      style:
+                          TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
                     ),
                   ),
                 ],

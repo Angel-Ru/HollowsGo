@@ -1,4 +1,5 @@
 import '../imports.dart';
+import '../service/audioservice.dart';
 
 class PreHomeScreen extends StatefulWidget {
   @override
@@ -25,15 +26,11 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   late Animation<double> _opacityAnimation;
   late ScrollController _scrollControllerTop;
   late ScrollController _scrollControllerBottom;
-  late AudioPlayer _audioPlayer;
-
-  Duration _currentPosition = Duration.zero;
 
   @override
   void initState() {
     super.initState();
 
-    // Selección aleatoria de fondo
     final random = Random();
     randomBackground = imagePaths[random.nextInt(imagePaths.length)];
 
@@ -57,28 +54,9 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     _startAutoScroll(_scrollControllerTop);
     _startAutoScroll(_scrollControllerBottom);
 
-    _audioPlayer = AudioPlayer();
-    _playBackgroundMusic();
-  }
-
-  void _playBackgroundMusic() async {
-    await _audioPlayer.play(UrlSource(
+    AudioService.instance.play(
       'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
-    ));
-  }
-
-  Future<void> _pauseBackgroundMusic() async {
-    _currentPosition = await _audioPlayer.getCurrentPosition() ?? Duration.zero;
-    await _audioPlayer.pause();
-  }
-
-  Future<void> _resumeBackgroundMusic() async {
-    await _audioPlayer.seek(_currentPosition);
-    await _audioPlayer.resume();
-  }
-
-  Future<void> _stopBackgroundMusic() async {
-    await _audioPlayer.stop();
+    );
   }
 
   void _startAutoScroll(ScrollController scrollController) {
@@ -105,7 +83,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   Future<bool> _checkLogin() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getBool('isLoggedIn') ?? false) {
-      await _stopBackgroundMusic();
+      await AudioService.instance.stop();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => HomeScreen()),
       );
@@ -119,7 +97,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     _controller.dispose();
     _scrollControllerTop.dispose();
     _scrollControllerBottom.dispose();
-    _audioPlayer.dispose();
+    AudioService.instance.stop(); // Per si de cas l'usuari surt abans
     super.dispose();
   }
 
@@ -130,11 +108,11 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () async {
-          await _pauseBackgroundMusic();
+          await AudioService.instance.pause();
           bool wentToHome = await _checkLogin();
           if (!wentToHome) {
             await _showLoginDialog(context);
-            await _resumeBackgroundMusic();
+            await AudioService.instance.resume();
           }
         },
         child: Stack(
@@ -145,7 +123,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 fit: BoxFit.cover,
               ),
             ),
-            // Capa oscura para mejorar contraste
             Positioned.fill(
               child: Container(
                 color: Colors.black.withOpacity(0.4),
@@ -205,14 +182,14 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     );
 
     if (result == true) {
-      await _stopBackgroundMusic();
+      await AudioService.instance.stop();
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => HomeScreen()),
         );
       }
     } else {
-      await _resumeBackgroundMusic();
+      await AudioService.instance.resume();
     }
   }
 }
