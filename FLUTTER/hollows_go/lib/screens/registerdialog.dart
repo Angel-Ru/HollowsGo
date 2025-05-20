@@ -1,5 +1,7 @@
 import 'package:http/http.dart' as http;
 import '../imports.dart';
+import '../widgets/animationdialeg.dart';
+import '../widgets/customtext_widget.dart';
 
 class RegisterDialog extends StatefulWidget {
   @override
@@ -114,124 +116,108 @@ class _RegisterDialogState extends State<RegisterDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      child: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(
-                    'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'), // Ejemplo de fondo
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                    Colors.black.withOpacity(0.7), BlendMode.darken),
-              ),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Crea el teu compte',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade300,
-                    letterSpacing: 1.2,
-                  ),
+      child: AnimatedDialog(
+        child: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7), BlendMode.darken),
                 ),
-                const SizedBox(height: 24),
-                _buildTextField(
-                    _usernameController, 'Nom', Icons.person_outline),
-                const SizedBox(height: 16),
-                _buildTextField(
-                    _emailController, 'Email', Icons.email_outlined),
-                const SizedBox(height: 16),
-                _buildPasswordField(),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text(
-                        'Cancel·la',
-                        style: TextStyle(
-                            color: Color.fromARGB(233, 255, 255, 255)),
-                      ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Crea el teu compte',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade300,
+                      letterSpacing: 1.2,
                     ),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _register,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orangeAccent.shade200,
-                        foregroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Nom
+                  CustomTextField(
+                    controller: _usernameController,
+                    label: 'Nom',
+                    icon: Icons.person_outline,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Email
+                  CustomTextField(
+                    controller: _emailController,
+                    label: 'Email',
+                    icon: Icons.email_outlined,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Contrasenya
+                  CustomTextField(
+                    controller: _passwordController,
+                    label: 'Contrasenya',
+                    icon: Icons.lock_outline,
+                    obscureText: !_isPasswordVisible,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                        color: Color.fromARGB(233, 255, 255, 255),
+                      ),
+                      onPressed: () {
+                        setState(() => _isPasswordVisible = !_isPasswordVisible);
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text(
+                          'Cancel·la',
+                          style: TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
                         ),
                       ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white),
-                            )
-                          : const Text('Registra\'t'),
-                    ),
-                  ],
-                )
-              ],
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _register,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orangeAccent.shade200,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Text('Registra\'t'),
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-      TextEditingController controller, String label, IconData icon) {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
-        prefixIcon: Icon(icon, color: Color.fromARGB(233, 255, 255, 255)),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none),
-      ),
-    );
-  }
-
-  Widget _buildPasswordField() {
-    return TextField(
-      controller: _passwordController,
-      obscureText: !_isPasswordVisible,
-      style: const TextStyle(color: Colors.white),
-      decoration: InputDecoration(
-        labelText: 'Contrasenya',
-        labelStyle: const TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
-        prefixIcon: const Icon(Icons.lock_outline,
-            color: Color.fromARGB(233, 255, 255, 255)),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-            color: Color.fromARGB(233, 255, 255, 255),
-          ),
-          onPressed: () {
-            setState(() => _isPasswordVisible = !_isPasswordVisible);
-          },
+          ],
         ),
-        filled: true,
-        fillColor: Colors.white.withOpacity(0.1),
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none),
       ),
     );
   }
