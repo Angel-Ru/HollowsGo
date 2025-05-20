@@ -32,6 +32,7 @@ class UltimateService {
           audioAsset: 'special_attack/shinji/shinji_aud.mp3',
           videoAsset: 'assets/special_attack/shinji/shinji_vid.mp4',
           damage: 100,
+          rotateScreen: true,
           onDamageApplied: onDamageApplied,
           onEnemyDefeated: onEnemyDefeated,
         );
@@ -44,6 +45,7 @@ class UltimateService {
           audioAsset: 'special_attack/yamamoto/yamamoto_aud.mp3',
           videoAsset: 'assets/special_attack/yamamoto/yamamoto_vid.mp4',
           damage: 1000,
+          rotateScreen: false,
           onDamageApplied: onDamageApplied,
           onEnemyDefeated: onEnemyDefeated,
         );
@@ -62,6 +64,7 @@ class UltimateService {
     required String audioAsset,
     required String videoAsset,
     required int damage,
+    required bool rotateScreen,
     required Function(int) onDamageApplied,
     required VoidCallback onEnemyDefeated,
   }) async {
@@ -91,12 +94,13 @@ class UltimateService {
       ),
     );
 
-    await _rotateScreenUpsideDown();
+    if (rotateScreen) await _rotateScreenUpsideDown();
+
     onDamageApplied(damage);
 
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
     if (combatProvider.enemicHealth <= 0) {
-      await _rotateScreenToPortrait();
+      if (rotateScreen) await _rotateScreenToPortrait();
       onEnemyDefeated();
     }
   }
