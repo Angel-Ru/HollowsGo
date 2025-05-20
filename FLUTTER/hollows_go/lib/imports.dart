@@ -51,6 +51,7 @@ export '/widgets/profile/perfil_avatar_widget.dart';
 export '/widgets/profile/perfil_header_widget.dart';
 export '/widgets/profile/perfil_stats_widget.dart';
 export '/widgets/dialegueequipament.dart';
+export 'widgets/detailsscreen_card_slider.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
