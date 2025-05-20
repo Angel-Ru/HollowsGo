@@ -439,4 +439,51 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
       return null;
     }
   }
+
+  Future<List<Skin>?> fetchPersonatgeSkins(int id) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token'); // Obtenir el token
+
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return null;
+      }
+
+      final url = Uri.parse('$_baseUrl/skins/$id');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = response.body;
+
+        // Si la respuesta es un mensaje de texto (cuando no hay skins)
+        if (responseBody is String &&
+            responseBody.contains("No s'han trobat skins")) {
+          return [];
+        }
+
+        final List<dynamic> data = json.decode(responseBody);
+        final List<Skin> skins = [];
+
+        for (var skinJson in data) {
+          final skin = Skin.fromJson(skinJson);
+          skins.add(skin);
+        }
+
+        return skins;
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error en fetchPersonatgeSkins: $error');
+      return null;
+    }
+  }
 }

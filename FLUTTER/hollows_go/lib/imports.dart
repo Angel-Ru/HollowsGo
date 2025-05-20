@@ -25,7 +25,6 @@ export '/providers/combat_provider.dart';
 export '/providers/armes_provider.dart';
 export '/providers/map_provider.dart';
 export '/providers/vials_provider.dart';
-export '/providers/personatges_provider.dart';
 
 export '../config.dart';
 

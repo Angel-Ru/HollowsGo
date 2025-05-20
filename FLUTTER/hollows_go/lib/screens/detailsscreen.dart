@@ -11,6 +11,7 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   Personatge? _personatge;
+  List<Skin> _skins = [];
   bool _isLoading = true;
 
   @override
@@ -23,8 +24,12 @@ class _DetailScreenState extends State<DetailScreen> {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     final personatge = await provider.fetchPersonatgeById(widget.personatgeId);
+    final skins = await provider.fetchPersonatgeSkins(widget.personatgeId);
     if (mounted) {
       setState(() {
+        if (skins != null) {
+          _skins = skins;
+        }
         _personatge = personatge;
         _isLoading = false;
       });
@@ -33,7 +38,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   String _formatAniversari(DateTime? aniversari) {
     if (aniversari == null) return 'Desconegut';
-    return '${aniversari.day}/${aniversari.month}/${aniversari.year}';
+    return '${aniversari.day}/${aniversari.month}';
   }
 
   @override
@@ -89,30 +94,28 @@ class _DetailScreenState extends State<DetailScreen> {
                       _buildStatRow('Aniversari',
                           _formatAniversari(_personatge!.aniversari)),
                       const SizedBox(height: 24),
-                      if (_personatge!.skins.isNotEmpty) ...[
-                        Text('Skins disponibles',
-                            style: TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 12),
-                        Column(
-                          children: _personatge!.skins.map((skin) {
-                            return Card(
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              child: ListTile(
-                                leading: skin.imatge != null
-                                    ? Image.asset(
-                                        skin.imatge!,
-                                        width: 50,
-                                        height: 50,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : null,
-                                title: Text(skin.nom),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
+                      Text('Skins disponibles',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 12),
+                      Column(
+                        children: _skins.map((skin) {
+                          return Card(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            child: ListTile(
+                              leading: skin.imatge != null
+                                  ? Image.network(
+                                      skin.imatge!,
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null,
+                              title: Text(skin.nom),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ],
                   ),
                 ),
