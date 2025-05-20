@@ -5,7 +5,7 @@ exports.getSkinsCategoria4Raça1 = async (req, res) => {
     const connection = await connectDB();
 
     const [result] = await connection.execute(`
-      SELECT s.nom AS skin_nom, s.imatge
+      SELECT s.nom, s.imatge
       FROM SKINS s
       WHERE s.raça = 1 AND s.categoria = 4
       ORDER BY s.nom

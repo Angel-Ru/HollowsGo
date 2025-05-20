@@ -308,10 +308,14 @@ Future<void> fetchSkinsCategoria4Shinigamis(BuildContext context) async {
   _setLoading(true);
 
   try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
     final response = await http.get(
       Uri.parse('https://${Config.ip}/destacats/shinigamis'),
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
     );
 
@@ -328,6 +332,7 @@ Future<void> fetchSkinsCategoria4Shinigamis(BuildContext context) async {
     _setLoading(false);
   }
 }
+
 
 
 
