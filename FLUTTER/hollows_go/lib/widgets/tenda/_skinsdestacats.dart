@@ -1,9 +1,46 @@
+import 'dart:async';
 import '../../imports.dart';
 
-class SkinSwiperPopup extends StatelessWidget {
+class SkinSwiperPopup extends StatefulWidget {
   final List<Map<String, dynamic>> skins;
 
-  const SkinSwiperPopup({required this.skins});
+  const SkinSwiperPopup({required this.skins, Key? key}) : super(key: key);
+
+  @override
+  State<SkinSwiperPopup> createState() => _SkinSwiperPopupState();
+}
+
+class _SkinSwiperPopupState extends State<SkinSwiperPopup> {
+  late final PageController _pageController;
+  late Timer _timer;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.8);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_pageController.hasClients) {
+        _currentPage++;
+        if (_currentPage >= widget.skins.length) {
+          _currentPage = 0;
+        }
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +64,10 @@ class SkinSwiperPopup extends StatelessWidget {
           const SizedBox(height: 20),
           Expanded(
             child: PageView.builder(
-              itemCount: skins.length,
-              controller: PageController(viewportFraction: 0.8),
+              controller: _pageController,
+              itemCount: widget.skins.length,
               itemBuilder: (context, index) {
-                final skin = skins[index];
+                final skin = widget.skins[index];
                 final imageUrl = skin['imatge'];
                 final nom = skin['nom'] ?? 'Sense nom';
 
