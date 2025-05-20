@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class UltimateAnimation extends StatefulWidget {
-  final VoidCallback onCompleted; // callback para cuando la animación termine
+  final String imageAsset;
+  final String audioAsset;
+  final VoidCallback onCompleted;
 
-  const UltimateAnimation({required this.onCompleted, Key? key})
-      : super(key: key);
+  const UltimateAnimation({
+    required this.imageAsset,
+    required this.audioAsset,
+    required this.onCompleted,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _UltimateAnimationState createState() => _UltimateAnimationState();
@@ -42,8 +48,7 @@ class _UltimateAnimationState extends State<UltimateAnimation>
 
   Future<void> _playAudio() async {
     try {
-      await _audioPlayer
-          .play(AssetSource('special_attack/shinji/shinji_aud.mp3'));
+      await _audioPlayer.play(AssetSource(widget.audioAsset));
     } catch (e) {
       print("Error reproduciendo audio: $e");
     }
@@ -71,15 +76,14 @@ class _UltimateAnimationState extends State<UltimateAnimation>
         child: FadeTransition(
           opacity: _fadeAnimation,
           child: OverflowBox(
-            maxWidth:
-                maxWidth * 1.5, // Permite un 50% más ancho que el contenedor
+            maxWidth: maxWidth * 1.5,
             child: Transform.scale(
-              scaleX: 1.4, // Estira la imagen 40% en horizontal
-              scaleY: 1.0, // No cambia la altura
+              scaleX: 1.4,
+              scaleY: 1.0,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  'assets/special_attack/shinji/marco_shinji.png',
+                  widget.imageAsset,
                   width: maxWidth,
                   height: scaledHeight,
                   fit: BoxFit.fill,

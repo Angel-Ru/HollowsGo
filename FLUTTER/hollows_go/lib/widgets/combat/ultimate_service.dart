@@ -10,7 +10,6 @@ import 'ultimate_video.dart';
 class UltimateService {
   OverlayEntry? _overlayEntry;
 
-  /// Método principal para ejecutar la ulti correspondiente a la skin actual
   Future<void> executeUltimateForSkin({
     required BuildContext context,
     required Function(int) onDamageApplied,
@@ -27,14 +26,28 @@ class UltimateService {
 
     switch (habilitat.id) {
       case 3:
-        // Shinji's ulti
-        await _executeShinjiUlti(context, onDamageApplied, onEnemyDefeated);
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/shinji/marco_shinji.png',
+          audioAsset: 'special_attack/shinji/shinji_aud.mp3',
+          videoAsset: 'assets/special_attack/shinji/shinji_vid.mp4',
+          damage: 100,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
         break;
 
-      // Aquí podrás añadir nuevas ultimates fácilmente:
-      // case 4:
-      //   await _executeNouPersonatgeUlti(context, onDamageApplied, onEnemyDefeated);
-      //   break;
+      case 4:
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/yamamoto/marco_yamamoto.png',
+          audioAsset: 'special_attack/yamamoto/yamamoto_aud.mp3',
+          videoAsset: 'assets/special_attack/yamamoto/yamamoto_vid.mp4',
+          damage: 1000,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
 
       default:
         debugPrint(
@@ -43,18 +56,21 @@ class UltimateService {
     }
   }
 
-  /// -------------------------
-  /// Ulti de Shinji (ID 3)
-  /// -------------------------
-  Future<void> _executeShinjiUlti(
-    BuildContext context,
-    Function(int) onDamageApplied,
-    VoidCallback onEnemyDefeated,
-  ) async {
+  Future<void> _executeUlti(
+    BuildContext context, {
+    required String imageAsset,
+    required String audioAsset,
+    required String videoAsset,
+    required int damage,
+    required Function(int) onDamageApplied,
+    required VoidCallback onEnemyDefeated,
+  }) async {
     final completer = Completer();
 
     _overlayEntry = OverlayEntry(
       builder: (context) => UltimateAnimation(
+        imageAsset: imageAsset,
+        audioAsset: audioAsset,
         onCompleted: () {
           _overlayEntry?.remove();
           _overlayEntry = null;
@@ -70,13 +86,13 @@ class UltimateService {
       context: context,
       barrierDismissible: false,
       builder: (_) => UltimateVideo(
+        videoAsset: videoAsset,
         onVideoEnd: () {},
       ),
     );
 
     await _rotateScreenUpsideDown();
-
-    onDamageApplied(100);
+    onDamageApplied(damage);
 
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
     if (combatProvider.enemicHealth <= 0) {
@@ -85,9 +101,6 @@ class UltimateService {
     }
   }
 
-  /// -------------------------
-  /// Utilidades de orientación
-  /// -------------------------
   Future<void> _rotateScreenUpsideDown() async {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitDown,
