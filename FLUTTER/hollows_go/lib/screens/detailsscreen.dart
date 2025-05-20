@@ -90,32 +90,11 @@ class _DetailScreenState extends State<DetailScreen> {
                           _personatge!.pes != null
                               ? '${_personatge!.pes} kg'
                               : null),
-                      _buildStatRow('Gènere', _personatge!.genere),
+                      _buildStatRowWithIcon('Gènere', _personatge!.genere),
                       _buildStatRow('Aniversari',
                           _formatAniversari(_personatge!.aniversari)),
                       const SizedBox(height: 24),
-                      Text('Skins disponibles',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 12),
-                      Column(
-                        children: _skins.map((skin) {
-                          return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: ListTile(
-                              leading: skin.imatge != null
-                                  ? Image.network(
-                                      skin.imatge!,
-                                      width: 50,
-                                      height: 50,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null,
-                              title: Text(skin.nom),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                      SkinsListWidget(skins: _skins),
                     ],
                   ),
                 ),
@@ -133,6 +112,40 @@ class _DetailScreenState extends State<DetailScreen> {
           ),
           Expanded(
             child: Text(value ?? 'Desconegut'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatRowWithIcon(String label, String? genere) {
+    IconData? iconData;
+    Color? iconColor;
+
+    if (genere == 'M') {
+      iconData = Icons.male;
+      iconColor = Colors.blue;
+    } else if (genere == 'F') {
+      iconData = Icons.female;
+      iconColor = Colors.pink;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Text(
+            '$label: ',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Row(
+              children: [
+                if (iconData != null)
+                  Icon(iconData, color: iconColor, size: 20),
+                if (iconData != null) SizedBox(width: 8),
+              ],
+            ),
           ),
         ],
       ),
