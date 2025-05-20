@@ -12,7 +12,7 @@ class UltimateVideo extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _UltimateVideoState createState() => _UltimateVideoState();
+  State<UltimateVideo> createState() => _UltimateVideoState();
 }
 
 class _UltimateVideoState extends State<UltimateVideo> {
@@ -23,20 +23,22 @@ class _UltimateVideoState extends State<UltimateVideo> {
   void initState() {
     super.initState();
 
-    _videoController = VideoPlayerController.asset(widget.videoAsset);
+    _videoController = VideoPlayerController.asset(widget.videoAsset)
+      ..initialize().then((_) {
+        setState(() {});
+        _videoController.play();
+        _startListeners();
+      });
+  }
 
-    _videoController.initialize().then((_) {
-      setState(() {});
-      _videoController.play();
-    });
-
+  void _startListeners() {
     _videoController.addListener(() {
       if (!_videoEnded &&
           _videoController.value.position >= _videoController.value.duration &&
           !_videoController.value.isPlaying) {
         _videoEnded = true;
         widget.onVideoEnd();
-        Navigator.of(context).pop(); // Cierra el diálogo
+        Navigator.of(context).pop(); // Cierra la pantalla tras el video
       }
     });
   }
@@ -49,28 +51,28 @@ class _UltimateVideoState extends State<UltimateVideo> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_videoController.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.orangeAccent,
-            width: 3,
-          ),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: AspectRatio(
-            aspectRatio: _videoController.value.aspectRatio,
-            child: VideoPlayer(_videoController),
-          ),
-        ),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: _videoController.value.isInitialized
+            ? Container(
+                margin: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.orangeAccent,
+                    width: 4,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: AspectRatio(
+                    aspectRatio: _videoController.value.aspectRatio,
+                    child: VideoPlayer(_videoController),
+                  ),
+                ),
+              )
+            : const CircularProgressIndicator(),
       ),
     );
   }
