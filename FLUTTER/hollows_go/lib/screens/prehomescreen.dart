@@ -7,7 +7,7 @@ class PreHomeScreen extends StatefulWidget {
 }
 
 class _PreHomeScreenState extends State<PreHomeScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final List<String> imagePaths = [
     'lib/images/imatges_prehomescreen/0c7569c5931f07a4fbce4e1dd58f9684.jpg',
     'lib/images/imatges_prehomescreen/28bee056b92ef5af41ab8d7cc6f6949a.jpg',
@@ -30,6 +30,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
 
     final random = Random();
     randomBackground = imagePaths[random.nextInt(imagePaths.length)];
@@ -57,6 +59,32 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     AudioService.instance.play(
       'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    _controller.dispose();
+    _scrollControllerTop.dispose();
+    _scrollControllerBottom.dispose();
+
+    AudioService.instance.stop(); // Per si de cas l'usuari surt abans
+
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.paused) {
+      // App va a background, pausa la música
+      AudioService.instance.pause();
+    } else if (state == AppLifecycleState.resumed) {
+      // App torna a foreground, reprèn la música
+      AudioService.instance.resume();
+    }
   }
 
   void _startAutoScroll(ScrollController scrollController) {
@@ -90,15 +118,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       return true;
     }
     return false;
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _scrollControllerTop.dispose();
-    _scrollControllerBottom.dispose();
-    AudioService.instance.stop(); // Per si de cas l'usuari surt abans
-    super.dispose();
   }
 
   @override
