@@ -79,8 +79,8 @@ exports.getVidaActualSkin = async (req, res) => {
 
         let vidaActual;
 
-        if (result.length === 0 || result[0].vida_actual === null) {
-            // No hi ha fila o vida_actual és null: agafar vida_base del personatge
+        if (result.length === 0) {
+            // No hi ha registre: obtenir vida_base i crear el registre
             const [personatgeResult] = await connection.execute(
                 'SELECT vida_base FROM PERSONATGES WHERE id = ?',
                 [personatgeId]
@@ -91,8 +91,28 @@ exports.getVidaActualSkin = async (req, res) => {
             }
 
             vidaActual = personatgeResult[0].vida_base;
+
+            // Insertar nou registre a USUARI_SKIN_ARMES
+            await connection.execute(
+                'INSERT INTO USUARI_SKIN_ARMES (usuari, skin, vida_actual) VALUES (?, ?, ?)',
+                [usuari_id, skinId, vidaActual]
+            );
         } else {
+            // Hi ha registre: comprovar si vida_actual és null
             vidaActual = result[0].vida_actual;
+
+            if (vidaActual === null) {
+                const [personatgeResult] = await connection.execute(
+                    'SELECT vida_base FROM PERSONATGES WHERE id = ?',
+                    [personatgeId]
+                );
+
+                if (personatgeResult.length === 0) {
+                    return res.status(404).json({ error: 'Personatge no trobat per a aquesta skin.' });
+                }
+
+                vidaActual = personatgeResult[0].vida_base;
+            }
         }
 
         res.status(200).json({ vida_actual: vidaActual });
@@ -102,6 +122,7 @@ exports.getVidaActualSkin = async (req, res) => {
         res.status(500).json({ error: 'Error intern del servidor.' });
     }
 };
+
 
 
 
