@@ -12,38 +12,40 @@ class UltimateVideo extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _UltimateVideoScreenState createState() => _UltimateVideoScreenState();
+  State<UltimateVideo> createState() => _UltimateVideoState();
 }
 
-class _UltimateVideoScreenState extends State<UltimateVideo> {
-  late VideoPlayerController _controller;
+class _UltimateVideoState extends State<UltimateVideo> {
+  late VideoPlayerController _videoController;
   bool _videoEnded = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset(widget.videoAsset)
+
+    _videoController = VideoPlayerController.asset(widget.videoAsset)
       ..initialize().then((_) {
         setState(() {});
-        _controller.play();
-        _controller.addListener(_videoListener);
+        _videoController.play();
+        _startListeners();
       });
   }
 
-  void _videoListener() {
-    if (!_videoEnded &&
-        _controller.value.position >= _controller.value.duration &&
-        !_controller.value.isPlaying) {
-      _videoEnded = true;
-      widget.onVideoEnd();
-      Navigator.of(context).pop(); // Salir de la pantalla
-    }
+  void _startListeners() {
+    _videoController.addListener(() {
+      if (!_videoEnded &&
+          _videoController.value.position >= _videoController.value.duration &&
+          !_videoController.value.isPlaying) {
+        _videoEnded = true;
+        widget.onVideoEnd();
+        Navigator.of(context).pop(); // Cierra la pantalla tras el video
+      }
+    });
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_videoListener);
-    _controller.dispose();
+    _videoController.dispose();
     super.dispose();
   }
 
@@ -52,17 +54,21 @@ class _UltimateVideoScreenState extends State<UltimateVideo> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: _controller.value.isInitialized
+        child: _videoController.value.isInitialized
             ? Container(
+                margin: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.orangeAccent, width: 3),
-                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.orangeAccent,
+                    width: 4,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   child: AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: VideoPlayer(_controller),
+                    aspectRatio: _videoController.value.aspectRatio,
+                    child: VideoPlayer(_videoController),
                   ),
                 ),
               )
