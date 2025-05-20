@@ -10,6 +10,10 @@ class GachaProvider extends ChangeNotifier {
   bool _isDuplicateSkin = false;
   bool get isDuplicateSkin => _isDuplicateSkin;
 
+  // Aquí guardare les skins de categoria 4 que siguin shinigamis o aliades(Angel del futuro pensa en modificar el endpoint per afegir les que tenen habilitat llegendaria) 
+  List<Map<String, dynamic>> _publicSkins = [];
+  List<Map<String, dynamic>> get publicSkins => _publicSkins;
+
   List<Map<String, dynamic>> _latestMultipleSkins = [];
   List<Map<String, dynamic>> get latestMultipleSkins => _latestMultipleSkins;
 
@@ -298,6 +302,33 @@ Future<bool> gachaPullMultipleEnemics(BuildContext context) async {
     _setLoading(false);
   }
 }
+
+
+Future<void> fetchSkinsCategoria4Shinigamis(BuildContext context) async {
+  _setLoading(true);
+
+  try {
+    final response = await http.get(
+      Uri.parse('https://${Config.ip}/destacats/shinigamis'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      _publicSkins = data.cast<Map<String, dynamic>>();
+      notifyListeners();
+    } else {
+      _showError(context, 'Error al obtenir les skins públiques');
+    }
+  } catch (e) {
+    _showError(context, 'Error en carregar les skins: $e');
+  } finally {
+    _setLoading(false);
+  }
+}
+
 
 
   void _showError(BuildContext context, String message) {

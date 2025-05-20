@@ -3,6 +3,7 @@ import 'package:hollows_go/widgets/multiskinrewarddialog.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import '../imports.dart';
+import 'tenda/_skinsdestacats.dart';
 
 class GachaBannerWidget extends StatefulWidget {
   const GachaBannerWidget({super.key});
@@ -60,7 +61,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
 
   void _handleSwipe(DragEndDetails details) {
     if (!mounted) return;
-
     if (details.primaryVelocity! > 0) {
       _changeBannerSet((_currentSetIndex - 1) % _allBannerSets.length);
     } else if (details.primaryVelocity! < 0) {
@@ -348,7 +348,33 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
             ),
           ],
         ),
+        const SizedBox(height: 12),
+        TextButton(
+          onPressed: () async {
+            final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+            await gachaProvider.fetchSkinsCategoria4Shinigamis(context);
+            if (!mounted) return;
+            showDialog(
+              context: context,
+              builder: (_) => Dialog(
+                backgroundColor: Colors.transparent,
+                insetPadding: const EdgeInsets.all(20),
+                child: SkinSwiperPopup(skins: gachaProvider.publicSkins),
+              ),
+            );
+          },
+          child: const Text(
+            '👁️ Veure Skins',
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        ),
       ],
     );
   }
 }
+
