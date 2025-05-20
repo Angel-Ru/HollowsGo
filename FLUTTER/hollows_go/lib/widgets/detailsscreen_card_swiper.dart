@@ -8,7 +8,7 @@ class SkinsListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PageController controller = PageController(
-      viewportFraction: 0.5,
+      viewportFraction: 0.48,
       initialPage: 0,
     );
 
@@ -18,28 +18,36 @@ class SkinsListWidget extends StatelessWidget {
         Text(
           'Skins disponibles',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 140,
+          height: 150,
           child: Align(
             alignment: Alignment.centerLeft,
             child: PageView.builder(
               controller: controller,
               itemCount: skins.length,
-              padEnds:
-                  false, // ← Esto es clave para que empiece en el borde izquierdo
+              padEnds: false,
               itemBuilder: (context, index) {
                 final skin = skins[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: Card(
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 78, 77, 77)
+                          .withOpacity(0.50),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        )
+                      ],
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8),
@@ -48,11 +56,11 @@ class SkinsListWidget extends StatelessWidget {
                         children: [
                           if (skin.imatge != null)
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                               child: Image.network(
                                 skin.imatge!,
-                                height: 93,
-                                width: 93,
+                                height: 80,
+                                width: 80,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -61,8 +69,9 @@ class SkinsListWidget extends StatelessWidget {
                             skin.nom,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
                           ),
                         ],
