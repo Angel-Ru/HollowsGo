@@ -48,6 +48,7 @@ exports.updateVidaActualSkin = async (req, res) => {
         res.status(500).json({ error: 'Error intern del servidor.' });
     }
 };
+
 exports.getVidaActualSkin = async (req, res) => {
     try {
         const connection = await connectDB();
@@ -60,13 +61,15 @@ exports.getVidaActualSkin = async (req, res) => {
 
         // Comprovar que la skin existeix
         const [skinCheck] = await connection.execute(
-            'SELECT id FROM SKINS WHERE id = ?',
+            'SELECT id, personatge FROM SKINS WHERE id = ?',
             [skinId]
         );
 
         if (skinCheck.length === 0) {
             return res.status(404).json({ error: 'Skin no trobada.' });
         }
+
+        const personatgeId = skinCheck[0].personatge;
 
         // Comprovar que la relació entre usuari i skin existeix
         const [result] = await connection.execute(
@@ -78,12 +81,29 @@ exports.getVidaActualSkin = async (req, res) => {
             return res.status(404).json({ error: 'Aquesta skin no està assignada a l\'usuari.' });
         }
 
-        res.status(200).json({ vida_actual: result[0].vida_actual });
+        let vidaActual = result[0].vida_actual;
+
+        if (vidaActual === null) {
+            // Si no hi ha vida_actual, buscar la vida_base del personatge
+            const [personatgeResult] = await connection.execute(
+                'SELECT vida_base FROM PERSONATGES WHERE id = ?',
+                [personatgeId]
+            );
+
+            if (personatgeResult.length === 0) {
+                return res.status(404).json({ error: 'Personatge no trobat per a aquesta skin.' });
+            }
+
+            vidaActual = personatgeResult[0].vida_base;
+        }
+
+        res.status(200).json({ vida_actual: vidaActual });
 
     } catch (err) {
         console.error('Error a getVidaActualSkin:', err);
         res.status(500).json({ error: 'Error intern del servidor.' });
     }
 };
+
 
 

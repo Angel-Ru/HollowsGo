@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ArmesProvider()),
         ChangeNotifierProvider(create: (_) => CombatProvider()),
         ChangeNotifierProvider(create: (_) => VialsProvider()),
-        ChangeNotifierProvider(create: (_) => PersonatgesProvider()),
         ChangeNotifierProvider(create: (_) => HabilitatProvider()), 
       ],
       child: MaterialApp(

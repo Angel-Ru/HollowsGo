@@ -2,13 +2,12 @@ import 'package:http/http.dart' as http;
 import '../imports.dart';
 
 class CombatProvider with ChangeNotifier {
-  double? _aliatHealth; // nullable fins que es carrega
+  double? _aliatHealth; // Nullable fins que es carrega
   double _enemicHealth = 1000.0;
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
-
   bool _ultiUsed = false;
 
   // GETTERS
