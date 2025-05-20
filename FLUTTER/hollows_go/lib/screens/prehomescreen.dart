@@ -59,6 +59,9 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     AudioService.instance.play(
       'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
     );
+    Provider.of<DialogueProvider>(context, listen: false)
+      .loadDialogueFromJson("ichigo");
+
   }
 
   @override
