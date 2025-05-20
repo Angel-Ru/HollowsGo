@@ -96,7 +96,7 @@ exports.getVidaActualSkin = async (req, res) => {
 
             vidaActual = personatgeResult[0].vida_base;
         }
-
+        console.log(res);
         res.status(200).json({ vida_actual: vidaActual });
 
     } catch (err) {
