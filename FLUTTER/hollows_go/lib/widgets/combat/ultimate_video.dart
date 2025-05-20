@@ -17,7 +17,7 @@ class UltimateVideo extends StatefulWidget {
 
 class _UltimateVideoState extends State<UltimateVideo> {
   late VideoPlayerController _videoController;
-  bool _videoEnded = false;
+  bool _hasEnded = false;
 
   @override
   void initState() {
@@ -27,18 +27,18 @@ class _UltimateVideoState extends State<UltimateVideo> {
       ..initialize().then((_) {
         setState(() {});
         _videoController.play();
-        _startListeners();
+        _startListener();
       });
   }
 
-  void _startListeners() {
+  void _startListener() {
     _videoController.addListener(() {
-      if (!_videoEnded &&
+      if (!_hasEnded &&
           _videoController.value.position >= _videoController.value.duration &&
           !_videoController.value.isPlaying) {
-        _videoEnded = true;
+        _hasEnded = true;
         widget.onVideoEnd();
-        Navigator.of(context).pop(); // Cierra la pantalla tras el video
+        Navigator.of(context).pop();
       }
     });
   }
@@ -58,10 +58,7 @@ class _UltimateVideoState extends State<UltimateVideo> {
             ? Container(
                 margin: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.orangeAccent,
-                    width: 4,
-                  ),
+                  border: Border.all(color: Colors.orangeAccent, width: 4),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: ClipRRect(

@@ -85,12 +85,13 @@ class UltimateService {
     Overlay.of(context).insert(_overlayEntry!);
     await completer.future;
 
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => UltimateVideo(
-        videoAsset: videoAsset,
-        onVideoEnd: () {},
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => UltimateVideo(
+          videoAsset: videoAsset,
+          onVideoEnd: () {},
+        ),
       ),
     );
 
