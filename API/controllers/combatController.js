@@ -59,7 +59,7 @@ exports.getVidaActualSkin = async (req, res) => {
             return res.status(400).json({ error: 'Falta l\'usuari_id com a paràmetre.' });
         }
 
-        // Comprovar que la skin existeix
+        // Comprovar que la skin existeix i obtenir el personatge associat
         const [skinCheck] = await connection.execute(
             'SELECT id, personatge FROM SKINS WHERE id = ?',
             [skinId]
@@ -71,20 +71,16 @@ exports.getVidaActualSkin = async (req, res) => {
 
         const personatgeId = skinCheck[0].personatge;
 
-        // Comprovar que la relació entre usuari i skin existeix
+        // Comprovar si hi ha vida_actual per usuari i skin
         const [result] = await connection.execute(
             'SELECT vida_actual FROM USUARI_SKIN_ARMES WHERE usuari = ? AND skin = ?',
             [usuari_id, skinId]
         );
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Aquesta skin no està assignada a l\'usuari.' });
-        }
+        let vidaActual;
 
-        let vidaActual = result[0].vida_actual;
-
-        if (vidaActual === null) {
-            // Si no hi ha vida_actual, buscar la vida_base del personatge
+        if (result.length === 0 || result[0].vida_actual === null) {
+            // No hi ha fila o vida_actual és null: agafar vida_base del personatge
             const [personatgeResult] = await connection.execute(
                 'SELECT vida_base FROM PERSONATGES WHERE id = ?',
                 [personatgeId]
@@ -95,8 +91,10 @@ exports.getVidaActualSkin = async (req, res) => {
             }
 
             vidaActual = personatgeResult[0].vida_base;
+        } else {
+            vidaActual = result[0].vida_actual;
         }
-        console.log(res);
+
         res.status(200).json({ vida_actual: vidaActual });
 
     } catch (err) {
@@ -104,6 +102,7 @@ exports.getVidaActualSkin = async (req, res) => {
         res.status(500).json({ error: 'Error intern del servidor.' });
     }
 };
+
 
 
 
