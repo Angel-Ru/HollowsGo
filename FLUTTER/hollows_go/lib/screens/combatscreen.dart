@@ -8,7 +8,7 @@ import 'package:hollows_go/providers/perfil_provider.dart';
 import 'package:hollows_go/providers/user_provider.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
 
-import '../imports.dart'; // asumo que tienes tus widgets importados aquí
+import '../imports.dart'; // widgets, dialogs, etc.
 
 class CombatScreen extends StatelessWidget {
   @override
@@ -34,54 +34,55 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
   bool get wantKeepAlive => true;
 
   @override
-void initState() {
-  super.initState();
-  _setRandomBackground();
+  void initState() {
+    super.initState();
+    _setRandomBackground();
 
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+      final skinsProvider =
+          Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-    // Agafem aliat
-    final aliat = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
+      // Agafem aliat
+      final aliat = skinsProvider.selectedSkinAliat ??
+          skinsProvider.selectedSkinQuincy ??
+          skinsProvider.selectedSkinEnemic;
 
-    if (aliat?.id != null) {
-      await combatProvider.fetchSkinVidaActual(aliat!.id);
-    }
+      if (aliat?.id != null) {
+        await combatProvider.fetchSkinVidaActual(aliat!.id);
+      }
 
-    // Un cop carregada la vida, fem el reset per ajustar l'enemic
-    final maxEnemyHealth = skinsProvider.selectedSkin?.vida ?? 1000;
-    combatProvider.resetCombat(
-      maxAllyHealth: combatProvider.aliatHealth,
-      maxEnemyHealth: maxEnemyHealth.toDouble(),
-      keepAllyHealth: true,
-    );
-    final habilitatProvider =
-        Provider.of<HabilitatProvider>(context, listen: false);
-        
-    if (aliat != null) {
-      await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
-    } else {
-      // No hay aliado: limpiamos habilidad para evitar mostrar datos obsoletos
-      habilitatProvider.clearHabilitat();
-    }
-    // Ara marques que la partida s'ha sumat i altres coses
-    if (!_partidaJugadaSumada) {
-      final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      perfilProvider.sumarPartidaJugada(userProvider.userId);
-      _partidaJugadaSumada = true;
-    }
-  });
-}
+      // Un cop carregada la vida, fem el reset per ajustar l'enemic
+      final maxEnemyHealth = skinsProvider.selectedSkin?.vida ?? 1000;
+      combatProvider.resetCombat(
+        maxAllyHealth: combatProvider.aliatHealth,
+        maxEnemyHealth: maxEnemyHealth.toDouble(),
+        keepAllyHealth: true,
+      );
 
+      final habilitatProvider =
+          Provider.of<HabilitatProvider>(context, listen: false);
+
+      if (aliat != null) {
+        await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
+      } else {
+        habilitatProvider.clearHabilitat();
+      }
+
+      if (!_partidaJugadaSumada) {
+        final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        perfilProvider.sumarPartidaJugada(userProvider.userId);
+        _partidaJugadaSumada = true;
+      }
+    });
+  }
 
   void _setRandomBackground() {
     final random = Random();
     int index = random.nextInt(5) + 1;
     _backgroundImage = 'lib/images/combatscreen_images/fondo_combat_$index.png';
   }
-
 
   void _showVictoryDialog() async {
     final skinsProvider =
@@ -218,6 +219,14 @@ void initState() {
       ),
       builder: (context, skins, _) {
         final combatProvider = Provider.of<CombatProvider>(context);
+
+        // Aquí controlem que la vida ja hagi arribat, si no, mostrem spinner
+        if (combatProvider.aliatHealth == 0) {
+          // Suposant que vida 0 és estat inicial, adapta si necessites
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
         final String allyName = skins.aliat?.nom ?? "Desconegut Aliat";
         final int aliatDamage = skins.aliat?.malTotal ?? 300;

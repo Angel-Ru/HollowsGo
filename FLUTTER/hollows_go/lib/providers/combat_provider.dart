@@ -2,25 +2,26 @@ import 'package:http/http.dart' as http;
 import '../imports.dart';
 
 class CombatProvider with ChangeNotifier {
-  double _aliatHealth = 1000.0;
+  double? _aliatHealth; // nullable fins que es carrega
   double _enemicHealth = 1000.0;
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
 
-  // Nuevo flag para controlar uso de ulti
   bool _ultiUsed = false;
 
-  double get aliatHealth => _aliatHealth;
+  // GETTERS
+  double get aliatHealth => _aliatHealth ?? 0.0;
   double get enemicHealth => _enemicHealth;
   bool get isEnemyTurn => _isEnemyTurn;
   bool get isEnemyHit => _isEnemyHit;
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
+  bool get ultiUsed => _ultiUsed;
+  bool get isHealthLoaded => _aliatHealth != null;
 
-  bool get ultiUsed => _ultiUsed; // getter para ultiUsed
-
+  // SETTERS
   void setAllyHealth(double value) {
     _aliatHealth = value;
     notifyListeners();
@@ -36,29 +37,27 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Setter para ultiUsed con notificación
   void setUltiUsed(bool value) {
     _ultiUsed = value;
     notifyListeners();
   }
 
   void resetCombat({
-  double maxAllyHealth = 1000.0,
-  double maxEnemyHealth = 1000.0,
-  bool keepAllyHealth = false,  // canviat keepCurrentHealth per especificar millor
-}) {
-  if (!keepAllyHealth) {
-    _aliatHealth = maxAllyHealth;
+    double maxAllyHealth = 1000.0,
+    double maxEnemyHealth = 1000.0,
+    bool keepAllyHealth = false,
+  }) {
+    if (!keepAllyHealth) {
+      _aliatHealth = maxAllyHealth;
+    }
+    _enemicHealth = maxEnemyHealth;
+    _isEnemyTurn = false;
+    _isEnemyHit = false;
+    _isAllyHit = false;
+    _isAttackInProgress = false;
+    _ultiUsed = false;
+    notifyListeners();
   }
-  _enemicHealth = maxEnemyHealth;  // sempre reseteja enemic a màxim
-  _isEnemyTurn = false;
-  _isEnemyHit = false;
-  _isAllyHit = false;
-  _isAttackInProgress = false;
-  _ultiUsed = false;
-  notifyListeners();
-}
-
 
   Future<void> performAttack(
     int allyDamage,
@@ -82,13 +81,13 @@ class CombatProvider with ChangeNotifier {
       notifyListeners();
 
       if (_enemicHealth > 0) {
-        await _performEnemyAttack(enemyDamage, skinId,onDefeat);
+        await _performEnemyAttack(enemyDamage, skinId, onDefeat);
       } else {
         _isAttackInProgress = false;
 
         await updateSkinVidaActual(
           skinId: skinId,
-          vidaActual: _aliatHealth,
+          vidaActual: _aliatHealth ?? 0,
         );
 
         onVictory();
@@ -106,8 +105,8 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = true;
     notifyListeners();
 
-    _aliatHealth -= enemyDamage;
-    if (_aliatHealth < 0) _aliatHealth = 0;
+    _aliatHealth = (_aliatHealth ?? 0) - enemyDamage;
+    if (_aliatHealth! < 0) _aliatHealth = 0;
 
     await Future.delayed(const Duration(milliseconds: 500));
 
@@ -116,10 +115,10 @@ class CombatProvider with ChangeNotifier {
     _isAttackInProgress = false;
     notifyListeners();
 
-    if (_aliatHealth <= 0) {
+    if (_aliatHealth! <= 0) {
       await updateSkinVidaActual(
         skinId: skinId,
-        vidaActual: _aliatHealth,
+        vidaActual: _aliatHealth!,
       );
 
       onDefeat();
@@ -127,72 +126,73 @@ class CombatProvider with ChangeNotifier {
   }
 
   Future<void> updateSkinVidaActual({
-  required int skinId,
-  required double vidaActual,
-}) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final usuariId = prefs.getInt('userId');
+    required int skinId,
+    required double vidaActual,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final usuariId = prefs.getInt('userId');
 
-    if (token == null || usuariId == null) {
-      print("Token o usuari_id no disponible");
-      return;
+      if (token == null || usuariId == null) {
+        print("Token o usuari_id no disponible");
+        return;
+      }
+
+      final response = await http.put(
+        Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'vida_actual': vidaActual.round(),
+          'usuari_id': usuariId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Vida actualitzada correctament.");
+      } else {
+        print("Error al actualitzar vida: ${response.statusCode}, ${response.body}");
+      }
+    } catch (e) {
+      print("Error en updateSkinVidaActual: $e");
     }
-
-    final response = await http.put(
-      Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode({
-        'vida_actual': vidaActual.round(),
-        'usuari_id': usuariId,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      print("Vida actualitzada correctament.");
-    } else {
-      print("Error al actualitzar vida: ${response.statusCode}, ${response.body}");
-    }
-  } catch (e) {
-    print("Error en updateSkinVidaActual: $e");
   }
-}
-Future<void> fetchSkinVidaActual(int skinId) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-    final usuariId = prefs.getInt('userId');
 
-    if (token == null || usuariId == null) {
-      print("Token o usuari_id no disponible");
-      return;
+  Future<double?> fetchSkinVidaActual(int skinId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final usuariId = prefs.getInt('userId');
+
+      if (token == null || usuariId == null) {
+        print("Token o usuari_id no disponible");
+        return null;
+      }
+
+      final response = await http.get(
+        Uri.parse('https://${Config.ip}/combats/vida/$skinId?usuari_id=$usuariId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final vida = (data['vida_actual'] as num).toDouble();
+
+        setAllyHealth(vida);
+        print("Vida actual obtinguda: $vida");
+        return vida;
+      } else {
+        print("Error al obtenir vida: ${response.statusCode}, ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Error en fetchSkinVidaActual: $e");
+      return null;
     }
-
-    final response = await http.get(
-      Uri.parse('https://${Config.ip}/combats/vida/$skinId?usuari_id=$usuariId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final vida = (data['vida_actual'] as num).toDouble();
-
-      setAllyHealth(vida); // Actualitza la vida a nivell local
-      print("Vida actual obtinguda: $vida");
-    } else {
-      print("Error al obtenir vida: ${response.statusCode}, ${response.body}");
-    }
-  } catch (e) {
-    print("Error en fetchSkinVidaActual: $e");
   }
-}
-
-
-
 }

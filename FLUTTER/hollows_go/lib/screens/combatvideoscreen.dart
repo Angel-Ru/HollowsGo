@@ -8,17 +8,22 @@ class CombatIntroVideoScreen extends StatefulWidget {
 class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   late VideoPlayerController _videoController;
   bool _navigated = false;
+  late Widget _combatScreen;
 
   @override
   void initState() {
     super.initState();
+
+    // Preinstancia la CombatScreen
+    _combatScreen = CombatScreen();
+
     _videoController =
         VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
           ..initialize().then((_) {
-            setState(() {});
+            setState(() {}); // Quan estigui inicialitzat el vídeo
             _videoController.play();
             _startListeners();
-            _preloadCombatImages();
+            _preloadCombatImages(); // Precarrega imatges
           });
   }
 
@@ -63,11 +68,21 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
     }
   }
 
-  void _navigateToCombat() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => CombatScreen()),
-    );
+  void _navigateToCombat() async {
+  final provider = Provider.of<CombatProvider>(context, listen: false);
+  final skin = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false).selectedSkin;
+
+  final skinId = skin?.id;
+
+  if (skinId != null) {
+    await provider.fetchSkinVidaActual(skinId);
   }
+
+  Navigator.of(context).pushReplacement(
+    MaterialPageRoute(builder: (context) => CombatScreen()),
+  );
+}
+
 
   @override
   void dispose() {

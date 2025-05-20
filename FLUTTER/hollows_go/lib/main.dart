@@ -6,12 +6,6 @@ import 'imports.dart';
 Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l'aplicació i es defineix el tema.
 A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
 */
-
-/*
-Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l'aplicació i es defineix el tema.
-A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
-*/
-
 void main() {
   runApp(const MyApp());
 }
@@ -28,15 +22,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => DialogueProvider()),
         ChangeNotifierProvider(create: (_) => GachaProvider()),
-        ChangeNotifierProvider(
-            create: (_) => SkinsEnemicsPersonatgesProvider()),
+        ChangeNotifierProvider(create: (_) => SkinsEnemicsPersonatgesProvider()),
         ChangeNotifierProvider(create: (_) => PerfilProvider()),
         ChangeNotifierProvider(create: (_) => MapDataProvider()),
         ChangeNotifierProvider(create: (_) => ArmesProvider()),
         ChangeNotifierProvider(create: (_) => CombatProvider()),
         ChangeNotifierProvider(create: (_) => VialsProvider()),
         ChangeNotifierProvider(create: (_) => PersonatgesProvider()),
-        ChangeNotifierProvider(create: (_) => HabilitatProvider()), // ✅ Añadido
+        ChangeNotifierProvider(create: (_) => HabilitatProvider()), 
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
