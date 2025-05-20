@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:audioplayers/audioplayers.dart';
 import '../imports.dart';
 
 class TendaScreen extends StatefulWidget {
@@ -41,17 +42,30 @@ class _TendaScreenState extends State<TendaScreen> {
     'lib/images/fondo_tendascreen/Yoruichi.jpg',
   ];
   int _currentImageIndex = 0;
+  late AudioPlayer _audioPlayer;
 
   @override
   void initState() {
     super.initState();
     _startBackgroundRotation();
 
+    _audioPlayer = AudioPlayer();
+    _playBackgroundMusic();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
       dialogueProvider.loadDialogueFromJson('urahara');
     });
+  }
+
+  void _playBackgroundMusic() async {
+    await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    await _audioPlayer.play(
+      UrlSource(
+        'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dq2skhigp8ml5kjysdl8',
+      ),
+    );
   }
 
   void _startBackgroundRotation() {
@@ -67,6 +81,7 @@ class _TendaScreenState extends State<TendaScreen> {
 
   @override
   void dispose() {
+    _audioPlayer.dispose();
     _pageController.dispose();
     super.dispose();
   }

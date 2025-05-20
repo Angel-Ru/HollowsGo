@@ -34,9 +34,9 @@ void initState() {
     final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
     
-    await skinsProvider.selectRandomSkin();
+    //await skinsProvider.selectRandomSkin();  // <-- Crida aquí la càrrega de l'enemic!
 
-    
+    // Ara sí, agafem aliat i enemic carregats
     final aliat = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
     final enemic = skinsProvider.selectedSkin;
 
