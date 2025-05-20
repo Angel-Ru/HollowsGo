@@ -1,14 +1,5 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-
-import 'package:hollows_go/providers/habilitat_provider.dart';
-import 'package:hollows_go/providers/perfil_provider.dart';
-import 'package:hollows_go/providers/user_provider.dart';
-import 'package:hollows_go/providers/combat_provider.dart';
-
 import '../imports.dart';
+import '../providers/habilitat_provider.dart'; // asumo que tienes tus widgets importados aquí
 
 class CombatScreen extends StatelessWidget {
   @override
@@ -34,42 +25,52 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
   bool get wantKeepAlive => true;
 
   @override
-  void initState() {
-    super.initState();
-    _setRandomBackground();
+void initState() {
+  super.initState();
+  _setRandomBackground();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-      final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+    final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-      final aliat = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
+    
+    await skinsProvider.selectRandomSkin();
 
-      if (aliat?.id != null) {
-        await combatProvider.fetchSkinVidaActual(aliat!.id);
-      }
+    
+    final aliat = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
+    final enemic = skinsProvider.selectedSkin;
 
-      final maxEnemyHealth = skinsProvider.selectedSkin?.vida ?? 1000;
-      combatProvider.resetCombat(
-        maxAllyHealth: combatProvider.aliatHealth,
-        maxEnemyHealth: maxEnemyHealth.toDouble(),
-        keepAllyHealth: true,
-      );
+    
 
-      final habilitatProvider = Provider.of<HabilitatProvider>(context, listen: false);
-      if (aliat != null) {
-        await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
-      } else {
-        habilitatProvider.clearHabilitat();
-      }
+    if (aliat?.id != null) {
+      await combatProvider.fetchSkinVidaActual(aliat!.id);
+    }
 
-      if (!_partidaJugadaSumada) {
-        final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        perfilProvider.sumarPartidaJugada(userProvider.userId);
-        _partidaJugadaSumada = true;
-      }
-    });
-  }
+    final maxEnemyHealth = enemic?.vida ?? 1000;
+    combatProvider.resetCombat(
+      maxAllyHealth: combatProvider.aliatHealth,
+      maxEnemyHealth: maxEnemyHealth.toDouble(),
+      keepAllyHealth: true,
+    );
+
+    final habilitatProvider = Provider.of<HabilitatProvider>(context, listen: false);
+
+    if (aliat != null) {
+      await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
+    } else {
+      habilitatProvider.clearHabilitat();
+    }
+
+    if (!_partidaJugadaSumada) {
+      final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      perfilProvider.sumarPartidaJugada(userProvider.userId);
+      _partidaJugadaSumada = true;
+    }
+  });
+}
+
+
 
   void _setRandomBackground() {
     final random = Random();
@@ -77,8 +78,10 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
     _backgroundImage = 'lib/images/combatscreen_images/fondo_combat_$index.png';
   }
 
+
   void _showVictoryDialog() async {
-    final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final skinsProvider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await skinsProvider.fetchEnemyPoints();
 
     final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
@@ -210,7 +213,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
         enemic: provider.selectedSkin,
       ),
       builder: (context, skins, _) {
-        final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+        final combatProvider = Provider.of<CombatProvider>(context);
 
         final String allyName = skins.aliat?.nom ?? "Desconegut Aliat";
         final int aliatDamage = skins.aliat?.malTotal ?? 300;
@@ -243,38 +246,24 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         isHit: combatProvider.isEnemyHit,
                         isEnemy: true,
                       ),
-                      const Spacer(),
-
-                      /// 👉 Només es reconstrueix la part de l'aliat quan la seva vida canvia
-                      Consumer<CombatProvider>(
-                        builder: (context, provider, _) {
-                          if ((skins.aliat != null) && provider.aliatHealth <= 0) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-
-                          return Column(
-                            children: [
-                              CharacterDisplayWidget(
-                                imageUrl: skins.aliat?.imatge ??
-                                    'lib/images/combatscreen_images/bleach_combat.png',
-                                name: allyName,
-                                health: provider.aliatHealth,
-                                maxHealth: skins.aliat?.vidaMaxima ?? 1000,
-                                isHit: provider.isAllyHit,
-                              ),
-                              SizedBox(height: 20),
-                              CombatActionButtons(
-                                combatProvider: provider,
-                                techniqueName: techniqueName,
-                                aliatDamage: aliatDamage,
-                                enemicDamage: enemicDamage,
-                                onVictory: _showVictoryDialog,
-                                onDefeat: _showDefeatDialog,
-                                skinId: skins.aliat?.id ?? 0,
-                              ),
-                            ],
-                          );
-                        },
+                      Spacer(),
+                      CharacterDisplayWidget(
+                        imageUrl: skins.aliat?.imatge ??
+                            'lib/images/combatscreen_images/bleach_combat.png',
+                        name: allyName,
+                        health: combatProvider.aliatHealth,
+                        maxHealth: skins.aliat?.vidaMaxima ?? 1000,
+                        isHit: combatProvider.isAllyHit,
+                      ),
+                      SizedBox(height: 20),
+                      CombatActionButtons(
+                        combatProvider: combatProvider,
+                        techniqueName: techniqueName,
+                        aliatDamage: aliatDamage,
+                        enemicDamage: enemicDamage,
+                        onVictory: _showVictoryDialog,
+                        onDefeat: _showDefeatDialog,
+                        skinId: skins.aliat?.id ?? 0,
                       ),
                     ],
                   ),
