@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import '../imports.dart';
+import '../service/audioservice.dart';
 import '../widgets/animationdialeg.dart';
 import '../widgets/customtext_widget.dart';
 
@@ -17,12 +18,24 @@ class _RegisterDialogState extends State<RegisterDialog> {
   bool _isLoading = false;
 
   @override
-  void dispose() {
-    _usernameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
+void initState() {
+  super.initState();
+  AudioService.instance.pause(); // 👈 Pausar música en obrir el registre
+}
+
+
+  @override
+void dispose() {
+  _usernameController.dispose();
+  _emailController.dispose();
+  _passwordController.dispose();
+
+  // Només reprendre si seguim a la PreHomeScreen
+  AudioService.instance.resume(); // 👈 Reprendre música si tanca el registre
+
+  super.dispose();
+}
+
 
   Future<void> _clearPreferences() async {
     final prefs = await SharedPreferences.getInstance();

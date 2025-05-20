@@ -101,7 +101,7 @@ flutter:
     - lib/images/Yoroichi.jpeg
     - lib/images/Byakuya.jpeg
     - lib/images/fondo_tendascreen/
-    - assets/dialogues.json
+    - assets/
     - lib/images/skinrepetida.gif
     - lib/images/imatges_prehomescreen/
     - assets/special_attack/shinji/shinji_aud.mp3
