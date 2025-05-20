@@ -12,40 +12,38 @@ class UltimateVideo extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<UltimateVideo> createState() => _UltimateVideoState();
+  _UltimateVideoScreenState createState() => _UltimateVideoScreenState();
 }
 
-class _UltimateVideoState extends State<UltimateVideo> {
-  late VideoPlayerController _videoController;
-  bool _hasEnded = false;
+class _UltimateVideoScreenState extends State<UltimateVideo> {
+  late VideoPlayerController _controller;
+  bool _videoEnded = false;
 
   @override
   void initState() {
     super.initState();
-
-    _videoController = VideoPlayerController.asset(widget.videoAsset)
+    _controller = VideoPlayerController.asset(widget.videoAsset)
       ..initialize().then((_) {
         setState(() {});
-        _videoController.play();
-        _startListener();
+        _controller.play();
+        _controller.addListener(_videoListener);
       });
   }
 
-  void _startListener() {
-    _videoController.addListener(() {
-      if (!_hasEnded &&
-          _videoController.value.position >= _videoController.value.duration &&
-          !_videoController.value.isPlaying) {
-        _hasEnded = true;
-        widget.onVideoEnd();
-        Navigator.of(context).pop();
-      }
-    });
+  void _videoListener() {
+    if (!_videoEnded &&
+        _controller.value.position >= _controller.value.duration &&
+        !_controller.value.isPlaying) {
+      _videoEnded = true;
+      widget.onVideoEnd();
+      Navigator.of(context).pop(); // Salir de la pantalla
+    }
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
+    _controller.removeListener(_videoListener);
+    _controller.dispose();
     super.dispose();
   }
 
@@ -54,18 +52,17 @@ class _UltimateVideoState extends State<UltimateVideo> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: _videoController.value.isInitialized
+        child: _controller.value.isInitialized
             ? Container(
-                margin: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.orangeAccent, width: 4),
-                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.orangeAccent, width: 3),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                   child: AspectRatio(
-                    aspectRatio: _videoController.value.aspectRatio,
-                    child: VideoPlayer(_videoController),
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(_controller),
                   ),
                 ),
               )
