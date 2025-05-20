@@ -1,4 +1,5 @@
-import 'package:hollows_go/imports.dart';
+import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class UltimateVideo extends StatefulWidget {
   final String videoAsset;
@@ -11,13 +12,12 @@ class UltimateVideo extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _UltimateVideoPlayerScreenState createState() =>
-      _UltimateVideoPlayerScreenState();
+  _UltimateVideoScreenState createState() => _UltimateVideoScreenState();
 }
 
-class _UltimateVideoPlayerScreenState extends State<UltimateVideo> {
+class _UltimateVideoScreenState extends State<UltimateVideo> {
   late VideoPlayerController _controller;
-  bool _navigated = false;
+  bool _videoEnded = false;
 
   @override
   void initState() {
@@ -26,23 +26,23 @@ class _UltimateVideoPlayerScreenState extends State<UltimateVideo> {
       ..initialize().then((_) {
         setState(() {});
         _controller.play();
-        _startListeners();
+        _controller.addListener(_videoListener);
       });
   }
 
-  void _startListeners() {
-    _controller.addListener(() {
-      if (_controller.value.position >= _controller.value.duration &&
-          !_navigated) {
-        _navigated = true;
-        widget.onVideoEnd();
-        Navigator.of(context).pop();
-      }
-    });
+  void _videoListener() {
+    if (!_videoEnded &&
+        _controller.value.position >= _controller.value.duration &&
+        !_controller.value.isPlaying) {
+      _videoEnded = true;
+      widget.onVideoEnd();
+      Navigator.of(context).pop(); // Salir de la pantalla
+    }
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_videoListener);
     _controller.dispose();
     super.dispose();
   }
@@ -53,11 +53,20 @@ class _UltimateVideoPlayerScreenState extends State<UltimateVideo> {
       backgroundColor: Colors.black,
       body: Center(
         child: _controller.value.isInitialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
+            ? Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.orangeAccent, width: 3),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(_controller),
+                  ),
+                ),
               )
-            : const SizedBox.shrink(),
+            : const CircularProgressIndicator(),
       ),
     );
   }
