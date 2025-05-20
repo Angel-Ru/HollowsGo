@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
 import 'package:hollows_go/providers/habilitat_provider.dart';
 import 'ultimate_animation.dart';
-import 'ultimate_video.dart';
+import 'ultimate_video.dart'; // Asegúrate que apunta al archivo correcto (ahora UltimateVideoPlayerScreen)
 
 class UltimateService {
   OverlayEntry? _overlayEntry;
@@ -85,12 +85,13 @@ class UltimateService {
     Overlay.of(context).insert(_overlayEntry!);
     await completer.future;
 
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => UltimateVideo(
-        videoAsset: videoAsset,
-        onVideoEnd: () {},
+    // ✅ Ahora usando la pantalla estilo CombatIntroVideoScreen
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => UltimateVideo(
+          videoAsset: videoAsset,
+          onVideoEnd: () {},
+        ),
       ),
     );
 
