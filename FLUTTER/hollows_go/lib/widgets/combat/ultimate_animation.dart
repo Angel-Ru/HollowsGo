@@ -42,7 +42,8 @@ class _UltimateAnimationState extends State<UltimateAnimation>
 
   Future<void> _playAudio() async {
     try {
-      await _audioPlayer.play(AssetSource('special_attack/shinji/yokoso.mp3'));
+      await _audioPlayer
+          .play(AssetSource('special_attack/shinji/shinji_aud.mp3'));
     } catch (e) {
       print("Error reproduciendo audio: $e");
     }
@@ -78,7 +79,7 @@ class _UltimateAnimationState extends State<UltimateAnimation>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.asset(
-                  'assets/special_attack/shinji/marco_prova.png',
+                  'assets/special_attack/shinji/marco_shinji.png',
                   width: maxWidth,
                   height: scaledHeight,
                   fit: BoxFit.fill,
