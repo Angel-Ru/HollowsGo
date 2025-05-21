@@ -657,7 +657,12 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
         const connection = await connectDB(); // connexió MySQL
 
         // Obtenir l'hora actual
-        const horaActual = new Date().getHours();
+        const horaActual = Number(new Intl.DateTimeFormat('es-ES', {
+    hour: 'numeric',
+    hour12: false,
+    timeZone: 'Europe/Madrid'
+        }).format(new Date()));
+
 
         // Definir dia (7:00 a 16:59) i vespre (17:00 a 6:59)
         const esDia = horaActual >= 7 && horaActual < 17;
