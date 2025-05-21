@@ -102,9 +102,11 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 4),
                   Text(
-                    "(MAL: ${widget.aliatDamage})",
+                    "(MAL: ${widget.combatProvider.playerAttack})" +
+                        (widget.combatProvider.bonusPlayerAttack > 0
+                            ? " +${widget.combatProvider.bonusPlayerAttack}"
+                            : ""),
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
