@@ -51,7 +51,7 @@ exports.getSkinsCategoria4Raça2 = async (req, res) => {
     const [result] = await connection.execute(`
       SELECT s.nom, s.imatge
       FROM SKINS s
-      WHERE s.raça = 0 AND s.categoria = 4
+      WHERE s.raça = 2 AND s.categoria = 4
       ORDER BY s.nom
     `);
 
