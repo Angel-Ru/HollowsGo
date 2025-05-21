@@ -114,7 +114,12 @@ flutter:
     - assets/special_attack/ulquiorra/marco_ulquiorra.png
     - assets/special_attack/ulquiorra/ulquiorra_vid.mp4
     - assets/special_attack/ichigo/ichigo_aud.mp3
-    
+    - assets/special_attack/ichigo/marco_ichigo.png
+    - assets/special_attack/ichigo/ichigo_aud.mp3
+    - assets/special_attack/grimmjow/grimmjow_aud.mp3
+    - assets/special_attack/grimmjow/marco_grimmjow.png
+    - assets/special_attack/grimmjow/grimmjow_vid.mp4
+
     
     
   # An image asset can refer to one or more resolution-specific "variants", see
