@@ -192,7 +192,10 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
       case 1:
         return const Color(0xFF2196F3);
       case 2:
-        return const Color(0xFF212121);
+        return const Color(0xFF550055)
+
+            // morado oscuro
+            ;
       default:
         return Colors.grey;
     }
@@ -200,8 +203,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
 
   BorderSide getButtonBorder(int index) {
     switch (index) {
-      case 2:
-        return const BorderSide(color: Colors.greenAccent, width: 2);
       default:
         return const BorderSide(color: Colors.black, width: 2);
     }
@@ -238,8 +239,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               elevation: 0,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -300,14 +300,15 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                         child: child,
                       ),
                       child: Image.network(
-                        key: ValueKey(
-                            _allBannerSets[_currentSetIndex][_currentBannerIndex]),
+                        key: ValueKey(_allBannerSets[_currentSetIndex]
+                            [_currentBannerIndex]),
                         _allBannerSets[_currentSetIndex][_currentBannerIndex],
                         width: MediaQuery.of(context).size.width * 0.8,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return const Center(child: CircularProgressIndicator());
+                          return const Center(
+                              child: CircularProgressIndicator());
                         },
                       ),
                     ),
@@ -340,24 +341,29 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                   onTap: () async {
                     final gachaProvider =
                         Provider.of<GachaProvider>(context, listen: false);
+
                     if (_currentSetIndex == 1) {
                       await gachaProvider.fetchSkinsCategoria4Quincy(context);
+                    } else if (_currentSetIndex == 2) {
+                      await gachaProvider.fetchSkinsCategoria4Hollows(context);
                     } else {
-                      await gachaProvider.fetchSkinsCategoria4Shinigamis(context);
+                      await gachaProvider
+                          .fetchSkinsCategoria4Shinigamis(context);
                     }
-                    if (!mounted) return;
-                    showDialog(
-  context: context,
-  builder: (_) => Dialog(
-    backgroundColor: Colors.transparent,
-    insetPadding: const EdgeInsets.all(20),
-    child: SkinSwiperPopup(
-      skins: gachaProvider.publicSkins,
-      currentIndex: _currentSetIndex,  // <-- PAS IMPORTANT!
-    ),
-  ),
-);
 
+                    if (!mounted) return;
+
+                    showDialog(
+                      context: context,
+                      builder: (_) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: const EdgeInsets.all(20),
+                        child: SkinSwiperPopup(
+                          skins: gachaProvider.publicSkins,
+                          currentIndex: _currentSetIndex,
+                        ),
+                      ),
+                    );
                   },
                   child: Container(
                     height: 50,
@@ -373,11 +379,25 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                       ],
                     ),
                     child: ClipOval(
-                      child: Image.network(
-                        _currentSetIndex == 1
-                            ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
-                            : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
-                        fit: BoxFit.cover,
+                      child: AnimatedSwitcher(
+                        duration: const Duration(seconds: 2),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOut,
+                          ),
+                          child: child,
+                        ),
+                        child: Image.network(
+                          key: ValueKey(
+                              _currentSetIndex), // clave para que cambie la imagen al cambiar índice
+                          _currentSetIndex == 1
+                              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
+                              : _currentSetIndex == 2
+                                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
+                                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),

@@ -115,7 +115,7 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   @override
   void dispose() {
     _videoController.dispose();
-    AudioService.instance.stop(); // detener música si se abandona esta pantalla
+    
     super.dispose();
   }
 

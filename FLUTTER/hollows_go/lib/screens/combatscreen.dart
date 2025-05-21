@@ -1,3 +1,5 @@
+import 'package:hollows_go/service/audioservice.dart';
+
 import '../imports.dart';
 import '../providers/habilitat_provider.dart'; // asumo que tienes tus widgets importados aquí
 
@@ -69,6 +71,11 @@ void initState() {
     }
   });
 }
+ @override
+  void dispose() {
+
+    super.dispose();
+  }
 
 
 

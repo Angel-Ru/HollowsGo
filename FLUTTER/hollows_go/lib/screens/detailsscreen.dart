@@ -132,7 +132,7 @@ class _DetailScreenState extends State<DetailScreen> {
     return Align(
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
-        widthFactor: 0.7,
+        widthFactor: 0.8,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.5),

@@ -15,17 +15,41 @@ class SkinSwiperPopup extends StatefulWidget {
   State<SkinSwiperPopup> createState() => _SkinSwiperPopupState();
 }
 
-
 class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderStateMixin {
   late final PageController _pageController;
   late Timer _timer;
   int _currentPage = 0;
   List<bool> _visibleStars = [false, false, false, false];
 
-  Color get _activeColor => widget.currentIndex == 1 ? Colors.blueAccent : Colors.orangeAccent;
-  Color get _borderColor => widget.currentIndex == 1 ? Colors.blueAccent.withOpacity(0.6) : Colors.orange.withOpacity(0.6);
-  Color get _textColor => widget.currentIndex == 1 ? Colors.blueAccent : Colors.orange;
+  Color get _activeColor {
+    if (widget.currentIndex == 1) {
+      return Colors.blueAccent;
+    } else if (widget.currentIndex == 2) {
+      return Colors.purple[700]!;
+    } else {
+      return Colors.orangeAccent;
+    }
+  }
 
+  Color get _borderColor {
+    if (widget.currentIndex == 1) {
+      return Colors.blueAccent.withOpacity(0.6);
+    } else if (widget.currentIndex == 2) {
+      return Colors.purple[700]!.withOpacity(0.6);
+    } else {
+      return Colors.orange.withOpacity(0.6);
+    }
+  }
+
+  Color get _textColor {
+    if (widget.currentIndex == 1) {
+      return Colors.blueAccent;
+    } else if (widget.currentIndex == 2) {
+      return Colors.purple[700]!;;
+    } else {
+      return Colors.orange;
+    }
+  }
 
   @override
   void initState() {
@@ -100,10 +124,11 @@ class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderSt
           gradient: LinearGradient(
             colors: [
               Colors.black.withOpacity(0.95),
-              // Pots posar un gradient més blau o taronja aquí si vols, o deixar igual:
-              widget.currentIndex == 1 
-                ? Colors.blueGrey.withOpacity(0.8)
-                : const Color(0xFF2F1B0E).withOpacity(0.8),
+              widget.currentIndex == 1
+                  ? Colors.blueGrey.withOpacity(0.8)
+                  : widget.currentIndex == 2
+                      ? Colors.purple[700]!.withOpacity(0.4)
+                      : const Color(0xFF2F1B0E).withOpacity(0.6),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -155,8 +180,8 @@ class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderSt
                                 child: Image.network(
                                   imageUrl,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      const Center(child: Icon(Icons.error, color: Colors.redAccent)),
+                                  errorBuilder: (_, __, ___) => const Center(
+                                      child: Icon(Icons.error, color: Colors.redAccent)),
                                   loadingBuilder: (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
                                     return const Center(child: CircularProgressIndicator());

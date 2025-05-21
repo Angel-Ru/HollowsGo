@@ -62,8 +62,9 @@ class HabilitatProvider with ChangeNotifier {
         throw Exception('Token no disponible');
       }
 
+      final url = Uri.parse('https://${Config.ip}/habilitats/personatge/$id');
       final response = await http.get(
-        Uri.parse('https://${Config.ip}/habilitats/personatge/$id'),
+        url,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -71,17 +72,12 @@ class HabilitatProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data != null) {
-          _habilitat = HabilitatLlegendaria.fromJson(data);
-        } else {
-          _habilitat = null;
-        }
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        _habilitat = HabilitatLlegendaria.fromJson(data);
       } else if (response.statusCode == 404) {
-        _habilitat = null;
+        _habilitat = null; // Personatge sense habilitat llegendària
       } else {
-        throw Exception(
-            'Error inesperat carregant habilitat: ${response.statusCode}');
+        throw Exception('Error carregant habilitat: ${response.statusCode}');
       }
     } catch (e) {
       debugPrint('Error carregant habilitat: $e');
