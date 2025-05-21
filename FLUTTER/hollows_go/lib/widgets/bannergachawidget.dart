@@ -192,7 +192,10 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
       case 1:
         return const Color(0xFF2196F3);
       case 2:
-        return const Color(0xFF212121);
+        return const Color(0xFF550055)
+
+            // morado oscuro
+            ;
       default:
         return Colors.grey;
     }
@@ -200,8 +203,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
 
   BorderSide getButtonBorder(int index) {
     switch (index) {
-      case 2:
-        return const BorderSide(color: Colors.greenAccent, width: 2);
       default:
         return const BorderSide(color: Colors.black, width: 2);
     }
@@ -334,61 +335,74 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                 ),
               ),
               Positioned(
-  bottom: -12,
-  right: -12,
-  child: GestureDetector(
-    onTap: () async {
-      final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+                bottom: -12,
+                right: -12,
+                child: GestureDetector(
+                  onTap: () async {
+                    final gachaProvider =
+                        Provider.of<GachaProvider>(context, listen: false);
 
-      if (_currentSetIndex == 1) {
-        await gachaProvider.fetchSkinsCategoria4Quincy(context);
-      } else if (_currentSetIndex == 2) {
-        await gachaProvider.fetchSkinsCategoria4Hollows(context);
-      } else {
-        await gachaProvider.fetchSkinsCategoria4Shinigamis(context);
-      }
+                    if (_currentSetIndex == 1) {
+                      await gachaProvider.fetchSkinsCategoria4Quincy(context);
+                    } else if (_currentSetIndex == 2) {
+                      await gachaProvider.fetchSkinsCategoria4Hollows(context);
+                    } else {
+                      await gachaProvider
+                          .fetchSkinsCategoria4Shinigamis(context);
+                    }
 
-      if (!mounted) return;
+                    if (!mounted) return;
 
-      showDialog(
-        context: context,
-        builder: (_) => Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.all(20),
-          child: SkinSwiperPopup(
-            skins: gachaProvider.publicSkins,
-            currentIndex: _currentSetIndex,
-          ),
-        ),
-      );
-    },
-    child: Container(
-      height: 50,
-      width: 50,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipOval(
-        child: Image.network(
-          _currentSetIndex == 1
-              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
-              : _currentSetIndex == 2
-                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
-                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
-          fit: BoxFit.cover,
-        ),
-      ),
-    ),
-  ),
-),
-
+                    showDialog(
+                      context: context,
+                      builder: (_) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: const EdgeInsets.all(20),
+                        child: SkinSwiperPopup(
+                          skins: gachaProvider.publicSkins,
+                          currentIndex: _currentSetIndex,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(seconds: 2),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOut,
+                          ),
+                          child: child,
+                        ),
+                        child: Image.network(
+                          key: ValueKey(
+                              _currentSetIndex), // clave para que cambie la imagen al cambiar índice
+                          _currentSetIndex == 1
+                              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
+                              : _currentSetIndex == 2
+                                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
+                                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
