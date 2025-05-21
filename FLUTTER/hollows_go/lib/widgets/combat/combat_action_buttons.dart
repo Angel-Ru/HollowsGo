@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hollows_go/service/audioservice.dart';
 import 'package:provider/provider.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
 import 'package:hollows_go/providers/habilitat_provider.dart';
 import 'package:hollows_go/widgets/combat/ultimate_service.dart';
 
-class CombatActionButtons extends StatelessWidget {
+class CombatActionButtons extends StatefulWidget {
   final CombatProvider combatProvider;
   final String techniqueName;
   final int aliatDamage;
@@ -25,12 +26,33 @@ class CombatActionButtons extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final bool ultiUsed = combatProvider.ultiUsed;
+  State<CombatActionButtons> createState() => _CombatActionButtonsState();
+}
 
-    final bool canAct = !combatProvider.isEnemyTurn &&
-        !combatProvider.isAttackInProgress &&
-        combatProvider.enemicHealth > 0;
+class _CombatActionButtonsState extends State<CombatActionButtons> {
+  bool _alreadyEnded = false;
+
+  Future<void> _handleVictory() async {
+    if (_alreadyEnded) return;
+    _alreadyEnded = true;
+    await AudioService.instance.fadeOut();
+    widget.onVictory();
+  }
+
+  Future<void> _handleDefeat() async {
+    if (_alreadyEnded) return;
+    _alreadyEnded = true;
+    await AudioService.instance.fadeOut();
+    widget.onDefeat();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool ultiUsed = widget.combatProvider.ultiUsed;
+
+    final bool canAct = !widget.combatProvider.isEnemyTurn &&
+        !widget.combatProvider.isAttackInProgress &&
+        widget.combatProvider.enemicHealth > 0;
 
     final habilitat = Provider.of<HabilitatProvider>(context).habilitat;
     final bool hasUltimate = habilitat != null;
@@ -48,13 +70,15 @@ class CombatActionButtons extends StatelessWidget {
             flex: 3,
             child: ElevatedButton(
               onPressed: canAct
-                  ? () => combatProvider.performAttack(
-                        aliatDamage,
-                        enemicDamage,
-                        skinId,
-                        onVictory,
-                        onDefeat,
-                      )
+                  ? () async {
+                      await widget.combatProvider.performAttack(
+                        widget.aliatDamage,
+                        widget.enemicDamage,
+                        widget.skinId,
+                        _handleVictory,
+                        _handleDefeat,
+                      );
+                    }
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
@@ -68,7 +92,7 @@ class CombatActionButtons extends StatelessWidget {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      techniqueName,
+                      widget.techniqueName,
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -80,7 +104,7 @@ class CombatActionButtons extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "(MAL: $aliatDamage)",
+                    "(MAL: ${widget.aliatDamage})",
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
@@ -121,24 +145,25 @@ class CombatActionButtons extends StatelessWidget {
                 onPressed: (!canAct || ultiUsed || !hasUltimate)
                     ? null
                     : () async {
-                        combatProvider.setUltiUsed(true);
+                        widget.combatProvider.setUltiUsed(true);
 
                         await UltimateService().executeUltimateForSkin(
                           context: context,
                           onDamageApplied: (damageDealt) async {
                             final newHealth =
-                                combatProvider.enemicHealth - damageDealt;
-                            combatProvider.setEnemyHealth(newHealth);
+                                widget.combatProvider.enemicHealth -
+                                    damageDealt;
+                            widget.combatProvider.setEnemyHealth(newHealth);
 
                             if (newHealth <= 0) {
-                              await combatProvider.updateSkinVidaActual(
-                                skinId: skinId,
-                                vidaActual: combatProvider.aliatHealth,
+                              await widget.combatProvider.updateSkinVidaActual(
+                                skinId: widget.skinId,
+                                vidaActual: widget.combatProvider.aliatHealth,
                               );
-                              onVictory();
+                              await _handleVictory();
                             }
                           },
-                          onEnemyDefeated: onVictory,
+                          onEnemyDefeated: _handleVictory,
                         );
                       },
               ),
