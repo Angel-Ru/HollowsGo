@@ -341,7 +341,7 @@ Future<void> fetchSkinsCategoria4Quincy(BuildContext context) async {
     final token = prefs.getString('token') ?? '';
 
     final response = await http.get(
-      Uri.parse('https://${Config.ip}/destacats/shinigamis'),
+      Uri.parse('https://${Config.ip}/destacats/quincy'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

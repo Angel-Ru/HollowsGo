@@ -347,14 +347,17 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                     }
                     if (!mounted) return;
                     showDialog(
-                      context: context,
-                      builder: (_) => Dialog(
-                        backgroundColor: Colors.transparent,
-                        insetPadding: const EdgeInsets.all(20),
-                        child:
-                            SkinSwiperPopup(skins: gachaProvider.publicSkins),
-                      ),
-                    );
+  context: context,
+  builder: (_) => Dialog(
+    backgroundColor: Colors.transparent,
+    insetPadding: const EdgeInsets.all(20),
+    child: SkinSwiperPopup(
+      skins: gachaProvider.publicSkins,
+      currentIndex: _currentSetIndex,  // <-- PAS IMPORTANT!
+    ),
+  ),
+);
+
                   },
                   child: Container(
                     height: 50,

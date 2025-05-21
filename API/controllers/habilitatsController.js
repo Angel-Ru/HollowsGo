@@ -243,12 +243,15 @@ exports.getHabilitatPersonatge = async (req, res) => {
         const { id } = req.params;
 
         const query = `
-      SELECT h.*
-      FROM HABILITAT_LLEGENDARIA h
-      JOIN SKINS s ON h.skin_personatge = s.id
-      WHERE s.personatge = ?
-      LIMIT 1
-    `;
+            SELECT h.*
+            FROM HABILITAT_LLEGENDARIA h
+            WHERE h.skin_personatge IN (
+                SELECT s.id
+                FROM SKINS s
+                WHERE s.personatge = ?
+            )
+                LIMIT 1
+        `;
 
         const [result] = await connection.query(query, [id]);
 
@@ -259,6 +262,9 @@ exports.getHabilitatPersonatge = async (req, res) => {
         res.json(result[0]);
     } catch (error) {
         console.error('Error en getHabilitatPersonatge:', error);
-        res.status(500).json({ error: 'Error intern del servidor.' });
+        res.status(500).json({
+            error: 'Error intern del servidor.',
+            details: error.message
+        });
     }
 };
