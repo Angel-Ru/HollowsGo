@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:hollows_go/models/habilitat_llegendaria.dart';
 import 'package:hollows_go/providers/habilitat_provider.dart';
-
 import '../imports.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -22,63 +21,61 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPersonatge();
+    _loadData();
   }
 
-  Future<void> _loadPersonatge() async {
-    final provider =
+  Future<void> _loadData() async {
+    final personatgeProvider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    final personatge = await provider.fetchPersonatgeById(widget.personatgeId);
-    final skins = await provider.fetchPersonatgeSkins(widget.personatgeId);
     final habilitatProvider =
         Provider.of<HabilitatProvider>(context, listen: false);
 
-    await habilitatProvider.loadHabilitatPerPersonatgeId(widget.personatgeId);
-    final habilitat = habilitatProvider.habilitat;
+    // Ejecuta todas las futuras en paralelo
+    final results = await Future.wait([
+      personatgeProvider.fetchPersonatgeById(widget.personatgeId),
+      personatgeProvider.fetchPersonatgeSkins(widget.personatgeId),
+      habilitatProvider.loadHabilitatPerPersonatgeId(widget.personatgeId),
+    ]);
 
-    if (mounted) {
-      setState(() {
-        _skins = skins ?? [];
-        _personatge = personatge;
-        _habilitat = habilitat;
-        _isLoading = false;
-      });
-    }
+    if (!mounted) return;
+
+    setState(() {
+      _personatge = results[0] as Personatge?;
+      _skins = results[1] as List<Skin>? ?? [];
+      _habilitat = habilitatProvider.habilitat;
+      _isLoading = false;
+    });
   }
 
-  String _formatAniversari(DateTime? aniversari) {
-    if (aniversari == null) return 'Desconegut';
-    return '${aniversari.day}/${aniversari.month}';
-  }
+  String _formatAniversari(DateTime? aniversari) => aniversari == null
+      ? 'Desconegut'
+      : '${aniversari.day}/${aniversari.month}';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Detalls del Personatge',
           style: TextStyle(
               color: Colors.white, fontSize: 18, fontStyle: FontStyle.italic),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Stack(
         children: [
-          // Fondo decorativo
+          // Fondo
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'lib/images/bibliotecascreen_images/biblioteca_aliats_fondo.png'),
+                image: AssetImage('lib/images/detailsscreen/fondo.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-
-          // Contenido
           _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _personatge == null
@@ -91,7 +88,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         children: [
                           Text(
                             _personatge!.nom,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -104,23 +101,20 @@ class _DetailScreenState extends State<DetailScreen> {
                           if (_personatge!.descripcio != null)
                             Text(
                               _personatge!.descripcio!,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white70,
-                              ),
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.white70),
                             ),
                           const SizedBox(height: 20),
-                          Text('Estadístiques',
+                          const Text('Estadístiques',
                               style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              )),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white)),
                           const SizedBox(height: 8),
                           _buildStatsSection(),
                           if (_habilitat != null) ...[
                             const SizedBox(height: 4),
-                            _buildStatsSection1(),
+                            _buildHabilitatSection(),
                           ],
                           const SizedBox(height: 24),
                           SkinsListWidget(skins: _skins),
@@ -133,43 +127,34 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _buildStatsSection() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: FractionallySizedBox(
-        widthFactor: 0.8,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildStatItem('Classe', _personatge!.classe.toString()),
-              _buildStatItem(
-                  'Vida base', _personatge!.vidaBase?.toString() ?? '-'),
-              _buildStatItem(
-                  'Mal base', _personatge!.malBase?.toString() ?? '-'),
-              _buildStatItem(
-                  'Alçada',
-                  _personatge!.altura != null
-                      ? '${_personatge!.altura} cm'
-                      : '-'),
-              _buildStatItem('Pes',
-                  _personatge!.pes != null ? '${_personatge!.pes} kg' : '-'),
-              _buildStatRowWithIcon('Gènere', _personatge!.genere),
-              _buildStatItem(
-                  'Aniversari', _formatAniversari(_personatge!.aniversari)),
-            ],
-          ),
-        ),
-      ),
+    return _buildContainer(
+      children: [
+        _buildStatItem('Classe', _personatge!.classe.toString()),
+        _buildStatItem('Vida base', _personatge!.vidaBase?.toString() ?? '-'),
+        _buildStatItem('Mal base', _personatge!.malBase?.toString() ?? '-'),
+        _buildStatItem('Alçada',
+            _personatge!.altura != null ? '${_personatge!.altura} cm' : '-'),
+        _buildStatItem(
+            'Pes', _personatge!.pes != null ? '${_personatge!.pes} kg' : '-'),
+        _buildStatRowWithIcon('Gènere', _personatge!.genere),
+        _buildStatItem(
+            'Aniversari', _formatAniversari(_personatge!.aniversari)),
+      ],
     );
   }
 
-  Widget _buildStatsSection1() {
+  Widget _buildHabilitatSection() {
+    return _buildContainer(
+      borderColor: Colors.yellow.withOpacity(0.5),
+      children: [
+        _buildStatItem('Habilitat', _habilitat!.nom),
+        _buildStatItem('Descripció habilitat', _habilitat!.descripcio),
+        _buildStatItem('Efecte habilitat', _habilitat!.efecte),
+      ],
+    );
+  }
+
+  Widget _buildContainer({required List<Widget> children, Color? borderColor}) {
     return Align(
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
@@ -178,18 +163,15 @@ class _DetailScreenState extends State<DetailScreen> {
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.5),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.yellow.withOpacity(0.5), width: 1),
+            border: Border.all(
+              color: borderColor ?? Colors.white.withOpacity(0.2),
+              width: 1,
+            ),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (_habilitat != null) ...[
-                _buildStatItem('Habilitat', _habilitat!.nom),
-                _buildStatItem('Descripció habilitat', _habilitat!.descripcio),
-                _buildStatItem('Efecte habilitat', _habilitat!.efecte),
-              ],
-            ],
+            children: children,
           ),
         ),
       ),
@@ -204,23 +186,15 @@ class _DetailScreenState extends State<DetailScreen> {
         children: [
           SizedBox(
             width: 120,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
-            ),
+            child: Text(label,
+                style: const TextStyle(color: Colors.white70, fontSize: 14)),
           ),
           Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            child: Text(value,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500)),
           ),
         ],
       ),
@@ -246,20 +220,15 @@ class _DetailScreenState extends State<DetailScreen> {
         children: [
           SizedBox(
             width: 120,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
-            ),
+            child: Text(label,
+                style: const TextStyle(color: Colors.white70, fontSize: 14)),
           ),
           Expanded(
             child: Row(
               children: [
                 if (iconData != null)
                   Icon(iconData, color: iconColor, size: 20),
-                if (iconData != null) SizedBox(width: 8),
+                if (iconData != null) const SizedBox(width: 8),
               ],
             ),
           ),
