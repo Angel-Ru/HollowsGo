@@ -240,7 +240,7 @@ exports.borrarHabilitatId = async (req, res) => {
 // Cercar una habilitat pel personatge
 exports.getHabilitatPersonatge = async (req, res) => {
     try {
-        const { characterId } = req.params;
+        const { id } = req.params;
         const connection = await connectDB();
 
         const [rows] = await connection.execute(
@@ -255,7 +255,7 @@ exports.getHabilitatPersonatge = async (req, res) => {
                       JOIN PERSONATGES p ON p.id = s.personatge
              WHERE p.id = ?
                  LIMIT 1`,
-            [characterId]
+            [id]
         );
 
         if (rows.length === 0) {
