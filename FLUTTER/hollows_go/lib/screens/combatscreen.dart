@@ -27,64 +27,64 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
   bool get wantKeepAlive => true;
 
   @override
-void initState() {
-  super.initState();
-  _setRandomBackground();
+  void initState() {
+    super.initState();
+    _setRandomBackground();
 
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final combatProvider =
+          Provider.of<CombatProvider>(context, listen: false);
+      final skinsProvider =
+          Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-    
-    //await skinsProvider.selectRandomSkin();  // <-- Crida aquí la càrrega de l'enemic!
+      //await skinsProvider.selectRandomSkin();  // <-- Crida aquí la càrrega de l'enemic!
 
-    // Ara sí, agafem aliat i enemic carregats
-    final aliat = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
-    final enemic = skinsProvider.selectedSkin;
+      // Ara sí, agafem aliat i enemic carregats
+      final aliat = skinsProvider.selectedSkinAliat ??
+          skinsProvider.selectedSkinQuincy ??
+          skinsProvider.selectedSkinEnemic;
+      final enemic = skinsProvider.selectedSkin;
 
-    
+      if (aliat?.id != null) {
+        await combatProvider.fetchSkinVidaActual(aliat!.id);
+      }
 
-    if (aliat?.id != null) {
-      await combatProvider.fetchSkinVidaActual(aliat!.id);
-    }
+      final maxEnemyHealth = enemic?.vida ?? 1000;
+      combatProvider.resetCombat(
+        maxAllyHealth: combatProvider.aliatHealth,
+        maxEnemyHealth: maxEnemyHealth.toDouble(),
+        keepAllyHealth: true,
+      );
 
-    final maxEnemyHealth = enemic?.vida ?? 1000;
-    combatProvider.resetCombat(
-      maxAllyHealth: combatProvider.aliatHealth,
-      maxEnemyHealth: maxEnemyHealth.toDouble(),
-      keepAllyHealth: true,
-    );
+      final habilitatProvider =
+          Provider.of<HabilitatProvider>(context, listen: false);
 
-    final habilitatProvider = Provider.of<HabilitatProvider>(context, listen: false);
+      if (aliat != null) {
+        await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
+      } else {
+        habilitatProvider.clearHabilitat();
+      }
 
-    if (aliat != null) {
-      await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
-    } else {
-      habilitatProvider.clearHabilitat();
-    }
-
-    if (!_partidaJugadaSumada) {
-      final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      perfilProvider.sumarPartidaJugada(userProvider.userId);
-      _partidaJugadaSumada = true;
-    }
-  });
-}
- @override
-  void dispose() {
-
-    super.dispose();
+      if (!_partidaJugadaSumada) {
+        final perfilProvider =
+            Provider.of<PerfilProvider>(context, listen: false);
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        perfilProvider.sumarPartidaJugada(userProvider.userId);
+        _partidaJugadaSumada = true;
+      }
+    });
   }
 
-
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   void _setRandomBackground() {
     final random = Random();
     int index = random.nextInt(5) + 1;
     _backgroundImage = 'lib/images/combatscreen_images/fondo_combat_$index.png';
   }
-
 
   void _showVictoryDialog() async {
     final skinsProvider =
@@ -149,7 +149,7 @@ void initState() {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Estás a un combat en curs',
+                    'Estàs a un combat en curs',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 22,
