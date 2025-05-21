@@ -111,6 +111,7 @@ flutter:
     - assets/special_attack/yamamoto/yamamoto_aud.mp3
     - assets/special_attack/yamamoto/marco_yamamoto.png
     - assets/special_attack/yamamoto/yamamoto_vid.mp4
+    - assets/special_attack/yamamoto/yamamoto_gacha.mp4
     - assets/special_attack/ulquiorra/ulquiorra_aud.mp3
     - assets/special_attack/ulquiorra/marco_ulquiorra.png
     - assets/special_attack/ulquiorra/ulquiorra_vid.mp4
