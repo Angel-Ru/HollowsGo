@@ -36,6 +36,8 @@ router.get('/usuari/:id/nom/:nom', verificacioUsuari.verifyToken,skinsController
 // Ruta per a la tirada de gacha
 router.post('/gacha',verificacioUsuari.verifyToken, skinsController.gachaTirada);  // Eliminat el :userId i ara rebem l'email en el cos de la petició
 
+router.post('/gacha/simulacio', verificacioUsuari.verifyToken, skinsController.gachaSimulacio)
+
 // Ruta per a la tirada de gacha dels quincys
 router.post('/gacha/quincys', verificacioUsuari.verifyToken, skinsController.gachaTiradaQuincy);
 
