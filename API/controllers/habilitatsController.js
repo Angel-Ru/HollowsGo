@@ -240,32 +240,42 @@ exports.borrarHabilitatId = async (req, res) => {
 // Cercar una habilitat pel personatge
 exports.getHabilitatPersonatge = async (req, res) => {
     try {
-        const { characterId } = req.params;
+        const { id } = req.params;
         const connection = await connectDB();
 
         const [rows] = await connection.execute(
-            `SELECT 
-                h.nom, 
-                h.descripcio, 
-                h.efecte 
+            `SELECT
+                 h.id,
+                 h.nom,
+                 h.descripcio,
+                 h.skin_personatge,
+                 h.efecte
              FROM HABILITAT_LLEGENDARIA h
-             JOIN SKINS s ON s.id = h.skin_personatge
-             JOIN PERSONATGES p ON p.id = s.personatge
-             WHERE p.id = ?`,
-            [characterId]
+                      JOIN SKINS s ON s.id = h.skin_personatge
+                      JOIN PERSONATGES p ON p.id = s.personatge
+             WHERE p.id = ?
+                 LIMIT 1`,
+            [id]
         );
 
         if (rows.length === 0) {
-            return res.status(404).send('No s\'han trobat habilitats llegendàries per aquest personatge');
+            return res.status(404).send('Cap habilitat llegendària trobada per aquest personatge');
         }
 
-        res.send({
-            characterId,
-            habilitats: rows
+        const habilitat = rows[0];
+
+        res.json({
+            id: habilitat.id,
+            nom: habilitat.nom,
+            descripcio: habilitat.descripcio,
+            skin_personatge: habilitat.skin_personatge,
+            efecte: habilitat.efecte
         });
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Error en la consulta');
     }
 };
+
 
