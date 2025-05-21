@@ -159,41 +159,9 @@ class _DetailScreenState extends State<DetailScreen> {
               _buildStatItem(
                   'Aniversari', _formatAniversari(_personatge!.aniversari)),
               if (_habilitat != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  'Habilitat Llegendària',
-                  style: TextStyle(
-                    color: Colors.amberAccent,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _habilitat!.nom,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _habilitat!.descripcio,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 13,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Efecte: ${_habilitat!.efecte}',
-                  style: TextStyle(
-                    color: Colors.lightBlueAccent,
-                    fontSize: 13,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+                _buildStatItem('Habilitat', _habilitat!.nom),
+                _buildStatItem('Descripció habilitat', _habilitat!.descripcio),
+                _buildStatItem('Efecte habilitat', _habilitat!.efecte),
               ],
             ],
           ),
