@@ -2,13 +2,18 @@ import 'package:http/http.dart' as http;
 import '../imports.dart';
 
 class CombatProvider with ChangeNotifier {
-  double? _aliatHealth; // Nullable hasta que se carga
+  double? _aliatHealth; // Vida del aliado
   double _enemicHealth = 1000.0;
+
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
+
+  // Nuevo: ataque base y buffo de ataque
+  int _basePlayerAttack = 100;
+  int _bonusPlayerAttack = 0;
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -19,6 +24,10 @@ class CombatProvider with ChangeNotifier {
   bool get isAttackInProgress => _isAttackInProgress;
   bool get ultiUsed => _ultiUsed;
   bool get isHealthLoaded => _aliatHealth != null;
+
+  // Nuevos getters para ataque
+  int get playerAttack => _basePlayerAttack + _bonusPlayerAttack;
+  int get bonusPlayerAttack => _bonusPlayerAttack;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -41,6 +50,12 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // NUEVO: aplicar buffo de ataque
+  void buffPlayerAttack(int amount) {
+    _bonusPlayerAttack += amount;
+    notifyListeners();
+  }
+
   void resetCombat({
     double maxAllyHealth = 1000.0,
     double maxEnemyHealth = 1000.0,
@@ -55,6 +70,10 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = false;
     _isAttackInProgress = false;
     _ultiUsed = false;
+
+    // Reiniciar ataque extra
+    _bonusPlayerAttack = 0;
+
     notifyListeners();
   }
 
@@ -153,7 +172,8 @@ class CombatProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         print("Vida actualitzada correctament.");
       } else {
-        print("Error al actualitzar vida: ${response.statusCode}, ${response.body}");
+        print(
+            "Error al actualitzar vida: ${response.statusCode}, ${response.body}");
       }
     } catch (e) {
       print("Error en updateSkinVidaActual: $e");
@@ -172,7 +192,8 @@ class CombatProvider with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('https://${Config.ip}/combats/vida/$skinId?usuari_id=$usuariId'),
+        Uri.parse(
+            'https://${Config.ip}/combats/vida/$skinId?usuari_id=$usuariId'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -186,7 +207,8 @@ class CombatProvider with ChangeNotifier {
         print("Vida actual obtinguda: $vida");
         return vida;
       } else {
-        print("Error al obtenir vida: ${response.statusCode}, ${response.body}");
+        print(
+            "Error al obtenir vida: ${response.statusCode}, ${response.body}");
         return null;
       }
     } catch (e) {

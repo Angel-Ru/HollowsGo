@@ -124,6 +124,9 @@ flutter:
     - assets/special_attack/kenpachi_tybw/kenpachi_tybw_aud.mp3
     - assets/special_attack/kenpachi_tybw/marco_kenpachi_tybw.png
     - assets/special_attack/kenpachi_tybw/kenpachi_tybw_vid.mp4
+    - assets/special_attack/kenpachi_ull/marco_kenpachi_ull.png
+    - assets/special_attack/kenpachi_ull/kenpachi_ull_aud.mp3
+    - assets/special_attack/kenpachi_ull/kenpachi_ull_vid.mp4
 
     
     
