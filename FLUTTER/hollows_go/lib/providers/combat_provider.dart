@@ -11,9 +11,12 @@ class CombatProvider with ChangeNotifier {
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
 
-  // Nuevo: ataque base y buffo de ataque
-  int _basePlayerAttack = 100;
+  // Daño base y bonus
+  int _basePlayerAttack = 0;
   int _bonusPlayerAttack = 0;
+
+  // NUEVO: Buff de ulti activo
+  bool _hasAttackBuff = false;
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -25,9 +28,11 @@ class CombatProvider with ChangeNotifier {
   bool get ultiUsed => _ultiUsed;
   bool get isHealthLoaded => _aliatHealth != null;
 
-  // Nuevos getters para ataque
   int get playerAttack => _basePlayerAttack + _bonusPlayerAttack;
   int get bonusPlayerAttack => _bonusPlayerAttack;
+
+  // NUEVO: getter para saber si el buff está activo (opcional)
+  bool get hasAttackBuff => _hasAttackBuff;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -50,9 +55,19 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // NUEVO: aplicar buffo de ataque
+  void setBasePlayerAttack(int value) {
+    _basePlayerAttack = value;
+    notifyListeners();
+  }
+
   void buffPlayerAttack(int amount) {
     _bonusPlayerAttack += amount;
+    notifyListeners();
+  }
+
+  // NUEVO: método para activar el buff de +300 al daño aliado
+  void applyAttackBuff() {
+    _hasAttackBuff = true;
     notifyListeners();
   }
 
@@ -71,8 +86,11 @@ class CombatProvider with ChangeNotifier {
     _isAttackInProgress = false;
     _ultiUsed = false;
 
-    // Reiniciar ataque extra
     _bonusPlayerAttack = 0;
+    // _basePlayerAttack = 0; // si quieres reiniciar base
+
+    // NUEVO: resetear buff
+    _hasAttackBuff = false;
 
     notifyListeners();
   }
@@ -91,7 +109,10 @@ class CombatProvider with ChangeNotifier {
 
       await Future.delayed(const Duration(milliseconds: 300));
 
-      _enemicHealth -= allyDamage;
+      // NUEVO: si el buff está activo, sumamos +300 al daño aliado
+      final int damageToApply = _hasAttackBuff ? allyDamage + 300 : allyDamage;
+
+      _enemicHealth -= damageToApply;
       if (_enemicHealth < 0) _enemicHealth = 0;
 
       _isEnemyHit = false;

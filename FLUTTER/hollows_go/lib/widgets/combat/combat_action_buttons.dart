@@ -126,7 +126,7 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
               height: 60,
               decoration: BoxDecoration(
                 color: !hasUltimate
-                    ? Colors.brown
+                    ? Colors.blueGrey
                     : ultiUsed
                         ? Colors.grey
                         : Colors.yellow,
@@ -141,8 +141,11 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
               ),
               child: IconButton(
                 icon: Icon(
-                  Icons.auto_awesome,
-                  color: ultiUsed ? Colors.black54 : Colors.black,
+                  hasUltimate
+                      ? Icons.auto_awesome
+                      : Icons.lock, // Mostrar candado si no tiene ulti
+                  color:
+                      ultiUsed || !hasUltimate ? Colors.black54 : Colors.white,
                 ),
                 onPressed: (!canAct || ultiUsed || !hasUltimate)
                     ? null

@@ -71,18 +71,17 @@ class UltimateService {
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
 
-        // Ejecutar animación + video sin aplicar daño directo
         await _executeUlti(
           context,
           imageAsset:
               'assets/special_attack/kenpachi_ull/marco_kenpachi_ull.png',
           audioAsset: 'special_attack/kenpachi_ull/kenpachi_ull_aud.mp3',
           videoAsset: 'assets/special_attack/kenpachi_ull/kenpachi_ull_vid.mp4',
-          damage: 0, // No daño directo
+          damage: 0, // el ulti no hace daño directo
           rotateScreen: false,
           onDamageApplied: (_) {
-            combatProvider
-                .buffPlayerAttack(300); // Aplicar buff visual y lógico
+            // Buff de +300 daño para el próximo ataque aliado
+            combatProvider.buffPlayerAttack(300);
           },
           onEnemyDefeated: onEnemyDefeated,
         );
