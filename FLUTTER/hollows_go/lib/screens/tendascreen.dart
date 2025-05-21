@@ -60,12 +60,18 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   void _playBackgroundMusic() async {
+    final List<String> musicUrls = [
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dq2skhigp8ml5kjysdl8',
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/n47sbuwwhjntfd5tplpl',
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/wqjoawsw8v7igikmuym4',
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/nzvkinzhqcoor7hdb72n',
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dtofpubrwmruyye4kajd',
+    ];
+
+    final randomUrl = (musicUrls..shuffle()).first;
+
     await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    await _audioPlayer.play(
-      UrlSource(
-        'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dq2skhigp8ml5kjysdl8',
-      ),
-    );
+    await _audioPlayer.play(UrlSource(randomUrl));
   }
 
   void _startBackgroundRotation() {
@@ -206,7 +212,8 @@ class _TendaScreenState extends State<TendaScreen> {
       margin: EdgeInsets.only(bottom: 16),
       child: ListTile(
         title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        trailing: Text(price, style: TextStyle(color: Colors.green, fontSize: 16)),
+        trailing:
+            Text(price, style: TextStyle(color: Colors.green, fontSize: 16)),
         onTap: () {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Funció de compra encara no implementada')),
