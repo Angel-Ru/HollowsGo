@@ -235,3 +235,29 @@ exports.borrarHabilitatId = async (req, res) => {
         res.status(500).send("Error en eliminar l'habilitat");
     }
 };
+
+
+// Cercar una habilitat pel personatge
+exports.getHabilitatPersonatge = async (req, res) => {
+    const personatgeId = req.params.personatgeId;
+
+    try {
+        const [rows] = await db.execute(`
+      SELECT h.id, h.nom, h.descripcio, h.video, h.musica_combat
+      FROM HABILITAT_LLEGENDARIA h
+      INNER JOIN SKINS s ON h.skin_personatge = s.id
+      WHERE s.personatge = ?
+      LIMIT 1;
+    `, [personatgeId]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Aquest personatge no té habilitat llegendària.' });
+        }
+
+        res.json(rows[0]);
+
+    } catch (error) {
+        console.error('Error consultant habilitat:', error);
+        res.status(500).json({ message: 'Error del servidor' });
+    }
+};

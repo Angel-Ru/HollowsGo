@@ -1,4 +1,7 @@
 import 'dart:ui';
+import 'package:hollows_go/models/habilitat_llegendaria.dart';
+import 'package:hollows_go/providers/habilitat_provider.dart';
+
 import '../imports.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -13,6 +16,7 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   Personatge? _personatge;
   List<Skin> _skins = [];
+  HabilitatLlegendaria? _habilitat;
   bool _isLoading = true;
 
   @override
@@ -26,10 +30,17 @@ class _DetailScreenState extends State<DetailScreen> {
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     final personatge = await provider.fetchPersonatgeById(widget.personatgeId);
     final skins = await provider.fetchPersonatgeSkins(widget.personatgeId);
+    final habilitatProvider =
+        Provider.of<HabilitatProvider>(context, listen: false);
+
+    await habilitatProvider.loadHabilitatPerSkinId(widget.personatgeId);
+    final habilitat = habilitatProvider.habilitat;
+
     if (mounted) {
       setState(() {
         _skins = skins ?? [];
         _personatge = personatge;
+        _habilitat = habilitat;
         _isLoading = false;
       });
     }
@@ -121,7 +132,7 @@ class _DetailScreenState extends State<DetailScreen> {
     return Align(
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
-        widthFactor: 0.7, // Ocupa la mitad del ancho disponible
+        widthFactor: 0.7,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.5),
@@ -147,6 +158,43 @@ class _DetailScreenState extends State<DetailScreen> {
               _buildStatRowWithIcon('Gènere', _personatge!.genere),
               _buildStatItem(
                   'Aniversari', _formatAniversari(_personatge!.aniversari)),
+              if (_habilitat != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  'Habilitat Llegendària',
+                  style: TextStyle(
+                    color: Colors.amberAccent,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  _habilitat!.nom,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _habilitat!.descripcio,
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Efecte: ${_habilitat!.efecte}',
+                  style: TextStyle(
+                    color: Colors.lightBlueAccent,
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
