@@ -118,6 +118,10 @@ class _DetailScreenState extends State<DetailScreen> {
                               )),
                           const SizedBox(height: 8),
                           _buildStatsSection(),
+                          if (_habilitat != null) ...[
+                            const SizedBox(height: 4),
+                            _buildStatsSection1(),
+                          ],
                           const SizedBox(height: 24),
                           SkinsListWidget(skins: _skins),
                         ],
@@ -158,6 +162,28 @@ class _DetailScreenState extends State<DetailScreen> {
               _buildStatRowWithIcon('Gènere', _personatge!.genere),
               _buildStatItem(
                   'Aniversari', _formatAniversari(_personatge!.aniversari)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsSection1() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: FractionallySizedBox(
+        widthFactor: 0.8,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.yellow.withOpacity(0.5), width: 1),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               if (_habilitat != null) ...[
                 _buildStatItem('Habilitat', _habilitat!.nom),
                 _buildStatItem('Descripció habilitat', _habilitat!.descripcio),
