@@ -29,20 +29,8 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   @override
   void initState() {
     super.initState();
-
     _combatScreen = CombatScreen();
-
-    _iniciarMusica();
     _inicitalitzarVideo();
-  }
-
-  void _iniciarMusica() {
-    final hora = DateTime.now().hour;
-    final esDia = hora >= 7 && hora < 17;
-    final musica = esDia ? musiquesDies : musiquesNit;
-    final musicaAleatoria = musica[Random().nextInt(musica.length)];
-
-    AudioService.instance.play(musicaAleatoria);
   }
 
   void _inicitalitzarVideo() {
@@ -57,13 +45,23 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   }
 
   void _startListeners() {
-    _videoController.addListener(() {
+    _videoController.addListener(() async {
       if (_videoController.value.position >= _videoController.value.duration &&
           !_navigated) {
         _navigated = true;
+        await _iniciarMusica();
         _navigateToCombat();
       }
     });
+  }
+
+  Future<void> _iniciarMusica() async {
+    final hora = DateTime.now().hour;
+    final esDia = hora >= 7 && hora < 17;
+    final musica = esDia ? musiquesDies : musiquesNit;
+    final musicaAleatoria = musica[Random().nextInt(musica.length)];
+
+    await AudioService.instance.play(musicaAleatoria);
   }
 
   Future<void> _preloadCombatImages() async {
@@ -109,8 +107,6 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
       await provider.fetchSkinVidaActual(skinId);
     }
 
-    await AudioService.instance.stop(); // detener música al cambiar de pantalla
-
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => CombatScreen()),
     );
@@ -119,7 +115,7 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   @override
   void dispose() {
     _videoController.dispose();
-    AudioService.instance.stop(); // asegúrate de parar la música si se sale
+    AudioService.instance.stop(); // detener música si se abandona esta pantalla
     super.dispose();
   }
 
