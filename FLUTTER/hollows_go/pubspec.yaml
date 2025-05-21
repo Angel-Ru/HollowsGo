@@ -120,6 +120,9 @@ flutter:
     - assets/special_attack/grimmjow/grimmjow_aud.mp3
     - assets/special_attack/grimmjow/marco_grimmjow.png
     - assets/special_attack/grimmjow/grimmjow_vid.mp4
+    - assets/special_attack/kenpachi_tybw/kenpachi_tybw_aud.mp3
+    - assets/special_attack/kenpachi_tybw/marco_kenpachi_tybw.png
+    - assets/special_attack/kenpachi_tybw/kenpachi_tybw_vid.mp4
 
     
     

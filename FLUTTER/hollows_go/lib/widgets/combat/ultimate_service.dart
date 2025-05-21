@@ -52,6 +52,21 @@ class UltimateService {
         );
         break;
 
+      case 6:
+        await _executeUlti(
+          context,
+          imageAsset:
+              'assets/special_attack/kenpachi_tybw/marco_kenpachi_tybw.png',
+          audioAsset: 'special_attack/kenpachi_tybw/kenpachi_tybw_aud.mp3',
+          videoAsset:
+              'assets/special_attack/kenpachi_tybw/kenpachi_tybw_vid.mp4',
+          damage: 1000,
+          rotateScreen: false,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
       case 8:
         await _executeUlti(
           context,
