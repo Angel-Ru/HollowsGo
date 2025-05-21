@@ -238,7 +238,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -260,7 +260,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                     );
                   },
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 2),
                 _isGachaLoading
                     ? const SizedBox(
                         height: 20,
@@ -436,9 +436,9 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
             ],
           ),
         ),
-        const SizedBox(height: 50),
+        const SizedBox(height: 40),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             animatedButtonWithImage(
               label: 'x100',
