@@ -45,7 +45,7 @@ class PerfilAvatar extends StatelessWidget {
               value: progress,
               strokeWidth: 6,
               backgroundColor: Colors.transparent,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
             ),
           ),
 
