@@ -12,16 +12,16 @@ class GachaBannerWidget extends StatefulWidget {
 class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   final List<List<String>> _allBannerSets = [
     [
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/r1ak8j1is33rrshhvttw.png',
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/dc8kvqgcrlrc0pglxy5h.png',
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/dc8kvqgcrlrc0pglxy5h',
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/r1ak8j1is33rrshhvttw',
     ],
     [
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641904/TENDASCREEN/lllx814oz39coei2qjw2.png',
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/em78g2xplw170ms4opvj.png',
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/lllx814oz39coei2qjw2',
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/em78g2xplw170ms4opvj',
     ],
     [
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746641903/TENDASCREEN/esxiqu8zcrdka97pacvr.png',
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/v1746706732/TENDASCREEN/luibwaplkahoyqhqdeyp.png'
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/esxiqu8zcrdka97pacvr',
+      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/luibwaplkahoyqhqdeyp'
     ]
   ];
 
