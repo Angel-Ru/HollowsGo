@@ -132,7 +132,7 @@ class _DetailScreenState extends State<DetailScreen> {
     return Align(
       alignment: Alignment.centerLeft,
       child: FractionallySizedBox(
-        widthFactor: 0.7,
+        widthFactor: 0.8,
         child: Container(
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.5),
@@ -158,30 +158,11 @@ class _DetailScreenState extends State<DetailScreen> {
               _buildStatRowWithIcon('Gènere', _personatge!.genere),
               _buildStatItem(
                   'Aniversari', _formatAniversari(_personatge!.aniversari)),
-              const Divider(color: Colors.white54),
-              const SizedBox(height: 12),
-              Text(
-                'Habilitat Llegendària',
-                style: TextStyle(
-                  color: Colors.amberAccent,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
               if (_habilitat != null) ...[
-                _buildStatItem('Nom', _habilitat!.nom),
-                _buildStatItem('Descripció', _habilitat!.descripcio),
-                _buildStatItem('Efecte', _habilitat!.efecte),
-              ] else
-                Text(
-                  'Aquest personatge no té habilitat llegendària.',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontStyle: FontStyle.italic,
-                    fontSize: 14,
-                  ),
-                ),
+                _buildStatItem('Habilitat', _habilitat!.nom),
+                _buildStatItem('Descripció habilitat', _habilitat!.descripcio),
+                _buildStatItem('Efecte habilitat', _habilitat!.efecte),
+              ],
             ],
           ),
         ),
