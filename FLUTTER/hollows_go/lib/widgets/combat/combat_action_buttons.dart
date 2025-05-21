@@ -103,9 +103,9 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
                     ),
                   ),
                   Text(
-                    "(MAL: ${widget.combatProvider.playerAttack})" +
-                        (widget.combatProvider.bonusPlayerAttack > 0
-                            ? " +${widget.combatProvider.bonusPlayerAttack}"
+                    "(MAL: ${widget.aliatDamage})" +
+                        (widget.combatProvider.bonusAllyDamage > 0
+                            ? " +${widget.combatProvider.bonusAllyDamage}"
                             : ""),
                     style: const TextStyle(
                       fontSize: 12,

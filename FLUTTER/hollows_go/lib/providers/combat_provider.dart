@@ -1,22 +1,17 @@
 import 'package:http/http.dart' as http;
 import '../imports.dart';
 
-class CombatProvider with ChangeNotifier {
-  double? _aliatHealth; // Vida del aliado
-  double _enemicHealth = 1000.0;
+// combat_provider.dart
 
+class CombatProvider with ChangeNotifier {
+  double? _aliatHealth;
+  double _enemicHealth = 1000.0;
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
-
-  // Daño base y bonus
-  int _basePlayerAttack = 0;
-  int _bonusPlayerAttack = 0;
-
-  // NUEVO: Buff de ulti activo
-  bool _hasAttackBuff = false;
+  int _bonusAllyDamage = 0; // <-- NUEVO
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -26,13 +21,9 @@ class CombatProvider with ChangeNotifier {
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
   bool get ultiUsed => _ultiUsed;
-  bool get isHealthLoaded => _aliatHealth != null;
 
-  int get playerAttack => _basePlayerAttack + _bonusPlayerAttack;
-  int get bonusPlayerAttack => _bonusPlayerAttack;
-
-  // NUEVO: getter para saber si el buff está activo (opcional)
-  bool get hasAttackBuff => _hasAttackBuff;
+  // NUEVO GETTER (opcional)
+  int get bonusAllyDamage => _bonusAllyDamage;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -55,19 +46,9 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setBasePlayerAttack(int value) {
-    _basePlayerAttack = value;
-    notifyListeners();
-  }
-
+  // NUEVO MÉTODO
   void buffPlayerAttack(int amount) {
-    _bonusPlayerAttack += amount;
-    notifyListeners();
-  }
-
-  // NUEVO: método para activar el buff de +300 al daño aliado
-  void applyAttackBuff() {
-    _hasAttackBuff = true;
+    _bonusAllyDamage = amount;
     notifyListeners();
   }
 
@@ -85,13 +66,7 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = false;
     _isAttackInProgress = false;
     _ultiUsed = false;
-
-    _bonusPlayerAttack = 0;
-    // _basePlayerAttack = 0; // si quieres reiniciar base
-
-    // NUEVO: resetear buff
-    _hasAttackBuff = false;
-
+    _bonusAllyDamage = 0; // Reiniciamos el buff aquí
     notifyListeners();
   }
 
@@ -109,10 +84,11 @@ class CombatProvider with ChangeNotifier {
 
       await Future.delayed(const Duration(milliseconds: 300));
 
-      // NUEVO: si el buff está activo, sumamos +300 al daño aliado
-      final int damageToApply = _hasAttackBuff ? allyDamage + 300 : allyDamage;
+      // Aplicar bonus de daño si lo hay
+      final totalAllyDamage = allyDamage + _bonusAllyDamage;
+      _bonusAllyDamage = 0; // Se consume el buff
 
-      _enemicHealth -= damageToApply;
+      _enemicHealth -= totalAllyDamage;
       if (_enemicHealth < 0) _enemicHealth = 0;
 
       _isEnemyHit = false;
@@ -133,6 +109,8 @@ class CombatProvider with ChangeNotifier {
       }
     }
   }
+
+  // ... resto igual ...
 
   Future<void> _performEnemyAttack(
     int enemyDamage,

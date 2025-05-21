@@ -66,6 +66,8 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
+//Metodo que habia antes hay que hacer uno nuevo que funcione correctamente
+// ultimate_service.dart
 
       case 7:
         final combatProvider =
@@ -77,10 +79,10 @@ class UltimateService {
               'assets/special_attack/kenpachi_ull/marco_kenpachi_ull.png',
           audioAsset: 'special_attack/kenpachi_ull/kenpachi_ull_aud.mp3',
           videoAsset: 'assets/special_attack/kenpachi_ull/kenpachi_ull_vid.mp4',
-          damage: 0, // el ulti no hace daño directo
+          damage: 0, // no hace daño directo
           rotateScreen: false,
           onDamageApplied: (_) {
-            // Buff de +300 daño para el próximo ataque aliado
+            // Aplicar el buff de +300 al próximo ataque aliado
             combatProvider.buffPlayerAttack(300);
           },
           onEnemyDefeated: onEnemyDefeated,
