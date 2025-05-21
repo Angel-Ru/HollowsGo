@@ -52,7 +52,6 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
     final videoPath = widget.skin?['video_especial'];
 
     if (videoPath == null || videoPath.isEmpty) {
-      // Sense vídeo: mostrar directament el contingut
       setState(() {
         _showDialogContent = true;
       });
@@ -72,14 +71,12 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
         allowFullScreen: false,
       );
 
-      // Escoltem quan acaba el vídeo
       _videoController!.addListener(_videoListener);
 
       setState(() {
         _isVideoReady = true;
       });
     } catch (e) {
-      // Si falla la càrrega, mostrar el contingut
       setState(() {
         _showDialogContent = true;
       });
@@ -133,9 +130,22 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
                 ),
               )
             : _isVideoReady
-                ? AspectRatio(
-                    aspectRatio: _videoController!.value.aspectRatio,
-                    child: Chewie(controller: _chewieController!),
+                ? Container(
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.black12.withOpacity(0.7),
+                        width: 4,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: AspectRatio(
+                        aspectRatio: _videoController!.value.aspectRatio,
+                        child: Chewie(controller: _chewieController!),
+                      ),
+                    ),
                   )
                 : const Center(child: CircularProgressIndicator()),
       ),
@@ -144,7 +154,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
 
   Widget _buildDialogContent(Map<String, dynamic>? skin, bool isDuplicate) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         image: const DecorationImage(
           image: NetworkImage(
@@ -173,15 +183,18 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
           ),
           const SizedBox(height: 24),
           if (!isDuplicate)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                skin?['imatge'] ?? '',
-                width: 240,
-                height: 240,
-                fit: BoxFit.cover,
-              ),
-            ),
+  Center(
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: Image.network(
+        skin?['imatge'] ?? '',
+        width: 240,
+        height: 240,
+        fit: BoxFit.cover,
+      ),
+    ),
+  ),
+
           const SizedBox(height: 10),
           if (!isDuplicate) ...[
             const Text(
@@ -224,7 +237,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
             ),
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: 10),
           TextButton(
             style: TextButton.styleFrom(
               backgroundColor: Colors.orangeAccent.shade200,
