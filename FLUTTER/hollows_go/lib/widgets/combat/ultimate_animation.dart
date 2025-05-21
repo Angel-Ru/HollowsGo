@@ -36,21 +36,28 @@ class _UltimateAnimationState extends State<UltimateAnimation>
     _fadeAnimation = Tween<double>(begin: 0, end: 1)
         .animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
-    _playAudio();
-
     _controller.forward();
-
-    Future.delayed(const Duration(seconds: 5), () async {
-      await _controller.reverse();
-      widget.onCompleted();
-    });
+    _playAudioAndAnimate();
   }
 
-  Future<void> _playAudio() async {
+  Future<void> _playAudioAndAnimate() async {
     try {
-      await _audioPlayer.play(AssetSource(widget.audioAsset));
+      await _audioPlayer.setSource(AssetSource(widget.audioAsset));
+      Duration? duration = await _audioPlayer.getDuration();
+
+      if (duration == null) {
+        duration = const Duration(seconds: 5);
+      }
+
+      await _audioPlayer.resume();
+      await Future.delayed(duration);
+
+      await _controller.reverse();
+      widget.onCompleted();
     } catch (e) {
       print("Error reproduciendo audio: $e");
+      await _controller.reverse();
+      widget.onCompleted();
     }
   }
 
