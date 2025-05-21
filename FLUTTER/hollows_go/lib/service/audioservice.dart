@@ -27,7 +27,7 @@ class AudioService {
   Future<void> pause() async {
     if (_isPlaying) {
       _currentPosition = await _player.getCurrentPosition() ?? Duration.zero;
-      await _player.stop();  // Aquí parem del tot el player
+      await _player.stop();
       _isPlaying = false;
     }
   }
@@ -35,7 +35,6 @@ class AudioService {
   /// Reprèn la reproducció des de la darrera posició
   Future<void> resume() async {
     if (_currentUrl != null && !_isPlaying) {
-      // Primer carreguem l'URL de nou, començant des de _currentPosition
       await _player.play(UrlSource(_currentUrl!), position: _currentPosition);
       _isPlaying = true;
     }
@@ -51,5 +50,25 @@ class AudioService {
   /// Allibera els recursos de l'àudio
   Future<void> dispose() async {
     await _player.dispose();
+  }
+
+  /// Realitza un fade out de l'àudio abans d'aturar-lo
+  Future<void> fadeOut({Duration duration = const Duration(seconds: 1)}) async {
+    if (!_isPlaying) return;
+
+    const int steps = 10;
+    final double stepVolume = _player.volume / steps;
+    final int stepDuration = duration.inMilliseconds ~/ steps;
+
+    for (int i = 0; i < steps; i++) {
+      final newVolume = (_player.volume - stepVolume).clamp(0.0, 1.0);
+      await _player.setVolume(newVolume);
+      await Future.delayed(Duration(milliseconds: stepDuration));
+    }
+
+    await _player.stop();
+    _player.setVolume(1.0); // Reset al volum per futures cançons
+    _isPlaying = false;
+    _currentPosition = Duration.zero;
   }
 }
