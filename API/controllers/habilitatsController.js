@@ -246,7 +246,7 @@ exports.getHabilitatPersonatge = async (req, res) => {
       SELECT h.*
       FROM HABILITAT_LLEGENDARIA h
       JOIN SKINS s ON h.skin_personatge = s.id
-      WHERE s.personatge = ?
+      WHERE s.personatge = 9
       LIMIT 1
     `;
 
