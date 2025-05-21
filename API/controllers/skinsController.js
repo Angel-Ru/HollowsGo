@@ -526,6 +526,170 @@ if (habilitatResult.length > 0) {
     }
 };
 
+exports.gachaSimulacio = async (req, res) => {
+    try {
+        const email = req.body.email;
+
+        if (!email) {
+            return res.status(400).send('Email no proporcionat.');
+        }
+
+        const connection = await connectDB();
+
+        // Buscar l'usuari per email
+        const [userRecord] = await connection.execute(
+            'SELECT id, punts_emmagatzemats FROM USUARIS WHERE email = ?',
+            [email]
+        );
+
+        if (userRecord.length === 0) {
+            return res.status(400).send('No es troba cap usuari amb aquest correu electrònic.');
+        }
+
+        const userId = userRecord[0].id;
+        const currentBalance = userRecord[0].punts_emmagatzemats;
+
+        if (currentBalance < 100) {
+            return res.status(400).send('No tens prou monedes per fer la tirada.');
+        }
+
+        // Obtenir les skins disponibles segons la condició
+        const [availableSkins] = await connection.execute(`
+            SELECT *
+            FROM SKINS s
+            WHERE s.raça = 1
+              AND (
+                  NOT EXISTS (
+                      SELECT 1
+                      FROM ENEMICS e
+                      WHERE e.personatge_id = s.personatge
+                  )
+                  OR s.nom LIKE '%bo%'
+              )
+        `);
+
+        if (availableSkins.length === 0) {
+            return res.status(400).send('No hi ha skins disponibles.');
+        }
+
+        // Classificar les skins per categoria (estrelles)
+        const starGroups = { 1: [], 2: [], 3: [], 4: [] };
+        availableSkins.forEach(skin => {
+            if (starGroups[skin.categoria]) {
+                starGroups[skin.categoria].push(skin);
+            }
+        });
+
+        // Probabilitats acumulades
+        const probabilities = [
+            { stars: 1, threshold: 0.6 },
+            { stars: 2, threshold: 0.7 },
+            { stars: 3, threshold: 0.8 },
+            { stars: 4, threshold: 0.85 }
+        ];
+
+        const rand = Math.random();
+        let chosenStars = 1;
+        for (const prob of probabilities) {
+            if (rand <= prob.threshold) {
+                chosenStars = prob.stars;
+                break;
+            }
+        }
+
+        // Si no hi ha skins en aquesta categoria, buscar una inferior
+        while (starGroups[chosenStars].length === 0 && chosenStars > 1) {
+            chosenStars--;
+        }
+
+        const selectedGroup = starGroups[chosenStars];
+        const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
+
+        // 🔥 Comprovar si té habilitat llegendària
+const [habilitatResult] = await connection.execute(
+    'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
+    [randomSkin.id]
+);
+
+if (habilitatResult.length > 0) {
+    randomSkin.habilitat_llegendaria = habilitatResult[0];
+
+    // 🧠 Utilitzar el nom del personatge per generar el path del vídeo
+    const [personatgeResult] = await connection.execute(
+        'SELECT nom FROM PERSONATGES WHERE id = ?',
+        [randomSkin.personatge]
+    );
+
+    if (personatgeResult.length > 0) {
+        const personatgeNom = personatgeResult[0].nom;
+
+        const carpeta = personatgeNom
+            .toLowerCase()
+            .replace(/[^\w]/g, '_')   // substitueix espais i símbols
+            .replace(/_+/g, '_')       // agrupa múltiples guions baixos
+            .replace(/^_+|_+$/g, '');  // elimina guions al principi/final
+
+        randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
+    }
+}
+
+
+
+        // Comprovar si l'usuari ja té la skin
+        const [userSkins] = await connection.execute(
+            'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
+            [userId, randomSkin.personatge]
+        );
+
+        let userSkinIds = userSkins.length > 0 && userSkins[0].skin_ids
+            ? userSkins[0].skin_ids.split(',')
+            : [];
+
+        if (userSkinIds.includes(String(randomSkin.id))) {
+            // Ja té aquesta skin: NO restem monedes
+            return res.status(200).send({
+                message: "Ja tens aquesta skin.",
+                skin: randomSkin,
+                remainingCoins: currentBalance,
+            });
+        }
+
+        // Afegir la nova skin i restar les monedes
+        const newBalance = currentBalance - 100;
+        await connection.execute(
+            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+            [newBalance, userId]
+        );
+
+        userSkinIds.push(String(randomSkin.id));
+        const updatedSkinIds = userSkinIds.join(',');
+
+        if (userSkins.length === 0) {
+            await connection.execute(
+                `INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
+                 VALUES (?, ?, NOW(), ?)`,
+                [userId, randomSkin.personatge, updatedSkinIds]
+            );
+        } else {
+            await connection.execute(
+                `UPDATE BIBLIOTECA
+                 SET skin_ids = ?
+                 WHERE user_id = ? AND personatge_id = ?`,
+                [updatedSkinIds, userId, randomSkin.personatge]
+            );
+        }
+
+        res.status(200).send({
+            message: '¡Tirada gacha realitzada amb èxit!',
+            skin: randomSkin,
+            remainingCoins: newBalance,
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en la tirada de gacha');
+    }
+};
 
 
 
