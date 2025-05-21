@@ -553,87 +553,45 @@ exports.gachaSimulacio = async (req, res) => {
             return res.status(400).send('No tens prou monedes per fer la tirada.');
         }
 
-        // Obtenir les skins disponibles segons la condició
-        const [availableSkins] = await connection.execute(`
-            SELECT *
-            FROM SKINS s
-            WHERE s.raça = 1
-              AND (
-                  NOT EXISTS (
-                      SELECT 1
-                      FROM ENEMICS e
-                      WHERE e.personatge_id = s.personatge
-                  )
-                  OR s.nom LIKE '%bo%'
-              )
-        `);
+        // 🔄 Simular que sempre toca la skin amb ID 237
+        const [simulatedSkinResult] = await connection.execute(
+            'SELECT * FROM SKINS WHERE id = ?',
+            [237]
+        );
 
-        if (availableSkins.length === 0) {
-            return res.status(400).send('No hi ha skins disponibles.');
+        if (simulatedSkinResult.length === 0) {
+            return res.status(400).send('No s\'ha trobat la skin simulada.');
         }
 
-        // Classificar les skins per categoria (estrelles)
-        const starGroups = { 1: [], 2: [], 3: [], 4: [] };
-        availableSkins.forEach(skin => {
-            if (starGroups[skin.categoria]) {
-                starGroups[skin.categoria].push(skin);
-            }
-        });
-
-        // Probabilitats acumulades
-        const probabilities = [
-            { stars: 1, threshold: 0.6 },
-            { stars: 2, threshold: 0.7 },
-            { stars: 3, threshold: 0.8 },
-            { stars: 4, threshold: 0.85 }
-        ];
-
-        const rand = Math.random();
-        let chosenStars = 1;
-        for (const prob of probabilities) {
-            if (rand <= prob.threshold) {
-                chosenStars = prob.stars;
-                break;
-            }
-        }
-
-        // Si no hi ha skins en aquesta categoria, buscar una inferior
-        while (starGroups[chosenStars].length === 0 && chosenStars > 1) {
-            chosenStars--;
-        }
-
-        const selectedGroup = starGroups[chosenStars];
-        const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
+        const randomSkin = simulatedSkinResult[0];
 
         // 🔥 Comprovar si té habilitat llegendària
-const [habilitatResult] = await connection.execute(
-    'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
-    [randomSkin.id]
-);
+        const [habilitatResult] = await connection.execute(
+            'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
+            [randomSkin.id]
+        );
 
-if (habilitatResult.length > 0) {
-    randomSkin.habilitat_llegendaria = habilitatResult[0];
+        if (habilitatResult.length > 0) {
+            randomSkin.habilitat_llegendaria = habilitatResult[0];
 
-    // 🧠 Utilitzar el nom del personatge per generar el path del vídeo
-    const [personatgeResult] = await connection.execute(
-        'SELECT nom FROM PERSONATGES WHERE id = ?',
-        [randomSkin.personatge]
-    );
+            // 🧠 Agafar el nom del personatge per crear el path del vídeo
+            const [personatgeResult] = await connection.execute(
+                'SELECT nom FROM PERSONATGES WHERE id = ?',
+                [randomSkin.personatge]
+            );
 
-    if (personatgeResult.length > 0) {
-        const personatgeNom = personatgeResult[0].nom;
+            if (personatgeResult.length > 0) {
+                const personatgeNom = personatgeResult[0].nom;
 
-        const carpeta = personatgeNom
-            .toLowerCase()
-            .replace(/[^\w]/g, '_')   // substitueix espais i símbols
-            .replace(/_+/g, '_')       // agrupa múltiples guions baixos
-            .replace(/^_+|_+$/g, '');  // elimina guions al principi/final
+                const carpeta = personatgeNom
+                    .toLowerCase()
+                    .replace(/[^\w]/g, '_')   // substitueix espais i símbols
+                    .replace(/_+/g, '_')       // agrupa múltiples guions baixos
+                    .replace(/^_+|_+$/g, '');  // elimina guions al principi/final
 
-        randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
-    }
-}
-
-
+                randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
+            }
+        }
 
         // Comprovar si l'usuari ja té la skin
         const [userSkins] = await connection.execute(
@@ -690,6 +648,7 @@ if (habilitatResult.length > 0) {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 
