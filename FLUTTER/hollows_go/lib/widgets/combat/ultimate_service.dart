@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
 import 'package:hollows_go/providers/habilitat_provider.dart';
 import 'ultimate_animation.dart';
@@ -49,7 +50,9 @@ class UltimateService {
           onDamageApplied: onDamageApplied,
           onEnemyDefeated: onEnemyDefeated,
         );
-      case 8: // Ichigo
+        break;
+
+      case 8:
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/ichigo/marco_ichigo.png',
@@ -62,7 +65,7 @@ class UltimateService {
         );
         break;
 
-      case 11: // Grimmjow
+      case 11:
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/grimmjow/marco_grimmjow.png',
@@ -75,7 +78,7 @@ class UltimateService {
         );
         break;
 
-      case 12: // Ulquiorra
+      case 12:
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/ulquiorra/marco_ulquiorra.png',
@@ -86,7 +89,6 @@ class UltimateService {
           onDamageApplied: onDamageApplied,
           onEnemyDefeated: onEnemyDefeated,
         );
-        break;
         break;
 
       default:
@@ -106,6 +108,9 @@ class UltimateService {
     required Function(int) onDamageApplied,
     required VoidCallback onEnemyDefeated,
   }) async {
+    final videoController = VideoPlayerController.asset(videoAsset);
+    await videoController.initialize(); // ⏳ Precarga del video
+
     final completer = Completer();
 
     _overlayEntry = OverlayEntry(
@@ -128,6 +133,7 @@ class UltimateService {
       barrierDismissible: false,
       builder: (_) => UltimateVideo(
         videoAsset: videoAsset,
+        controller: videoController, // ✅ Reutiliza controlador precargado
         onVideoEnd: () {},
       ),
     );

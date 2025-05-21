@@ -3,11 +3,13 @@ import 'package:video_player/video_player.dart';
 
 class UltimateVideo extends StatefulWidget {
   final String videoAsset;
+  final VideoPlayerController? controller;
   final VoidCallback onVideoEnd;
 
   const UltimateVideo({
     required this.videoAsset,
     required this.onVideoEnd,
+    this.controller,
     Key? key,
   }) : super(key: key);
 
@@ -23,12 +25,19 @@ class _UltimateVideoState extends State<UltimateVideo> {
   void initState() {
     super.initState();
 
-    _videoController = VideoPlayerController.asset(widget.videoAsset)
-      ..initialize().then((_) {
+    _videoController =
+        widget.controller ?? VideoPlayerController.asset(widget.videoAsset);
+
+    if (widget.controller == null) {
+      _videoController.initialize().then((_) {
         setState(() {});
         _videoController.play();
         _startListeners();
       });
+    } else {
+      _videoController.play();
+      _startListeners();
+    }
   }
 
   void _startListeners() {
@@ -38,14 +47,16 @@ class _UltimateVideoState extends State<UltimateVideo> {
           !_videoController.value.isPlaying) {
         _videoEnded = true;
         widget.onVideoEnd();
-        Navigator.of(context).pop(); // Cierra la pantalla tras el video
+        Navigator.of(context).pop();
       }
     });
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
+    if (widget.controller == null) {
+      _videoController.dispose();
+    }
     super.dispose();
   }
 
