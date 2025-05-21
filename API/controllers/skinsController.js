@@ -440,6 +440,36 @@ exports.gachaTirada = async (req, res) => {
         const selectedGroup = starGroups[chosenStars];
         const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
 
+        // 🔥 Comprovar si té habilitat llegendària
+const [habilitatResult] = await connection.execute(
+    'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
+    [randomSkin.id]
+);
+
+if (habilitatResult.length > 0) {
+    randomSkin.habilitat_llegendaria = habilitatResult[0];
+
+    // 🧠 Utilitzar el nom del personatge per generar el path del vídeo
+    const [personatgeResult] = await connection.execute(
+        'SELECT nom FROM PERSONATGES WHERE id = ?',
+        [randomSkin.personatge]
+    );
+
+    if (personatgeResult.length > 0) {
+        const personatgeNom = personatgeResult[0].nom;
+
+        const carpeta = personatgeNom
+            .toLowerCase()
+            .replace(/[^\w]/g, '_')   // substitueix espais i símbols
+            .replace(/_+/g, '_')       // agrupa múltiples guions baixos
+            .replace(/^_+|_+$/g, '');  // elimina guions al principi/final
+
+        randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
+    }
+}
+
+
+
         // Comprovar si l'usuari ja té la skin
         const [userSkins] = await connection.execute(
             'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
@@ -495,6 +525,7 @@ exports.gachaTirada = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 

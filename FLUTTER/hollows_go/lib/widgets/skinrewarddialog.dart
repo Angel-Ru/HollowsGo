@@ -1,16 +1,46 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import '../imports.dart';
 
-class SkinRewardDialog extends StatelessWidget {
+class SkinRewardDialog extends StatefulWidget {
   final Map<String, dynamic>? skin;
   final bool isDuplicate;
 
-  const SkinRewardDialog(
-      {required this.skin, this.isDuplicate = false, Key? key})
-      : super(key: key);
+  const SkinRewardDialog({required this.skin, this.isDuplicate = false, Key? key}) : super(key: key);
+
+  @override
+  State<SkinRewardDialog> createState() => _SkinRewardDialogState();
+}
+
+class _SkinRewardDialogState extends State<SkinRewardDialog> {
+  late VideoPlayerController? _videoController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final videoUrl = widget.skin?['video_especial'];
+    if (videoUrl != null) {
+      _videoController = VideoPlayerController.asset(videoUrl)
+        ..initialize().then((_) {
+          setState(() {});
+          _videoController?.play();
+        });
+    } else {
+      _videoController = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final skin = widget.skin;
+    final isDuplicate = widget.isDuplicate;
+
     return Dialog(
       backgroundColor: Colors.black.withOpacity(0.5),
       child: Stack(
@@ -20,7 +50,7 @@ class SkinRewardDialog extends StatelessWidget {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: NetworkImage(
-                    'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'), // Mismo fondo de la estética previa
+                    'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                     Colors.black.withOpacity(0.2), BlendMode.darken),
@@ -35,7 +65,7 @@ class SkinRewardDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  isDuplicate ? '🔁 Skin Repetida! 🔁' : '🎉 Nova Skin Obtinguda! ',
+                  isDuplicate ? '🔁 Skin Repetida! 🔁' : '🎉 Nova Skin Obtinguda!',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -45,7 +75,14 @@ class SkinRewardDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                if (!isDuplicate) ...[
+
+                // 🎬 Mostrar vídeo si hi ha habilitat llegendària
+                if (!isDuplicate && _videoController != null && _videoController!.value.isInitialized)
+                  AspectRatio(
+                    aspectRatio: _videoController!.value.aspectRatio,
+                    child: VideoPlayer(_videoController!),
+                  )
+                else if (!isDuplicate)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: Image.network(
@@ -55,11 +92,15 @@ class SkinRewardDialog extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  const SizedBox(height: 10),
+
+                const SizedBox(height: 10),
+                if (!isDuplicate) ...[
                   Text(
                     'Has desbloquejat la skin:',
                     style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
                   ),
                   const SizedBox(height: 5),
                   Center(
@@ -97,7 +138,10 @@ class SkinRewardDialog extends StatelessWidget {
                   Text(
                     'Ja tens aquesta skin.\n Se ha retornat el cost del gacha',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
                   ),
                 ],
                 const SizedBox(height: 24),
