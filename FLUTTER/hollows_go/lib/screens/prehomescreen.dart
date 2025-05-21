@@ -60,8 +60,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
       'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
     );
     Provider.of<DialogueProvider>(context, listen: false)
-      .loadDialogueFromJson("ichigo");
-
+        .loadDialogueFromJson("ichigo");
   }
 
   @override
@@ -181,8 +180,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 200),
-                  Image.network(
-                    "https://res.cloudinary.com/dkcgsfcky/image/upload/v1744708246/PREHOMESCREEN/ee9hwiaahvn6mj2dcnov.png",
+                  Image.asset(
+                    'lib/images/prehomescreen_images/HollowsGo_Remastered_LOGO.png',
                     width: 300,
                   ),
                 ],

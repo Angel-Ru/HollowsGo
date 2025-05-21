@@ -1,5 +1,3 @@
-import 'package:hollows_go/models/avatar.dart';
-import 'package:hollows_go/providers/perfil_provider.dart';
 import '../imports.dart';
 
 class ImageSelectionPage extends StatefulWidget {
@@ -127,18 +125,21 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return const Center(child: Text('Error carregant els avatars'));
+                    return const Center(
+                        child: Text('Error carregant els avatars'));
                   }
 
                   if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('No hi ha avatars disponibles.'));
+                    return const Center(
+                        child: Text('No hi ha avatars disponibles.'));
                   }
 
                   final avatars = snapshot.data!;
 
                   return GridView.builder(
                     padding: const EdgeInsets.all(8.0),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 10.0,
                       mainAxisSpacing: 10.0,
@@ -188,7 +189,8 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: const BoxDecoration(
                               color: Color.fromARGB(243, 194, 194, 194),
                               borderRadius: BorderRadius.only(
