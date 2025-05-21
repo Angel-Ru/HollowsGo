@@ -15,4 +15,7 @@ router.post('/', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, 
 //Eliminar una habilitat per id
 router.delete('/:id', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, habilitatsController.borrarHabilitatId);
 
+// Obtenir l'habilitat llegendaria d'un personatge per id
+router.get('/personatge/:id', verificacioUsuari.verifyToken,habilitatsController.getHabilitatPersonatge);
+
 module.exports = router;
