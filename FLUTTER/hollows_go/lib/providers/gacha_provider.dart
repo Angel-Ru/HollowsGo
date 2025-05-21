@@ -333,6 +333,35 @@ Future<void> fetchSkinsCategoria4Shinigamis(BuildContext context) async {
   }
 }
 
+Future<void> fetchSkinsCategoria4Quincy(BuildContext context) async {
+  _setLoading(true);
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final response = await http.get(
+      Uri.parse('https://${Config.ip}/destacats/shinigamis'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      _publicSkins = data.cast<Map<String, dynamic>>();
+      notifyListeners();
+    } else {
+      _showError(context, 'Error al obtenir les skins públiques');
+    }
+  } catch (e) {
+    _showError(context, 'Error en carregar les skins: $e');
+  } finally {
+    _setLoading(false);
+  }
+}
+
 
 
 

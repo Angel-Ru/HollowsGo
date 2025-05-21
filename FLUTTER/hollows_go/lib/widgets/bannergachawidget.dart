@@ -187,17 +187,23 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
 
   Color getButtonColor(int index) {
     switch (index) {
-      case 0: return const Color(0xFFFF9800);
-      case 1: return const Color(0xFF2196F3);
-      case 2: return const Color(0xFF212121);
-      default: return Colors.grey;
+      case 0:
+        return const Color(0xFFFF9800);
+      case 1:
+        return const Color(0xFF2196F3);
+      case 2:
+        return const Color(0xFF212121);
+      default:
+        return Colors.grey;
     }
   }
 
   BorderSide getButtonBorder(int index) {
     switch (index) {
-      case 2: return const BorderSide(color: Colors.greenAccent, width: 2);
-      default: return const BorderSide(color: Colors.black, width: 2);
+      case 2:
+        return const BorderSide(color: Colors.greenAccent, width: 2);
+      default:
+        return const BorderSide(color: Colors.black, width: 2);
     }
   }
 
@@ -209,10 +215,8 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
     );
   }
 
-  Widget animatedButton(String text, VoidCallback onPressed, {
-    required double scale,
-    required void Function(double) setScale,
-  }) {
+  Widget animatedButton(String text, VoidCallback onPressed,
+      {required double scale, required void Function(double) setScale}) {
     return GestureDetector(
       onTapDown: (_) => setState(() => setScale(0.9)),
       onTapUp: (_) => setState(() => setScale(1.0)),
@@ -234,7 +238,8 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -262,6 +267,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
         GestureDetector(
           onHorizontalDragEnd: _handleSwipe,
           child: Stack(
+            clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
             children: [
               Transform.scale(
@@ -294,7 +300,8 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                         child: child,
                       ),
                       child: Image.network(
-                        key: ValueKey(_allBannerSets[_currentSetIndex][_currentBannerIndex]),
+                        key: ValueKey(
+                            _allBannerSets[_currentSetIndex][_currentBannerIndex]),
                         _allBannerSets[_currentSetIndex][_currentBannerIndex],
                         width: MediaQuery.of(context).size.width * 0.8,
                         fit: BoxFit.cover,
@@ -326,6 +333,53 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                   }),
                 ),
               ),
+              Positioned(
+                bottom: -12,
+                right: -12,
+                child: GestureDetector(
+                  onTap: () async {
+                    final gachaProvider =
+                        Provider.of<GachaProvider>(context, listen: false);
+                    if (_currentSetIndex == 1) {
+                      await gachaProvider.fetchSkinsCategoria4Quincy(context);
+                    } else {
+                      await gachaProvider.fetchSkinsCategoria4Shinigamis(context);
+                    }
+                    if (!mounted) return;
+                    showDialog(
+                      context: context,
+                      builder: (_) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: const EdgeInsets.all(20),
+                        child:
+                            SkinSwiperPopup(skins: gachaProvider.publicSkins),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.network(
+                        _currentSetIndex == 1
+                            ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
+                            : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -348,33 +402,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        TextButton(
-          onPressed: () async {
-            final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
-            await gachaProvider.fetchSkinsCategoria4Shinigamis(context);
-            if (!mounted) return;
-            showDialog(
-              context: context,
-              builder: (_) => Dialog(
-                backgroundColor: Colors.transparent,
-                insetPadding: const EdgeInsets.all(20),
-                child: SkinSwiperPopup(skins: gachaProvider.publicSkins),
-              ),
-            );
-          },
-          child: const Text(
-            '👁️ Veure Skins',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              decoration: TextDecoration.underline,
-            ),
-          ),
-        ),
       ],
     );
   }
 }
-
