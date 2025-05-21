@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:hollows_go/widgets/multiskinrewarddialog.dart';
-import 'dart:async';
-import 'package:provider/provider.dart';
 import '../imports.dart';
 import 'tenda/_skinsdestacats.dart';
 
@@ -192,7 +189,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
       case 1:
         return const Color(0xFF2196F3);
       case 2:
-        return const Color(0xFF212121);
+        return const Color(0xFF550055);
       default:
         return Colors.grey;
     }
@@ -200,8 +197,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
 
   BorderSide getButtonBorder(int index) {
     switch (index) {
-      case 2:
-        return const BorderSide(color: Colors.greenAccent, width: 2);
       default:
         return const BorderSide(color: Colors.black, width: 2);
     }
@@ -215,8 +210,13 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
     );
   }
 
-  Widget animatedButton(String text, VoidCallback onPressed,
-      {required double scale, required void Function(double) setScale}) {
+  Widget animatedButtonWithImage({
+    required String label,
+    required String imageUrl,
+    required VoidCallback onPressed,
+    required double scale,
+    required void Function(double) setScale,
+  }) {
     return GestureDetector(
       onTapDown: (_) => setState(() => setScale(0.9)),
       onTapUp: (_) => setState(() => setScale(1.0)),
@@ -238,21 +238,44 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
               backgroundColor: Colors.transparent,
               shadowColor: Colors.transparent,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: _isGachaLoading
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Text(text, style: getTextStyle(_currentSetIndex)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.network(
+                  imageUrl,
+                  height: 30,
+                  width: 30,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const SizedBox(
+                      height: 30,
+                      width: 30,
+                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    );
+                  },
+                ),
+                const SizedBox(width: 8),
+                _isGachaLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : Text(
+                        label,
+                        style: getTextStyle(_currentSetIndex),
+                      ),
+              ],
+            ),
           ),
         ),
       ),
@@ -261,6 +284,9 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    const buttonImageUrl =
+        'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/OTHERS/yslqndyf4eri3f7mpl6i';
+
     return Column(
       children: [
         GestureDetector(
@@ -334,78 +360,98 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                 ),
               ),
               Positioned(
-  bottom: -12,
-  right: -12,
-  child: GestureDetector(
-    onTap: () async {
-      final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+                bottom: -12,
+                right: -12,
+                child: GestureDetector(
+                  onTap: () async {
+                    final gachaProvider =
+                        Provider.of<GachaProvider>(context, listen: false);
 
-      if (_currentSetIndex == 1) {
-        await gachaProvider.fetchSkinsCategoria4Quincy(context);
-      } else if (_currentSetIndex == 2) {
-        await gachaProvider.fetchSkinsCategoria4Hollows(context);
-      } else {
-        await gachaProvider.fetchSkinsCategoria4Shinigamis(context);
-      }
+                    if (_currentSetIndex == 1) {
+                      await gachaProvider.fetchSkinsCategoria4Quincy(context);
+                    } else if (_currentSetIndex == 2) {
+                      await gachaProvider.fetchSkinsCategoria4Hollows(context);
+                    } else {
+                      await gachaProvider
+                          .fetchSkinsCategoria4Shinigamis(context);
+                    }
 
-      if (!mounted) return;
+                    if (!mounted) return;
 
-      showDialog(
-        context: context,
-        builder: (_) => Dialog(
-          backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.all(20),
-          child: SkinSwiperPopup(
-            skins: gachaProvider.publicSkins,
-            currentIndex: _currentSetIndex,
-          ),
-        ),
-      );
-    },
-    child: Container(
-      height: 50,
-      width: 50,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.4),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: ClipOval(
-        child: Image.network(
-          _currentSetIndex == 1
-              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
-              : _currentSetIndex == 2
-                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
-                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
-          fit: BoxFit.cover,
-        ),
-      ),
-    ),
-  ),
-),
-
+                    showDialog(
+                      context: context,
+                      builder: (_) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: const EdgeInsets.all(20),
+                        child: SkinSwiperPopup(
+                          skins: gachaProvider.publicSkins,
+                          currentIndex: _currentSetIndex,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(seconds: 2),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOut,
+                          ),
+                          child: child,
+                        ),
+                        child: Image.network(
+                          key: ValueKey(
+                              _currentSetIndex), // clave para que cambie la imagen al cambiar índice
+                          _currentSetIndex == 1
+                              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
+                              : _currentSetIndex == 2
+                                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
+                                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 50),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            animatedButton(
-              'Tirar Gacha',
-              () => _handleGachaPull(context),
+            animatedButtonWithImage(
+              label: 'x100',
+              imageUrl: buttonImageUrl,
+              onPressed: () => _handleGachaPull(context),
               scale: _scaleSingle,
               setScale: (val) => _scaleSingle = val,
             ),
-            const SizedBox(width: 16),
-            animatedButton(
-              'Tirada x5',
-              () => _handleGachaPullMultiple(context),
+            const SizedBox(width: 15),
+            animatedButtonWithImage(
+              label: 'x500',
+              imageUrl: buttonImageUrl,
+              onPressed: () => _handleGachaPullMultiple(context),
               scale: _scaleMulti,
               setScale: (val) => _scaleMulti = val,
             ),
