@@ -49,6 +49,44 @@ class UltimateService {
           onDamageApplied: onDamageApplied,
           onEnemyDefeated: onEnemyDefeated,
         );
+      case 8: // Ichigo
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ichigo/marco_ichigo.png',
+          audioAsset: 'special_attack/ichigo/ichigo_aud.mp3',
+          videoAsset: 'assets/special_attack/ichigo/ichigo_vid.mp4',
+          damage: 350,
+          rotateScreen: false,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
+      case 11: // Grimmjow
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/grimmjow/marco_grimmjow.png',
+          audioAsset: 'special_attack/grimmjow/grimmjow_aud.mp3',
+          videoAsset: 'assets/special_attack/grimmjow/grimmjow_vid.mp4',
+          damage: 350,
+          rotateScreen: false,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
+      case 12: // Ulquiorra
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ulquiorra/marco_ulquiorra.png',
+          audioAsset: 'special_attack/ulquiorra/ulquiorra_aud.mp3',
+          videoAsset: 'assets/special_attack/ulquiorra/ulquiorra_vid.mp4',
+          damage: 350,
+          rotateScreen: false,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
         break;
 
       default:

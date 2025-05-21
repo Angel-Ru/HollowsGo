@@ -110,9 +110,13 @@ flutter:
     - assets/special_attack/yamamoto/yamamoto_aud.mp3
     - assets/special_attack/yamamoto/marco_yamamoto.png
     - assets/special_attack/yamamoto/yamamoto_vid.mp4
-    #- assets/special_attack/yamamoto/ulquiorra_aud.mp4
-    #- assets/special_attack/yamamoto/marco_ulquiorra.png
-    #- assets/special_attack/yamamoto/ulquiorra_vid.mp4
+    - assets/special_attack/ulquiorra/ulquiorra_aud.mp3
+    - assets/special_attack/ulquiorra/marco_ulquiorra.png
+    - assets/special_attack/ulquiorra/ulquiorra_vid.mp4
+    - assets/special_attack/ichigo/ichigo_aud.mp3
+    
+    
+    
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see
