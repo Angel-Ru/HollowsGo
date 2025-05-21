@@ -67,6 +67,31 @@ class UltimateService {
         );
         break;
 
+      case 7:
+        await _executeUlti(
+          context,
+          imageAsset:
+              'assets/special_attack/kenpachi_ull/marco_kenpachi_ull.png',
+          audioAsset: 'special_attack/kenpachi_ull/kenpachi_ull_aud.mp3',
+          videoAsset: 'assets/special_attack/kenpachi_ull/kenpachi_ull_vid.mp4',
+          damage: 0, // No aplica daño directo
+          rotateScreen: false,
+          onDamageApplied: (int _) {
+            final combatProvider =
+                Provider.of<CombatProvider>(context, listen: false);
+            combatProvider
+                .buffPlayerAttack(300); // 💥 Aplica buffo de ataque +300
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('+300 d\'atac aplicat!'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+
+        break;
       case 8:
         await _executeUlti(
           context,
