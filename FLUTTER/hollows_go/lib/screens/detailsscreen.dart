@@ -33,7 +33,7 @@ class _DetailScreenState extends State<DetailScreen> {
     final habilitatProvider =
         Provider.of<HabilitatProvider>(context, listen: false);
 
-    await habilitatProvider.loadHabilitatPerSkinId(widget.personatgeId);
+    await habilitatProvider.loadHabilitatPerPersonatgeId(widget.personatgeId);
     final habilitat = habilitatProvider.habilitat;
 
     if (mounted) {
