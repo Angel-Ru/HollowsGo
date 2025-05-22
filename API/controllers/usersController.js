@@ -838,7 +838,7 @@ exports.obtenirSolicitudsAmistatAcceptarRebutjar = async (req, res) => {
 
         // Obtenir les sol·licituds pendents rebudes per l'usuari
         const [solicituts] = await connection.execute(`
-            SELECT id_usuari AS sol·licitant, estat
+            SELECT id_usuari AS sollicitant, estat
             FROM AMISTATS
             WHERE id_usuari_amic = ? AND estat = 'pendent'
         `, [userId]);
