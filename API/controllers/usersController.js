@@ -829,3 +829,43 @@ exports.obtenirAmistats = async (req, res) => {
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
+
+// Acceptar una sol·licitud d'amistat
+exports.acceptarAmistat = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const friendId = parseInt(req.body.friendId);
+
+        if (userId === friendId) {
+            return res.status(400).json({ missatge: 'No pots enviar una sol·licitud a tu mateix' });
+        }
+
+        const connection = await connectDB();
+
+        // Verifiquem que la sol·licitud existeixi i estigui en estat 'pendent'
+        const [existingRequest] = await connection.execute(`
+            SELECT * FROM AMISTATS 
+            WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
+            AND estat = 'pendent'
+        `, [userId, friendId, friendId, userId]);
+
+        if (existingRequest.length === 0) {
+            return res.status(404).json({ missatge: 'No s\'ha trobat cap sol·licitud d\'amistat pendent entre aquests usuaris' });
+        }
+
+        const request = existingRequest[0];
+        const storedUserId = request.id_usuari;
+        const storedFriendId = request.id_usuari_amic;
+
+        await connection.execute(`
+            UPDATE AMISTATS 
+            SET estat = 'acceptat'
+            WHERE id_usuari = ? AND id_usuari_amic = ?
+        `, [storedUserId, storedFriendId]);
+
+        res.status(200).json({ missatge: 'Sol·licitud d\'amistat acceptada correctament' });
+    } catch (error) {
+        console.error('Error acceptant amistat:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
