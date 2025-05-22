@@ -1,6 +1,6 @@
 import 'package:hollows_go/widgets/multiskinrewarddialog.dart';
 import '../imports.dart';
-import 'tenda/_skinsdestacats.dart';
+import 'tenda/skinsdestacats.dart';
 
 class GachaBannerWidget extends StatefulWidget {
   const GachaBannerWidget({super.key});

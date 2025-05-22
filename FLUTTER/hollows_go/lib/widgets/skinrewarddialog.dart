@@ -28,6 +28,15 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
 
+  late AnimationController _fadeOutStarsController;
+  late Animation<double> _fadeOutStarsAnimation;
+
+  late AnimationController _fadeInImageController;
+  late Animation<double> _fadeInImageAnimation;
+
+  bool _showStars = true;
+  bool _showImage = false;
+
   @override
   void initState() {
     super.initState();
@@ -38,13 +47,29 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
   void _setupAnimations() {
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 800),
     );
     _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
     );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+
+    _fadeOutStarsController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _fadeOutStarsAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _fadeOutStarsController, curve: Curves.easeOut),
+    );
+
+    _fadeInImageController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _fadeInImageAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _fadeInImageController, curve: Curves.easeIn),
     );
   }
 
@@ -104,6 +129,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
     _videoController?.dispose();
     _chewieController?.dispose();
     _animationController.dispose();
+    _fadeOutStarsController.dispose();
+    _fadeInImageController.dispose();
     super.dispose();
   }
 
@@ -112,7 +139,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
     final skin = widget.skin;
     final isDuplicate = widget.isDuplicate;
 
-    final double dialogWidth = 400;
+    final double dialogWidth = 440;
     final double dialogHeight = dialogWidth * 9 / 16;
 
     return Dialog(
@@ -157,16 +184,12 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         image: const DecorationImage(
-          image: NetworkImage(
-              'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
+          image: NetworkImage('https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken),
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.8),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.withOpacity(0.8), width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -182,46 +205,78 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          if (!isDuplicate)
-  Center(
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(15),
-      child: Image.network(
-        skin?['imatge'] ?? '',
-        width: 240,
-        height: 240,
-        fit: BoxFit.cover,
-      ),
-    ),
-  ),
-
-          const SizedBox(height: 10),
           if (!isDuplicate) ...[
-            const Text(
-              'Has desbloquejat la skin:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
-            ),
-            const SizedBox(height: 5),
-            Center(
-              child: SizedBox(
-                height: 40,
-                child: AnimatedTextKit(
-                  animatedTexts: [
-                    ScaleAnimatedText(
-                      skin?['nom'] ?? '',
-                      textStyle: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                  repeatForever: true,
-                  pause: const Duration(milliseconds: 100),
+            if (_showStars)
+              FadeTransition(
+                opacity: _fadeOutStarsAnimation,
+                child: AnimatedStarRow(
+                  count: _getStarCount(skin),
+                  onCompleted: () async {
+                    await _fadeOutStarsController.forward();
+                    if (!mounted) return;
+                    setState(() {
+                      _showStars = false;
+                      _showImage = true;
+                    });
+                    await _fadeInImageController.forward();
+                  },
                 ),
               ),
-            ),
+            if (_showImage)
+              FadeTransition(
+                opacity: _fadeInImageAnimation,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    Center(
+                      child: Container(
+                        width: 240,
+                        height: 240,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: _getBorderColor(skin),
+                            width: 5,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            skin?['imatge'] ?? '',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Has desbloquejat la skin:',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+                    ),
+                    const SizedBox(height: 5),
+                    Center(
+                      child: SizedBox(
+                        height: 40,
+                        child: AnimatedTextKit(
+                          animatedTexts: [
+                            ScaleAnimatedText(
+                              skin?['nom'] ?? '',
+                              textStyle: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                          repeatForever: true,
+                          pause: const Duration(milliseconds: 100),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
           if (isDuplicate) ...[
             Image.asset(
@@ -232,7 +287,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
             ),
             const SizedBox(height: 10),
             const Text(
-              'Ja tens aquesta skin.\n Se ha retornat el cost del gacha',
+              'Ja tens aquesta skin.\nSe ha retornat el cost del gacha',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
             ),
@@ -242,9 +297,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
             style: TextButton.styleFrom(
               backgroundColor: Colors.orangeAccent.shade200,
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.of(context).pop(),
             child: const Text(
@@ -254,6 +307,129 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
           ),
         ],
       ),
+    );
+  }
+
+  Color _getBorderColor(Map<String, dynamic>? skin) {
+    if (skin == null) return Colors.grey;
+
+    if (skin['habilitat_llegendaria'] == true) {
+      return Colors.amber.shade400;
+    }
+
+    switch (skin['categoria']) {
+      case 1:
+        return Colors.grey.shade400;
+      case 2:
+        return Colors.green;
+      case 3:
+        return Colors.blue;
+      case 4:
+        return Colors.purple;
+      default:
+        return Colors.white;
+    }
+  }
+
+  int _getStarCount(Map<String, dynamic>? skin) {
+    if (skin == null) return 0;
+    if (skin['habilitat_llegendaria'] == true) return 5;
+    return skin['categoria'] ?? 0;
+  }
+}
+
+class AnimatedStarRow extends StatefulWidget {
+  final int count;
+  final VoidCallback? onCompleted;
+
+  const AnimatedStarRow({required this.count, this.onCompleted, Key? key}) : super(key: key);
+
+  @override
+  State<AnimatedStarRow> createState() => _AnimatedStarRowState();
+}
+
+class _AnimatedStarRowState extends State<AnimatedStarRow> with TickerProviderStateMixin {
+  late List<bool> _starVisible;
+  late List<AnimationController> _controllers;
+  late List<Animation<double>> _scaleAnimations;
+
+  @override
+  void initState() {
+    super.initState();
+    _starVisible = List.generate(widget.count, (_) => false);
+
+    _controllers = List.generate(
+      widget.count,
+      (_) => AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 400),
+      ),
+    );
+
+    _scaleAnimations = _controllers.map((controller) {
+      return Tween<double>(begin: 0.5, end: 1.2)
+          .chain(CurveTween(curve: Curves.elasticOut))
+          .animate(controller);
+    }).toList();
+
+    _showStarsSequentially();
+  }
+
+  Future<void> _showStarsSequentially() async {
+    for (int i = 0; i < widget.count; i++) {
+      await Future.delayed(const Duration(milliseconds: 400));
+      if (!mounted) return;
+      setState(() {
+        _starVisible[i] = true;
+      });
+      _controllers[i].forward();
+    }
+
+    if (widget.onCompleted != null) {
+      widget.onCompleted!();
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(widget.count, (index) {
+        return AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: _starVisible[index] ? 1.0 : 0.0,
+          child: ScaleTransition(
+            scale: _scaleAnimations[index],
+            child: ShaderMask(
+              shaderCallback: (rect) {
+                return LinearGradient(
+                  colors: [
+                    Colors.amber.shade700,
+                    Colors.amber.shade300,
+                    Colors.yellow.shade300,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ).createShader(rect);
+              },
+              blendMode: BlendMode.srcATop,
+              child: const Icon(
+                Icons.star,
+                color: Colors.white,
+                size: 32,
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }
