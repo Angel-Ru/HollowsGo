@@ -232,4 +232,77 @@ class UserProvider with ChangeNotifier {
       print('Error a sumarExperiencia: $error');
     }
   }
+
+  Future<List<Map<String, dynamic>>> fetchAmistatsUsuari() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      String? token = prefs.getString('token');
+
+      if (userId == null || token == null) return [];
+
+      final url = Uri.parse('https://${Config.ip}/usuaris/amics/$userId');
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        // Conversió segura a llista de mapes
+        final List<Map<String, dynamic>> amistats = data.map((amic) {
+          return {
+            'nom_amic': amic['nom_amic'],
+            'estat': amic['estat'],
+          };
+        }).toList();
+
+        return amistats;
+      } else {
+        print('Error en fetchAmistatsUsuari: ${response.statusCode}');
+        return [];
+      }
+    } catch (error) {
+      print('Error a fetchAmistatsUsuari: $error');
+      return [];
+    }
+  }
+
+  Future<bool> acceptarAmistat(int friendId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      String? token = prefs.getString('token');
+
+      if (userId == null || token == null) return false;
+
+      final url =
+          Uri.parse('https://${Config.ip}/usuaris/amics/$userId/acceptar');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final body = json.encode({
+        'friendId': friendId,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        // Actualitzar la llista d'amistats després d'acceptar
+        notifyListeners();
+        return true;
+      } else {
+        print(
+            'Error en acceptarAmistat: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (error) {
+      print('Error en acceptarAmistat: $error');
+      return false;
+    }
+  }
 }

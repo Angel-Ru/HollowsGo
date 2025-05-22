@@ -102,15 +102,48 @@ class UltimateService {
         );
         break;
 
+      //ULTI ICHIBE HYOSUBE
+      // ULTIMATE ICHIBE HYOSUBE - aplica debuff
+      case 10:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ichibe/marco_ichibe.png',
+          audioAsset: 'special_attack/ichibe/ichibe_aud.mp3',
+          videoAsset: 'assets/special_attack/ichibe/ichibe_vid.mp4',
+          damage: 0,
+          rotateScreen: false,
+          onDamageApplied: (_) {},
+          onEnemyDefeated: onEnemyDefeated,
+        );
+
+        // Cortar nombre (sin parámetro porque no cambia)
+        combatProvider.cutEnemyNameInHalf();
+
+        // Reducir ataque enemigo a la mitad (calculamos aquí)
+        int currentAttack = combatProvider.enemyAttack;
+        int reducedAttack = (currentAttack / 2).round();
+        combatProvider.applyEnemyDebuffAttack(reducedAttack);
+
+        // Reducir vida máxima a la mitad
+        combatProvider.reduceEnemyMaxHealthByHalf();
+        break;
+
       case 11:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/grimmjow/marco_grimmjow.png',
           audioAsset: 'special_attack/grimmjow/grimmjow_aud.mp3',
           videoAsset: 'assets/special_attack/grimmjow/grimmjow_vid.mp4',
-          damage: 350,
+          damage: 100,
           rotateScreen: false,
-          onDamageApplied: onDamageApplied,
+          onDamageApplied: (_) {
+            combatProvider.buffPlayerAttack(200);
+          },
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
@@ -133,6 +166,28 @@ class UltimateService {
             "No hay implementación para la habilitat ID: ${habilitat.id}");
         break;
     }
+    /*case ASNODT:
+  final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+
+  await _executeUlti(
+    context,
+    imageAsset: 'assets/special_attack/otro_personaje/ulti.png',
+    audioAsset: 'special_attack/otro_personaje/audio.mp3',
+    videoAsset: 'assets/special_attack/otro_personaje/video.mp4',
+    damage: 0,
+    rotateScreen: false,
+    onDamageApplied: (_) {},
+    onEnemyDefeated: onEnemyDefeated,
+  );
+
+  // Aquí aplicamos un debuff de 100 (o la cantidad que quieras)
+  int currentAttack = combatProvider.enemyAttack;
+  int newAttack = currentAttack - 100;
+  if (newAttack < 0) newAttack = 0; // no puede ser negativo
+  combatProvider.applyEnemyDebuffAttack(newAttack);
+
+  break;*/
+
   }
 
   Future<void> _executeUlti(
@@ -146,7 +201,7 @@ class UltimateService {
     required VoidCallback onEnemyDefeated,
   }) async {
     final videoController = VideoPlayerController.asset(videoAsset);
-    await videoController.initialize(); // ⏳ Precarga del video
+    await videoController.initialize();
 
     final completer = Completer();
 
@@ -170,7 +225,7 @@ class UltimateService {
       barrierDismissible: false,
       builder: (_) => UltimateVideo(
         videoAsset: videoAsset,
-        controller: videoController, // ✅ Reutiliza controlador precargado
+        controller: videoController,
         onVideoEnd: () {},
       ),
     );

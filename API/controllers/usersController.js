@@ -802,3 +802,70 @@ exports.obtenirAvatar = async (req, res) => {
         res.status(500).json({ message: 'Error al carregar l\'avatar' });
     }
 };
+
+// Obtenir totes les amistats d'un usuari
+exports.obtenirAmistats = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const connection = await connectDB();
+
+        const [amistats] = await connection.execute(`
+            SELECT
+                CASE
+                    WHEN a.id_usuari = ? THEN u2.nom
+                    ELSE u1.nom
+                    END AS nom_amic,
+                a.estat
+            FROM AMISTATS a
+                     JOIN USUARIS u1 ON a.id_usuari = u1.id
+                     JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+            WHERE a.id_usuari = ? OR a.id_usuari_amic = ?
+        `, [userId, userId, userId]);
+
+
+        res.status(200).json(amistats);
+    } catch (error) {
+        console.error('Error obtenint amistats:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
+
+// Acceptar una sol·licitud d'amistat
+exports.acceptarAmistat = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const friendId = parseInt(req.body.friendId);
+
+        if (userId === friendId) {
+            return res.status(400).json({ missatge: 'No pots enviar una sol·licitud a tu mateix' });
+        }
+
+        const connection = await connectDB();
+
+        // Verifiquem que la sol·licitud existeixi i estigui en estat 'pendent'
+        const [existingRequest] = await connection.execute(`
+            SELECT * FROM AMISTATS 
+            WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
+            AND estat = 'pendent'
+        `, [userId, friendId, friendId, userId]);
+
+        if (existingRequest.length === 0) {
+            return res.status(404).json({ missatge: 'No s\'ha trobat cap sol·licitud d\'amistat pendent entre aquests usuaris' });
+        }
+
+        const request = existingRequest[0];
+        const storedUserId = request.id_usuari;
+        const storedFriendId = request.id_usuari_amic;
+
+        await connection.execute(`
+            UPDATE AMISTATS 
+            SET estat = 'acceptat'
+            WHERE id_usuari = ? AND id_usuari_amic = ?
+        `, [storedUserId, storedFriendId]);
+
+        res.status(200).json({ missatge: 'Sol·licitud d\'amistat acceptada correctament' });
+    } catch (error) {
+        console.error('Error acceptant amistat:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};

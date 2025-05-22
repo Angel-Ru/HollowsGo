@@ -127,6 +127,9 @@ flutter:
     - assets/special_attack/kenpachi_ull/marco_kenpachi_ull.png
     - assets/special_attack/kenpachi_ull/kenpachi_ull_aud.mp3
     - assets/special_attack/kenpachi_ull/kenpachi_ull_vid.mp4
+    - assets/special_attack/ichibe/ichibe_aud.mp3
+    - assets/special_attack/ichibe/marco_ichibe.png
+    - assets/special_attack/ichibe/ichibe_vid.mp4
 
     
     
