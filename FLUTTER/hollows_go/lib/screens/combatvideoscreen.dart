@@ -1,14 +1,19 @@
+import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 import '../imports.dart';
 import '../service/audioservice.dart';
 import 'dart:math';
+
+import '../widgets/tenda/dialog_animations.dart';
 
 class CombatIntroVideoScreen extends StatefulWidget {
   @override
   _CombatIntroVideoScreenState createState() => _CombatIntroVideoScreenState();
 }
 
-class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
+class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> with TickerProviderStateMixin {
   late VideoPlayerController _videoController;
+  late DialogAnimationManager _animationManager;
   bool _navigated = false;
   late Widget _combatScreen;
 
@@ -30,25 +35,26 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   void initState() {
     super.initState();
     _combatScreen = CombatScreen();
+    _animationManager = DialogAnimationManager(vsync: this);
     _inicitalitzarVideo();
   }
 
   void _inicitalitzarVideo() {
-    _videoController =
-        VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
-          ..initialize().then((_) {
-            setState(() {});
-            _videoController.play();
-            _startListeners();
-            _preloadCombatImages();
-          });
+    _videoController = VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
+      ..initialize().then((_) {
+        setState(() {});
+        _videoController.play();
+        _animationManager.playEntryAnimation(); // fade in
+        _startListeners();
+        _preloadCombatImages();
+      });
   }
 
   void _startListeners() {
     _videoController.addListener(() async {
-      if (_videoController.value.position >= _videoController.value.duration &&
-          !_navigated) {
+      if (_videoController.value.position >= _videoController.value.duration && !_navigated) {
         _navigated = true;
+        await _animationManager.fadeController.reverse(); // fade out
         await _iniciarMusica();
         _navigateToCombat();
       }
@@ -60,34 +66,23 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
     final esDia = hora >= 7 && hora < 17;
     final musica = esDia ? musiquesDies : musiquesNit;
     final musicaAleatoria = musica[Random().nextInt(musica.length)];
-
     await AudioService.instance.play(musicaAleatoria);
   }
 
   Future<void> _preloadCombatImages() async {
-    final provider =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-
+    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     try {
       await provider.selectRandomSkin();
-
-      final aliat = provider.selectedSkinAliat ??
-          provider.selectedSkinQuincy ??
-          provider.selectedSkinEnemic;
-
+      final aliat = provider.selectedSkinAliat ?? provider.selectedSkinQuincy ?? provider.selectedSkinEnemic;
       final enemic = provider.selectedSkin;
-
-      final aliatImageUrl =
-          aliat?.imatge ?? 'lib/images/combatscreen_images/bleach_combat.png';
-      final enemicImageUrl =
-          enemic?.imatge ?? 'lib/images/combatscreen_images/aizen_combat.png';
+      final aliatImageUrl = aliat?.imatge ?? 'lib/images/combatscreen_images/bleach_combat.png';
+      final enemicImageUrl = enemic?.imatge ?? 'lib/images/combatscreen_images/aizen_combat.png';
 
       await precacheImage(NetworkImage(aliatImageUrl), context);
       await precacheImage(NetworkImage(enemicImageUrl), context);
 
       for (int i = 1; i <= 5; i++) {
-        final backgroundPath =
-            'lib/images/combatscreen_images/fondo_combat_$i.png';
+        final backgroundPath = 'lib/images/combatscreen_images/fondo_combat_$i.png';
         await precacheImage(AssetImage(backgroundPath), context);
       }
     } catch (e) {
@@ -97,10 +92,7 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
 
   void _navigateToCombat() async {
     final provider = Provider.of<CombatProvider>(context, listen: false);
-    final skin =
-        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false)
-            .selectedSkin;
-
+    final skin = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false).selectedSkin;
     final skinId = skin?.id;
 
     if (skinId != null) {
@@ -115,7 +107,7 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
   @override
   void dispose() {
     _videoController.dispose();
-    
+    _animationManager.dispose();
     super.dispose();
   }
 
@@ -125,9 +117,12 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> {
       backgroundColor: Colors.black,
       body: Center(
         child: _videoController.value.isInitialized
-            ? AspectRatio(
-                aspectRatio: _videoController.value.aspectRatio,
-                child: VideoPlayer(_videoController),
+            ? FadeTransition(
+                opacity: _animationManager.fadeAnimation,
+                child: AspectRatio(
+                  aspectRatio: _videoController.value.aspectRatio,
+                  child: VideoPlayer(_videoController),
+                ),
               )
             : SizedBox.shrink(),
       ),
