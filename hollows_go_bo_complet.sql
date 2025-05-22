@@ -1,8 +1,8 @@
--- Crear la base de datos
+-- Crear la base de dades
 CREATE DATABASE hollowsgo;
 USE hollowsgo;
 
--- Tabla: ARMES
+-- Taula: ARMES
 CREATE TABLE ARMES (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
@@ -10,21 +10,21 @@ CREATE TABLE ARMES (
     buff_atac INT
 );
 
--- Tabla: ATACS
+-- Taula: ATACS
 CREATE TABLE ATACS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(255),
     mal INT
 );
 
--- Tabla: AVATARS
+-- Taula: AVATARS
 CREATE TABLE AVATARS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     url TEXT NOT NULL,
     nom TEXT
 );
 
--- Tabla: BIBLIOTECA
+-- Taula: BIBLIOTECA
 CREATE TABLE BIBLIOTECA (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE BIBLIOTECA (
     skin_ids TEXT
 );
 
--- Tabla: ENEMICS
+-- Taula: ENEMICS
 CREATE TABLE ENEMICS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     personatge_id INT NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE ENEMICS (
     musica_combat VARCHAR(255)
 );
 
--- Tabla: HABILITAT_LLEGENDARIA
+-- Taula: HABILITAT_LLEGENDARIA
 CREATE TABLE HABILITAT_LLEGENDARIA (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE HABILITAT_LLEGENDARIA (
     skin_personatge INT NOT NULL
 );
 
--- Tabla: MISSIONS
+-- Taula: MISSIONS
 CREATE TABLE MISSIONS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom_missio VARCHAR(100),
@@ -61,21 +61,21 @@ CREATE TABLE MISSIONS (
     fixa TINYINT
 );
 
--- Tabla: MISSIONS_ARMES
+-- Taula: MISSIONS_ARMES
 CREATE TABLE MISSIONS_ARMES (
     arma INT NOT NULL,
     missio INT NOT NULL,
     PRIMARY KEY (arma, missio)
 );
 
--- Tabla: MISSIONS_COMPLETADES
+-- Taula: MISSIONS_COMPLETADES
 CREATE TABLE MISSIONS_COMPLETADES (
     missio INT NOT NULL,
     usuari INT NOT NULL,
     PRIMARY KEY (missio, usuari)
 );
 
--- Tabla: MISSIONS_DIARIES
+-- Taula: MISSIONS_DIARIES
 CREATE TABLE MISSIONS_DIARIES (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuari INT,
@@ -84,14 +84,14 @@ CREATE TABLE MISSIONS_DIARIES (
     completada TINYINT
 );
 
--- Tabla: MISSIONS_TITOLS
+-- Taula: MISSIONS_TITOLS
 CREATE TABLE MISSIONS_TITOLS (
     titol INT NOT NULL,
     missio INT NOT NULL,
     PRIMARY KEY (titol, missio)
 );
 
--- Tabla: PERFIL_USUARI
+-- Taula: PERFIL_USUARI
 CREATE TABLE PERFIL_USUARI (
     usuari INT PRIMARY KEY,
     partides_jugades INT,
@@ -100,7 +100,7 @@ CREATE TABLE PERFIL_USUARI (
     skin_preferida_id INT
 );
 
--- Tabla: PERSONATGES
+-- Taula: PERSONATGES
 CREATE TABLE PERSONATGES (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
@@ -114,7 +114,7 @@ CREATE TABLE PERSONATGES (
     aniversari DATE
 );
 
--- Tabla: SKINS
+-- Taula: SKINS
 CREATE TABLE SKINS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(60) NOT NULL,
@@ -125,21 +125,21 @@ CREATE TABLE SKINS (
     raça TINYINT
 );
 
--- Tabla: SKINS_ARMES
+-- Taula: SKINS_ARMES
 CREATE TABLE SKINS_ARMES (
     skin INT NOT NULL,
     arma INT NOT NULL,
     PRIMARY KEY (skin, arma)
 );
 
--- Tabla: TITOLS
+-- Taula: TITOLS
 CREATE TABLE TITOLS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom_titol VARCHAR(100),
     personatge INT
 );
 
--- Tabla: USUARI_SKIN_ARMES
+-- Taula: USUARI_SKIN_ARMES
 CREATE TABLE USUARI_SKIN_ARMES (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuari INT,
@@ -148,7 +148,7 @@ CREATE TABLE USUARI_SKIN_ARMES (
     arma INT
 );
 
--- Tabla: USUARIS
+-- Taula: USUARIS
 CREATE TABLE USUARIS (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50),
@@ -159,14 +159,26 @@ CREATE TABLE USUARIS (
     imatgeperfil INT
 );
 
--- Tabla: USUARIS_ARMES
+-- Taula: USUARIS_ARMES
 CREATE TABLE USUARIS_ARMES (
     usuari INT NOT NULL,
     arma INT NOT NULL,
     PRIMARY KEY (usuari, arma)
 );
 
+-- Taula: AMISTATS
+CREATE TABLE AMISTATS (
+    id_usuari INT,
+    id_usuari_amic INT,
+    estat VARCHAR(20) DEFAULT 'pendent',
+    PRIMARY KEY (id_usuari, id_usuari_amic),
+    FOREIGN KEY (id_usuari) REFERENCES USUARIS(id),
+    FOREIGN KEY (id_usuari_amic) REFERENCES USUARIS(id),
+    CHECK (id_usuari < id_usuari_amic),
+    CHECK (estat IN ('pendent', 'acceptat', 'rebutjat'))
+);
 
+-- Inserts d'ARMES
 INSERT INTO ARMES (id, nom, categoria, buff_atac) VALUES
 (10, 'Kyoka Suigetsu (Arma base)', 0, 40),
 (11, 'Kyoka Suigetsu (Shikai)', 1, 50),
@@ -248,7 +260,7 @@ INSERT INTO ARMES (id, nom, categoria, buff_atac) VALUES
 (88, 'Fuji Kujaku (Shikai)', 1, 40);
 
 
--- Insert data into ATACS
+-- Insert d'ATACS
 INSERT INTO ATACS (id, nom, mal) VALUES 
 (1, 'Hado #90: Kurohitsugi (Calaix Negre)', 180),
 (2, 'Senbonzakura Kageyoshi (Mil Petals de Cirerers)', 170),
@@ -339,7 +351,7 @@ INSERT INTO ATACS (id, nom, mal) VALUES
 (87, 'Cop de Martell: Aigües Termals', 150);
 
 
--- Insert data into AVATARS
+-- Insert d'AVATARS
 INSERT INTO AVATARS (id, url, nom) VALUES 
 (1, 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/CONFIGURATIONSCREEN/PROFILE_IMAGES/jdpenjhmoamfxzpdgubr', 'Yachiru'),
 (2, 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/CONFIGURATIONSCREEN/PROFILE_IMAGES/jesi4rdib6xl4m92hxu2', 'Kon'),
@@ -361,7 +373,7 @@ INSERT INTO AVATARS (id, url, nom) VALUES
 
 
 
-
+-- Inserts de personatges com a enemics
 INSERT INTO ENEMICS (id, personatge_id, punts_donats, musica_combat) VALUES
 (1, 1, 80, NULL),
 (42, 40, 50, NULL),
@@ -412,6 +424,7 @@ INSERT INTO PERFIL_USUARI (usuari, partides_jugades, partides_guanyades, persona
 (74, 9, 5, NULL, NULL),
 (75, 0, 0, NULL, NULL);
 
+-- Inserts de Personatges
 INSERT INTO PERSONATGES (id, nom, vida_base, mal_base, Classe, descripcio, altura, pes, Genere, aniversari) VALUES
 (1, 'Aizen', 950.00, 130.00, 'Ànima', 'Un geni manipulador amb un poder hipnòtic absolut, l\'antic Capità del 5è Escamot del Gotei 13. La seva Zanpakuto, Kyoka Suigetsu, controla els sentits dels seus enemics. Ambitiós i fred, cerca trascendir els límits de shinigamis i déus.', 186, 74.0, 'M', '2000-05-29'),
 (2, 'Byakuya', 900.00, 120.00, 'Ànima', 'Capità del 6é Escamot del Gotei 13 i germà de la Rukia Kuchiki. El seu Senbonzakura es descompon en milers de fulles afilades que simulen pétals d\'un cirerer. Orgullos i elegant, sota la seva fredor, amaga un profund sentit d\'honor i lleialtat.', 180, 64.0, 'M', '2000-01-31'),
@@ -502,6 +515,7 @@ INSERT INTO PERSONATGES (id, nom, vida_base, mal_base, Classe, descripcio, altur
 (91, 'Driscoll Berci', 800.00, 115.00, 'Quincy', 'Quincy amb un poder que li permet augmentar la força dels seus atacs cada vegada que mata algú. Un assassí sense escrúpols que representa la brutalitat pura dels Quincy més radicals.', 235, 135.0, 'M', '2000-03-25'),
 (92, 'Tenjiro Kirinji', 1100.00, 170.00, 'Ànima', 'Membre de l\'Escamot 0, també anomenat "Deu de les Termes", és la persona amb majors coneixements mèdics de la Societat d\'Ànimes, i fou el mestre de la Unohana.', 193, 88.0, 'M', '2000-05-31');
 
+-- Inserts de totes les skins
 INSERT INTO `SKINS` (`id`, `nom`, `categoria`, `imatge`, `personatge`, `atac`, `raça`) VALUES
 (1, 'Aizen Bo', 2, 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/PERSONATGES/Aizen/nweidzhwmbbz5nxceujt', 1, 1, 1),
 (2, 'Aizen Dolent Ulleres', 1, 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/ENEMICS/Aizen/u6xihhxt3zvaxqmhjbqo', 1, 1, 2),
@@ -743,6 +757,7 @@ INSERT INTO `SKINS` (`id`, `nom`, `categoria`, `imatge`, `personatge`, `atac`, `
 
 -- No cal SET IDENTITY_INSERT a MySQL
 
+-- Inserts de les Skins amb les ARMES
 INSERT INTO SKINS_ARMES (skin, arma) VALUES
 (1, 10),
 (2, 10),
