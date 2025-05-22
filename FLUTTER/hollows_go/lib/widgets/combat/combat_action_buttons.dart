@@ -71,19 +71,9 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
             child: ElevatedButton(
               onPressed: canAct
                   ? () async {
-                      final combatProvider = widget.combatProvider;
-
-                      // Aplicar debuff al daño enemigo (200)
-                      int adjustedEnemyDamage =
-                          widget.enemicDamage - combatProvider.enemyDebuff;
-                      if (adjustedEnemyDamage < 0) adjustedEnemyDamage = 0;
-
-                      // Consumir el debuff para que solo se aplique una vez
-                      combatProvider.consumeEnemyDebuff();
-
-                      await combatProvider.performAttack(
+                      await widget.combatProvider.performAttack(
                         widget.aliatDamage,
-                        adjustedEnemyDamage,
+                        widget.enemicDamage,
                         widget.skinId,
                         _handleVictory,
                         _handleDefeat,

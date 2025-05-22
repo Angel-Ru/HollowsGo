@@ -12,7 +12,8 @@ class CombatProvider with ChangeNotifier {
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
   int _bonusAllyDamage = 0; // <-- NUEVO
-  int _enemyDebuff = 0;
+  int _enemyAttackDebuff = 0;
+  bool _showDebuffIndicator = false;
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -22,18 +23,7 @@ class CombatProvider with ChangeNotifier {
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
   bool get ultiUsed => _ultiUsed;
-  int get enemyDebuff => _enemyDebuff;
-
-  void debuffEnemyAttack(int amount) {
-    _enemyDebuff = amount;
-    notifyListeners();
-  }
-
-  void consumeEnemyDebuff() {
-    _enemyDebuff = 0;
-    notifyListeners();
-  }
-
+  int get enemyAttackDebuff => _enemyAttackDebuff;
   // NUEVO GETTER (opcional)
   int get bonusAllyDamage => _bonusAllyDamage;
 
@@ -79,6 +69,12 @@ class CombatProvider with ChangeNotifier {
     _isAttackInProgress = false;
     _ultiUsed = false;
     _bonusAllyDamage = 0; // Reiniciamos el buff aquí
+    notifyListeners();
+  }
+
+  void applyEnemyAttackDebuff(int amount) {
+    _enemyAttackDebuff = amount;
+    _showDebuffIndicator = true;
     notifyListeners();
   }
 
@@ -134,22 +130,33 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = true;
     notifyListeners();
 
-    _aliatHealth = (_aliatHealth ?? 0) - enemyDamage;
+    // --- LÓGICA DEL DEBUFF ---
+    final effectiveDamage = enemyDamage - _enemyAttackDebuff;
+    final damage =
+        effectiveDamage > 0 ? effectiveDamage : 0; // Evita daño negativo
+
+    // Debugging detallado
+    debugPrint('[DEBUFF DEBUG] Ataque enemigo: '
+        'Original=$enemyDamage, '
+        'Debuff=-$_enemyAttackDebuff, '
+        'Total=$damage');
+
+    _aliatHealth = (_aliatHealth ?? 0) - damage;
     if (_aliatHealth! < 0) _aliatHealth = 0;
 
+    // --- EFECTO VISUAL DEL GOLPE ---
     await Future.delayed(const Duration(milliseconds: 500));
-
     _isAllyHit = false;
     _isEnemyTurn = false;
     _isAttackInProgress = false;
     notifyListeners();
 
+    // --- VERIFICACIÓN DE DERROTA ---
     if (_aliatHealth! <= 0) {
       await updateSkinVidaActual(
         skinId: skinId,
         vidaActual: _aliatHealth!,
       );
-
       onDefeat();
     }
   }

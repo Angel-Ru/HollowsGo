@@ -102,6 +102,24 @@ class UltimateService {
         );
         break;
 
+      case 10: // ID para el debuff
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ulquiorra/marco_ulquiorra.png',
+          audioAsset: 'special_attack/ulquiorra/ulquiorra_aud.mp3',
+          videoAsset: 'assets/special_attack/ulquiorra/ulquiorra_vid.mp4',
+          damage: 0, // No hace daño directo
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            final combatProvider =
+                Provider.of<CombatProvider>(context, listen: false);
+            combatProvider.applyEnemyAttackDebuff(200); // Reduce 200 de daño
+            debugPrint('[DEBUG] Debuff aplicado: -200 al ataque enemigo');
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+
+        break;
       case 11:
         await _executeUlti(
           context,
@@ -124,26 +142,6 @@ class UltimateService {
           damage: 350,
           rotateScreen: false,
           onDamageApplied: onDamageApplied,
-          onEnemyDefeated: onEnemyDefeated,
-        );
-        break;
-
-      case 16:
-        final combatProvider =
-            Provider.of<CombatProvider>(context, listen: false);
-
-        await _executeUlti(
-          context,
-          imageAsset: 'assets/special_attack/ulquiorra/marco_ulquiorra.png',
-          audioAsset: 'special_attack/ulquiorra/ulquiorra_aud.mp3',
-          videoAsset:
-              'assets/special_attack/ulquiorra/ulquiorra_vid.mp4', // pon el vídeo que quieras
-          damage: 0, // no daño directo, solo debuff
-          rotateScreen: false,
-          onDamageApplied: (_) {
-            combatProvider.debuffEnemyAttack(
-                200); // aquí aplicas el debuff de 200 al ataque enemigo
-          },
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
