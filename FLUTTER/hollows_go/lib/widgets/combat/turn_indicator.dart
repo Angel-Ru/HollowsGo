@@ -11,22 +11,25 @@ class TurnIndicator extends StatelessWidget {
     required this.enemyName,
     super.key,
   });
-
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 20,
-      left: 20,
+      top: 10,
+      left: 10,
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isEnemyTurn ? Colors.red : Colors.green,
+          color: isEnemyTurn
+              ? Colors.red.withOpacity(0.2)
+              : Colors.green.withOpacity(0.2),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
-          "Torn: ${isEnemyTurn ? enemyName : allyName}",
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          isEnemyTurn ? " $enemyName" : "$allyName ",
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 12,
+          ),
         ),
       ),
     );
