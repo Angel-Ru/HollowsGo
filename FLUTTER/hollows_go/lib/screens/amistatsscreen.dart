@@ -16,7 +16,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
   void initState() {
     super.initState();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-    _amistatsFuture = userProvider.fetchAmistatsPendentsUsuari();
+    _amistatsFuture = userProvider.fetchAmistatsUsuari();
   }
 
   @override

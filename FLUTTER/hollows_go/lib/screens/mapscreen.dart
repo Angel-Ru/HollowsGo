@@ -13,7 +13,7 @@ class Mapscreen extends StatefulWidget {
 
 class _MapaScreenState extends State<Mapscreen> {
   final Completer<GoogleMapController> _controller = Completer();
-  MapType _currentMapType = MapType.normal;
+  MapType _currentMapType = MapType.normal; // Sempre normal
   LatLng? _currentLocation;
   bool _isLoading = true;
   Set<Marker> _markers = {};
@@ -27,6 +27,72 @@ class _MapaScreenState extends State<Mapscreen> {
     'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
     'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
   ];
+
+  static const String _darkMapStyle = '''
+[
+  {
+    "elementType": "geometry",
+    "stylers": [{"color": "#0d0d0d"}]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [{"visibility": "off"}]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#e0e0e0"}]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [{"color": "#121212"}]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [{"color": "#1a1a1a"}]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#7a7a7a"}]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [{"color": "#101010"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.fill",
+    "stylers": [{"color": "#151515"}]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [{"color": "#a6a6a6"}]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "geometry",
+    "stylers": [{"color": "#222222"}]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [{"color": "#292929"}]
+  },
+  {
+    "featureType": "transit",
+    "elementType": "geometry",
+    "stylers": [{"color": "#1f1f1f"}]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [{"color": "#0b0b0b"}]
+  }
+]
+''';
 
   @override
   void initState() {
@@ -46,18 +112,24 @@ class _MapaScreenState extends State<Mapscreen> {
     final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
 
     if (mapProvider.isReady && mapProvider.currentLocation != null) {
-      _currentLocation = mapProvider.currentLocation;
+      // Assignem la posició i mostrem el mapa ràpidament
+      setState(() {
+        _currentLocation = mapProvider.currentLocation;
+        _isLoading = false;
+      });
+
       _startLocationUpdates();
-      final enemyMarkers = await MarkerHelper.generateEnemyMarkers(
+
+      // Carreguem els marcadors en background sense bloquejar UI
+      MarkerHelper.generateEnemyMarkers(
         currentLocation: _currentLocation!,
         context: context,
         imagePaths: imagePaths,
         radius: _radiusInMeters,
-      );
-
-      setState(() {
-        _markers.addAll(enemyMarkers);
-        _isLoading = false;
+      ).then((enemyMarkers) {
+        setState(() {
+          _markers.addAll(enemyMarkers);
+        });
       });
     }
   }
@@ -110,8 +182,11 @@ class _MapaScreenState extends State<Mapscreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading || _currentLocation == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_currentLocation == null) {
+      // Esperem només la posició
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
     final CameraPosition _puntInicial = CameraPosition(
@@ -124,33 +199,17 @@ class _MapaScreenState extends State<Mapscreen> {
       body: Stack(
         children: [
           GoogleMap(
-            myLocationEnabled: true, 
+            myLocationEnabled: true,
             myLocationButtonEnabled: true,
             markers: _markers,
             mapType: _currentMapType,
             initialCameraPosition: _puntInicial,
             onMapCreated: (controller) {
               _controller.complete(controller);
-              controller.setMapStyle(
-                '[{"featureType":"poi","stylers":[{"visibility":"off"}]}]',
-              );
+              controller.setMapStyle(_darkMapStyle);
             },
           ),
-          Positioned(
-            bottom: 25,
-            right: 330,
-            child: FloatingActionButton(
-              backgroundColor: Colors.deepPurple,
-              child: const Icon(Icons.layers, color: Colors.white),
-              onPressed: () {
-                setState(() {
-                  _currentMapType = _currentMapType == MapType.normal
-                      ? MapType.hybrid
-                      : MapType.normal;
-                });
-              },
-            ),
-          ),
+          // Aquí pots posar botons o altres widgets, si vols
         ],
       ),
     );
