@@ -102,15 +102,33 @@ class UltimateService {
         );
         break;
 
+      //ULTI ICHIBE HYOSUBE 
+      case 10:
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ichibe/marco_ichibe.png',
+          audioAsset: 'special_attack/ichibe/ichibe_aud.mp3',
+          videoAsset: 'assets/special_attack/ichibe/ichibe_vid.mp4',
+          damage: 350,
+          rotateScreen: false,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
       case 11:
+              final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/grimmjow/marco_grimmjow.png',
           audioAsset: 'special_attack/grimmjow/grimmjow_aud.mp3',
           videoAsset: 'assets/special_attack/grimmjow/grimmjow_vid.mp4',
-          damage: 350,
+          damage: 0,
           rotateScreen: false,
-          onDamageApplied: onDamageApplied,
+          onDamageApplied: (_) {
+            combatProvider.buffPlayerAttack(200);
+          },
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
