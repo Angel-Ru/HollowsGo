@@ -32,12 +32,7 @@ class _DialogContentState extends State<DialogContent> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        image: const DecorationImage(
-          image: NetworkImage(
-              'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black54, BlendMode.darken),
-        ),
+        color: Colors.black.withOpacity(0.4),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey.withOpacity(0.8), width: 1),
       ),
