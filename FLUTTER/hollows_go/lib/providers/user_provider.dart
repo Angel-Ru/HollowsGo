@@ -269,40 +269,4 @@ class UserProvider with ChangeNotifier {
       return [];
     }
   }
-
-  Future<bool> acceptarAmistat(int friendId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      int? userId = prefs.getInt('userId');
-      String? token = prefs.getString('token');
-
-      if (userId == null || token == null) return false;
-
-      final url =
-          Uri.parse('https://${Config.ip}/usuaris/amics/$userId/acceptar');
-      final headers = {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      };
-
-      final body = json.encode({
-        'friendId': friendId,
-      });
-
-      final response = await http.post(url, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        // Actualitzar la llista d'amistats després d'acceptar
-        notifyListeners();
-        return true;
-      } else {
-        print(
-            'Error en acceptarAmistat: ${response.statusCode} - ${response.body}');
-        return false;
-      }
-    } catch (error) {
-      print('Error en acceptarAmistat: $error');
-      return false;
-    }
-  }
 }
