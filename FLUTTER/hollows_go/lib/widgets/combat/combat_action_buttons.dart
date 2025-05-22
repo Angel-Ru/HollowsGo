@@ -65,55 +65,37 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
       ),
       child: Row(
         children: [
-          // Botón LLUITA
+          // Botón LLUITA con Tooltip al mantener pulsado
           Expanded(
             flex: 3,
-            child: ElevatedButton(
-              onPressed: canAct
-                  ? () async {
-                      await widget.combatProvider.performAttack(
-                        widget.aliatDamage,
-                        widget.enemicDamage,
-                        widget.skinId,
-                        _handleVictory,
-                        _handleDefeat,
-                      );
-                    }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              ),
-              child: Column(
-                children: [
-                  const Text("LLUITA", style: TextStyle(fontSize: 18)),
-                  const SizedBox(height: 4),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      widget.techniqueName,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  Text(
-                    "(MAL: ${widget.aliatDamage})" +
-                        (widget.combatProvider.bonusAllyDamage > 0
-                            ? " +${widget.combatProvider.bonusAllyDamage}"
-                            : ""),
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
-                    ),
-                  ),
-                ],
+            child: Tooltip(
+              message: '${widget.techniqueName} - MAL: ${widget.aliatDamage}' +
+                  (widget.combatProvider.bonusAllyDamage > 0
+                      ? ' +${widget.combatProvider.bonusAllyDamage}'
+                      : ''),
+              preferBelow: false,
+              waitDuration: const Duration(milliseconds: 500),
+              child: ElevatedButton(
+                onPressed: canAct
+                    ? () async {
+                        await widget.combatProvider.performAttack(
+                          widget.aliatDamage,
+                          widget.enemicDamage,
+                          widget.skinId,
+                          _handleVictory,
+                          _handleDefeat,
+                        );
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                ),
+                child: const Text(
+                  "LLUITA",
+                  style: TextStyle(fontSize: 18),
+                ),
               ),
             ),
           ),
@@ -141,9 +123,7 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
               ),
               child: IconButton(
                 icon: Icon(
-                  hasUltimate
-                      ? Icons.auto_awesome
-                      : Icons.lock, // Mostrar candado si no tiene ulti
+                  hasUltimate ? Icons.auto_awesome : Icons.lock,
                   color:
                       ultiUsed || !hasUltimate ? Colors.black54 : Colors.white,
                 ),
