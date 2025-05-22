@@ -75,10 +75,10 @@ class CombatProvider with ChangeNotifier {
   }
 
   // DEBUFF: Reducir ataque enemigo a la mitad
-void applyEnemyDebuffAttack(int newAttackValue) {
-  _enemyAttack = newAttackValue;
-  notifyListeners();
-}
+  void applyEnemyDebuffAttack(int newAttackValue) {
+    _enemyAttack = newAttackValue;
+    notifyListeners();
+  }
 
   // DEBUFF: Reducir vida máxima enemigo a la mitad
   void reduceEnemyMaxHealthByHalf() {
@@ -155,7 +155,7 @@ void applyEnemyDebuffAttack(int newAttackValue) {
   }
 
   Future<void> _performEnemyAttack(
-    int enemyDamage,
+    int enemyDamage, // <- este puede quedarse o eliminarse
     int skinId,
     VoidCallback onDefeat,
   ) async {
@@ -164,7 +164,7 @@ void applyEnemyDebuffAttack(int newAttackValue) {
     _isAllyHit = true;
     notifyListeners();
 
-    _aliatHealth = (_aliatHealth ?? 0) - enemyDamage;
+    _aliatHealth = (_aliatHealth ?? 0) - _enemyAttack;
     if (_aliatHealth! < 0) _aliatHealth = 0;
 
     await Future.delayed(const Duration(milliseconds: 500));
@@ -179,7 +179,6 @@ void applyEnemyDebuffAttack(int newAttackValue) {
         skinId: skinId,
         vidaActual: _aliatHealth!,
       );
-
       onDefeat();
     }
   }
