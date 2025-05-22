@@ -830,42 +830,45 @@ exports.obtenirAmistats = async (req, res) => {
     }
 };
 
-// Acceptar una sol·licitud d'amistat
-exports.acceptarAmistat = async (req, res) => {
+// Obtenir les sol·licituds d'amistat d'un usuari i acceptar o rebutjar-les
+exports.obtenirSolicitudsAmistatAcceptarRebutjar = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        const friendId = parseInt(req.body.friendId);
-
-        if (userId === friendId) {
-            return res.status(400).json({ missatge: 'No pots enviar una sol·licitud a tu mateix' });
-        }
-
         const connection = await connectDB();
 
-        // Verifiquem que la sol·licitud existeixi i estigui en estat 'pendent'
-        const [existingRequest] = await connection.execute(`
-            SELECT * FROM AMISTATS 
-            WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
-            AND estat = 'pendent'
-        `, [userId, friendId, friendId, userId]);
+        // Obtenir les sol·licituds pendents rebudes per l'usuari
+        const [solicituts] = await connection.execute(`
+            SELECT id_usuari AS sol·licitant, estat
+            FROM AMISTATS
+            WHERE id_usuari_amic = ? AND estat = 'pendent'
+        `, [userId]);
 
-        if (existingRequest.length === 0) {
-            return res.status(404).json({ missatge: 'No s\'ha trobat cap sol·licitud d\'amistat pendent entre aquests usuaris' });
+        // Si és una petició GET, només retorna les sol·licituds pendents
+        if (req.method === 'GET') {
+            return res.status(200).json({ solicituts });
         }
 
-        const request = existingRequest[0];
-        const storedUserId = request.id_usuari;
-        const storedFriendId = request.id_usuari_amic;
+        // Si és una petició PUT o POST, processa una acció
+        const { sollicitantId, accio } = req.body; // accio hauria de ser 'acceptat' o 'rebutjat'
 
-        await connection.execute(`
-            UPDATE AMISTATS 
-            SET estat = 'acceptat'
-            WHERE id_usuari = ? AND id_usuari_amic = ?
-        `, [storedUserId, storedFriendId]);
+        if (!sollicitantId || !['acceptat', 'rebutjat'].includes(accio)) {
+            return res.status(400).json({ missatge: "Dades invàlides. Cal 'sol·licitantId' i 'accio' ('acceptat' o 'rebutjat')." });
+        }
 
-        res.status(200).json({ missatge: 'Sol·licitud d\'amistat acceptada correctament' });
+        // Actualitzar l'estat de la sol·licitud
+        const [result] = await connection.execute(`
+            UPDATE AMISTATS
+            SET estat = ?
+            WHERE id_usuari = ? AND id_usuari_amic = ? AND estat = 'pendent'
+        `, [accio, sollicitantId, userId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ missatge: "No s'ha trobat cap sol·licitud pendent amb aquests valors." });
+        }
+
+        res.status(200).json({ missatge: `Sol·licitud ${accio} correctament.` });
     } catch (error) {
-        console.error('Error acceptant amistat:', error);
-        res.status(500).json({ missatge: 'Error intern del servidor' });
+        console.error(error);
+        res.status(500).json({ missatge: 'Error del servidor.' });
     }
 };
