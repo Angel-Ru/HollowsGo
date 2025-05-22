@@ -128,6 +128,26 @@ class UltimateService {
         );
         break;
 
+      case 16:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ulquiorra/marco_ulquiorra.png',
+          audioAsset: 'special_attack/ulquiorra/ulquiorra_aud.mp3',
+          videoAsset:
+              'assets/special_attack/ulquiorra/ulquiorra_vid.mp4', // pon el vídeo que quieras
+          damage: 0, // no daño directo, solo debuff
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            combatProvider.debuffEnemyAttack(
+                200); // aquí aplicas el debuff de 200 al ataque enemigo
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
       default:
         debugPrint(
             "No hay implementación para la habilitat ID: ${habilitat.id}");

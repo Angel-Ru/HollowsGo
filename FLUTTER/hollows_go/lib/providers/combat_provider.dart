@@ -12,6 +12,7 @@ class CombatProvider with ChangeNotifier {
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
   int _bonusAllyDamage = 0; // <-- NUEVO
+  int _enemyDebuff = 0;
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -21,6 +22,17 @@ class CombatProvider with ChangeNotifier {
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
   bool get ultiUsed => _ultiUsed;
+  int get enemyDebuff => _enemyDebuff;
+
+  void debuffEnemyAttack(int amount) {
+    _enemyDebuff = amount;
+    notifyListeners();
+  }
+
+  void consumeEnemyDebuff() {
+    _enemyDebuff = 0;
+    notifyListeners();
+  }
 
   // NUEVO GETTER (opcional)
   int get bonusAllyDamage => _bonusAllyDamage;
