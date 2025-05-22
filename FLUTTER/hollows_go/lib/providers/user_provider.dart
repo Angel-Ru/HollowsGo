@@ -241,7 +241,7 @@ class UserProvider with ChangeNotifier {
 
       if (userId == null || token == null) return [];
 
-      final url = Uri.parse('https://${Config.ip}/usuaris/amics/$userId');
+      final url = Uri.parse('https://${Config.ip}/amics/$userId/acceptar');
       final headers = {
         'Authorization': 'Bearer $token',
       };

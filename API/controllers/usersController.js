@@ -832,16 +832,16 @@ exports.obtenirAmistats = async (req, res) => {
 
 // Obtenir les sol·licituds d'amistat d'un usuari i acceptar o rebutjar-les
 exports.acceptaramistats = async (req, res) => {
-    try {
-        const userId = parseInt(req.params.id);
-        const connection = await connectDB();
+        try {
+            const userId = parseInt(req.params.id);
+            const connection = await connectDB();
 
-        const [amistats] = await connection.execute(`
+            const [amistats] = await connection.execute(`
             SELECT
                 CASE
                     WHEN a.id_usuari = ? THEN u2.nom
                     ELSE u1.nom
-                END AS nom_amic,
+                    END AS nom_amic,
                 a.estat
             FROM AMISTATS a
                      JOIN USUARIS u1 ON a.id_usuari = u1.id
@@ -850,9 +850,9 @@ exports.acceptaramistats = async (req, res) => {
               AND a.estat = 'pendent'
         `, [userId, userId, userId]);
 
-        res.status(200).json(amistats);
-    } catch (error) {
-        console.error('Error obtenint amistats:', error);
-        res.status(500).json({ missatge: 'Error intern del servidor' });
-    }
-};
+            res.status(200).json(amistats);
+        } catch (error) {
+            console.error('Error obtenint amistats pendents:', error);
+            res.status(500).json({ missatge: 'Error intern del servidor' });
+        }
+    };
