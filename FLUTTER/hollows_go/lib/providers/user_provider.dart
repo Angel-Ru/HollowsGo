@@ -270,41 +270,27 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchAmistatsPendentsUsuari() async {
+  Future<bool> acceptarAmistat(int userId, int amistatId, String token) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      int? userId = prefs.getInt('userId');
-      String? token = prefs.getString('token');
-
-      if (userId == null || token == null) return [];
-
-      // Canvia la URL per l'endpoint de amistats pendents
-      final url = Uri.parse('https://${Config.ip}/amics/$userId/acceptar');
+      final url =
+          Uri.parse('https://${Config.ip}/usuaris/amics/$userId/acceptar');
       final headers = {
         'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
       };
+      final body = json.encode({'amistat_id': amistatId});
 
-      final response = await http.get(url, headers: headers);
+      final response = await http.put(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-
-        // Conversió segura a llista de mapes
-        final List<Map<String, dynamic>> amistats = data.map((amic) {
-          return {
-            'nom_amic': amic['nom_amic'],
-            'estat': amic['estat'],
-          };
-        }).toList();
-
-        return amistats;
+        return true;
       } else {
-        print('Error en fetchAmistatsPendentsUsuari: ${response.statusCode}');
-        return [];
+        print('Error acceptant amistat: ${response.statusCode}');
+        return false;
       }
-    } catch (error) {
-      print('Error a fetchAmistatsPendentsUsuari: $error');
-      return [];
+    } catch (e) {
+      print('Error a acceptarAmistat: $e');
+      return false;
     }
   }
 }
