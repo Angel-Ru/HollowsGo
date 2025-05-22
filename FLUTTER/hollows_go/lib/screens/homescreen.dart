@@ -5,6 +5,7 @@ import 'package:hollows_go/widgets/home/dialogue_section.dart';
 import 'package:hollows_go/widgets/home/home_app_bar.dart';
 import 'package:hollows_go/widgets/home/home_background.dart';
 import 'package:hollows_go/widgets/home/home_screen_controller.dart';
+import 'package:hollows_go/screens/amistatsscreen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -20,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _controller = HomeScreenController(context);
-      
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final avatarUrl = await _controller.loadProfileImage();
@@ -33,7 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
       userProvider.fetchUserPoints();
       _timer = Timer.periodic(
           Duration(seconds: 5), (_) => userProvider.fetchUserPoints());
-      Provider.of<VialsProvider>(context, listen: false).fetchVials(userProvider.userId);
+      Provider.of<VialsProvider>(context, listen: false)
+          .fetchVials(userProvider.userId);
       Provider.of<DialogueProvider>(context, listen: false)
           .loadDialogueFromJson("ichigo");
       await _controller.loadUserData();
@@ -92,6 +94,27 @@ class _HomeScreenState extends State<HomeScreen> {
               return FadeTransition(opacity: animation, child: child);
             },
             child: _getSelectedScreenWithKey(uiProvider.selectedMenuOpt),
+          ),
+          Positioned(
+            bottom: 100,
+            right: 20,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => AmistatsScreen()),
+                );
+              },
+              icon: Icon(Icons.group),
+              label: Text('Amistats'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
           ),
         ],
       ),
