@@ -802,3 +802,27 @@ exports.obtenirAvatar = async (req, res) => {
         res.status(500).json({ message: 'Error al carregar l\'avatar' });
     }
 };
+
+// Obtenir totes les amistats d'un usuari
+exports.obtenirAmistats = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const connection = await connectDB();
+
+        const [amistats] = await connection.execute(`
+            SELECT
+                u1.nom AS nom_usuari,
+                u2.nom AS nom_amic,
+                a.estat
+            FROM AMISTATS a
+            JOIN USUARIS u1 ON a.id_usuari = u1.id
+            JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+            WHERE a.id_usuari = ? OR a.id_usuari_amic = ?
+        `, [userId, userId]);
+
+        res.status(200).json(amistats);
+    } catch (error) {
+        console.error('Error obtenint amistats:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};

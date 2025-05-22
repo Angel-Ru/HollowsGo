@@ -49,4 +49,7 @@ router.put('/partida_guanyada/:id', verificacioUsuari.verifyToken, userControlle
 //Ruta per sumar una partida jugada al perfil d'usuari
 router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.sumarPartidaJugada);
 
+// Ruta per obtenir totes les amistats d'un usuari
+router.get('/amics/:id', verificacioUsuari.verifyToken, userController.obtenirAmistats);
+
 module.exports = router;
