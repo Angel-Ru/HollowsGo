@@ -831,44 +831,28 @@ exports.obtenirAmistats = async (req, res) => {
 };
 
 // Obtenir les sol·licituds d'amistat d'un usuari i acceptar o rebutjar-les
-exports.obtenirSolicitudsAmistatAcceptarRebutjar = async (req, res) => {
+exports.acceptaramistats = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
         const connection = await connectDB();
 
-        // Obtenir les sol·licituds pendents rebudes per l'usuari
-        const [solicituts] = await connection.execute(`
-            SELECT id_usuari AS sollicitant, estat
-            FROM AMISTATS
-            WHERE id_usuari_amic = ? AND estat = 'pendent'
-        `, [userId]);
+        const [amistats] = await connection.execute(`
+            SELECT
+                CASE
+                    WHEN a.id_usuari = ? THEN u2.nom
+                    ELSE u1.nom
+                END AS nom_amic,
+                a.estat
+            FROM AMISTATS a
+                     JOIN USUARIS u1 ON a.id_usuari = u1.id
+                     JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+            WHERE (a.id_usuari = ? OR a.id_usuari_amic = ?)
+              AND a.estat = 'pendent'
+        `, [userId, userId, userId]);
 
-        // Si és una petició GET, només retorna les sol·licituds pendents
-        if (req.method === 'GET') {
-            return res.status(200).json({ solicituts });
-        }
-
-        // Si és una petició PUT o POST, processa una acció
-        const { sollicitantId, accio } = req.body; // accio hauria de ser 'acceptat' o 'rebutjat'
-
-        if (!sollicitantId || !['acceptat', 'rebutjat'].includes(accio)) {
-            return res.status(400).json({ missatge: "Dades invàlides. Cal 'sol·licitantId' i 'accio' ('acceptat' o 'rebutjat')." });
-        }
-
-        // Actualitzar l'estat de la sol·licitud
-        const [result] = await connection.execute(`
-            UPDATE AMISTATS
-            SET estat = ?
-            WHERE id_usuari = ? AND id_usuari_amic = ? AND estat = 'pendent'
-        `, [accio, sollicitantId, userId]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ missatge: "No s'ha trobat cap sol·licitud pendent amb aquests valors." });
-        }
-
-        res.status(200).json({ missatge: `Sol·licitud ${accio} correctament.` });
+        res.status(200).json(amistats);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ missatge: 'Error del servidor.' });
+        console.error('Error obtenint amistats:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
