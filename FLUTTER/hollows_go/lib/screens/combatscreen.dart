@@ -1,5 +1,3 @@
-import 'package:hollows_go/service/audioservice.dart';
-
 import '../imports.dart';
 import '../providers/habilitat_provider.dart'; // asumo que tienes tus widgets importados aquí
 
@@ -37,7 +35,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       final skinsProvider =
           Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-      //await skinsProvider.selectRandomSkin();  // <-- Crida aquí la càrrega de l'enemic!
+      await skinsProvider
+          .selectRandomSkin(); // <-- Crida aquí la càrrega de l'enemic!
 
       // Ara sí, agafem aliat i enemic carregats
       final aliat = skinsProvider.selectedSkinAliat ??

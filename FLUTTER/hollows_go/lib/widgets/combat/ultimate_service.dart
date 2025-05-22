@@ -161,33 +161,34 @@ class UltimateService {
         );
         break;
 
+      case 15:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ulquiorra/marco_ulquiorra.png',
+          audioAsset: 'special_attack/ulquiorra/ulquiorra_aud.mp3',
+          videoAsset: 'assets/special_attack/ulquiorra/ulquiorra_vid.mp4',
+          damage: 0,
+          rotateScreen: false,
+          onDamageApplied: (_) {},
+          onEnemyDefeated: onEnemyDefeated,
+        );
+
+        // Aquí aplicamos un debuff de 100 (o la cantidad que quieras)
+        int currentAttack = combatProvider.enemyAttack;
+        int newAttack = currentAttack - 200;
+        if (newAttack < 0) newAttack = 0; // no puede ser negativo
+        combatProvider.applyEnemyDebuffAttack(newAttack);
+
+        break;
+
       default:
         debugPrint(
             "No hay implementación para la habilitat ID: ${habilitat.id}");
         break;
     }
-    /*case ASNODT:
-  final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-
-  await _executeUlti(
-    context,
-    imageAsset: 'assets/special_attack/otro_personaje/ulti.png',
-    audioAsset: 'special_attack/otro_personaje/audio.mp3',
-    videoAsset: 'assets/special_attack/otro_personaje/video.mp4',
-    damage: 0,
-    rotateScreen: false,
-    onDamageApplied: (_) {},
-    onEnemyDefeated: onEnemyDefeated,
-  );
-
-  // Aquí aplicamos un debuff de 100 (o la cantidad que quieras)
-  int currentAttack = combatProvider.enemyAttack;
-  int newAttack = currentAttack - 100;
-  if (newAttack < 0) newAttack = 0; // no puede ser negativo
-  combatProvider.applyEnemyDebuffAttack(newAttack);
-
-  break;*/
-
   }
 
   Future<void> _executeUlti(
