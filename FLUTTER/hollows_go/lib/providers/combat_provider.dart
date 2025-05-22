@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import '../imports.dart';
 
 // combat_provider.dart
@@ -14,15 +11,7 @@ class CombatProvider with ChangeNotifier {
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
-  int _bonusAllyDamage = 0; // <-- NUEVO: buff de ataque aliado
-
-  // NUEVAS PROPIEDADES PARA DEBUFFS DE ENEMIGO
-  String _enemyName = "Enemic"; // ejemplo nombre inicial
-  String _originalEnemyName = "Enemic";
-  int _enemyAttack = 100; // ataque enemigo base
-  int _originalEnemyAttack = 100;
-  double _enemyMaxHealth = 1000.0; // vida máxima enemiga
-  double _originalEnemyMaxHealth = 1000.0;
+  int _bonusAllyDamage = 0; // <-- NUEVO
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -33,11 +22,8 @@ class CombatProvider with ChangeNotifier {
   bool get isAttackInProgress => _isAttackInProgress;
   bool get ultiUsed => _ultiUsed;
 
+  // NUEVO GETTER (opcional)
   int get bonusAllyDamage => _bonusAllyDamage;
-
-  String get enemyName => _enemyName;
-  int get enemyAttack => _enemyAttack;
-  double get enemyMaxHealth => _enemyMaxHealth;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -60,39 +46,12 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Buff de ataque aliado
+  // NUEVO MÉTODO
   void buffPlayerAttack(int amount) {
     _bonusAllyDamage = amount;
     notifyListeners();
   }
 
-  // DEBUFF: Cortar nombre enemigo a la mitad
-  void cutEnemyNameInHalf() {
-    _originalEnemyName = _enemyName;
-    int halfLength = (_enemyName.length / 2).ceil();
-    _enemyName = _enemyName.substring(0, halfLength);
-    notifyListeners();
-  }
-
-  // DEBUFF: Reducir ataque enemigo a la mitad
-  void applyEnemyDebuffAttack(int newAttackValue) {
-    _enemyAttack = newAttackValue;
-    notifyListeners();
-  }
-
-  // DEBUFF: Reducir vida máxima enemigo a la mitad
-  void reduceEnemyMaxHealthByHalf() {
-    _originalEnemyMaxHealth = _enemyMaxHealth;
-    _enemyMaxHealth = _enemyMaxHealth / 2;
-
-    // Si la vida actual es mayor que la nueva max, ajustamos
-    if (_enemicHealth > _enemyMaxHealth) {
-      _enemicHealth = _enemyMaxHealth;
-    }
-    notifyListeners();
-  }
-
-  // Resetea el combate y también restaura los valores originales enemigos
   void resetCombat({
     double maxAllyHealth = 1000.0,
     double maxEnemyHealth = 1000.0,
@@ -102,9 +61,6 @@ class CombatProvider with ChangeNotifier {
       _aliatHealth = maxAllyHealth;
     }
     _enemicHealth = maxEnemyHealth;
-    _enemyMaxHealth = maxEnemyHealth;
-    _enemyAttack = _originalEnemyAttack;
-    _enemyName = _originalEnemyName;
     _isEnemyTurn = false;
     _isEnemyHit = false;
     _isAllyHit = false;
@@ -154,8 +110,10 @@ class CombatProvider with ChangeNotifier {
     }
   }
 
+  // ... resto igual ...
+
   Future<void> _performEnemyAttack(
-    int enemyDamage, // <- este puede quedarse o eliminarse
+    int enemyDamage,
     int skinId,
     VoidCallback onDefeat,
   ) async {
@@ -164,7 +122,7 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = true;
     notifyListeners();
 
-    _aliatHealth = (_aliatHealth ?? 0) - _enemyAttack;
+    _aliatHealth = (_aliatHealth ?? 0) - enemyDamage;
     if (_aliatHealth! < 0) _aliatHealth = 0;
 
     await Future.delayed(const Duration(milliseconds: 500));
@@ -179,6 +137,7 @@ class CombatProvider with ChangeNotifier {
         skinId: skinId,
         vidaActual: _aliatHealth!,
       );
+
       onDefeat();
     }
   }
