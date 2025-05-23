@@ -11,7 +11,7 @@ class CharacterDisplayWidget extends StatelessWidget {
   final bool isHit;
   final bool isEnemy;
 
-  final int buffAmount; // nous paràmetres d'estat
+  final int buffAmount;
   final int debuffAmount;
 
   final double imageSize;
@@ -31,6 +31,41 @@ class CharacterDisplayWidget extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
+  Widget buildStatusIcon() {
+    if (buffAmount > 0) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.arrow_upward, color: Colors.green, size: 18),
+          Text(
+            '+$buffAmount',
+            style: const TextStyle(
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      );
+    } else if (debuffAmount > 0) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.arrow_downward, color: Colors.red, size: 18),
+          Text(
+            '-$debuffAmount',
+            style: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
   @override
   Widget build(BuildContext context) {
     final double scaleFactor = 1.9;
@@ -38,50 +73,9 @@ class CharacterDisplayWidget extends StatelessWidget {
     final double blur = isEnemy ? blurSigma * 1.2 : blurSigma;
     final BorderRadius imageBorderRadius = BorderRadius.circular(10);
 
-    Widget buildStatusIcon() {
-      if (buffAmount > 0) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.arrow_upward, color: Colors.green, size: 18),
-            Text(
-              '+$buffAmount',
-              style: const TextStyle(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        );
-      } else if (debuffAmount > 0) {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.arrow_downward, color: Colors.red, size: 18),
-            Text(
-              '-$debuffAmount',
-              style: const TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        );
-      }
-      return const SizedBox.shrink();
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Espai per als estats a sobre
-        SizedBox(
-          height: 24,
-          child: Center(child: buildStatusIcon()),
-        ),
-
         SizedBox(
           height: containerSize,
           width: containerSize,
@@ -130,9 +124,9 @@ class CharacterDisplayWidget extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        // Barra de vida i després nom en columna vertical
+        // Contenidor ampliat per barra + nom + icon estats
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
             color: Colors.grey.shade300,
             borderRadius: BorderRadius.circular(10),
@@ -141,40 +135,56 @@ class CharacterDisplayWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
-                mainAxisAlignment: isEnemy
-                    ? MainAxisAlignment.end
-                    : MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  if (isEnemy && (buffAmount > 0 || debuffAmount > 0)) ...[
+                    buildStatusIcon(),
+                    const SizedBox(width: 6),
+                  ],
+
+                  // Barra de vida + text de vida per aliats
                   if (!isEnemy) ...[
-                    Row(
-                      children: [
-                        HealthBarWidget(
-                          currentHealth: health,
-                          maxHealth: maxHealth,
-                          showText: false,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          "${health.toInt()}/$maxHealth",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          HealthBarWidget(
+                            currentHealth: health,
+                            maxHealth: maxHealth,
+                            showText: false,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            "${health.toInt()}/$maxHealth",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else ...[
+                    Expanded(
+                      child: HealthBarWidget(
+                        currentHealth: health,
+                        maxHealth: maxHealth,
+                        showText: false,
+                      ),
                     ),
                   ],
-                  if (isEnemy) ...[
-                    HealthBarWidget(
-                      currentHealth: health,
-                      maxHealth: maxHealth,
-                      showText: false,
-                    ),
+
+                  if (!isEnemy && (buffAmount > 0 || debuffAmount > 0)) ...[
+                    const SizedBox(width: 6),
+                    buildStatusIcon(),
                   ],
                 ],
               ),
-              const SizedBox(height: 4),
+
+              const SizedBox(height: 6),
+
+              // Nom sota la barra
               Text(
                 name,
                 style: const TextStyle(

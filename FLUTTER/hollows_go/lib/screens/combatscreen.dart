@@ -242,7 +242,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         maxHealth: skins.enemic?.vida ?? 1000,
                         isHit: combatProvider.isEnemyHit,
                         isEnemy: true,
-                        buffAmount: combatProvider.bonusAllyDamage,
                         debuffAmount: combatProvider.enemyAttackDebuff,
                       ),
                       Spacer(),
@@ -254,7 +253,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         maxHealth: skins.aliat?.vidaMaxima ?? 1000,
                         isHit: combatProvider.isAllyHit,
                         buffAmount: combatProvider.bonusAllyDamage,
-                        debuffAmount: combatProvider.enemyAttackDebuff,
                       ),
                       SizedBox(height: 20),
                       CombatActionButtons(
