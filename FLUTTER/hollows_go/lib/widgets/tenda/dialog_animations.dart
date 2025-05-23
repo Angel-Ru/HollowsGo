@@ -17,6 +17,10 @@ class DialogAnimationManager {
   late final Animation<double> flashAnimation;
   late final Animation<double> fadeInImageAnimation;
 
+
+    // Animacions de la vida (exemple: animar barra de vida)
+  late final AnimationController vidaBarController;
+  late Animation<double> vidaBarAnimation;
   DialogAnimationManager({required this.vsync}) {
     fadeController = AnimationController(
       vsync: vsync,
@@ -74,6 +78,17 @@ class DialogAnimationManager {
         parent: fadeInImageController,
         curve: Curves.easeIn,
       ),
+    );
+
+    // Nova animació per barra de vida
+    vidaBarController = AnimationController(
+      vsync: vsync,
+      duration: const Duration(milliseconds: 1100),
+    );
+
+    vidaBarAnimation = CurvedAnimation(
+      parent: vidaBarController,
+      curve: Curves.easeInOut,
     );
   }
 
