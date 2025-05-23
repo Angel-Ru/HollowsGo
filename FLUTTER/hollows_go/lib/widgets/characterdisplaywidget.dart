@@ -12,7 +12,7 @@ class CharacterDisplayWidget extends StatelessWidget {
   final bool isHit;
   final bool isEnemy;
 
-  /// Parámetros nuevos
+  /// Parámetros personalizables
   final double imageSize;
   final double blurSigma;
 
@@ -30,7 +30,6 @@ class CharacterDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Escalamos automáticamente si es enemigo
     final double size = isEnemy ? imageSize * 1.2 : imageSize;
     final double blur = isEnemy ? blurSigma * 1.3 : blurSigma;
 
@@ -43,10 +42,10 @@ class CharacterDisplayWidget extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Imagen con borde difuminado sutil
+              // Imagen con desenfoque sutil
               _buildSoftEdgedImage(size, blur),
 
-              // Sombra exterior flotante (opcional)
+              // Sombra opcional si no está siendo golpeado
               if (!isHit)
                 Container(
                   height: size,
@@ -110,30 +109,28 @@ class CharacterDisplayWidget extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Capa inferior con blur suave
-          ClipOval(
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(
-                sigmaX: blur,
-                sigmaY: blur,
-              ),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-              ),
+          // Imagen desenfocada sutilmente debajo
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: blur,
+              sigmaY: blur,
+            ),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              color: Colors.black.withOpacity(0.05),
+              colorBlendMode: BlendMode.darken,
             ),
           ),
 
-          // Capa nítida encima
-          ClipOval(
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: isHit ? 0.5 : 1.0,
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(Icons.error),
-              ),
+          // Imagen nítida encima
+          AnimatedOpacity(
+            duration: const Duration(milliseconds: 300),
+            opacity: isHit ? 0.5 : 1.0,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Icon(Icons.error),
             ),
           ),
         ],
