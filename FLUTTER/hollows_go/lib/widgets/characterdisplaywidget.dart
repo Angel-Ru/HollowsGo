@@ -25,27 +25,44 @@ class CharacterDisplayWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Imagen del personaje
-        AnimatedOpacity(
-          duration: const Duration(milliseconds: 300),
-          opacity: isHit ? 0.5 : 1.0,
-          child: Image.network(
-            imageUrl,
-            height: isEnemy ? 300 : 250,
-            width: isEnemy ? 300 : 250,
-            errorBuilder: (_, __, ___) => const Icon(Icons.error),
+        // Imagen del personaje con efecto flotante y bordes difuminados
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100), // Redondeo fuerte
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 30,
+                spreadRadius: 10,
+                offset: const Offset(0, 15), // Sombra inferior
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: isHit ? 0.5 : 1.0,
+              child: Image.network(
+                imageUrl,
+                height: isEnemy ? 300 : 250,
+                width: isEnemy ? 300 : 250,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(Icons.error),
+              ),
+            ),
           ),
         ),
 
         const SizedBox(height: 1),
 
-        // Barra de vida y nombre (VERSIÓN CORREGIDA)
+        // Barra de vida y nombre
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.grey.shade300,
             borderRadius: BorderRadius.circular(10),
-          ), // ¡Coma añadida aquí!
+          ),
           child: Row(
             mainAxisAlignment: isEnemy
                 ? MainAxisAlignment.end
