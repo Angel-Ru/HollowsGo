@@ -24,29 +24,33 @@ class CharacterDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double size = isEnemy ? 300 : 250;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Contenedor con efecto de borde ultra-sutil
         Container(
-          height: isEnemy ? 300 : 250,
-          width: isEnemy ? 300 : 250,
+          height: size,
+          width: size,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Imagen principal con doble capa para el efecto de borde
-              _buildSoftEdgedImage(),
+              // Imagen con borde difuminado sutil
+              _buildSoftEdgedImage(size),
 
-              // Sombra circular suave (opcional)
+              // Sombra exterior (flotante)
               if (!isHit)
                 Container(
+                  height: size,
+                  width: size,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.15),
-                        blurRadius: 8,
+                        blurRadius: 10,
                         spreadRadius: 1,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
@@ -54,9 +58,7 @@ class CharacterDisplayWidget extends StatelessWidget {
             ],
           ),
         ),
-
-        // Barra de vida y nombre (sin cambios)
-        const SizedBox(height: 1),
+        const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -93,42 +95,36 @@ class CharacterDisplayWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSoftEdgedImage() {
-    return ClipRRect(
-      borderRadius:
-          BorderRadius.circular(150), // Ajusta según la forma del personaje
+  Widget _buildSoftEdgedImage(double size) {
+    return SizedBox(
+      height: size,
+      width: size,
       child: Stack(
+        alignment: Alignment.center,
         children: [
-          // Capa base con mini-difuminado (0.5px)
-          ImageFiltered(
-            imageFilter: ImageFilter.blur(
-              sigmaX: 0.5,
-              sigmaY: 0.5,
-              tileMode: TileMode.decal,
-            ),
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.contain,
-              color: Colors.black.withOpacity(0.05),
-              colorBlendMode: BlendMode.darken,
+          // Capa inferior con blur
+          ClipOval(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(
+                sigmaX: 1.2,
+                sigmaY: 1.2,
+              ),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
 
-          // Capa superior nítida (recortada 1px más pequeña)
-          Center(
-            child: Container(
-              margin: const EdgeInsets.all(1), // Compensa el blur
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(150),
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: isHit ? 0.5 : 1.0,
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.error),
-                  ),
-                ),
+          // Imagen nítida encima
+          ClipOval(
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: isHit ? 0.5 : 1.0,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(Icons.error),
               ),
             ),
           ),
