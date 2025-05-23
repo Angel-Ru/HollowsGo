@@ -32,22 +32,8 @@ class CharacterDisplayWidget extends StatelessWidget {
   }) : super(key: key);
 
   Widget buildStatusIcon() {
-    if (buffAmount > 0) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.arrow_upward, color: Colors.green, size: 18),
-          Text(
-            '+$buffAmount',
-            style: const TextStyle(
-              color: Colors.green,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      );
-    } else if (debuffAmount > 0) {
+    if (isEnemy && debuffAmount > 0) {
+      // Debuff només per enemics, a l'esquerra de la barra
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -56,6 +42,22 @@ class CharacterDisplayWidget extends StatelessWidget {
             '-$debuffAmount',
             style: const TextStyle(
               color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      );
+    } else if (!isEnemy && buffAmount > 0) {
+      // Buff només per aliats, a la dreta de la barra
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.arrow_upward, color: Colors.green, size: 18),
+          Text(
+            '+$buffAmount',
+            style: const TextStyle(
+              color: Colors.green,
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
@@ -138,46 +140,39 @@ class CharacterDisplayWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if (isEnemy && (buffAmount > 0 || debuffAmount > 0)) ...[
-                    buildStatusIcon(),
+                  if (isEnemy && debuffAmount > 0) ...[
+                    buildStatusIcon(), // Debuff esquerra de la barra
                     const SizedBox(width: 6),
                   ],
-
-                  // Barra de vida + text de vida per aliats
-                  if (!isEnemy) ...[
-                    Expanded(
-                      child: Row(
-                        children: [
-                          HealthBarWidget(
+                  Expanded(
+                    child: !isEnemy
+                        ? Row(
+                            children: [
+                              HealthBarWidget(
+                                currentHealth: health,
+                                maxHealth: maxHealth,
+                                showText: false,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "${health.toInt()}/$maxHealth",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                          )
+                        : HealthBarWidget(
                             currentHealth: health,
                             maxHealth: maxHealth,
                             showText: false,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            "${health.toInt()}/$maxHealth",
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ] else ...[
-                    Expanded(
-                      child: HealthBarWidget(
-                        currentHealth: health,
-                        maxHealth: maxHealth,
-                        showText: false,
-                      ),
-                    ),
-                  ],
-
-                  if (!isEnemy && (buffAmount > 0 || debuffAmount > 0)) ...[
+                  ),
+                  if (!isEnemy && buffAmount > 0) ...[
                     const SizedBox(width: 6),
-                    buildStatusIcon(),
+                    buildStatusIcon(), // Buff dreta de la barra
                   ],
                 ],
               ),
