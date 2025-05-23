@@ -11,6 +11,9 @@ class CharacterDisplayWidget extends StatelessWidget {
   final bool isHit;
   final bool isEnemy;
 
+  final int buffAmount; // nous paràmetres d'estat
+  final int debuffAmount;
+
   final double imageSize;
   final double blurSigma;
 
@@ -21,6 +24,8 @@ class CharacterDisplayWidget extends StatelessWidget {
     required this.maxHealth,
     required this.isHit,
     this.isEnemy = false,
+    this.buffAmount = 0,
+    this.debuffAmount = 0,
     this.imageSize = 100,
     this.blurSigma = 0.8,
     Key? key,
@@ -28,21 +33,61 @@ class CharacterDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double scaleFactor = 1.9; // Igual per enemic i aliat
+    final double scaleFactor = 1.9;
     final double containerSize = imageSize * scaleFactor;
     final double blur = isEnemy ? blurSigma * 1.2 : blurSigma;
     final BorderRadius imageBorderRadius = BorderRadius.circular(10);
 
+    Widget buildStatusIcon() {
+      if (buffAmount > 0) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.arrow_upward, color: Colors.green, size: 18),
+            Text(
+              '+$buffAmount',
+              style: const TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        );
+      } else if (debuffAmount > 0) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.arrow_downward, color: Colors.red, size: 18),
+            Text(
+              '-$debuffAmount',
+              style: const TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        );
+      }
+      return const SizedBox.shrink();
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        // Espai per als estats a sobre
+        SizedBox(
+          height: 24,
+          child: Center(child: buildStatusIcon()),
+        ),
+
         SizedBox(
           height: containerSize,
           width: containerSize,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Fons desenfocat amb cantons rodons
               Transform.scale(
                 scale: scaleFactor,
                 child: ImageFiltered(
@@ -61,8 +106,6 @@ class CharacterDisplayWidget extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Imatge nítida a sobre amb cantons rodons
               Transform.scale(
                 scale: scaleFactor,
                 child: AnimatedOpacity(
@@ -84,58 +127,64 @@ class CharacterDisplayWidget extends StatelessWidget {
             ],
           ),
         ),
+
         const SizedBox(height: 8),
+
+        // Barra de vida i després nom en columna vertical
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.grey.shade300,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Row(
-            mainAxisAlignment: isEnemy
-                ? MainAxisAlignment.end
-                : MainAxisAlignment.spaceBetween,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              if (!isEnemy) ...[
-                Row(
-                  children: [
+              Row(
+                mainAxisAlignment: isEnemy
+                    ? MainAxisAlignment.end
+                    : MainAxisAlignment.spaceBetween,
+                children: [
+                  if (!isEnemy) ...[
+                    Row(
+                      children: [
+                        HealthBarWidget(
+                          currentHealth: health,
+                          maxHealth: maxHealth,
+                          showText: false,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${health.toInt()}/$maxHealth",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                  if (isEnemy) ...[
                     HealthBarWidget(
                       currentHealth: health,
                       maxHealth: maxHealth,
-                      showText: false, // No mostrar text dins la barra
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "${health.toInt()}/$maxHealth", // Mostrar text separat
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
+                      showText: false,
                     ),
                   ],
-                ),
-              ],
-              const SizedBox(width: 10),
-              Flexible(
-                child: Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                ],
               ),
-              if (isEnemy) ...[
-                const SizedBox(width: 10),
-                HealthBarWidget(
-                  currentHealth: health,
-                  maxHealth: maxHealth,
-                  showText: false, // No mostrar text per enemic
+              const SizedBox(height: 4),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
-              ],
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),

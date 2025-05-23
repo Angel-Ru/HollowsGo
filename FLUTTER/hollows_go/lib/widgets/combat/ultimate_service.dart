@@ -119,16 +119,22 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
 
-        break;
+// GRIMMJOW
       case 11:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/grimmjow/marco_grimmjow.png',
           audioAsset: 'special_attack/grimmjow/grimmjow_aud.mp3',
           videoAsset: 'assets/special_attack/grimmjow/grimmjow_vid.mp4',
-          damage: 350,
+          damage: 100, // no hace daño directo
           rotateScreen: false,
-          onDamageApplied: onDamageApplied,
+          onDamageApplied: (_) {
+            // Aplicar el buff de +300 al próximo ataque aliado
+            combatProvider.buffPlayerAttack(300);
+          },
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
