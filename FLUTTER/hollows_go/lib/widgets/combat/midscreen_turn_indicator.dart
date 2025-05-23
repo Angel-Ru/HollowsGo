@@ -15,11 +15,11 @@ class MidScreenTurnIndicator extends StatelessWidget {
           opacity: isEnemyTurn ? 1.0 : 0.2,
           duration: const Duration(milliseconds: 400),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              const Icon(Icons.arrow_upward, color: Colors.red, size: 24),
-              const SizedBox(width: 8),
-              Container(height: 8, width: 120, color: Colors.red),
+                            const SizedBox(width: 8),
+
+              const Icon(Icons.arrow_upward, color: Colors.red, size: 30),
             ],
           ),
         ),
@@ -31,9 +31,9 @@ class MidScreenTurnIndicator extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(height: 8, width: 120, color: Colors.green),
+          
               const SizedBox(width: 8),
-              const Icon(Icons.arrow_downward, color: Colors.green, size: 24),
+              const Icon(Icons.arrow_downward, color: Colors.green, size: 30),
             ],
           ),
         ),
