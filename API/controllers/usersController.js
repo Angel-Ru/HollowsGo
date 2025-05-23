@@ -830,63 +830,92 @@ exports.obtenirAmistats = async (req, res) => {
     }
 };
 
-// Obtenir les sol·licituds d'amistat d'un usuari i acceptar o rebutjar-les
-exports.acceptaramistats = async (req, res) => {
+// Obtenir les sol·licituds d'amistat d'un usuari pendents
+exports.obtenirpendents = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        const { amistatId } = req.body; // ID de la relació d'amistat
+        const connection = await connectDB();
+
+        const [amistats] = await connection.execute(`
+            SELECT
+        CASE
+        WHEN a.id_usuari = ? THEN u2.nom
+        ELSE u1.nom
+        END AS nom_amic,
+            a.estat
+        FROM AMISTATS a
+        JOIN USUARIS u1 ON a.id_usuari = u1.id
+        JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+        WHERE (a.id_usuari = ? OR a.id_usuari_amic = ?)
+        AND a.estat = 'pendent'`
+            , [userId, userId, userId]);
+
+        res.status(200).json(amistats);
+    } catch (error) {
+        console.error('Error obtenint amistats pendents:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
+
+// Acceptar una sol·licitud d'amistat
+exports.acceptarAmistat = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const { amistatId } = req.body;
 
         if (!amistatId) {
-            return res.status(400).json({ missatge: 'Falta l\'ID de l\'amistat' });
+            return res.status(400).json({ missatge: "Falta l'ID de l'amistat" });
         }
 
         const connection = await connectDB();
 
-        // 1. Verificar que la sol·licitud existeixi i estigui pendent
-        const [sollicitud] = await connection.execute(
+        // Verificar que la sol·licitud existeix i que és per aquest usuari
+        const [resultats] = await connection.execute(
             `SELECT * FROM AMISTATS 
-             WHERE id = ? 
-             AND estat = 'pendent'
-             AND id_usuari_amic = ?`, // Assegurar que l'usuari actual és el destinatari
+       WHERE id = ? 
+       AND estat = 'pendent' 
+       AND id_usuari_amic = ?`,
             [amistatId, userId]
         );
 
-        if (sollicitud.length === 0) {
+        if (resultats.length === 0) {
             return res.status(404).json({
-                missatge: 'No s\'ha trobat la sol·licitud o ja està processada'
+                missatge: 'No s\'ha trobat la sol·licitud o ja ha estat processada',
             });
         }
 
-        // 2. Actualitzar l'estat a 'acceptat'
+        // Acceptar l'amistat
         await connection.execute(
             `UPDATE AMISTATS
-             SET estat = 'acceptat'
-             WHERE id = ?`,
+       SET estat = 'acceptat'
+       WHERE id = ?`,
             [amistatId]
         );
 
-        // 3. Retornar la informació actualitzada
+        // Retornar la sol·licitud actualitzada
         const [amistatActualitzada] = await connection.execute(
-            `SELECT
-                 a.id,
-                 a.id_usuari,
-                 a.id_usuari_amic,
-                 u1.nom as nom_solicitant,
-                 u2.nom as nom_destinatari,
-                 a.estat
-             FROM AMISTATS a
-                      JOIN USUARIS u1 ON a.id_usuari = u1.id
-                      JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
-             WHERE a.id = ?`,
+            `SELECT 
+          a.id,
+          a.id_usuari,
+          a.id_usuari_amic,
+          u1.nom AS nom_solicitant,
+          u2.nom AS nom_destinatari,
+          a.estat
+       FROM AMISTATS a
+       JOIN USUARIS u1 ON a.id_usuari = u1.id
+       JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+       WHERE a.id = ?`,
             [amistatId]
         );
 
         res.status(200).json({
             missatge: 'Sol·licitud acceptada correctament',
-            amistat: amistatActualitzada[0]
+            amistat: amistatActualitzada[0],
         });
     } catch (error) {
         console.error('Error al acceptar amistat:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
+
+

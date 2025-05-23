@@ -19,49 +19,45 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
 
   void _refreshAmistats() {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-
-    // Ara només fem servir fetchAmistatsUsuari, ja que fetchAmistatsPendentsUsuari no està definit
     _amistatsFuture = userProvider.fetchAmistatsUsuari();
 
     if (mounted) setState(() {});
   }
 
   Future<void> _acceptarAmistat(int amistatId, String nomAmic) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
 
-    final prefs = await SharedPreferences.getInstance();
-    int? userId = prefs.getInt('userId');
-    String? token = prefs.getString('token');
+      if (token == null) {
+        _showSnackBar('Usuari no autenticat', isError: true);
+        return;
+      }
 
-    if (userId == null || token == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Usuari no autenticat'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
+      final acceptat = await userProvider.acceptarAmistat(amistatId, token);
+
+      if (acceptat && mounted) {
+        _showSnackBar('Has acceptat la sol·licitud de $nomAmic');
+        _refreshAmistats();
+      } else if (mounted) {
+        _showSnackBar('Error al acceptar la sol·licitud', isError: true);
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Error: ${e.toString()}', isError: true);
+      }
+      print('Error en _acceptarAmistat: $e');
     }
+  }
 
-    final acceptat =
-        await userProvider.acceptarAmistat(userId, amistatId, token);
-
-    if (acceptat && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Has acceptat la sol·licitud de $nomAmic'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      _refreshAmistats();
-    } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error al acceptar la sol·licitud'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
+    );
   }
 
   @override
@@ -100,8 +96,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
               final amistat = amistats[index];
               final nom = amistat['nom_amic'] ?? 'Desconegut';
               final estat = amistat['estat'] ?? 'desconegut';
-              final amistatId =
-                  amistat['id'] ?? 0; // Important tenir aquest id!
+              final amistatId = amistat['id'] ?? 0;
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

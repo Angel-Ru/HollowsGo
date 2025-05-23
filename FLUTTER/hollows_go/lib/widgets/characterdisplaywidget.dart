@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'dart:ui'; // Para ImageFilter.blur
 import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/widgets/healthbarwidget.dart';
@@ -28,70 +27,50 @@ class CharacterDisplayWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Contenedor de la imagen con efectos
+        // Contenedor de la imagen con bordes difuminados
         Container(
           height: isEnemy ? 300 : 250,
           width: isEnemy ? 300 : 250,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Sombra difuminada (base para el efecto de vuelo)
-              if (!isHit) ...[
-                Positioned.fill(
-                  child: Transform.scale(
-                    scale: 1.05,
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.contain,
-                      color: Colors.black.withOpacity(0.2),
-                      colorBlendMode: BlendMode.dstATop,
-                    ),
-                  ),
+              // Imagen principal
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: isHit ? 0.5 : 1.0,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.error),
                 ),
-                Positioned.fill(
-                  child: Transform.scale(
-                    scale: 1.03,
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.contain,
-                      color: Colors.black.withOpacity(0.1),
-                      colorBlendMode: BlendMode.dstATop,
-                    ),
-                  ),
-                ),
-              ],
+              ),
 
-              // Imagen principal con máscara de difuminado
-              ClipRRect(
-                borderRadius:
-                    BorderRadius.circular(150), // Borde circular suave
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: isHit ? 0.5 : 1.0,
-                  child: ImageFiltered(
-                    imageFilter: ImageFilter.blur(
-                      sigmaX: 1.5,
-                      sigmaY: 1.5,
+              // Máscara de difuminado perimetral
+              IgnorePointer(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                      30), // Ajusta para suavizar esquinas
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 6, // Intensidad del difuminado (4-8 es óptimo)
+                      sigmaY: 6,
                       tileMode: TileMode.decal,
                     ),
                     child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 20,
-                            spreadRadius: 5,
-                            offset: Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Image.network(
-                        imageUrl,
-                        height: isEnemy ? 290 : 240, // Reducción para el efecto
-                        width: isEnemy ? 290 : 240,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                      decoration: const BoxDecoration(
+                        gradient: RadialGradient(
+                          colors: [
+                            Colors.transparent,
+                            Colors.transparent,
+                            Colors.black12,
+                          ],
+                          stops: [
+                            0.7,
+                            0.9,
+                            1.0
+                          ], // Controla dónde empieza el difuminado
+                          radius: 0.8,
+                        ),
                       ),
                     ),
                   ),
@@ -101,7 +80,7 @@ class CharacterDisplayWidget extends StatelessWidget {
           ),
         ),
 
-        // Resto del widget (barra de vida y nombre)
+        // Barra de vida y nombre
         const SizedBox(height: 1),
         Container(
           padding: const EdgeInsets.all(10),
