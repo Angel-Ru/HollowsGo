@@ -12,6 +12,10 @@ class CharacterDisplayWidget extends StatelessWidget {
   final bool isHit;
   final bool isEnemy;
 
+  /// Parámetros nuevos
+  final double imageSize;
+  final double blurSigma;
+
   const CharacterDisplayWidget({
     required this.imageUrl,
     required this.name,
@@ -19,26 +23,30 @@ class CharacterDisplayWidget extends StatelessWidget {
     required this.maxHealth,
     required this.isHit,
     this.isEnemy = false,
+    this.imageSize = 250,
+    this.blurSigma = 1.2,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final double size = isEnemy ? 300 : 250;
+    // Escalamos automáticamente si es enemigo
+    final double size = isEnemy ? imageSize * 1.2 : imageSize;
+    final double blur = isEnemy ? blurSigma * 1.3 : blurSigma;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
+        SizedBox(
           height: size,
           width: size,
           child: Stack(
             alignment: Alignment.center,
             children: [
               // Imagen con borde difuminado sutil
-              _buildSoftEdgedImage(size),
+              _buildSoftEdgedImage(size, blur),
 
-              // Sombra exterior (flotante)
+              // Sombra exterior flotante (opcional)
               if (!isHit)
                 Container(
                   height: size,
@@ -95,19 +103,19 @@ class CharacterDisplayWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildSoftEdgedImage(double size) {
+  Widget _buildSoftEdgedImage(double size, double blur) {
     return SizedBox(
       height: size,
       width: size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Capa inferior con blur
+          // Capa inferior con blur suave
           ClipOval(
             child: ImageFiltered(
               imageFilter: ImageFilter.blur(
-                sigmaX: 1.2,
-                sigmaY: 1.2,
+                sigmaX: blur,
+                sigmaY: blur,
               ),
               child: Image.network(
                 imageUrl,
@@ -116,7 +124,7 @@ class CharacterDisplayWidget extends StatelessWidget {
             ),
           ),
 
-          // Imagen nítida encima
+          // Capa nítida encima
           ClipOval(
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
