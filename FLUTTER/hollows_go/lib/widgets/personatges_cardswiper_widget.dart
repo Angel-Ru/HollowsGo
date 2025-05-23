@@ -50,13 +50,13 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     _loadVidaPerSkins();
   }
 
-  Future<void> _downloadAllSkinImages() async {
+ Future<void> _downloadAllSkinImages() async {
   try {
     final directory = await getApplicationDocumentsDirectory();
     final dio = Dio();
 
-    for (final skin in widget.personatge.skins) {
-      if (skin.imatge == null || skin.imatge!.isEmpty) continue;
+    final futures = widget.personatge.skins.map((skin) async {
+      if (skin.imatge == null || skin.imatge!.isEmpty) return;
 
       final fileName = skin.imatge!.split('/').last;
       final localDir = Directory('${directory.path}/skins');
@@ -73,28 +73,35 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
           await dio.download(skin.imatge!, localPath);
           _localImagePaths[skin.id] = localPath;
         } catch (e) {
-          // Error en descarregar, no bloqueja l'app, es pot usar la URL
           debugPrint('Error descarregant imatge: $e');
         }
       }
-    }
+    }).toList();
 
-    setState(() {}); // Actualitza per utilitzar imatges locals
+    // Esperem que totes les descàrregues acabin paral·lelament
+    await Future.wait(futures);
+
+    setState(() {}); // Un sol setState al final
   } catch (e) {
     debugPrint('Error accedint a documents: $e');
   }
 }
 
+Future<void> _loadVidaPerSkins() async {
+  final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+  final futures = widget.personatge.skins.map((skin) async {
+    final vida = await combatProvider.fetchSkinVidaActual(skin.id);
+    return MapEntry(skin.id, vida);
+  }).toList();
 
-  Future<void> _loadVidaPerSkins() async {
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    for (final skin in widget.personatge.skins) {
-      final vida = await combatProvider.fetchSkinVidaActual(skin.id);
-      setState(() {
-        _vidaPerSkin[skin.id] = vida;
-      });
-    }
-  }
+  final results = await Future.wait(futures);
+  final newVidaMap = Map<int, double?>.fromEntries(results);
+
+  setState(() {
+    _vidaPerSkin.addAll(newVidaMap);
+  });
+}
+
 
   @override
   void dispose() {
