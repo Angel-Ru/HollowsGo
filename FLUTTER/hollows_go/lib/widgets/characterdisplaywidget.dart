@@ -12,7 +12,7 @@ class CharacterDisplayWidget extends StatelessWidget {
   final bool isHit;
   final bool isEnemy;
 
-  /// Parámetros personalizables
+  /// Personalización
   final double imageSize;
   final double blurSigma;
 
@@ -24,14 +24,14 @@ class CharacterDisplayWidget extends StatelessWidget {
     required this.isHit,
     this.isEnemy = false,
     this.imageSize = 250,
-    this.blurSigma = 1.2,
+    this.blurSigma = 3.0,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final double size = isEnemy ? imageSize * 1.2 : imageSize;
-    final double blur = isEnemy ? blurSigma * 1.3 : blurSigma;
+    final double blur = isEnemy ? blurSigma * 1.2 : blurSigma;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,26 +42,36 @@ class CharacterDisplayWidget extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Imagen con desenfoque sutil
-              _buildSoftEdgedImage(size, blur),
+              // Imagen desenfocada de fondo para fusión natural
+              ImageFiltered(
+                imageFilter: ImageFilter.blur(
+                  sigmaX: blur,
+                  sigmaY: blur,
+                ),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  height: size * 1.1, // Levemente más grande para efecto "halo"
+                  width: size * 1.1,
+                  alignment: Alignment.center,
+                  color: Colors.black.withOpacity(0.05),
+                  colorBlendMode: BlendMode.darken,
+                ),
+              ),
 
-              // Sombra opcional si no está siendo golpeado
-              if (!isHit)
-                Container(
+              // Imagen principal nítida
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: isHit ? 0.5 : 1.0,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
                   height: size,
                   width: size,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                  alignment: Alignment.center,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.error),
                 ),
+              ),
             ],
           ),
         ),
@@ -99,42 +109,6 @@ class CharacterDisplayWidget extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSoftEdgedImage(double size, double blur) {
-    return SizedBox(
-      height: size,
-      width: size,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Imagen desenfocada sutilmente debajo
-          ImageFiltered(
-            imageFilter: ImageFilter.blur(
-              sigmaX: blur,
-              sigmaY: blur,
-            ),
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              color: Colors.black.withOpacity(0.05),
-              colorBlendMode: BlendMode.darken,
-            ),
-          ),
-
-          // Imagen nítida encima
-          AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
-            opacity: isHit ? 0.5 : 1.0,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const Icon(Icons.error),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
