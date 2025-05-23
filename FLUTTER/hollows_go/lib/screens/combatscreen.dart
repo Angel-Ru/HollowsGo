@@ -1,5 +1,7 @@
+import 'package:hollows_go/widgets/combat/midscreen_turn_indicator.dart';
+
 import '../imports.dart';
-import '../providers/habilitat_provider.dart'; // asumo que tienes tus widgets importados aquí
+import '../providers/habilitat_provider.dart';
 
 class CombatScreen extends StatelessWidget {
   @override
@@ -35,10 +37,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       final skinsProvider =
           Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-      await skinsProvider
-          .selectRandomSkin(); // <-- Crida aquí la càrrega de l'enemic!
+      await skinsProvider.selectRandomSkin();
 
-      // Ara sí, agafem aliat i enemic carregats
       final aliat = skinsProvider.selectedSkinAliat ??
           skinsProvider.selectedSkinQuincy ??
           skinsProvider.selectedSkinEnemic;
@@ -72,11 +72,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
         _partidaJugadaSumada = true;
       }
     });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   void _setRandomBackground() {
@@ -160,10 +155,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                   const SizedBox(height: 24),
                   Text(
                     'Estàs segur que vols sortir de l\'aplicació?',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
@@ -172,10 +164,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text(
-                          'No',
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        child: const Text('No',
+                            style: TextStyle(color: Colors.white)),
                       ),
                       ElevatedButton(
                         onPressed: () => Navigator.of(context).pop(true),
@@ -238,6 +228,11 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                   isEnemyTurn: combatProvider.isEnemyTurn,
                   allyName: allyName,
                   enemyName: enemyName,
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: MidScreenTurnIndicator(
+                      isEnemyTurn: combatProvider.isEnemyTurn),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
