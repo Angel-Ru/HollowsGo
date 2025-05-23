@@ -4,10 +4,12 @@ import 'package:hollows_go/imports.dart';
 class HealthBarWidget extends StatelessWidget {
   final double currentHealth;
   final int maxHealth;
+  final bool showText; // 👈 Nou paràmetre
 
   const HealthBarWidget({
     required this.currentHealth,
     required this.maxHealth,
+    this.showText = true, // 👈 Per defecte sí que es mostra
     Key? key,
   }) : super(key: key);
 
@@ -19,11 +21,11 @@ class HealthBarWidget extends StatelessWidget {
         : (healthPercentage < 0.6 ? Colors.orange : Colors.green);
 
     return Stack(
-      alignment: Alignment.center,
+      alignment: Alignment.centerLeft,
       children: [
         Container(
           width: 200,
-          height: 24,
+          height: 12, // 👈 Més estret
           decoration: BoxDecoration(
             color: Colors.grey.shade700,
             borderRadius: BorderRadius.circular(10),
@@ -42,7 +44,7 @@ class HealthBarWidget extends StatelessWidget {
               ),
               builder: (context, value, child) => Container(
                 width: value,
-                height: 24,
+                height: 12, // 👈 Igual d’estret
                 decoration: BoxDecoration(
                   color: barColor,
                   borderRadius: BorderRadius.circular(10),
@@ -51,14 +53,19 @@ class HealthBarWidget extends StatelessWidget {
             ),
           ),
         ),
-        Text(
-          "${currentHealth.toInt()}/$maxHealth",
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+        if (showText)
+          Positioned.fill(
+            child: Center(
+              child: Text(
+                "${currentHealth.toInt()}/$maxHealth",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
-        ),
       ],
     );
   }

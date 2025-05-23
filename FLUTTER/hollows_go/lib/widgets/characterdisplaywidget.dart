@@ -28,10 +28,10 @@ class CharacterDisplayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double scaleFactor = isEnemy ? 1.9 : 1.9;
+    final double scaleFactor = 1.9; // Igual per enemic i aliat
     final double containerSize = imageSize * scaleFactor;
     final double blur = isEnemy ? blurSigma * 1.2 : blurSigma;
-    final BorderRadius imageBorderRadius = BorderRadius.circular(10); // ajusta el radi
+    final BorderRadius imageBorderRadius = BorderRadius.circular(10);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,7 +84,6 @@ class CharacterDisplayWidget extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(10),
@@ -93,11 +92,30 @@ class CharacterDisplayWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
-            mainAxisAlignment:
-                isEnemy ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: isEnemy
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.spaceBetween,
             children: [
-              if (!isEnemy)
-                HealthBarWidget(currentHealth: health, maxHealth: maxHealth),
+              if (!isEnemy) ...[
+                Row(
+                  children: [
+                    HealthBarWidget(
+                      currentHealth: health,
+                      maxHealth: maxHealth,
+                      showText: false, // No mostrar text dins la barra
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "${health.toInt()}/$maxHealth", // Mostrar text separat
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
               const SizedBox(width: 10),
               Flexible(
                 child: Text(
@@ -112,7 +130,11 @@ class CharacterDisplayWidget extends StatelessWidget {
               ),
               if (isEnemy) ...[
                 const SizedBox(width: 10),
-                HealthBarWidget(currentHealth: health, maxHealth: maxHealth),
+                HealthBarWidget(
+                  currentHealth: health,
+                  maxHealth: maxHealth,
+                  showText: false, // No mostrar text per enemic
+                ),
               ],
             ],
           ),
