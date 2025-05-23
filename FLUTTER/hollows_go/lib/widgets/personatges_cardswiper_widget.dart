@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../imports.dart';
+import 'healthbarwidget.dart';
 
 class PersonatgesCardSwiper extends StatefulWidget {
   final Personatge personatge;
@@ -437,33 +438,14 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     );
 
     return Container(
-      width: 10,
-      height: 160,
-      margin: const EdgeInsets.only(right: 4, top: 12),
-      decoration: BoxDecoration(
-        color: percent > 0 ? Colors.grey.shade600 : Colors.grey.shade800,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Colors.black),
-      ),
-      child: Align(
-        alignment: Alignment.bottomCenter,
-        child: _animarBarraVida
-            ? TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0.0, end: percent),
-                duration: const Duration(milliseconds: 1000),
-                curve: Curves.easeOut,
-                builder: (context, animatedPercent, child) {
-                  return FractionallySizedBox(
-                    heightFactor: animatedPercent,
-                    child: barraInterior,
-                  );
-                },
-              )
-            : FractionallySizedBox(
-                heightFactor: percent,
-                child: barraInterior,
-              ),
-      ),
-    );
+    margin: const EdgeInsets.only(right: 8, top: 12),
+    child: HealthBarWidget(
+      currentHealth: vida,
+      maxHealth: skin.vidaMaxima!,
+      showText: false,
+      isVertical: true, // Aquí la fem vertical
+    ),
+  );
+
   }
 }

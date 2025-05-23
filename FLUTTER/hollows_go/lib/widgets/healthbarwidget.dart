@@ -1,15 +1,16 @@
-// health_bar_widget.dart
-import 'package:hollows_go/imports.dart';
+import 'package:flutter/material.dart';
 
 class HealthBarWidget extends StatelessWidget {
   final double currentHealth;
   final int maxHealth;
-  final bool showText; // 👈 Nou paràmetre
+  final bool showText;
+  final bool isVertical; // Nou paràmetre per orientació
 
   const HealthBarWidget({
     required this.currentHealth,
     required this.maxHealth,
-    this.showText = true, // 👈 Per defecte sí que es mostra
+    this.showText = true,
+    this.isVertical = false, // per defecte horitzontal
     Key? key,
   }) : super(key: key);
 
@@ -20,12 +21,16 @@ class HealthBarWidget extends StatelessWidget {
         ? Colors.red
         : (healthPercentage < 0.6 ? Colors.orange : Colors.green);
 
+    // Dimensions segons orientació
+    final double width = isVertical ? 12 : 200;
+    final double height = isVertical ? 160 : 12;
+
     return Stack(
-      alignment: Alignment.centerLeft,
+      alignment: isVertical ? Alignment.bottomCenter : Alignment.centerLeft,
       children: [
         Container(
-          width: 200,
-          height: 12, // 👈 Més estret
+          width: width,
+          height: height,
           decoration: BoxDecoration(
             color: Colors.grey.shade700,
             borderRadius: BorderRadius.circular(10),
@@ -33,35 +38,41 @@ class HealthBarWidget extends StatelessWidget {
           ),
         ),
         Positioned(
-          left: 0,
+          left: isVertical ? null : 0,
+          bottom: isVertical ? 0 : null,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: TweenAnimationBuilder<double>(
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               tween: Tween<double>(
                 begin: 0,
-                end: 200 * healthPercentage,
+                end: isVertical ? height * healthPercentage : width * healthPercentage,
               ),
-              builder: (context, value, child) => Container(
-                width: value,
-                height: 12, // 👈 Igual d’estret
-                decoration: BoxDecoration(
-                  color: barColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              builder: (context, value, child) {
+                return Container(
+                  width: isVertical ? width : value,
+                  height: isVertical ? value : height,
+                  decoration: BoxDecoration(
+                    color: barColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                );
+              },
             ),
           ),
         ),
         if (showText)
           Positioned.fill(
             child: Center(
-              child: Text(
-                "${currentHealth.toInt()}/$maxHealth",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+              child: RotatedBox(
+                quarterTurns: isVertical ? 1 : 0, // Rota el text si es vertical
+                child: Text(
+                  "${currentHealth.toInt()}/$maxHealth",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
