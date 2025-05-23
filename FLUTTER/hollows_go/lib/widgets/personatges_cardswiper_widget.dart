@@ -51,6 +51,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   }
 
   Future<void> _downloadAllSkinImages() async {
+  try {
     final directory = await getApplicationDocumentsDirectory();
     final dio = Dio();
 
@@ -58,24 +59,32 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
       if (skin.imatge == null || skin.imatge!.isEmpty) continue;
 
       final fileName = skin.imatge!.split('/').last;
-      final localPath = '${directory.path}/skins/$fileName';
+      final localDir = Directory('${directory.path}/skins');
+      if (!await localDir.exists()) {
+        await localDir.create(recursive: true);
+      }
+      final localPath = '${localDir.path}/$fileName';
 
       final file = File(localPath);
       if (await file.exists()) {
         _localImagePaths[skin.id] = localPath;
       } else {
         try {
-          await file.parent.create(recursive: true);
           await dio.download(skin.imatge!, localPath);
           _localImagePaths[skin.id] = localPath;
         } catch (e) {
-          // En cas d'error no fem res, usarem la URL normal
+          // Error en descarregar, no bloqueja l'app, es pot usar la URL
+          debugPrint('Error descarregant imatge: $e');
         }
       }
     }
 
-    setState(() {}); // Actualitzem per usar imatges locals
+    setState(() {}); // Actualitza per utilitzar imatges locals
+  } catch (e) {
+    debugPrint('Error accedint a documents: $e');
   }
+}
+
 
   Future<void> _loadVidaPerSkins() async {
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
