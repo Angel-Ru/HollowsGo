@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../imports.dart';
 
@@ -31,7 +29,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   late final PageController _pageController;
   int _currentPage = 0;
   final Map<int, double?> _vidaPerSkin = {};
-  final Map<int, String> _localImagePaths = {}; // Guardar paths locals
 
   bool _animarBarraVida = false;
 
@@ -39,63 +36,45 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 0.65);
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page?.round() ?? 0;
-      });
-    });
+    _pageController.addListener(_onPageChanged);
 
-    _downloadAllSkinImages();
-    _loadVidaPerSkins();
+    _loadVidaPerSkinsAroundPage(_currentPage);
   }
 
-  Future<void> _downloadAllSkinImages() async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final dio = Dio();
-
-      for (final skin in widget.personatge.skins) {
-        if (skin.imatge == null || skin.imatge!.isEmpty) continue;
-
-        final fileName = skin.imatge!.split('/').last;
-        final localDir = Directory('${directory.path}/skins');
-        if (!await localDir.exists()) {
-          await localDir.create(recursive: true);
-        }
-        final localPath = '${localDir.path}/$fileName';
-
-        final file = File(localPath);
-        if (await file.exists()) {
-          _localImagePaths[skin.id] = localPath;
-        } else {
-          try {
-            await dio.download(skin.imatge!, localPath);
-            _localImagePaths[skin.id] = localPath;
-          } catch (e) {
-            // Error en descarregar, no bloqueja l'app, es pot usar la URL
-            debugPrint('Error descarregant imatge: $e');
-          }
-        }
-      }
-
-      setState(() {}); // Actualitza per utilitzar imatges locals
-    } catch (e) {
-      debugPrint('Error accedint a documents: $e');
+  void _onPageChanged() {
+    final newPage = _pageController.page?.round() ?? 0;
+    if (newPage != _currentPage) {
+      setState(() {
+        _currentPage = newPage;
+      });
+      _loadVidaPerSkinsAroundPage(newPage);
     }
   }
 
-  Future<void> _loadVidaPerSkins() async {
+  /// Carrega la vida només per la skin actual i les adjacents (lazy loading)
+  Future<void> _loadVidaPerSkinsAroundPage(int page) async {
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    for (final skin in widget.personatge.skins) {
+    final skins = widget.personatge.skins;
+
+    final indices = [page];
+    if (page - 1 >= 0) indices.add(page - 1);
+    if (page + 1 < skins.length) indices.add(page + 1);
+
+    for (final i in indices) {
+      final skin = skins[i];
+      if (_vidaPerSkin.containsKey(skin.id)) continue; // Ja carregada
       final vida = await combatProvider.fetchSkinVidaActual(skin.id);
-      setState(() {
-        _vidaPerSkin[skin.id] = vida;
-      });
+      if (mounted) {
+        setState(() {
+          _vidaPerSkin[skin.id] = vida;
+        });
+      }
     }
   }
 
   @override
   void dispose() {
+    _pageController.removeListener(_onPageChanged);
     _pageController.dispose();
     super.dispose();
   }
@@ -113,8 +92,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: true);
-    final isFavorite =
-        userProvider.personatgePreferitId == widget.personatge.id;
+    final isFavorite = userProvider.personatgePreferitId == widget.personatge.id;
     final maxHeight = _calculateMaxSkinCardHeight(widget.personatge.skins);
 
     return Column(
@@ -210,8 +188,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   }
 
   Future<void> _toggleFavorite(UserProvider userProvider) async {
-    final isCurrentlyFavorite =
-        userProvider.personatgePreferitId == widget.personatge.id;
+    final isCurrentlyFavorite = userProvider.personatgePreferitId == widget.personatge.id;
     final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
     await userProvider.updatePersonatgePreferit(newId);
   }
@@ -232,10 +209,9 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     });
   }
 
-  Widget _buildSkinCardStyled(Skin skin, bool isSkinSelected,
-      bool isSkinFavorite, UserProvider userProvider) {
+  Widget _buildSkinCardStyled(
+      Skin skin, bool isSkinSelected, bool isSkinFavorite, UserProvider userProvider) {
     final displayName = _cleanSkinName(skin.nom, widget.personatge.nom);
-    final localImagePath = _localImagePaths[skin.id];
 
     return FractionallySizedBox(
       widthFactor: 0.9,
@@ -248,15 +224,13 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
         },
         onDoubleTap: () {
           if (widget.isEnemyMode) return;
-          if (widget.selectedSkin?.id == skin.id &&
-              widget.onSkinDeselected != null) {
+          if (widget.selectedSkin?.id == skin.id && widget.onSkinDeselected != null) {
             widget.onSkinDeselected!();
           }
         },
         onLongPress: () async {
           if (widget.isEnemyMode) return;
-          final armesProvider =
-              Provider.of<ArmesProvider>(context, listen: false);
+          final armesProvider = Provider.of<ArmesProvider>(context, listen: false);
           final usuariId = userProvider.userId;
           await mostrarDialegArmesPredefinides(
             context: context,
@@ -291,28 +265,14 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: localImagePath != null
-                        ? Image.file(
-                            File(localImagePath),
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Center(
-                                    child: Icon(Icons.error,
-                                        color: Colors.redAccent)),
-                          )
-                        : Image.network(
-                            skin.imatge ?? '',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Center(
-                                    child: Icon(Icons.error,
-                                        color: Colors.redAccent)),
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            },
-                          ),
+                    child: CachedNetworkImage(
+                      imageUrl: skin.imatge ?? '',
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          const Center(child: Icon(Icons.error, color: Colors.redAccent)),
+                    ),
                   ),
                   Positioned(
                     top: 8,
@@ -323,9 +283,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                         isSkinFavorite ? Icons.star : Icons.star_border,
                         color: isSkinFavorite ? Colors.yellow : Colors.grey,
                         size: 28,
-                        shadows: const [
-                          Shadow(blurRadius: 4, color: Colors.black)
-                        ],
+                        shadows: const [Shadow(blurRadius: 4, color: Colors.black)],
                       ),
                     ),
                   ),
@@ -333,20 +291,16 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: Icon(Icons.check_circle,
-                          color: _activeColor, size: 28),
+                      child: Icon(Icons.check_circle, color: _activeColor, size: 28),
                     ),
                   Positioned(
                     bottom: 60,
                     left: 8,
                     child: GestureDetector(
-                      behavior: HitTestBehavior
-                          .translucent, // que només s'activi aquí
+                      behavior: HitTestBehavior.translucent,
                       onTap: () async {
                         if (widget.isEnemyMode) return;
-                        final success = await Provider.of<VialsProvider>(
-                                context,
-                                listen: false)
+                        final success = await Provider.of<VialsProvider>(context, listen: false)
                             .utilitzarVial(
                           usuariId: userProvider.userId,
                           skinId: skin.id,
@@ -356,22 +310,14 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                             _animarBarraVida = true;
                           });
 
-                          final combatProvider = Provider.of<CombatProvider>(
-                              context,
-                              listen: false);
-                          final novaVida =
-                              await combatProvider.fetchSkinVidaActual(skin.id);
+                          final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+                          final novaVida = await combatProvider.fetchSkinVidaActual(skin.id);
 
                           setState(() {
                             _vidaPerSkin[skin.id] = novaVida;
-                            // NO canviïs la selecció de skin aquí per evitar conflictes
-                            // if (widget.selectedSkin?.id != skin.id) {
-                            //   widget.onSkinSelected(skin);
-                            // }
                           });
 
-                          Future.delayed(const Duration(milliseconds: 1100),
-                              () {
+                          Future.delayed(const Duration(milliseconds: 1100), () {
                             setState(() {
                               _animarBarraVida = false;
                             });
@@ -397,8 +343,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                     right: 0,
                     child: Container(
                       color: Colors.black.withOpacity(0.6),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -419,9 +364,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                             children: List.generate(4, (i) {
                               return Icon(
                                 Icons.star,
-                                color: i < (skin.categoria ?? 0)
-                                    ? Colors.yellow
-                                    : Colors.grey,
+                                color: i < (skin.categoria ?? 0) ? Colors.yellow : Colors.grey,
                                 size: 20,
                               );
                             }),
