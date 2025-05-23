@@ -205,12 +205,13 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
                                           text: _fullBankaiText,
                                           progress: _writeController.value,
                                           textStyle: const TextStyle(
-                                            fontSize: 64,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            letterSpacing: 8,
-                                            fontFamily: 'Serif',
-                                          ),
+  fontSize: 64,
+  fontWeight: FontWeight.bold,
+  color: Colors.white,
+  letterSpacing: 8,
+  fontFamily: 'Harukaze',  // Usa el nom que vas posar a pubspec.yaml
+),
+
                                         ),
                                       ),
                                     );
