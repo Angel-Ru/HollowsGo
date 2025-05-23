@@ -834,36 +834,59 @@ exports.obtenirAmistats = async (req, res) => {
 exports.acceptaramistats = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
+        const { amistatId } = req.body; // ID de la relació d'amistat
+
+        if (!amistatId) {
+            return res.status(400).json({ missatge: 'Falta l\'ID de l\'amistat' });
+        }
+
         const connection = await connectDB();
 
-        // 1. Primer fem update dels pendents a acceptats
+        // 1. Verificar que la sol·licitud existeixi i estigui pendent
+        const [sollicitud] = await connection.execute(
+            `SELECT * FROM AMISTATS 
+             WHERE id = ? 
+             AND estat = 'pendent'
+             AND id_usuari_amic = ?`, // Assegurar que l'usuari actual és el destinatari
+            [amistatId, userId]
+        );
+
+        if (sollicitud.length === 0) {
+            return res.status(404).json({
+                missatge: 'No s\'ha trobat la sol·licitud o ja està processada'
+            });
+        }
+
+        // 2. Actualitzar l'estat a 'acceptat'
         await connection.execute(
             `UPDATE AMISTATS
              SET estat = 'acceptat'
-             WHERE (id_usuari = ? OR id_usuari_amic = ?)
-               AND estat = 'pendent'`,
-            [userId, userId]
+             WHERE id = ?`,
+            [amistatId]
         );
 
-        // 2. Ara recuperem les amistats (ja com acceptades)
-        const [amistats] = await connection.execute(
-            `SELECT 
-                a.id,
-                CASE 
-                    WHEN a.id_usuari = ? THEN u2.nom
-                    ELSE u1.nom
-                END AS nom_amic,
-                a.estat
-            FROM AMISTATS a
-            JOIN USUARIS u1 ON a.id_usuari = u1.id
-            JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
-            WHERE a.id_usuari = ? OR a.id_usuari_amic = ?`,
-            [userId, userId, userId]
+        // 3. Retornar la informació actualitzada
+        const [amistatActualitzada] = await connection.execute(
+            `SELECT
+                 a.id,
+                 a.id_usuari,
+                 a.id_usuari_amic,
+                 u1.nom as nom_solicitant,
+                 u2.nom as nom_destinatari,
+                 a.estat
+             FROM AMISTATS a
+                      JOIN USUARIS u1 ON a.id_usuari = u1.id
+                      JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+             WHERE a.id = ?`,
+            [amistatId]
         );
 
-        res.status(200).json(amistats);
+        res.status(200).json({
+            missatge: 'Sol·licitud acceptada correctament',
+            amistat: amistatActualitzada[0]
+        });
     } catch (error) {
-        console.error('Error al acceptar amistats pendents:', error);
+        console.error('Error al acceptar amistat:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
