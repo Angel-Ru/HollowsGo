@@ -270,22 +270,30 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> acceptarAmistat(int userId, int amistatId, String token) async {
+  Future<bool> acceptarAmistat(int amistatId, String token) async {
     try {
-      final url =
-          Uri.parse('https://${Config.ip}/usuaris/amics/$userId/acceptar');
+      final url = Uri.parse('https://${Config.ip}/amistats/acceptar');
       final headers = {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       };
-      final body = json.encode({'amistat_id': amistatId});
 
-      final response = await http.put(url, headers: headers, body: body);
+      final body = json.encode({
+        'amistatId':
+            amistatId, // Important: Ha de coincidir amb el que espera el backend
+      });
+
+      final response = await http.put(
+        url,
+        headers: headers,
+        body: body,
+      );
 
       if (response.statusCode == 200) {
         return true;
       } else {
-        print('Error acceptant amistat: ${response.statusCode}');
+        print(
+            'Error acceptant amistat: ${response.statusCode} - ${response.body}');
         return false;
       }
     } catch (e) {
