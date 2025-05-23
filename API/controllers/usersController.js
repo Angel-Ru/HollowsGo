@@ -861,21 +861,25 @@ exports.obtenirpendents = async (req, res) => {
 exports.acceptarAmistat = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        const { amistatId } = req.body;
+        let { id_usuari, id_usuari_amic } = req.body;
 
-        if (!amistatId) {
-            return res.status(400).json({ missatge: "Falta l'ID de l'amistat" });
+        if (!id_usuari || !id_usuari_amic) {
+            return res.status(400).json({ missatge: "Falten els IDs de l'amistat" });
         }
+
+        // Ordenar els IDs si cal (opcional segons el teu model de dades)
+        const usuariMin = Math.min(id_usuari, id_usuari_amic);
+        const usuariMax = Math.max(id_usuari, id_usuari_amic);
 
         const connection = await connectDB();
 
-        // Verificar que la sol·licitud existeix i que és per aquest usuari
+        // Verificar que la sol·licitud existeix i que va dirigida a aquest usuari
         const [resultats] = await connection.execute(
             `SELECT * FROM AMISTATS 
-       WHERE id = ? 
-       AND estat = 'pendent' 
-       AND id_usuari_amic = ?`,
-            [amistatId, userId]
+             WHERE id_usuari = ? AND id_usuari_amic = ? 
+             AND estat = 'pendent' 
+             AND id_usuari_amic = ?`,
+            [usuariMin, usuariMax, userId]
         );
 
         if (resultats.length === 0) {
@@ -887,25 +891,24 @@ exports.acceptarAmistat = async (req, res) => {
         // Acceptar l'amistat
         await connection.execute(
             `UPDATE AMISTATS
-       SET estat = 'acceptat'
-       WHERE id = ?`,
-            [amistatId]
+             SET estat = 'acceptat'
+             WHERE id_usuari = ? AND id_usuari_amic = ?`,
+            [usuariMin, usuariMax]
         );
 
         // Retornar la sol·licitud actualitzada
         const [amistatActualitzada] = await connection.execute(
-            `SELECT 
-          a.id,
-          a.id_usuari,
-          a.id_usuari_amic,
-          u1.nom AS nom_solicitant,
-          u2.nom AS nom_destinatari,
-          a.estat
-       FROM AMISTATS a
-       JOIN USUARIS u1 ON a.id_usuari = u1.id
-       JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
-       WHERE a.id = ?`,
-            [amistatId]
+            `SELECT
+                 a.id_usuari,
+                 a.id_usuari_amic,
+                 u1.nom AS nom_solicitant,
+                 u2.nom AS nom_destinatari,
+                 a.estat
+             FROM AMISTATS a
+                      JOIN USUARIS u1 ON a.id_usuari = u1.id
+                      JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+             WHERE a.id_usuari = ? AND a.id_usuari_amic = ?`,
+            [usuariMin, usuariMax]
         );
 
         res.status(200).json({
@@ -917,5 +920,3 @@ exports.acceptarAmistat = async (req, res) => {
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
-
-

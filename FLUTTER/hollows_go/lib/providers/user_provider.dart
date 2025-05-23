@@ -270,34 +270,70 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> acceptarAmistat(int amistatId, String token) async {
+  Future<List<Map<String, dynamic>>> fetchAmistatsPendents() async {
     try {
-      final url = Uri.parse('https://${Config.ip}/amistats/acceptar');
+      final prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      String? token = prefs.getString('token');
+
+      if (userId == null || token == null) return [];
+
+      final url =
+          Uri.parse('https://${Config.ip}/usuaris/amics/$userId/pendents');
       final headers = {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
       };
 
-      final body = json.encode({
-        'amistatId':
-            amistatId, // Important: Ha de coincidir amb el que espera el backend
-      });
-
-      final response = await http.put(
-        url,
-        headers: headers,
-        body: body,
-      );
+      final response = await http.put(url, headers: headers);
 
       if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map<Map<String, dynamic>>((amistat) {
+          return {
+            'nom_amic': amistat['nom_amic'],
+            'estat': amistat['estat'],
+          };
+        }).toList();
+      } else {
+        print('Error en fetchAmistatsPendents: ${response.statusCode}');
+        return [];
+      }
+    } catch (error) {
+      print('Error a fetchAmistatsPendents: $error');
+      return [];
+    }
+  }
+
+  Future<bool> acceptarAmistat(int amistatId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      int? userId = prefs.getInt('userId');
+      String? token = prefs.getString('token');
+
+      if (userId == null || token == null) return false;
+
+      final url =
+          Uri.parse('https://${Config.ip}/usuaris/amics/$userId/acceptar');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final body = jsonEncode({'id': amistatId});
+
+      final response = await http.put(url, headers: headers, body: body);
+
+      if (response.statusCode == 200) {
+        print('Amistat acceptada correctament.');
         return true;
       } else {
         print(
-            'Error acceptant amistat: ${response.statusCode} - ${response.body}');
+            'Error a acceptarAmistat: ${response.statusCode} ${response.body}');
         return false;
       }
-    } catch (e) {
-      print('Error a acceptarAmistat: $e');
+    } catch (error) {
+      print('Excepció a acceptarAmistat: $error');
       return false;
     }
   }
