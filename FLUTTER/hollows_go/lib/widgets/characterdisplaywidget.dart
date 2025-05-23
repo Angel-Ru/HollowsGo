@@ -58,18 +58,15 @@ class CharacterDisplayWidget extends StatelessWidget {
                     ),
                     child: Container(
                       decoration: const BoxDecoration(
-                        gradient: RadialGradient(
+                        gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
                             Colors.transparent,
-                            Colors.black12,
+                            Colors.black12
                           ],
-                          stops: [
-                            0.7,
-                            0.9,
-                            1.0
-                          ], // Controla dónde empieza el difuminado
-                          radius: 0.8,
+                          stops: [0.6, 0.8, 1.0],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
                       ),
                     ),

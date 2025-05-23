@@ -102,7 +102,8 @@ class _MapaScreenState extends State<Mapscreen> {
   }
 
   void _checkSkinSelection() {
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     if (provider.selectedSkinAliat == null) {
       PersonatgeNoSeleccionatDialog.mostrar(context);
     }
@@ -155,7 +156,8 @@ class _MapaScreenState extends State<Mapscreen> {
   @override
   void didUpdateWidget(Mapscreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.profileImagePath != widget.profileImagePath && _currentLocation != null) {
+    if (oldWidget.profileImagePath != widget.profileImagePath &&
+        _currentLocation != null) {
       _updateUserMarker();
     }
   }
