@@ -22,7 +22,7 @@ class CharacterDisplayWidget extends StatelessWidget {
     required this.isHit,
     this.isEnemy = false,
     this.imageSize = 100,
-    this.blurSigma = 2.0,
+    this.blurSigma = 0.8,
     Key? key,
   }) : super(key: key);
 
@@ -31,6 +31,7 @@ class CharacterDisplayWidget extends StatelessWidget {
     final double scaleFactor = isEnemy ? 1.9 : 1.9;
     final double containerSize = imageSize * scaleFactor;
     final double blur = isEnemy ? blurSigma * 1.2 : blurSigma;
+    final BorderRadius imageBorderRadius = BorderRadius.circular(10); // ajusta el radi
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -41,35 +42,41 @@ class CharacterDisplayWidget extends StatelessWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Fons desenfocat
+              // Fons desenfocat amb cantons rodons
               Transform.scale(
                 scale: scaleFactor,
                 child: ImageFiltered(
                   imageFilter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.network(
-                      imageUrl,
-                      alignment: Alignment.center,
-                      color: Colors.black.withOpacity(0.05),
-                      colorBlendMode: BlendMode.darken,
+                  child: ClipRRect(
+                    borderRadius: imageBorderRadius,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Image.network(
+                        imageUrl,
+                        alignment: Alignment.center,
+                        color: Colors.black.withOpacity(0.05),
+                        colorBlendMode: BlendMode.darken,
+                      ),
                     ),
                   ),
                 ),
               ),
 
-              // Imatge nítida a sobre
+              // Imatge nítida a sobre amb cantons rodons
               Transform.scale(
                 scale: scaleFactor,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 300),
                   opacity: isHit ? 0.5 : 1.0,
-                  child: FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.network(
-                      imageUrl,
-                      alignment: Alignment.center,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                  child: ClipRRect(
+                    borderRadius: imageBorderRadius,
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Image.network(
+                        imageUrl,
+                        alignment: Alignment.center,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                      ),
                     ),
                   ),
                 ),
