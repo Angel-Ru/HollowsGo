@@ -52,7 +52,7 @@ router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.
 // Ruta per obtenir totes les amistats d'un usuari
 router.get('/amics/:id', verificacioUsuari.verifyToken, userController.obtenirAmistats);
 
-// Ruta per afegir un amic
+// Ruta per veure les sol·licituds pendents d'un usuari
 router.put('/amics/:id/pendents', verificacioUsuari.verifyToken, userController.obtenirpendents);
 
 // Ruta per acceptar una sol·licitud d'amistat

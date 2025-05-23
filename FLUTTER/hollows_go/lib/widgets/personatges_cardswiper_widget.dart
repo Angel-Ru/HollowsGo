@@ -30,17 +30,27 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   bool _animarBarraVida = false;
 
   @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(viewportFraction: 0.65);
-    _pageController.addListener(() {
-      setState(() {
-        _currentPage = _pageController.page?.round() ?? 0;
-      });
+void initState() {
+  super.initState();
+  _pageController = PageController(viewportFraction: 0.65);
+  _pageController.addListener(() {
+    setState(() {
+      _currentPage = _pageController.page?.round() ?? 0;
     });
+  });
 
-    _loadVidaPerSkins();
+  _loadVidaPerSkins();
+  _precacheAllSkinImages();
+}
+
+Future<void> _precacheAllSkinImages() async {
+  for (final skin in widget.personatge.skins) {
+    if (skin.imatge != null && skin.imatge!.isNotEmpty) {
+      precacheImage(CachedNetworkImageProvider(skin.imatge!), context);
+    }
   }
+}
+
 
   Future<void> _loadVidaPerSkins() async {
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
