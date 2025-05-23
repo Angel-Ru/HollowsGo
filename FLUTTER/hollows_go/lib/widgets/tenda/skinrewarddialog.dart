@@ -57,34 +57,42 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
   }
 
   Future<void> _startBankaiThenVideo() async {
-    final String? videoPath = widget.skin?['video_especial'];
+  final String? videoPath = widget.skin?['video_especial'];
 
-    if (videoPath != null && videoPath.isNotEmpty) {
-      setState(() {
-        _showBankaiScreen = true;
-        _bankaiWritten = false;
-      });
+  setState(() {
+    _showBankaiScreen = true;
+    _bankaiWritten = false;
+  });
 
-      await _playBankaiAudioWithTyping();
+  await _playBankaiAudioWithTyping();
 
-      setState(() {
-        _bankaiWritten = true;
-      });
+  setState(() {
+    _bankaiWritten = true;
+  });
 
-      await _fadeOutController.forward();
-      await _initVideo();
-      await _slashController.forward();
+  await _fadeOutController.forward();
 
-      _videoController?.addListener(() {
-        if (_videoController!.value.position >= _videoController!.value.duration) {
-          setState(() {
-            _showDialogContent = true;
-          });
-          _animations.playEntryAnimation();
-        }
-      });
-    }
+  if (videoPath != null && videoPath.isNotEmpty) {
+    await _initVideo();
+    await _slashController.forward();
+
+    _videoController?.addListener(() {
+      if (_videoController!.value.position >= _videoController!.value.duration) {
+        setState(() {
+          _showDialogContent = true;
+        });
+        _animations.playEntryAnimation();
+      }
+    });
+  } else {
+    // No hay video, mostrar contenido directamente
+    setState(() {
+      _showDialogContent = true;
+    });
+    _animations.playEntryAnimation();
   }
+}
+
 
   Future<void> _playBankaiAudioWithTyping() async {
     await _audioPlayer.setSource(AssetSource('special_attack/yamamoto/yamamoto_aud.mp3'));

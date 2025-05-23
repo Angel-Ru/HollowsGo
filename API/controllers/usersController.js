@@ -831,37 +831,39 @@ exports.obtenirAmistats = async (req, res) => {
 };
 
 // Obtenir les sol·licituds d'amistat d'un usuari i acceptar o rebutjar-les
-exports.acceptarAmistat = async (req, res) => {
+exports.acceptaramistats = async (req, res) => {
     try {
-        const userId = parseInt(req.params.id); // usuari que accepta
-        const amistatId = parseInt(req.body.amistat_id);
-
-        if (!amistatId) {
-            return res.status(400).json({ missatge: 'Falta amistat_id' });
-        }
-
+        const userId = parseInt(req.params.id);
         const connection = await connectDB();
 
-        // Comprova que l'amistat existeixi i que estigui pendent
-        const [amistat] = await connection.execute(`
-      SELECT *
-      FROM AMISTATS
-      WHERE id = ? AND estat = 'pendent' AND (id_usuari = ? OR id_usuari_amic = ?)
-    `, [amistatId, userId, userId]);
+        // 1. Primer fem update dels pendents a acceptats
+        await connection.execute(
+            `UPDATE AMISTATS
+             SET estat = 'acceptat'
+             WHERE (id_usuari = ? OR id_usuari_amic = ?)
+               AND estat = 'pendent'`,
+            [userId, userId]
+        );
 
-        if (amistat.length === 0) {
-            return res.status(404).json({ missatge: 'Amistat no trobada o no pendent' });
-        }
+        // 2. Ara recuperem les amistats (ja com acceptades)
+        const [amistats] = await connection.execute(
+            `SELECT 
+                a.id,
+                CASE 
+                    WHEN a.id_usuari = ? THEN u2.nom
+                    ELSE u1.nom
+                END AS nom_amic,
+                a.estat
+            FROM AMISTATS a
+            JOIN USUARIS u1 ON a.id_usuari = u1.id
+            JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+            WHERE a.id_usuari = ? OR a.id_usuari_amic = ?`,
+            [userId, userId, userId]
+        );
 
-        await connection.execute(`
-      UPDATE AMISTATS
-      SET estat = 'acceptat'
-      WHERE id = ?
-    `, [amistatId]);
-
-        res.status(200).json({ missatge: 'Amistat acceptada' });
+        res.status(200).json(amistats);
     } catch (error) {
-        console.error('Error acceptant amistat:', error);
+        console.error('Error al acceptar amistats pendents:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
