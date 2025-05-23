@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/widgets/healthbarwidget.dart';
@@ -25,53 +27,35 @@ class CharacterDisplayWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Contenedor principal con efecto de borde difuminado
+        // Contenedor con efecto de borde ultra-sutil
         Container(
           height: isEnemy ? 300 : 250,
           width: isEnemy ? 300 : 250,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Sombra exterior difuminada (simula el borde)
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 15,
-                      spreadRadius: 3,
-                    ),
-                  ],
-                ),
-              ),
+              // Imagen principal con doble capa para el efecto de borde
+              _buildSoftEdgedImage(),
 
-              // Imagen principal con máscara de recorte suave
-              ClipRRect(
-                borderRadius: BorderRadius.circular(150),
-                child: Container(
+              // Sombra circular suave (opcional)
+              if (!isHit)
+                Container(
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.black.withOpacity(0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: isHit ? 0.5 : 1.0,
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.error),
-                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
                   ),
                 ),
-              ),
             ],
           ),
         ),
 
-        // Barra de vida y nombre
+        // Barra de vida y nombre (sin cambios)
         const SizedBox(height: 1),
         Container(
           padding: const EdgeInsets.all(10),
@@ -106,6 +90,50 @@ class CharacterDisplayWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSoftEdgedImage() {
+    return ClipRRect(
+      borderRadius:
+          BorderRadius.circular(150), // Ajusta según la forma del personaje
+      child: Stack(
+        children: [
+          // Capa base con mini-difuminado (0.5px)
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(
+              sigmaX: 0.5,
+              sigmaY: 0.5,
+              tileMode: TileMode.decal,
+            ),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.contain,
+              color: Colors.black.withOpacity(0.05),
+              colorBlendMode: BlendMode.darken,
+            ),
+          ),
+
+          // Capa superior nítida (recortada 1px más pequeña)
+          Center(
+            child: Container(
+              margin: const EdgeInsets.all(1), // Compensa el blur
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(150),
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: isHit ? 0.5 : 1.0,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
