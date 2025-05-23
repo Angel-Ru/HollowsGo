@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 import 'package:video_player/video_player.dart';
 import 'package:hollows_go/providers/combat_provider.dart';
 import 'package:hollows_go/providers/habilitat_provider.dart';
@@ -150,6 +151,58 @@ class UltimateService {
           onDamageApplied: onDamageApplied,
           onEnemyDefeated: onEnemyDefeated,
         );
+        break;
+
+      case 18: // Tosen - Buff i Debuff + fons negre + baixa lluminositat
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+
+        // Estableix la lluminositat al mínim
+        try {
+          await ScreenBrightness().setScreenBrightness(0.0);
+        } catch (e) {
+          debugPrint("Error al establir lluminositat mínima: $e");
+        }
+
+        // Crea un overlay temporal amb fons negre
+        final overlay = OverlayEntry(
+          builder: (context) => Positioned.fill(
+            child: Container(
+              color: Colors.black,
+              child: Image.asset(
+                'assets/special_attack/tosen/fons_negre.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        );
+
+        Overlay.of(context).insert(overlay);
+
+        // Executa l'animació de l'ulti normalment
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/tosen/marco_tosen.png',
+          audioAsset: 'special_attack/tosen/tosen_aud.mp3',
+          videoAsset: 'assets/special_attack/tosen/tosen_vid.mp4',
+          damage: 0, // No fa dany directe, només buffs/debuffs
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            combatProvider.buffPlayerAttack(100);
+            combatProvider.applyEnemyAttackDebuff(150);
+            debugPrint("[DEBUG] Buff +100 i Debuff -150 aplicats per Tosen");
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+
+        overlay.remove();
+
+        // Restaura la lluminositat (opcional, si vols que torni al valor original després)
+        try {
+          await ScreenBrightness().resetScreenBrightness();
+        } catch (e) {
+          debugPrint("Error al restaurar lluminositat: $e");
+        }
         break;
 
       default:
