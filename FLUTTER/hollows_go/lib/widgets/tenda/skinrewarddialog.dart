@@ -57,23 +57,34 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
   }
 
   Future<void> _startBankaiThenVideo() async {
-  final String? videoPath = widget.skin?['video_especial'];
+    final String? videoPath = widget.skin?['video_especial'];
 
-  setState(() {
-    _showBankaiScreen = true;
-    _bankaiWritten = false;
-  });
+    if (videoPath == null || videoPath.isEmpty) {
+      // No hi ha vídeo: no mostrar pantalla negra ni àudio, mostrar contingut directament
+      setState(() {
+        _showBankaiScreen = false;
+        _showDialogContent = true;
+      });
+      _animations.playEntryAnimation();
+      return;
+    }
 
-  await _playBankaiAudioWithTyping();
+    // Hi ha vídeo: mostrar pantalla negra i reproduir àudio
+    setState(() {
+      _showBankaiScreen = true;
+      _bankaiWritten = false;
+    });
 
-  setState(() {
-    _bankaiWritten = true;
-  });
+    await _playBankaiAudioWithTyping();
 
-  await _fadeOutController.forward();
+    setState(() {
+      _bankaiWritten = true;
+    });
 
-  if (videoPath != null && videoPath.isNotEmpty) {
+    await _fadeOutController.forward();
+
     await _initVideo();
+
     await _slashController.forward();
 
     _videoController?.addListener(() {
@@ -84,15 +95,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
         _animations.playEntryAnimation();
       }
     });
-  } else {
-    // No hay video, mostrar contenido directamente
-    setState(() {
-      _showDialogContent = true;
-    });
-    _animations.playEntryAnimation();
   }
-}
-
 
   Future<void> _playBankaiAudioWithTyping() async {
     await _audioPlayer.setSource(AssetSource('special_attack/yamamoto/yamamoto_aud.mp3'));
@@ -270,48 +273,39 @@ class _InkWritePainter extends CustomPainter {
 
   _InkWritePainter({required this.text, required this.progress, required this.textStyle});
 
- @override
-void paint(Canvas canvas, Size size) {
-  final characters = text.characters.toList();
-  final countToShow = (characters.length * progress).floor();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final characters = text.characters.toList();
+    final countToShow = (characters.length * progress).floor();
 
-  double totalWidth = 0;
-  final visiblePainters = <TextPainter>[];
+    double totalWidth = 0;
+    final visiblePainters = <TextPainter>[];
 
-  for (int i = 0; i < characters.length; i++) {
-    final isVisible = i < countToShow;
-    final char = characters[i];
+    for (int i = 0; i < characters.length; i++) {
+      final isVisible = i < countToShow;
+      final char = characters[i];
 
-    final tp = TextPainter(
-      text: TextSpan(
-        text: char,
-        style: textStyle.copyWith(
-          color: isVisible ? textStyle.color : Colors.transparent,
+      final tp = TextPainter(
+        text: TextSpan(
+          text: char,
+          style: textStyle.copyWith(
+            color: isVisible ? textStyle.color : Colors.transparent,
+          ),
         ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
+        textDirection: TextDirection.ltr,
+      )..layout();
 
-    visiblePainters.add(tp);
-    totalWidth += tp.width + (textStyle.letterSpacing ?? 0);
-  }
+      visiblePainters.add(tp);
+      totalWidth += tp.width + (textStyle.letterSpacing ?? 0);
+    }
 
-  double x = (size.width - totalWidth) / 2;
-  final y = (size.height - textStyle.fontSize!) / 2;
+    double x = (size.width - totalWidth) / 2;
+    final y = (size.height - textStyle.fontSize!) / 2;
 
-  for (final tp in visiblePainters) {
-    tp.paint(canvas, Offset(x, y));
-    x += tp.width + (textStyle.letterSpacing ?? 0);
-  }
-}
-
-
-  double textPainterWidth() {
-    final tp = TextPainter(
-      text: TextSpan(text: text, style: textStyle),
-      textDirection: TextDirection.ltr,
-    )..layout();
-    return tp.width;
+    for (final tp in visiblePainters) {
+      tp.paint(canvas, Offset(x, y));
+      x += tp.width + (textStyle.letterSpacing ?? 0);
+    }
   }
 
   @override
