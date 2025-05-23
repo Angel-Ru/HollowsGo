@@ -3,60 +3,41 @@ import 'package:flutter/material.dart';
 class MidScreenTurnIndicator extends StatelessWidget {
   final bool isEnemyTurn;
 
-  const MidScreenTurnIndicator({required this.isEnemyTurn});
+  const MidScreenTurnIndicator({required this.isEnemyTurn, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 40),
-      width: MediaQuery.of(context).size.width * 0.85,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Fletxa enemic (cap a esquerra)
-          AnimatedOpacity(
-            opacity: isEnemyTurn ? 1.0 : 0.3,
-            duration: Duration(milliseconds: 300),
-            child: Transform.rotate(
-              angle: 3.14, // 180º per apuntar a la dreta
-              child: Icon(
-                Icons.arrow_forward_ios,
-                size: 28,
-                color: Colors.redAccent,
-              ),
-            ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Indicador de torn de l'enemic
+        AnimatedOpacity(
+          opacity: isEnemyTurn ? 1.0 : 0.2,
+          duration: const Duration(milliseconds: 400),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const Icon(Icons.arrow_upward, color: Colors.red, size: 24),
+              const SizedBox(width: 8),
+              Container(height: 8, width: 120, color: Colors.red),
+            ],
           ),
-
-          // Línia central estirada
-          Expanded(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 12),
-              height: 4,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.redAccent,
-                    Colors.white,
-                    Colors.greenAccent,
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+        ),
+        const SizedBox(height: 8),
+        // Indicador de torn de l'aliat
+        AnimatedOpacity(
+          opacity: isEnemyTurn ? 0.2 : 1.0,
+          duration: const Duration(milliseconds: 400),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(height: 8, width: 120, color: Colors.green),
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_downward, color: Colors.green, size: 24),
+            ],
           ),
-
-          // Fletxa aliat (cap a dreta)
-          AnimatedOpacity(
-            opacity: isEnemyTurn ? 0.3 : 1.0,
-            duration: Duration(milliseconds: 300),
-            child: Icon(
-              Icons.arrow_forward_ios,
-              size: 28,
-              color: Colors.greenAccent,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
