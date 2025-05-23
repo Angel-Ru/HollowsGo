@@ -1,8 +1,6 @@
-import 'dart:ui'; // Para ImageFilter.blur
 import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/widgets/healthbarwidget.dart';
-import 'package:provider/provider.dart';
 
 class CharacterDisplayWidget extends StatelessWidget {
   final String imageUrl;
@@ -27,57 +25,24 @@ class CharacterDisplayWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Contenedor de la imagen con bordes difuminados
+        // Contenedor con efecto de bordes difuminados
         Container(
           height: isEnemy ? 300 : 250,
           width: isEnemy ? 300 : 250,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Imagen principal
+              // Imagen original
               AnimatedOpacity(
                 duration: const Duration(milliseconds: 300),
                 opacity: isHit ? 0.5 : 1.0,
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.error),
-                ),
-              ),
-
-              // Máscara de difuminado perimetral
-              IgnorePointer(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(
-                      30), // Ajusta para suavizar esquinas
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: 6, // Intensidad del difuminado (4-8 es óptimo)
-                      sigmaY: 6,
-                      tileMode: TileMode.decal,
-                    ),
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            Colors.transparent,
-                            Colors.black12
-                          ],
-                          stops: [0.6, 0.8, 1.0],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                child: _buildImageWithFeatheredEdges(),
               ),
             ],
           ),
         ),
 
-        // Barra de vida y nombre
+        // Resto del widget (barra de vida y nombre)
         const SizedBox(height: 1),
         Container(
           padding: const EdgeInsets.all(10),
@@ -112,6 +77,28 @@ class CharacterDisplayWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildImageWithFeatheredEdges() {
+    return ShaderMask(
+      blendMode: BlendMode.dstOut,
+      shaderCallback: (Rect bounds) {
+        return RadialGradient(
+          center: Alignment.center,
+          radius: 0.9,
+          colors: [
+            Colors.black,
+            Colors.transparent,
+          ],
+          stops: [0.8, 1.0],
+        ).createShader(bounds);
+      },
+      child: Image.network(
+        imageUrl,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => const Icon(Icons.error),
+      ),
     );
   }
 }
