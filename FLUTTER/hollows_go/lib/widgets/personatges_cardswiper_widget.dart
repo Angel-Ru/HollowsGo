@@ -1,9 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../imports.dart';
 
@@ -32,7 +29,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   late final PageController _pageController;
   int _currentPage = 0;
   final Map<int, double?> _vidaPerSkin = {};
-  final Map<int, String> _localImagePaths = {}; // Guardar paths locals
 
   bool _animarBarraVida = false;
 
@@ -40,71 +36,45 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 0.65);
-    _pageController.addListener(() {
+    _pageController.addListener(_onPageChanged);
+
+    _loadVidaPerSkinsAroundPage(_currentPage);
+  }
+
+  void _onPageChanged() {
+    final newPage = _pageController.page?.round() ?? 0;
+    if (newPage != _currentPage) {
       setState(() {
-        _currentPage = _pageController.page?.round() ?? 0;
+        _currentPage = newPage;
       });
-    });
-
-    _downloadAllSkinImages();
-    _loadVidaPerSkins();
+      _loadVidaPerSkinsAroundPage(newPage);
+    }
   }
 
- Future<void> _downloadAllSkinImages() async {
-  try {
-    final directory = await getApplicationDocumentsDirectory();
-    final dio = Dio();
+  /// Carrega la vida només per la skin actual i les adjacents (lazy loading)
+  Future<void> _loadVidaPerSkinsAroundPage(int page) async {
+    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+    final skins = widget.personatge.skins;
 
-    final futures = widget.personatge.skins.map((skin) async {
-      if (skin.imatge == null || skin.imatge!.isEmpty) return;
+    final indices = [page];
+    if (page - 1 >= 0) indices.add(page - 1);
+    if (page + 1 < skins.length) indices.add(page + 1);
 
-      final fileName = skin.imatge!.split('/').last;
-      final localDir = Directory('${directory.path}/skins');
-      if (!await localDir.exists()) {
-        await localDir.create(recursive: true);
+    for (final i in indices) {
+      final skin = skins[i];
+      if (_vidaPerSkin.containsKey(skin.id)) continue; // Ja carregada
+      final vida = await combatProvider.fetchSkinVidaActual(skin.id);
+      if (mounted) {
+        setState(() {
+          _vidaPerSkin[skin.id] = vida;
+        });
       }
-      final localPath = '${localDir.path}/$fileName';
-
-      final file = File(localPath);
-      if (await file.exists()) {
-        _localImagePaths[skin.id] = localPath;
-      } else {
-        try {
-          await dio.download(skin.imatge!, localPath);
-          _localImagePaths[skin.id] = localPath;
-        } catch (e) {
-          debugPrint('Error descarregant imatge: $e');
-        }
-      }
-    }).toList();
-
-    // Esperem que totes les descàrregues acabin paral·lelament
-    await Future.wait(futures);
-
-    setState(() {}); // Un sol setState al final
-  } catch (e) {
-    debugPrint('Error accedint a documents: $e');
+    }
   }
-}
-
-Future<void> _loadVidaPerSkins() async {
-  final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-  final futures = widget.personatge.skins.map((skin) async {
-    final vida = await combatProvider.fetchSkinVidaActual(skin.id);
-    return MapEntry(skin.id, vida);
-  }).toList();
-
-  final results = await Future.wait(futures);
-  final newVidaMap = Map<int, double?>.fromEntries(results);
-
-  setState(() {
-    _vidaPerSkin.addAll(newVidaMap);
-  });
-}
-
 
   @override
   void dispose() {
+    _pageController.removeListener(_onPageChanged);
     _pageController.dispose();
     super.dispose();
   }
@@ -160,7 +130,8 @@ Future<void> _loadVidaPerSkins() async {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => DetailScreen(personatgeId: widget.personatge.id),
+                    builder: (context) =>
+                        DetailScreen(personatgeId: widget.personatge.id),
                   ),
                 );
               },
@@ -238,9 +209,9 @@ Future<void> _loadVidaPerSkins() async {
     });
   }
 
-  Widget _buildSkinCardStyled(Skin skin, bool isSkinSelected, bool isSkinFavorite, UserProvider userProvider) {
+  Widget _buildSkinCardStyled(
+      Skin skin, bool isSkinSelected, bool isSkinFavorite, UserProvider userProvider) {
     final displayName = _cleanSkinName(skin.nom, widget.personatge.nom);
-    final localImagePath = _localImagePaths[skin.id];
 
     return FractionallySizedBox(
       widthFactor: 0.9,
@@ -294,23 +265,14 @@ Future<void> _loadVidaPerSkins() async {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: localImagePath != null
-                        ? Image.file(
-                            File(localImagePath),
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Center(child: Icon(Icons.error, color: Colors.redAccent)),
-                          )
-                        : Image.network(
-                            skin.imatge ?? '',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Center(child: Icon(Icons.error, color: Colors.redAccent)),
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(child: CircularProgressIndicator());
-                            },
-                          ),
+                    child: CachedNetworkImage(
+                      imageUrl: skin.imatge ?? '',
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          const Center(child: Icon(Icons.error, color: Colors.redAccent)),
+                    ),
                   ),
                   Positioned(
                     top: 8,
@@ -335,9 +297,11 @@ Future<void> _loadVidaPerSkins() async {
                     bottom: 60,
                     left: 8,
                     child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
                       onTap: () async {
                         if (widget.isEnemyMode) return;
-                        final success = await Provider.of<VialsProvider>(context, listen: false).utilitzarVial(
+                        final success = await Provider.of<VialsProvider>(context, listen: false)
+                            .utilitzarVial(
                           usuariId: userProvider.userId,
                           skinId: skin.id,
                         );
@@ -351,9 +315,6 @@ Future<void> _loadVidaPerSkins() async {
 
                           setState(() {
                             _vidaPerSkin[skin.id] = novaVida;
-                            if (widget.selectedSkin?.id != skin.id) {
-                              widget.onSkinSelected(skin);
-                            }
                           });
 
                           Future.delayed(const Duration(milliseconds: 1100), () {
@@ -363,20 +324,16 @@ Future<void> _loadVidaPerSkins() async {
                           });
                         }
                         final snackBar = SnackBar(
-                          content: Text(success ? 'Vial utilitzat per curar!' : 'No hi ha vials disponibles'),
+                          content: Text(success
+                              ? 'Vial utilitzat correctament!'
+                              : 'No tens vials disponibles.'),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       },
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.8),
-                          shape: BoxShape.circle,
-                          boxShadow: const [
-                            BoxShadow(color: Colors.black38, blurRadius: 4, offset: Offset(0, 2)),
-                          ],
-                        ),
-                        child: const Icon(Icons.local_hospital, color: Colors.white, size: 26),
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.green,
+                        child: Icon(Icons.healing, color: Colors.white),
                       ),
                     ),
                   ),

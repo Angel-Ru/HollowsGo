@@ -20,7 +20,8 @@ class SkinRewardDialog extends StatefulWidget {
   State<SkinRewardDialog> createState() => _SkinRewardDialogState();
 }
 
-class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProviderStateMixin {
+class _SkinRewardDialogState extends State<SkinRewardDialog>
+    with TickerProviderStateMixin {
   final String _fullBankaiText = "Bankai";
 
   bool _showBankaiScreen = false;
@@ -88,7 +89,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
     await _slashController.forward();
 
     _videoController?.addListener(() {
-      if (_videoController!.value.position >= _videoController!.value.duration) {
+      if (_videoController!.value.position >=
+          _videoController!.value.duration) {
         setState(() {
           _showDialogContent = true;
         });
@@ -98,7 +100,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
   }
 
   Future<void> _playBankaiAudioWithTyping() async {
-    await _audioPlayer.setSource(AssetSource('special_attack/yamamoto/yamamoto_aud.mp3'));
+    await _audioPlayer
+        .setSource(AssetSource('special_attack/yamamoto/yamamoto_aud.mp3'));
 
     Duration? duration;
     final completer = Completer<void>();
@@ -192,7 +195,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
                               ),
                             ),
                             FadeTransition(
-                              opacity: Tween<double>(begin: 1, end: 0).animate(_fadeOutController),
+                              opacity: Tween<double>(begin: 1, end: 0)
+                                  .animate(_fadeOutController),
                               child: Center(
                                 child: AnimatedBuilder(
                                   animation: _writeController,
@@ -209,7 +213,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,
                                             letterSpacing: 8,
-                                            fontFamily: 'Serif',
+                                            fontFamily:
+                                                'Harukaze', // Usa el nom que vas posar a pubspec.yaml
                                           ),
                                         ),
                                       ),
@@ -223,14 +228,25 @@ class _SkinRewardDialogState extends State<SkinRewardDialog> with TickerProvider
                                 animation: _slashController,
                                 builder: (context, child) {
                                   return ClipPath(
-                                    clipper: SlashClipper(_slashController.value),
+                                    clipper:
+                                        SlashClipper(_slashController.value),
                                     child: child,
                                   );
                                 },
                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: Chewie(controller: _chewieController!),
-                                ),
+  borderRadius: BorderRadius.circular(16),
+  child: AnimatedBuilder(
+    animation: _slashController,
+    builder: (context, child) {
+      return ClipPath(
+        clipper: SlashClipper(_slashController.value),
+        child: child,
+      );
+    },
+    child: Chewie(controller: _chewieController!),
+  ),
+),
+
                               ),
                           ],
                         ),
@@ -271,7 +287,8 @@ class _InkWritePainter extends CustomPainter {
   final double progress;
   final TextStyle textStyle;
 
-  _InkWritePainter({required this.text, required this.progress, required this.textStyle});
+  _InkWritePainter(
+      {required this.text, required this.progress, required this.textStyle});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -310,6 +327,8 @@ class _InkWritePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _InkWritePainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.text != text || oldDelegate.textStyle != textStyle;
+    return oldDelegate.progress != progress ||
+        oldDelegate.text != text ||
+        oldDelegate.textStyle != textStyle;
   }
 }

@@ -72,7 +72,10 @@ flutter_launcher_icons:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
 flutter:
-
+  fonts:
+    - family: Harukaze
+      fonts:
+        - asset: assets/fonts/Harukaze.ttf
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
