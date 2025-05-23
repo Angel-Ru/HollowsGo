@@ -53,6 +53,6 @@ router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.
 router.get('/amics/:id', verificacioUsuari.verifyToken, userController.obtenirAmistats);
 
 // Ruta per afegir un amic
-router.put('/amics/:id/acceptar', verificacioUsuari.verifyToken, userController.acceptarAmistat);
+router.put('/amistats/:amistat_id/acceptar', verificacioUsuari.verifyToken, userController.acceptarAmistat);
 
 module.exports = router;
