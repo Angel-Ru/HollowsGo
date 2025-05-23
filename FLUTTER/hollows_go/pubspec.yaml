@@ -137,7 +137,7 @@ flutter:
     - assets/special_attack/as_nodt/as_nodt_aud.mp3
     - assets/special_attack/as_nodt/marco_as_nodt.png
     - assets/special_attack/as_nodt/as_nodt_vid.mp4
-    
+    - assets/loading/loading.gif
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

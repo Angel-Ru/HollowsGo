@@ -92,7 +92,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context, listen: true);
-    final isFavorite = userProvider.personatgePreferitId == widget.personatge.id;
+    final isFavorite =
+        userProvider.personatgePreferitId == widget.personatge.id;
     final maxHeight = _calculateMaxSkinCardHeight(widget.personatge.skins);
 
     return Column(
@@ -188,7 +189,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   }
 
   Future<void> _toggleFavorite(UserProvider userProvider) async {
-    final isCurrentlyFavorite = userProvider.personatgePreferitId == widget.personatge.id;
+    final isCurrentlyFavorite =
+        userProvider.personatgePreferitId == widget.personatge.id;
     final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
     await userProvider.updatePersonatgePreferit(newId);
   }
@@ -209,8 +211,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     });
   }
 
-  Widget _buildSkinCardStyled(
-      Skin skin, bool isSkinSelected, bool isSkinFavorite, UserProvider userProvider) {
+  Widget _buildSkinCardStyled(Skin skin, bool isSkinSelected,
+      bool isSkinFavorite, UserProvider userProvider) {
     final displayName = _cleanSkinName(skin.nom, widget.personatge.nom);
 
     return FractionallySizedBox(
@@ -224,13 +226,15 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
         },
         onDoubleTap: () {
           if (widget.isEnemyMode) return;
-          if (widget.selectedSkin?.id == skin.id && widget.onSkinDeselected != null) {
+          if (widget.selectedSkin?.id == skin.id &&
+              widget.onSkinDeselected != null) {
             widget.onSkinDeselected!();
           }
         },
         onLongPress: () async {
           if (widget.isEnemyMode) return;
-          final armesProvider = Provider.of<ArmesProvider>(context, listen: false);
+          final armesProvider =
+              Provider.of<ArmesProvider>(context, listen: false);
           final usuariId = userProvider.userId;
           await mostrarDialegArmesPredefinides(
             context: context,
@@ -268,10 +272,15 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                     child: CachedNetworkImage(
                       imageUrl: skin.imatge ?? '',
                       fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                          const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) =>
-                          const Center(child: Icon(Icons.error, color: Colors.redAccent)),
+                      placeholder: (context, url) => Center(
+                        child: Image.asset(
+                          'assets/loading/loading.gif',
+                          width: 40,
+                          height: 40,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.error, color: Colors.redAccent)),
                     ),
                   ),
                   Positioned(
@@ -283,7 +292,9 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                         isSkinFavorite ? Icons.star : Icons.star_border,
                         color: isSkinFavorite ? Colors.yellow : Colors.grey,
                         size: 28,
-                        shadows: const [Shadow(blurRadius: 4, color: Colors.black)],
+                        shadows: const [
+                          Shadow(blurRadius: 4, color: Colors.black)
+                        ],
                       ),
                     ),
                   ),
@@ -291,7 +302,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: Icon(Icons.check_circle, color: _activeColor, size: 28),
+                      child: Icon(Icons.check_circle,
+                          color: _activeColor, size: 28),
                     ),
                   Positioned(
                     bottom: 60,
@@ -300,7 +312,9 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                       behavior: HitTestBehavior.translucent,
                       onTap: () async {
                         if (widget.isEnemyMode) return;
-                        final success = await Provider.of<VialsProvider>(context, listen: false)
+                        final success = await Provider.of<VialsProvider>(
+                                context,
+                                listen: false)
                             .utilitzarVial(
                           usuariId: userProvider.userId,
                           skinId: skin.id,
@@ -310,14 +324,18 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                             _animarBarraVida = true;
                           });
 
-                          final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-                          final novaVida = await combatProvider.fetchSkinVidaActual(skin.id);
+                          final combatProvider = Provider.of<CombatProvider>(
+                              context,
+                              listen: false);
+                          final novaVida =
+                              await combatProvider.fetchSkinVidaActual(skin.id);
 
                           setState(() {
                             _vidaPerSkin[skin.id] = novaVida;
                           });
 
-                          Future.delayed(const Duration(milliseconds: 1100), () {
+                          Future.delayed(const Duration(milliseconds: 1100),
+                              () {
                             setState(() {
                               _animarBarraVida = false;
                             });
@@ -343,7 +361,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                     right: 0,
                     child: Container(
                       color: Colors.black.withOpacity(0.6),
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 10),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -364,7 +383,9 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                             children: List.generate(4, (i) {
                               return Icon(
                                 Icons.star,
-                                color: i < (skin.categoria ?? 0) ? Colors.yellow : Colors.grey,
+                                color: i < (skin.categoria ?? 0)
+                                    ? Colors.yellow
+                                    : Colors.grey,
                                 size: 20,
                               );
                             }),
