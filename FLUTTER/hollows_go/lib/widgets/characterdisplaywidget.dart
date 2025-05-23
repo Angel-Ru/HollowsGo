@@ -12,6 +12,10 @@ class CharacterDisplayWidget extends StatelessWidget {
   final bool isHit;
   final bool isEnemy;
 
+  /// Personalización
+  final double imageSize;
+  final double blurSigma;
+
   const CharacterDisplayWidget({
     required this.imageUrl,
     required this.name,
@@ -19,44 +23,59 @@ class CharacterDisplayWidget extends StatelessWidget {
     required this.maxHealth,
     required this.isHit,
     this.isEnemy = false,
+    this.imageSize = 250,
+    this.blurSigma = 3.0,
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final double size = isEnemy ? imageSize * 1.2 : imageSize;
+    final double blur = isEnemy ? blurSigma * 1.2 : blurSigma;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Contenedor con efecto de borde ultra-sutil
-        Container(
-          height: isEnemy ? 300 : 250,
-          width: isEnemy ? 300 : 250,
+        SizedBox(
+          height: size,
+          width: size,
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Imagen principal con doble capa para el efecto de borde
-              _buildSoftEdgedImage(),
-
-              // Sombra circular suave (opcional)
-              if (!isHit)
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 8,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
+              // Imagen desenfocada de fondo para fusión natural
+              ImageFiltered(
+                imageFilter: ImageFilter.blur(
+                  sigmaX: blur,
+                  sigmaY: blur,
                 ),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  height: size * 1.1, // Levemente más grande para efecto "halo"
+                  width: size * 1.1,
+                  alignment: Alignment.center,
+                  color: Colors.black.withOpacity(0.05),
+                  colorBlendMode: BlendMode.darken,
+                ),
+              ),
+
+              // Imagen principal nítida
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: isHit ? 0.5 : 1.0,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  height: size,
+                  width: size,
+                  alignment: Alignment.center,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                ),
+              ),
             ],
           ),
         ),
-
-        // Barra de vida y nombre (sin cambios)
-        const SizedBox(height: 1),
+        const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -90,50 +109,6 @@ class CharacterDisplayWidget extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSoftEdgedImage() {
-    return ClipRRect(
-      borderRadius:
-          BorderRadius.circular(150), // Ajusta según la forma del personaje
-      child: Stack(
-        children: [
-          // Capa base con mini-difuminado (0.5px)
-          ImageFiltered(
-            imageFilter: ImageFilter.blur(
-              sigmaX: 0.5,
-              sigmaY: 0.5,
-              tileMode: TileMode.decal,
-            ),
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.contain,
-              color: Colors.black.withOpacity(0.05),
-              colorBlendMode: BlendMode.darken,
-            ),
-          ),
-
-          // Capa superior nítida (recortada 1px más pequeña)
-          Center(
-            child: Container(
-              margin: const EdgeInsets.all(1), // Compensa el blur
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(150),
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: isHit ? 0.5 : 1.0,
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.error),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

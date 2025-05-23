@@ -1,3 +1,10 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
+
+
 import '../imports.dart';
 
 class PersonatgesCardSwiper extends StatefulWidget {
@@ -25,29 +32,56 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   late final PageController _pageController;
   int _currentPage = 0;
   final Map<int, double?> _vidaPerSkin = {};
+  final Map<int, String> _localImagePaths = {}; // Guardar paths locals
 
-  // Flag per controlar si la barra ha d'animar-se
   bool _animarBarraVida = false;
 
   @override
-void initState() {
-  super.initState();
-  _pageController = PageController(viewportFraction: 0.65);
-  _pageController.addListener(() {
-    setState(() {
-      _currentPage = _pageController.page?.round() ?? 0;
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.65);
+    _pageController.addListener(() {
+      setState(() {
+        _currentPage = _pageController.page?.round() ?? 0;
+      });
     });
-  });
 
-  _loadVidaPerSkins();
-  _precacheAllSkinImages();
-}
+    _downloadAllSkinImages();
+    _loadVidaPerSkins();
+  }
 
-Future<void> _precacheAllSkinImages() async {
-  for (final skin in widget.personatge.skins) {
-    if (skin.imatge != null && skin.imatge!.isNotEmpty) {
-      precacheImage(CachedNetworkImageProvider(skin.imatge!), context);
+  Future<void> _downloadAllSkinImages() async {
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final dio = Dio();
+
+    for (final skin in widget.personatge.skins) {
+      if (skin.imatge == null || skin.imatge!.isEmpty) continue;
+
+      final fileName = skin.imatge!.split('/').last;
+      final localDir = Directory('${directory.path}/skins');
+      if (!await localDir.exists()) {
+        await localDir.create(recursive: true);
+      }
+      final localPath = '${localDir.path}/$fileName';
+
+      final file = File(localPath);
+      if (await file.exists()) {
+        _localImagePaths[skin.id] = localPath;
+      } else {
+        try {
+          await dio.download(skin.imatge!, localPath);
+          _localImagePaths[skin.id] = localPath;
+        } catch (e) {
+          // Error en descarregar, no bloqueja l'app, es pot usar la URL
+          debugPrint('Error descarregant imatge: $e');
+        }
+      }
     }
+
+    setState(() {}); // Actualitza per utilitzar imatges locals
+  } catch (e) {
+    debugPrint('Error accedint a documents: $e');
   }
 }
 
@@ -156,7 +190,12 @@ Future<void> _precacheAllSkinImages() async {
                   children: [
                     Flexible(
                       fit: FlexFit.loose,
-                      child: _buildSkinCardStyled(skin, isSkinSelected, isSkinFavorite, userProvider),
+                      child: _buildSkinCardStyled(
+                        skin,
+                        isSkinSelected,
+                        isSkinFavorite,
+                        userProvider,
+                      ),
                     ),
                     const SizedBox(width: 4),
                     _buildBarraVida(skin.id),
@@ -194,6 +233,7 @@ Future<void> _precacheAllSkinImages() async {
 
   Widget _buildSkinCardStyled(Skin skin, bool isSkinSelected, bool isSkinFavorite, UserProvider userProvider) {
     final displayName = _cleanSkinName(skin.nom, widget.personatge.nom);
+    final localImagePath = _localImagePaths[skin.id];
 
     return FractionallySizedBox(
       widthFactor: 0.9,
@@ -247,16 +287,23 @@ Future<void> _precacheAllSkinImages() async {
               child: Stack(
                 children: [
                   Positioned.fill(
-                    child: Image.network(
-                      skin.imatge ?? '',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          const Center(child: Icon(Icons.error, color: Colors.redAccent)),
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                    ),
+                    child: localImagePath != null
+                        ? Image.file(
+                            File(localImagePath),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Center(child: Icon(Icons.error, color: Colors.redAccent)),
+                          )
+                        : Image.network(
+                            skin.imatge ?? '',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Center(child: Icon(Icons.error, color: Colors.redAccent)),
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(child: CircularProgressIndicator());
+                            },
+                          ),
                   ),
                   Positioned(
                     top: 8,
@@ -288,12 +335,10 @@ Future<void> _precacheAllSkinImages() async {
                           skinId: skin.id,
                         );
                         if (success) {
-                          // Activar animació de la barra
                           setState(() {
                             _animarBarraVida = true;
                           });
 
-                          // Tornem a carregar la vida actual de la skin
                           final combatProvider = Provider.of<CombatProvider>(context, listen: false);
                           final novaVida = await combatProvider.fetchSkinVidaActual(skin.id);
 
@@ -304,7 +349,6 @@ Future<void> _precacheAllSkinImages() async {
                             }
                           });
 
-                          // Desactivar animació després que acabi (1s)
                           Future.delayed(const Duration(milliseconds: 1100), () {
                             setState(() {
                               _animarBarraVida = false;
