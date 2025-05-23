@@ -224,15 +224,11 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
             body: Stack(
               children: [
                 CombatBackground(_backgroundImage),
-                TurnIndicator(
-                  isEnemyTurn: combatProvider.isEnemyTurn,
-                  allyName: allyName,
-                  enemyName: enemyName,
-                ),
                 Align(
                   alignment: Alignment.center,
                   child: MidScreenTurnIndicator(
-                      isEnemyTurn: combatProvider.isEnemyTurn),
+                    isEnemyTurn: combatProvider.isEnemyTurn,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
