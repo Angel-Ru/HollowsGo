@@ -1,6 +1,9 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/widgets/healthbarwidget.dart';
+import 'package:provider/provider.dart';
 
 class CharacterDisplayWidget extends StatelessWidget {
   final String imageUrl;
@@ -25,36 +28,81 @@ class CharacterDisplayWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Imagen con borde difuminado
-        AnimatedOpacity(
-          duration: const Duration(milliseconds: 300),
-          opacity: isHit ? 0.5 : 1.0,
-          child: ShaderMask(
-            shaderCallback: (Rect bounds) {
-              return RadialGradient(
-                center: Alignment.center,
-                radius: 0.8,
-                colors: [
-                  Colors.white,
-                  Colors.transparent,
-                ],
-                stops: const [0.85, 1.0],
-              ).createShader(bounds);
-            },
-            blendMode: BlendMode.dstIn,
-            child: Image.network(
-              imageUrl,
-              height: isEnemy ? 300 : 250,
-              width: isEnemy ? 300 : 250,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const Icon(Icons.error),
-            ),
+        // Contenedor de la imagen con efectos
+        Container(
+          height: isEnemy ? 300 : 250,
+          width: isEnemy ? 300 : 250,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Sombra difuminada (base para el efecto de vuelo)
+              if (!isHit) ...[
+                Positioned.fill(
+                  child: Transform.scale(
+                    scale: 1.05,
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                      color: Colors.black.withOpacity(0.2),
+                      colorBlendMode: BlendMode.dstATop,
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: Transform.scale(
+                    scale: 1.03,
+                    child: Image.network(
+                      imageUrl,
+                      fit: BoxFit.contain,
+                      color: Colors.black.withOpacity(0.1),
+                      colorBlendMode: BlendMode.dstATop,
+                    ),
+                  ),
+                ),
+              ],
+
+              // Imagen principal con máscara de difuminado
+              ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(150), // Borde circular suave
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: isHit ? 0.5 : 1.0,
+                  child: ImageFiltered(
+                    imageFilter: ImageFilter.blur(
+                      sigmaX: 1.5,
+                      sigmaY: 1.5,
+                      tileMode: TileMode.decal,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                            offset: Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Image.network(
+                        imageUrl,
+                        height: isEnemy ? 290 : 240, // Reducción para el efecto
+                        width: isEnemy ? 290 : 240,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
 
-        const SizedBox(height: 4),
-
-        // Barra de vida y nombre
+        // Resto del widget (barra de vida y nombre)
+        const SizedBox(height: 1),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
