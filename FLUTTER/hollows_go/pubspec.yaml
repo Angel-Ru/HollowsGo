@@ -130,7 +130,9 @@ flutter:
     - assets/special_attack/ichibe/ichibe_aud.mp3
     - assets/special_attack/ichibe/marco_ichibe.png
     - assets/special_attack/ichibe/ichibe_vid.mp4
-
+    - assets/special_attack/as_nodt/as_nodt_aud.mp3
+    - assets/special_attack/as_nodt/marco_as_nodt.png
+    - assets/special_attack/as_nodt/as_nodt_vid.mp4
     
     
   # An image asset can refer to one or more resolution-specific "variants", see

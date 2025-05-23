@@ -102,12 +102,12 @@ class UltimateService {
         );
         break;
 
-      case 10: // ID para el debuff
+      case 19: // ID para el debuff
         await _executeUlti(
           context,
-          imageAsset: 'assets/special_attack/ulquiorra/marco_ulquiorra.png',
-          audioAsset: 'special_attack/ulquiorra/ulquiorra_aud.mp3',
-          videoAsset: 'assets/special_attack/ulquiorra/ulquiorra_vid.mp4',
+          imageAsset: 'assets/special_attack/as_nodt/marco_as_nodt.png',
+          audioAsset: 'special_attack/as_nodt/as_nodt_aud.mp3',
+          videoAsset: 'assets/special_attack/as_nodt/as_nodt_vid.mp4',
           damage: 0, // No hace daño directo
           rotateScreen: false,
           onDamageApplied: (_) {
