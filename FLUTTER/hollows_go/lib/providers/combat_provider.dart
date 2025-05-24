@@ -1,7 +1,8 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import '../imports.dart';
-
-// combat_provider.dart
+import '../config.dart'; // Assegura't que tens aquest fitxer amb la IP de l'API
 
 class CombatProvider with ChangeNotifier {
   double? _aliatHealth;
@@ -11,9 +12,12 @@ class CombatProvider with ChangeNotifier {
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
-  int _bonusAllyDamage = 0; // <-- NUEVO
+
+  int _bonusAllyDamage = 0;
   int _enemyAttackDebuff = 0;
-  bool _showDebuffIndicator = false;
+
+  String? _overrideBackground;
+  String? get overrideBackground => _overrideBackground;
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -23,9 +27,8 @@ class CombatProvider with ChangeNotifier {
   bool get isAllyHit => _isAllyHit;
   bool get isAttackInProgress => _isAttackInProgress;
   bool get ultiUsed => _ultiUsed;
-  int get enemyAttackDebuff => _enemyAttackDebuff;
-  // NUEVO GETTER (opcional)
   int get bonusAllyDamage => _bonusAllyDamage;
+  int get enemyAttackDebuff => _enemyAttackDebuff;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -48,9 +51,18 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // NUEVO MÉTODO
   void buffPlayerAttack(int amount) {
     _bonusAllyDamage = amount;
+    notifyListeners();
+  }
+
+  void applyEnemyAttackDebuff(int amount) {
+    _enemyAttackDebuff = amount;
+    notifyListeners();
+  }
+
+  void setOverrideBackground(String? value) {
+    _overrideBackground = value;
     notifyListeners();
   }
 
@@ -68,13 +80,9 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = false;
     _isAttackInProgress = false;
     _ultiUsed = false;
-    _bonusAllyDamage = 0; // Reiniciamos el buff aquí
-    notifyListeners();
-  }
-
-  void applyEnemyAttackDebuff(int amount) {
-    _enemyAttackDebuff = amount;
-    _showDebuffIndicator = true;
+    _bonusAllyDamage = 0;
+    _enemyAttackDebuff = 0;
+    _overrideBackground = null; // ✅ Esborrar fons negre per pròxim combat
     notifyListeners();
   }
 
@@ -92,9 +100,8 @@ class CombatProvider with ChangeNotifier {
 
       await Future.delayed(const Duration(milliseconds: 300));
 
-      // Aplicar bonus de daño si lo hay
       final totalAllyDamage = allyDamage + _bonusAllyDamage;
-      _bonusAllyDamage = 0; // Se consume el buff
+      _bonusAllyDamage = 0; // Consumir buff
 
       _enemicHealth -= totalAllyDamage;
       if (_enemicHealth < 0) _enemicHealth = 0;
@@ -118,24 +125,18 @@ class CombatProvider with ChangeNotifier {
     }
   }
 
-  // ... resto igual ...
-
   Future<void> _performEnemyAttack(
     int enemyDamage,
     int skinId,
     VoidCallback onDefeat,
   ) async {
     await Future.delayed(const Duration(seconds: 1));
-
     _isAllyHit = true;
     notifyListeners();
 
-    // --- LÓGICA DEL DEBUFF ---
     final effectiveDamage = enemyDamage - _enemyAttackDebuff;
-    final damage =
-        effectiveDamage > 0 ? effectiveDamage : 0; // Evita daño negativo
+    final damage = effectiveDamage > 0 ? effectiveDamage : 0;
 
-    // Debugging detallado
     debugPrint('[DEBUFF DEBUG] Ataque enemigo: '
         'Original=$enemyDamage, '
         'Debuff=-$_enemyAttackDebuff, '
@@ -144,14 +145,12 @@ class CombatProvider with ChangeNotifier {
     _aliatHealth = (_aliatHealth ?? 0) - damage;
     if (_aliatHealth! < 0) _aliatHealth = 0;
 
-    // --- EFECTO VISUAL DEL GOLPE ---
     await Future.delayed(const Duration(milliseconds: 500));
     _isAllyHit = false;
     _isEnemyTurn = false;
     _isAttackInProgress = false;
     notifyListeners();
 
-    // --- VERIFICACIÓN DE DERROTA ---
     if (_aliatHealth! <= 0) {
       await updateSkinVidaActual(
         skinId: skinId,
@@ -220,7 +219,6 @@ class CombatProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final vida = (data['vida_actual'] as num).toDouble();
-
         setAllyHealth(vida);
         print("Vida actual obtinguda: $vida");
         return vida;

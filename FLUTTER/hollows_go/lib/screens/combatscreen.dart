@@ -223,7 +223,9 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
           child: Scaffold(
             body: Stack(
               children: [
-                CombatBackground(_backgroundImage),
+                combatProvider.overrideBackground != null
+                    ? CombatBackground(combatProvider.overrideBackground!)
+                    : CombatBackground(_backgroundImage),
                 Align(
                   alignment: Alignment.center,
                   child: MidScreenTurnIndicator(
