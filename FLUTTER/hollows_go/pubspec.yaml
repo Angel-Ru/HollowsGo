@@ -50,7 +50,7 @@ dependencies:
   flutter_volume_controller: ^1.3.3
   font_awesome_flutter: ^10.5.0
   dio: ^5.0.0
-  permission_handler: ^10.0.0
+  permission_handler: ^12.0.0+1
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
@@ -138,6 +138,11 @@ flutter:
     - assets/special_attack/as_nodt/marco_as_nodt.png
     - assets/special_attack/as_nodt/as_nodt_vid.mp4
     - assets/loading/loading.gif
+    - assets/special_attack/tosen/tosen_vid.mp4
+    - assets/special_attack/tosen/marco_tosen.png
+    - assets/special_attack/tosen/tosen_aud.mp3
+    - assets/special_attack/tosen/fons_negre.png
+
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
