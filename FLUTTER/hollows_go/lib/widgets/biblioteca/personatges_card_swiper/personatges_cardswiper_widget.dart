@@ -1,6 +1,8 @@
 import '../../../imports.dart';
 import '../../healthbarwidget.dart';
+import 'skin_card.dart';
 import 'skin_interaccions.dart';
+import 'skin_vida_controller.dart';
 
 class PersonatgesCardSwiper extends StatefulWidget {
   final Personatge personatge;
@@ -26,10 +28,9 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     with TickerProviderStateMixin {
   late final PageController _pageController;
   late final SkinInteractionController _skinController;
-  int _currentPage = 0;
-  final Map<int, double?> _vidaPerSkin = {};
+  late final SkinHealthController _skinHealthController;
 
-  bool _animarBarraVida = false;
+  int _currentPage = 0;
 
   @override
   void initState() {
@@ -43,7 +44,14 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
       usuariId: Provider.of<UserProvider>(context, listen: false).userId,
     );
 
-    _loadVidaPerSkinsAroundPage(_currentPage);
+    _skinHealthController = SkinHealthController(
+      context: context,
+      skinController: _skinController,
+    );
+
+    _skinHealthController.carregarVidaPerSkinsAroundPage(
+      widget.personatge.skins, _currentPage,
+    );
   }
 
   void _onPageChanged() {
@@ -52,27 +60,9 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
       setState(() {
         _currentPage = newPage;
       });
-      _loadVidaPerSkinsAroundPage(newPage);
-    }
-  }
-
-  Future<void> _loadVidaPerSkinsAroundPage(int page) async {
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    final skins = widget.personatge.skins;
-
-    final indices = [page];
-    if (page - 1 >= 0) indices.add(page - 1);
-    if (page + 1 < skins.length) indices.add(page + 1);
-
-    for (final i in indices) {
-      final skin = skins[i];
-      if (_vidaPerSkin.containsKey(skin.id)) continue;
-      final vida = await combatProvider.fetchSkinVidaActual(skin.id);
-      if (mounted) {
-        setState(() {
-          _vidaPerSkin[skin.id] = vida;
-        });
-      }
+      _skinHealthController.carregarVidaPerSkinsAroundPage(
+        widget.personatge.skins, newPage,
+      );
     }
   }
 
@@ -183,12 +173,39 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                   children: [
                     Flexible(
                       fit: FlexFit.loose,
-                      child: _buildSkinCardStyled(
-                        skin,
-                        isSkinSelected,
-                        isSkinFavorite,
-                        userProvider,
-                      ),
+                      child: SkinCard(
+  skin: skin,
+  isSelected: isSkinSelected,
+  isFavorite: isSkinFavorite,
+  isEnemyMode: widget.isEnemyMode,
+  onTap: () {
+    widget.onSkinSelected(skin);
+  },
+  onDoubleTap: () {
+    if (widget.onSkinDeselected != null) {
+      widget.onSkinDeselected!();
+    }
+  },
+  onLongPress: () async {
+    await _skinController.showArmesDialog(skin);
+  },
+  onVialPressed: () async {
+    final novaVida = await _skinHealthController.usarVialISync(skin);
+    if (novaVida != null) {
+      setState(() {
+        _skinHealthController.animarBarraVida = true;
+      });
+      Future.delayed(const Duration(milliseconds: 1100), () {
+        if (mounted) {
+          setState(() {
+            _skinHealthController.animarBarraVida = false;
+          });
+        }
+      });
+    }
+  },
+),
+
                     ),
                     const SizedBox(width: 4),
                     _buildBarraVida(skin.id),
@@ -211,191 +228,26 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     });
   }
 
-  Widget _buildSkinCardStyled(Skin skin, bool isSkinSelected,
-      bool isSkinFavorite, UserProvider userProvider) {
-    final displayName = _cleanSkinName(skin.nom, widget.personatge.nom);
+ 
+Widget _buildBarraVida(int skinId) {
+  final vida = _skinHealthController.getVida(skinId);
+  final Skin? skin = widget.personatge.skins.firstWhere(
+    (s) => s.id == skinId,
+    orElse: () => null as Skin,
+  );
 
-    return FractionallySizedBox(
-      widthFactor: 0.9,
-      child: GestureDetector(
-        onTap: () {
-          if (widget.isEnemyMode) return;
-          if (widget.selectedSkin?.id != skin.id) {
-            widget.onSkinSelected(skin);
-          }
-        },
-        onDoubleTap: () {
-          if (widget.isEnemyMode) return;
-          if (widget.selectedSkin?.id == skin.id &&
-              widget.onSkinDeselected != null) {
-            widget.onSkinDeselected!();
-          }
-        },
-        onLongPress: () async {
-          if (widget.isEnemyMode) return;
-          await _skinController.showArmesDialog(skin);
-        },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.grey[900],
-              border: Border.all(
-                color: isSkinSelected ? _activeColor : _borderColor,
-                width: isSkinSelected ? 3 : 2,
-              ),
-              boxShadow: isSkinSelected
-                  ? [
-                      BoxShadow(
-                        color: _activeColor.withOpacity(0.7),
-                        blurRadius: 12,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 3),
-                      ),
-                    ]
-                  : null,
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: CachedNetworkImage(
-                      imageUrl: skin.imatge ?? '',
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Center(
-                        child: Image.asset(
-                          'assets/loading/loading.gif',
-                          width: 40,
-                          height: 40,
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => const Center(
-                          child: Icon(Icons.error, color: Colors.redAccent)),
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    left: 8,
-                    child: GestureDetector(
-                      onTap: () => _toggleFavoriteSkin(userProvider, skin),
-                      child: Icon(
-                        isSkinFavorite ? Icons.star : Icons.star_border,
-                        color: isSkinFavorite ? Colors.yellow : Colors.grey,
-                        size: 28,
-                        shadows: const [
-                          Shadow(blurRadius: 4, color: Colors.black)
-                        ],
-                      ),
-                    ),
-                  ),
-                  if (isSkinSelected)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Icon(Icons.check_circle,
-                          color: _activeColor, size: 28),
-                    ),
-                  Positioned(
-                    bottom: 60,
-                    left: 8,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.translucent,
-                      onTap: () async {
-                        if (widget.isEnemyMode) return;
-                        final novaVida =
-                            await _skinController.useVialAndFetchHealth(skin);
-                        if (novaVida != null) {
-                          setState(() {
-                            _vidaPerSkin[skin.id] = novaVida;
-                            _animarBarraVida = true;
-                          });
-                          Future.delayed(const Duration(milliseconds: 1100),
-                              () {
-                            setState(() {
-                              _animarBarraVida = false;
-                            });
-                          });
-                        }
-                      },
-                      child: const CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.green,
-                        child: Icon(Icons.healing, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      color: Colors.black.withOpacity(0.6),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 10),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            displayName.isEmpty ? skin.nom : displayName,
-                            style: TextStyle(
-                              color: _activeColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(4, (i) {
-                              return Icon(
-                                Icons.star,
-                                color: i < (skin.categoria ?? 0)
-                                    ? Colors.yellow
-                                    : Colors.grey,
-                                size: 20,
-                              );
-                            }),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+  if (vida == null || skin == null || skin.vidaMaxima == null) {
+    return const SizedBox(height: 160);
   }
 
-  Widget _buildBarraVida(int skinId) {
-    final vida = _vidaPerSkin[skinId];
-    Skin? skin;
-
-    try {
-      skin = widget.personatge.skins.firstWhere((s) => s.id == skinId);
-    } catch (e) {
-      skin = null;
-    }
-
-    if (vida == null || skin == null) {
-      return const SizedBox(height: 160);
-    }
-
-    return Container(
-      margin: const EdgeInsets.only(right: 8, top: 12),
-      child: HealthBarWidget(
-        currentHealth: vida,
-        maxHealth: skin.vidaMaxima!,
-        showText: false,
-        isVertical: true,
-      ),
-    );
-  }
+  return Container(
+    margin: const EdgeInsets.only(right: 8, top: 12),
+    child: HealthBarWidget(
+      currentHealth: vida,
+      maxHealth: skin.vidaMaxima!,
+      showText: false,
+      isVertical: true,
+    ),
+  );
+}
 }
