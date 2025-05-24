@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
-import '../imports.dart';
-import 'healthbarwidget.dart';
+import '../../../imports.dart';
+import '../../healthbarwidget.dart';
+import 'skin_interaccions.dart';
 
 class PersonatgesCardSwiper extends StatefulWidget {
   final Personatge personatge;
@@ -28,6 +25,7 @@ class PersonatgesCardSwiper extends StatefulWidget {
 class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     with TickerProviderStateMixin {
   late final PageController _pageController;
+  late final SkinInteractionController _skinController;
   int _currentPage = 0;
   final Map<int, double?> _vidaPerSkin = {};
 
@@ -38,6 +36,12 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     super.initState();
     _pageController = PageController(viewportFraction: 0.65);
     _pageController.addListener(_onPageChanged);
+
+    _skinController = SkinInteractionController(
+      context: context,
+      isEnemyMode: widget.isEnemyMode,
+      usuariId: Provider.of<UserProvider>(context, listen: false).userId,
+    );
 
     _loadVidaPerSkinsAroundPage(_currentPage);
   }
@@ -52,7 +56,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     }
   }
 
-  /// Carrega la vida només per la skin actual i les adjacents (lazy loading)
   Future<void> _loadVidaPerSkinsAroundPage(int page) async {
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
     final skins = widget.personatge.skins;
@@ -63,7 +66,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
 
     for (final i in indices) {
       final skin = skins[i];
-      if (_vidaPerSkin.containsKey(skin.id)) continue; // Ja carregada
+      if (_vidaPerSkin.containsKey(skin.id)) continue;
       final vida = await combatProvider.fetchSkinVidaActual(skin.id);
       if (mounted) {
         setState(() {
@@ -88,6 +91,16 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
       return skinName.substring(characterName.length).trim();
     }
     return skinName;
+  }
+
+  Future<void> _toggleFavorite(UserProvider userProvider) async {
+    await _skinController.togglePersonatgeFavorite(widget.personatge.id);
+    setState(() {});
+  }
+
+  Future<void> _toggleFavoriteSkin(UserProvider userProvider, Skin skin) async {
+    await _skinController.toggleSkinFavorite(skin);
+    setState(() {});
   }
 
   @override
@@ -189,20 +202,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     );
   }
 
-  Future<void> _toggleFavorite(UserProvider userProvider) async {
-    final isCurrentlyFavorite =
-        userProvider.personatgePreferitId == widget.personatge.id;
-    final newId = isCurrentlyFavorite ? 0 : widget.personatge.id;
-    await userProvider.updatePersonatgePreferit(newId);
-  }
-
-  Future<void> _toggleFavoriteSkin(UserProvider userProvider, Skin skin) async {
-    final isCurrentlyFavorite = userProvider.skinPreferidaId == skin.id;
-    final newId = isCurrentlyFavorite ? 0 : skin.id;
-    await userProvider.updateSkinPreferida(newId);
-    setState(() {});
-  }
-
   double _calculateMaxSkinCardHeight(List<Skin> skins) {
     return skins.fold<double>(0.0, (max, skin) {
       final nameLength = skin.nom.length;
@@ -234,15 +233,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
         },
         onLongPress: () async {
           if (widget.isEnemyMode) return;
-          final armesProvider =
-              Provider.of<ArmesProvider>(context, listen: false);
-          final usuariId = userProvider.userId;
-          await mostrarDialegArmesPredefinides(
-            context: context,
-            skinId: skin.id,
-            usuariId: usuariId,
-            armesProvider: armesProvider,
-          );
+          await _skinController.showArmesDialog(skin);
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -313,28 +304,13 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                       behavior: HitTestBehavior.translucent,
                       onTap: () async {
                         if (widget.isEnemyMode) return;
-                        final success = await Provider.of<VialsProvider>(
-                                context,
-                                listen: false)
-                            .utilitzarVial(
-                          usuariId: userProvider.userId,
-                          skinId: skin.id,
-                        );
-                        if (success) {
-                          setState(() {
-                            _animarBarraVida = true;
-                          });
-
-                          final combatProvider = Provider.of<CombatProvider>(
-                              context,
-                              listen: false);
-                          final novaVida =
-                              await combatProvider.fetchSkinVidaActual(skin.id);
-
+                        final novaVida =
+                            await _skinController.useVialAndFetchHealth(skin);
+                        if (novaVida != null) {
                           setState(() {
                             _vidaPerSkin[skin.id] = novaVida;
+                            _animarBarraVida = true;
                           });
-
                           Future.delayed(const Duration(milliseconds: 1100),
                               () {
                             setState(() {
@@ -342,12 +318,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                             });
                           });
                         }
-                        final snackBar = SnackBar(
-                          content: Text(success
-                              ? 'Vial utilitzat correctament!'
-                              : 'No tens vials disponibles.'),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       },
                       child: const CircleAvatar(
                         radius: 20,
@@ -418,34 +388,14 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
       return const SizedBox(height: 160);
     }
 
-    final double vidaMaxima = skin.vidaMaxima?.toDouble() ?? 100;
-    final double percent = (vida / vidaMaxima).clamp(0.0, 1.0);
-
-    Color barraColor;
-    if (percent > 2 / 3) {
-      barraColor = Colors.green;
-    } else if (percent > 1 / 3) {
-      barraColor = Colors.yellow;
-    } else {
-      barraColor = Colors.red;
-    }
-
-    Widget barraInterior = Container(
-      decoration: BoxDecoration(
-        color: barraColor,
-        borderRadius: BorderRadius.circular(6),
+    return Container(
+      margin: const EdgeInsets.only(right: 8, top: 12),
+      child: HealthBarWidget(
+        currentHealth: vida,
+        maxHealth: skin.vidaMaxima!,
+        showText: false,
+        isVertical: true,
       ),
     );
-
-    return Container(
-    margin: const EdgeInsets.only(right: 8, top: 12),
-    child: HealthBarWidget(
-      currentHealth: vida,
-      maxHealth: skin.vidaMaxima!,
-      showText: false,
-      isVertical: true, // Aquí la fem vertical
-    ),
-  );
-
   }
 }

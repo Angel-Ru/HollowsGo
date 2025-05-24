@@ -37,7 +37,7 @@ export '/widgets/bannergachawidget.dart';
 export '/widgets/dialogue_widget.dart';
 export '/widgets/gachavideodialog.dart';
 export 'widgets/tenda/skinrewarddialog.dart';
-export '/widgets/personatges_cardswiper_widget.dart';
+export 'widgets/biblioteca/personatges_card_swiper/personatges_cardswiper_widget.dart';
 export '/widgets/selectedskincard_widget.dart';
 export '/widgets/custom_bottom_nav_bar.dart';
 export '/widgets/personatge_no_seleccionat_widget.dart';
