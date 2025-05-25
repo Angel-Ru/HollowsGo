@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Importa el card_swiper si el PersonatgesCardSwiper fa servir aquest paquet
-import 'package:card_swiper/card_swiper.dart';
-
 // Aquí importes els teus models i providers
 import '../imports.dart';
 
