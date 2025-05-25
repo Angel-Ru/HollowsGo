@@ -15,7 +15,7 @@ class SpecialAnimationService {
       audioAsset: 'special_attack/yamamoto/yamamoto_aud.mp3',
     ),
     'gin': SpecialAnimationConfig(
-      bankaiText: 'Kamishi no Yari',
+      bankaiText: 'Kamishini no Yari',
       audioAsset: 'special_attack/gin/gin_aud.mp3',
     ),
     

@@ -146,6 +146,7 @@ flutter:
     - assets/special_attack/tosen/tosen_aud.mp3
     - assets/special_attack/tosen/fons_negre.png
     - assets/special_attack/gin/gin_gacha.mp4
+    - assets/special_attack/gin/gin_aud.mp3
 
     
   # An image asset can refer to one or more resolution-specific "variants", see

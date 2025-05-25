@@ -304,39 +304,32 @@ class _InkWritePainter extends CustomPainter {
       {required this.text, required this.progress, required this.textStyle});
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final characters = text.characters.toList();
-    final countToShow = (characters.length * progress).floor();
+void paint(Canvas canvas, Size size) {
+  final characters = text.characters.toList();
+  final countToShow = (characters.length * progress).floor();
+  final visibleText = characters.take(countToShow).join();
 
-    double totalWidth = 0;
-    final visiblePainters = <TextPainter>[];
+  final textPainter = TextPainter(
+    text: TextSpan(
+      text: visibleText,
+      style: textStyle,
+    ),
+    textAlign: TextAlign.center,
+    textDirection: TextDirection.ltr,
+    maxLines: null, // Permet múltiples línies
+  );
 
-    for (int i = 0; i < characters.length; i++) {
-      final isVisible = i < countToShow;
-      final char = characters[i];
+  // Limita a l'amplada del canvas
+  textPainter.layout(maxWidth: size.width * 0.9);
 
-      final tp = TextPainter(
-        text: TextSpan(
-          text: char,
-          style: textStyle.copyWith(
-            color: isVisible ? textStyle.color : Colors.transparent,
-          ),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout();
+  final offset = Offset(
+    (size.width - textPainter.width) / 2,
+    (size.height - textPainter.height) / 2,
+  );
 
-      visiblePainters.add(tp);
-      totalWidth += tp.width + (textStyle.letterSpacing ?? 0);
-    }
+  textPainter.paint(canvas, offset);
+}
 
-    double x = (size.width - totalWidth) / 2;
-    final y = (size.height - textStyle.fontSize!) / 2;
-
-    for (final tp in visiblePainters) {
-      tp.paint(canvas, Offset(x, y));
-      x += tp.width + (textStyle.letterSpacing ?? 0);
-    }
-  }
 
   @override
   bool shouldRepaint(covariant _InkWritePainter oldDelegate) {
