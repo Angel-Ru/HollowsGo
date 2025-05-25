@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../models/skin.dart'; // assegura't d'importar el model correcte
+import '../../../models/skin.dart'; 
 
 class SkinCard extends StatelessWidget {
   final Skin skin;
