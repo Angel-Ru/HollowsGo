@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../combat/healthbarwidget.dart'; // ajusta el path segons la teva estructura
 import '../../../models/skin.dart'; // assegura't d'importar el model correcte
 
 class SkinCard extends StatelessWidget {

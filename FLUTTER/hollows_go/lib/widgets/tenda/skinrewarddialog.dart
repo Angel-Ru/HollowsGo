@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'dialog_content.dart';
 import 'dialog_animations.dart';
+import 'special_animacio_service.dart';
 
 class SkinRewardDialog extends StatefulWidget {
   final Map<String, dynamic>? skin;
@@ -22,7 +23,7 @@ class SkinRewardDialog extends StatefulWidget {
 
 class _SkinRewardDialogState extends State<SkinRewardDialog>
     with TickerProviderStateMixin {
-  final String _fullBankaiText = "Bankai";
+  String _fullBankaiText = "Bankai";
 
   bool _showBankaiScreen = false;
   bool _bankaiWritten = false;
@@ -100,8 +101,19 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
   }
 
   Future<void> _playBankaiAudioWithTyping() async {
-    await _audioPlayer
-        .setSource(AssetSource('special_attack/yamamoto/yamamoto_aud.mp3'));
+    final config = SpecialAnimationService.getConfigForSkin(widget.skin ?? {});
+    if (config == null) {
+      // No és una animació especial
+      setState(() {
+        _showBankaiScreen = false;
+        _showDialogContent = true;
+      });
+      _animations.playEntryAnimation();
+      return;
+    }
+
+    await _audioPlayer.setSource(AssetSource(config.audioAsset));
+    _fullBankaiText = config.bankaiText;
 
     Duration? duration;
     final completer = Completer<void>();
@@ -234,19 +246,20 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
                                   );
                                 },
                                 child: ClipRRect(
-  borderRadius: BorderRadius.circular(16),
-  child: AnimatedBuilder(
-    animation: _slashController,
-    builder: (context, child) {
-      return ClipPath(
-        clipper: SlashClipper(_slashController.value),
-        child: child,
-      );
-    },
-    child: Chewie(controller: _chewieController!),
-  ),
-),
-
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: AnimatedBuilder(
+                                    animation: _slashController,
+                                    builder: (context, child) {
+                                      return ClipPath(
+                                        clipper: SlashClipper(
+                                            _slashController.value),
+                                        child: child,
+                                      );
+                                    },
+                                    child:
+                                        Chewie(controller: _chewieController!),
+                                  ),
+                                ),
                               ),
                           ],
                         ),
