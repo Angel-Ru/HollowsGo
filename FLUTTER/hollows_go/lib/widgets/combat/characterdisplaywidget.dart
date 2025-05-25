@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
-import 'package:hollows_go/widgets/healthbarwidget.dart';
+import 'package:hollows_go/widgets/combat/healthbarwidget.dart';
 
 class CharacterDisplayWidget extends StatelessWidget {
   final String imageUrl;

@@ -124,7 +124,7 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
-
+//REVISAR ULTI TOSEN FALTA CONTROLAR QUE TORNI ES BRILLO COM ESTAVA ORIGINALMENT
       case 10:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);

@@ -46,7 +46,7 @@ export '/widgets/combat/combat_background.dart';
 export '/widgets/combat/defeat_dialog.dart';
 export '/widgets/combat/turn_indicator.dart';
 export '/widgets/combat/victory_dialog.dart';
-export '/widgets/characterdisplaywidget.dart';
+export 'widgets/combat/characterdisplaywidget.dart';
 export '/widgets/profile/perfil_avatar_widget.dart';
 export '/widgets/profile/perfil_header_widget.dart';
 export '/widgets/profile/perfil_stats_widget.dart';

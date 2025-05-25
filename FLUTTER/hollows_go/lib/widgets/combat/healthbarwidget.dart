@@ -46,7 +46,9 @@ class HealthBarWidget extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               tween: Tween<double>(
                 begin: 0,
-                end: isVertical ? height * healthPercentage : width * healthPercentage,
+                end: isVertical
+                    ? height * healthPercentage
+                    : width * healthPercentage,
               ),
               builder: (context, value, child) {
                 return Container(

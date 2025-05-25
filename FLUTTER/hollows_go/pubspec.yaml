@@ -110,6 +110,8 @@ flutter:
     - lib/images/skinrepetida.gif
     - lib/images/imatges_prehomescreen/
     - lib/images/detailsscreen/
+    - lib/images/settings_screen/
+    - lib/images/tutorial_screen/
     - assets/special_attack/shinji/shinji_aud.mp3
     - assets/special_attack/shinji/marco_shinji.png
     - assets/special_attack/shinji/shinji_vid.mp4
