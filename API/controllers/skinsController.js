@@ -595,7 +595,7 @@ exports.gachaSimulacio = async (req, res) => {
         // 🔄 Simular que sempre toca la skin amb ID 237
         const [simulatedSkinResult] = await connection.execute(
             'SELECT * FROM SKINS WHERE id = ?',
-            [19]
+            [233]
         );
 
         if (simulatedSkinResult.length === 0) {
