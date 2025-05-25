@@ -1,4 +1,5 @@
 import '../imports.dart';
+import 'dart:math';
 
 class DialogueProvider extends ChangeNotifier {
   int _dialogIndex = 0;
@@ -9,11 +10,13 @@ class DialogueProvider extends ChangeNotifier {
 
   String get currentDialogue =>
       _dialogues.isNotEmpty ? _dialogues[_dialogIndex] : "";
+
   String get currentImage => _currentImage;
   String get currentCharacter => _currentCharacter;
 
+  // FUNCIONALITAT NORMAL (amb rotació circular i imatge aleatòria)
   Future<void> loadDialogueFromJson(String characterKey) async {
-    if (_currentCharacter == characterKey) return; // Ya están cargados
+    if (_currentCharacter == characterKey) return;
 
     final String response =
         await rootBundle.loadString('assets/dialogues.json');
@@ -39,13 +42,53 @@ class DialogueProvider extends ChangeNotifier {
 
     _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
 
+    _currentImage = _getRandomImage();
+    notifyListeners();
+  }
+
+  // 🔹 Funció específica pel TUTORIAL (imatge aleatòria, diàlegs en ordre)
+  Future<void> loadTutorialDialogue(String characterKey) async {
+    final String response =
+        await rootBundle.loadString('assets/dialogues.json');
+    final data = json.decode(response);
+
+    if (!data.containsKey(characterKey)) return;
+
+    _dialogues = List<String>.from(data[characterKey]["dialogues"]);
+    _characterImages = List<String>.from(data[characterKey]["images"]);
+    _dialogIndex = 0;
+    _currentImage = _getRandomImage();
+    _currentCharacter = characterKey;
+
+    notifyListeners();
+  }
+
+  void nextTutorialStep() {
+    if (_dialogIndex < _dialogues.length - 1) {
+      _dialogIndex++;
+      _currentImage = _getRandomImage();
+      notifyListeners();
+    }
+  }
+
+  void previousTutorialStep() {
+    if (_dialogIndex > 0) {
+      _dialogIndex--;
+      _currentImage = _getRandomImage();
+      notifyListeners();
+    }
+  }
+
+  bool get isFirstStep => _dialogIndex == 0;
+  bool get isLastStep => _dialogIndex == _dialogues.length - 1;
+
+  String _getRandomImage() {
+    if (_characterImages.isEmpty) return '';
     String newImage;
     do {
       newImage = _characterImages[Random().nextInt(_characterImages.length)];
-    } while (newImage == _currentImage);
-
-    _currentImage = newImage;
-    notifyListeners();
+    } while (newImage == _currentImage && _characterImages.length > 1);
+    return newImage;
   }
 
   void resetDialogue() {
