@@ -299,31 +299,31 @@ class UserProvider with ChangeNotifier {
           notifyListeners();
           return {
             'success': true,
-            'message': 'Amistad creada exitosamente',
+            'message': 'Amistat creada amb èxit',
             'data': json.decode(response.body)
           };
         case 400:
           return {
             'success': false,
-            'message': 'No puedes agregarte a ti mismo',
+            'message': 'No et pots afegir a tu mateix',
             'statusCode': 400
           };
         case 404:
           return {
             'success': false,
-            'message': 'Usuario no encontrado',
+            'message': 'Usuarino trobat',
             'statusCode': 404
           };
         case 409:
           return {
             'success': false,
-            'message': 'Ya son amigos',
+            'message': 'Ja sou amics',
             'statusCode': 409
           };
         default:
           return {
             'success': false,
-            'message': 'Error inesperado',
+            'message': 'Error inesperat',
             'statusCode': response.statusCode
           };
       }

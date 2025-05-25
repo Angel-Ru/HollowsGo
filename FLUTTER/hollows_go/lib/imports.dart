@@ -13,6 +13,7 @@ export '/screens/combatscreen.dart';
 export '/screens/mapscreen.dart';
 export '/screens/settingsscreen.dart';
 export '/screens/detailsscreen.dart';
+export '/screens/tutorial_screen.dart';
 
 export '/providers/loginprovider.dart';
 export '/providers/ui_provider.dart';
@@ -25,6 +26,7 @@ export '/providers/combat_provider.dart';
 export '/providers/armes_provider.dart';
 export '/providers/map_provider.dart';
 export '/providers/vials_provider.dart';
+export '/providers/habilitat_provider.dart';
 
 export '../config.dart';
 
@@ -46,12 +48,12 @@ export '/widgets/combat/combat_background.dart';
 export '/widgets/combat/defeat_dialog.dart';
 export '/widgets/combat/turn_indicator.dart';
 export '/widgets/combat/victory_dialog.dart';
-export 'widgets/combat/characterdisplaywidget.dart';
+export '/widgets/combat/characterdisplaywidget.dart';
 export '/widgets/profile/perfil_avatar_widget.dart';
 export '/widgets/profile/perfil_header_widget.dart';
 export '/widgets/profile/perfil_stats_widget.dart';
 export '/widgets/dialegueequipament.dart';
-export 'widgets/detailsscreen_card_swiper.dart';
+export '/widgets/detailsscreen_card_swiper.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
@@ -66,6 +68,8 @@ export 'package:fluttertoast/fluttertoast.dart';
 export 'package:audioplayers/audioplayers.dart';
 export 'package:cached_network_image/cached_network_image.dart';
 export 'package:awesome_dialog/awesome_dialog.dart';
+export 'package:screen_brightness/screen_brightness.dart';
+export 'package:flutter_volume_controller/flutter_volume_controller.dart';
 
 export 'dart:convert';
 export 'dart:math';

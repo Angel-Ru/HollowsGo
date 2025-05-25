@@ -1,12 +1,6 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:hollows_go/screens/tutorial_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:screen_brightness/screen_brightness.dart';
-import 'package:flutter_volume_controller/flutter_volume_controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../imports.dart'; // Inclou aquí el teu import general
+import '../imports.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
