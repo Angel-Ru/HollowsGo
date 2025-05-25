@@ -99,7 +99,7 @@
         ]
 
     },
-    "Shinji Tutorial": {
+    "tutorial": {
         "dialogues":[
             "Hola, benvingut a Hollows Go, aquí et podràs enfrontar a Hollows i Quincies per igual, anem a explicar-te un poc com funciona.", 
             "Això es la pantalla d'Inici, aqui podràs veure una vista general de l'aplicació",                        

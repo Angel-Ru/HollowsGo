@@ -1,11 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/screens/tutorial_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../imports.dart'; // Assegura't que aquí hi ha el DialogueProvider, DialogueWidget i PreHomeScreen
+import '../imports.dart'; // Inclou aquí el teu import general
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -113,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Stack(
         children: [
-          // FONS D’IMATGE
+          // Fons d'imatge
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -124,7 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
-          // FILTRE DE VIDRE GLAÇAT (opcional)
+          // Filtre glaçat (blur)
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Container(
@@ -132,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
 
-          // CONTINGUT AMB DIALOGUE WIDGET A BAIX
+          // Contingut
           Column(
             children: [
               Expanded(
@@ -203,17 +204,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Icon(Icons.volume_up, color: Colors.white),
                           ],
                         ),
+
+                        // 🔈 Botó Mutar / Desmutar
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
                             icon: Icon(
-                              _isMuted ? Icons.volume_off : Icons.volume_up,
-                            ),
+                                _isMuted ? Icons.volume_off : Icons.volume_up),
                             label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
                             onPressed: _toggleMute,
                           ),
                         ),
-                        SizedBox(height: 40),
+                        SizedBox(height: 20),
+
+                        // 🆕 Botó Tutorial
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.school),
+                            label: Text('Tutorial'),
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Colors.blueAccent,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => TutorialScreen()),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+
+                        // 🚪 Botó Logout
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -232,6 +257,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
+
+              // 💬 Diàleg del personatge
               Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 child: DialogueWidget(

@@ -201,7 +201,7 @@ class _DialogueWidgetState extends State<DialogueWidget>
                           ),
                         ],
                         border: Border.all(
-                          color: widget.nameColor.withOpacity(0.6), 
+                          color: widget.nameColor.withOpacity(0.6),
                           width: 1.5,
                         ),
                       ),
@@ -237,7 +237,6 @@ class _DialogueWidgetState extends State<DialogueWidget>
                               ),
                       ),
                     ),
-
                     Positioned(
                       left: -16,
                       top: 20,
@@ -277,7 +276,8 @@ class _TrianglePainter extends CustomPainter {
     );
 
     final paint = Paint()
-      ..shader = gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height));
+      ..shader =
+          gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height));
 
     canvas.drawPath(path, paint);
 
