@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import '../imports.dart';
+import '../imports.dart'; // Inclou aquí el teu import general
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -130,6 +130,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Contingut
           Column(
             children: [
+              const SizedBox(height: 10),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20.0, 80, 20, 0),
