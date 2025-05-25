@@ -22,7 +22,7 @@ class UltimateService {
     final habilitat = habilitatProvider.habilitat;
 
     if (habilitat == null) {
-      debugPrint("No hay habilitat llegendaria para esta skin.");
+      debugPrint("No hi ha habilitat llegendària per a aquesta skin.");
       return;
     }
 
@@ -67,25 +67,19 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
-//Metodo que habia antes hay que hacer uno nuevo que funcione correctamente
-// ultimate_service.dart
 
       case 7:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
-
         await _executeUlti(
           context,
           imageAsset:
               'assets/special_attack/kenpachi_ull/marco_kenpachi_ull.png',
           audioAsset: 'special_attack/kenpachi_ull/kenpachi_ull_aud.mp3',
           videoAsset: 'assets/special_attack/kenpachi_ull/kenpachi_ull_vid.mp4',
-          damage: 0, // no hace daño directo
+          damage: 0,
           rotateScreen: false,
-          onDamageApplied: (_) {
-            // Aplicar el buff de +300 al próximo ataque aliado
-            combatProvider.buffPlayerAttack(300);
-          },
+          onDamageApplied: (_) => combatProvider.buffPlayerAttack(300),
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
@@ -103,39 +97,17 @@ class UltimateService {
         );
         break;
 
-      case 19: // ID para el debuff
-        await _executeUlti(
-          context,
-          imageAsset: 'assets/special_attack/as_nodt/marco_as_nodt.png',
-          audioAsset: 'special_attack/as_nodt/as_nodt_aud.mp3',
-          videoAsset: 'assets/special_attack/as_nodt/as_nodt_vid.mp4',
-          damage: 0, // No hace daño directo
-          rotateScreen: false,
-          onDamageApplied: (_) {
-            final combatProvider =
-                Provider.of<CombatProvider>(context, listen: false);
-            combatProvider.applyEnemyAttackDebuff(200); // Reduce 200 de daño
-            debugPrint('[DEBUG] Debuff aplicado: -200 al ataque enemigo');
-          },
-          onEnemyDefeated: onEnemyDefeated,
-        );
-
-// GRIMMJOW
       case 11:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
-
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/grimmjow/marco_grimmjow.png',
           audioAsset: 'special_attack/grimmjow/grimmjow_aud.mp3',
           videoAsset: 'assets/special_attack/grimmjow/grimmjow_vid.mp4',
-          damage: 100, // no hace daño directo
+          damage: 100,
           rotateScreen: false,
-          onDamageApplied: (_) {
-            // Aplicar el buff de +300 al próximo ataque aliado
-            combatProvider.buffPlayerAttack(300);
-          },
+          onDamageApplied: (_) => combatProvider.buffPlayerAttack(300),
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
@@ -152,62 +124,63 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
-
-      case 18: // Tosen - Buff i Debuff + fons negre + baixa lluminositat
+//REVISAR ULTI TOSEN FALTA CONTROLAR QUE TORNI ES BRILLO COM ESTAVA ORIGINALMENT
+      case 10:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
+        double? originalBrightness;
 
-        // Estableix la lluminositat al mínim
         try {
+          originalBrightness = await ScreenBrightness().current;
           await ScreenBrightness().setScreenBrightness(0.0);
+
+          await _executeUlti(
+            context,
+            imageAsset: 'assets/special_attack/tosen/marco_tosen.png',
+            audioAsset: 'special_attack/tosen/tosen_aud.mp3',
+            videoAsset: 'assets/special_attack/tosen/tosen_vid.mp4',
+            damage: 0,
+            rotateScreen: false,
+            onDamageApplied: (_) {
+              combatProvider.buffPlayerAttack(100);
+              combatProvider.applyEnemyAttackDebuff(150);
+              combatProvider.setOverrideBackground(
+                  'assets/special_attack/tosen/fons_negre.png');
+            },
+            onEnemyDefeated: () {
+              onEnemyDefeated();
+            },
+            originalBrightness: originalBrightness,
+          );
         } catch (e) {
-          debugPrint("Error al establir lluminositat mínima: $e");
-        }
-
-        // Crea un overlay temporal amb fons negre
-        final overlay = OverlayEntry(
-          builder: (context) => Positioned.fill(
-            child: Container(
-              color: Colors.black,
-              child: Image.asset(
-                'assets/special_attack/tosen/fons_negre.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        );
-
-        Overlay.of(context).insert(overlay);
-
-        // Executa l'animació de l'ulti normalment
-        await _executeUlti(
-          context,
-          imageAsset: 'assets/special_attack/tosen/marco_tosen.png',
-          audioAsset: 'special_attack/tosen/tosen_aud.mp3',
-          videoAsset: 'assets/special_attack/tosen/tosen_vid.mp4',
-          damage: 0, // No fa dany directe, només buffs/debuffs
-          rotateScreen: false,
-          onDamageApplied: (_) {
-            combatProvider.buffPlayerAttack(100);
-            combatProvider.applyEnemyAttackDebuff(150);
-            debugPrint("[DEBUG] Buff +100 i Debuff -150 aplicats per Tosen");
-          },
-          onEnemyDefeated: onEnemyDefeated,
-        );
-
-        overlay.remove();
-
-        // Restaura la lluminositat (opcional, si vols que torni al valor original després)
-        try {
-          await ScreenBrightness().resetScreenBrightness();
-        } catch (e) {
-          debugPrint("Error al restaurar lluminositat: $e");
+          debugPrint("Error executant ulti: $e");
+          // També pots restaurar aquí si vols per seguretat
+          if (originalBrightness != null) {
+            try {
+              await ScreenBrightness().setScreenBrightness(originalBrightness);
+            } catch (e) {
+              debugPrint("Error restaurant la brillantor en catch: $e");
+            }
+          }
         }
         break;
 
-      default:
-        debugPrint(
-            "No hay implementación para la habilitat ID: ${habilitat.id}");
+      case 19: // As Nodt - debuff
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/as_nodt/marco_as_nodt.png',
+          audioAsset: 'special_attack/as_nodt/as_nodt_aud.mp3',
+          videoAsset: 'assets/special_attack/as_nodt/as_nodt_vid.mp4',
+          damage: 0,
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            final combatProvider =
+                Provider.of<CombatProvider>(context, listen: false);
+            combatProvider.applyEnemyAttackDebuff(200);
+            debugPrint('[DEBUG] Debuff aplicat: -200 al atac enemic');
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
         break;
     }
   }
@@ -221,9 +194,10 @@ class UltimateService {
     required bool rotateScreen,
     required Function(int) onDamageApplied,
     required VoidCallback onEnemyDefeated,
+    double? originalBrightness,
   }) async {
     final videoController = VideoPlayerController.asset(videoAsset);
-    await videoController.initialize(); // ⏳ Precarga del video
+    await videoController.initialize();
 
     final completer = Completer();
 
@@ -247,7 +221,7 @@ class UltimateService {
       barrierDismissible: false,
       builder: (_) => UltimateVideo(
         videoAsset: videoAsset,
-        controller: videoController, // ✅ Reutiliza controlador precargado
+        controller: videoController,
         onVideoEnd: () {},
       ),
     );
@@ -260,6 +234,15 @@ class UltimateService {
     if (combatProvider.enemicHealth <= 0) {
       if (rotateScreen) await _rotateScreenToPortrait();
       onEnemyDefeated();
+
+      // Restaurar brillantor només si s'ha passat originalBrightness
+      if (originalBrightness != null) {
+        try {
+          await ScreenBrightness().setScreenBrightness(originalBrightness);
+        } catch (e) {
+          debugPrint("Error restaurant la brillantor: $e");
+        }
+      }
     }
   }
 

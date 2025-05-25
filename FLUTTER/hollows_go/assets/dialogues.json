@@ -81,6 +81,45 @@
             "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/RYUKEN/uescl6o1rv50bqzjw5lv",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/RYUKEN/o6jvcyvat6pvisoerbyi"
         ]
+    },
+    "Shinji": {
+        "dialogues":[
+            "Jo que pensava que venies a lluitar...",
+            "Això no explotarà... crec.",
+            "Toca i remena el que vulguis... però no vinguis després plorant.",
+            "Pensa bé abans de tocar res... o no, tampoc és que m'importi.",
+            "Estàs segur que entens què fa aquest botó?"
+        ],
+        "images": [
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/ur0cikpzpyim61tkqd2i",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/dpemq71fkvndtyvjjcmv",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/bqr6giwyx7aa4a1slsgi",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/qcjpt9nf6ynru7zo48b3",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/gmx9v7pklo9aptkqugqg"
+        ]
+
+    },
+    "Shinji Tutorial": {
+        "dialogues":[
+            "Hola, benvingut a Hollows Go, aquí et podràs enfrontar a Hollows i Quincies per igual, anem a explicar-te un poc com funciona.", 
+            "Això es la pantalla d'Inici, aqui podràs veure una vista general de l'aplicació",                        
+            "A la zona d'adalt hi tenim d'esquerre a dreta, les monedes(kans), llavors els vials, i finalment el perfil",
+            "A la part d'abaix podem observar els diferents llocs de l'aplicació, ara anirem a la Tenda",
+            "A la tenda hi tenim el gacha on podem fer tirades per aconseguir un personatge, una vegada aconseguit un personatge podem anar a la biblioteca",
+            "Aqui hi tenim la biblioteca, on podem equipar-nos els personatges que aconseguim per combatre, informar-mos dels mateixos, i a part podrem emprar els vials per curar-nos. Ara anem al mapa",
+            "Aqui agafarà la nostra ubicació actual i ens sortiràn Quincies o Hollows, depenent de si es de dia o de nit, en pressionarem un per entrar en combat",
+            "Aquesta es la pantalla de combat, on ens enfronatrem a enemics poderosos, tenim el botó de lluita, i un botó secret que només funciona per certs personatges, si guanyem ens donaràn monedes",
+            "Llavors tenim el Perfil, on podrem veure les nostres estadístiques com a jugadors, també ens podrem modificar la foto de perfil, a més també podem anar a la configuració per fer uns retocs",
+            "Aquesta es la pantalla de configuració, on podrem tancar la sessió si ho desitjam i fins hi tot borrar-ne el nostre compte si ho dessitjam",
+            "Espero que t'agradi l'aventura que estàs a punt de començar. Passa-ho bé!"
+        ],
+        "images": [
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/ur0cikpzpyim61tkqd2i",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/dpemq71fkvndtyvjjcmv",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/bqr6giwyx7aa4a1slsgi",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/qcjpt9nf6ynru7zo48b3",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/gmx9v7pklo9aptkqugqg"
+        ]
     }
     
 }

@@ -51,6 +51,7 @@ dependencies:
   font_awesome_flutter: ^10.5.0
   dio: ^5.0.0
   permission_handler: ^12.0.0+1
+  card_swiper: ^3.0.1
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
@@ -109,6 +110,8 @@ flutter:
     - lib/images/skinrepetida.gif
     - lib/images/imatges_prehomescreen/
     - lib/images/detailsscreen/
+    - lib/images/settings_screen/
+    - lib/images/tutorial_screen/
     - assets/special_attack/shinji/shinji_aud.mp3
     - assets/special_attack/shinji/marco_shinji.png
     - assets/special_attack/shinji/shinji_vid.mp4

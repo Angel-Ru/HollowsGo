@@ -857,67 +857,58 @@ exports.obtenirpendents = async (req, res) => {
     }
 };
 
-// Acceptar una sol·licitud d'amistat
-exports.acceptarAmistat = async (req, res) => {
+//  Crear una nova amistat
+exports.crearamistat = async (req, res) => {
+    const { id_usuari, email_amic } = req.body;
+
+    if (!id_usuari || !email_amic) {
+        return res.status(400).json({ missatge: 'Falten dades requerides' });
+    }
+
     try {
-        const userId = parseInt(req.params.id);
-        let { id_usuari, id_usuari_amic } = req.body;
-
-        if (!id_usuari || !id_usuari_amic) {
-            return res.status(400).json({ missatge: "Falten els IDs de l'amistat" });
-        }
-
-        // Calcular usuari_min i usuari_max
-        const usuariMin = Math.min(id_usuari, id_usuari_amic);
-        const usuariMax = Math.max(id_usuari, id_usuari_amic);
-
         const connection = await connectDB();
 
-        // Verificar que la sol·licitud existeix i va dirigida a aquest usuari
-        const [resultats] = await connection.execute(
-            `SELECT * FROM AMISTATS
-             WHERE usuari_min = ? AND usuari_max = ?
-               AND estat = 'pendent'
-               AND (? = ? OR ? = ?)`,
-            [usuariMin, usuariMax, id_usuari_amic, userId, id_usuari, userId]
+        // Buscar l’ID de l’usuari amb aquest email
+        const [result] = await connection.execute(
+            'SELECT id FROM USUARIS WHERE email = ?',
+            [email_amic]
         );
 
-        if (resultats.length === 0) {
-            return res.status(404).json({
-                missatge: 'No s\'ha trobat la sol·licitud o ja ha estat processada',
-            });
+        if (result.length === 0) {
+            return res.status(404).json({ missatge: 'Usuari no trobat amb aquest email' });
         }
 
-        // Acceptar l'amistat
-        await connection.execute(
-            `UPDATE AMISTATS
-             SET estat = 'acceptat'
-             WHERE usuari_min = ? AND usuari_max = ?`,
-            [usuariMin, usuariMax]
-        );
+        const id_usuari_amic = result[0].id;
 
-        // Retornar la sol·licitud actualitzada
-        const [amistatActualitzada] = await connection.execute(
-            `SELECT
-                 a.usuari_min,
-                 a.usuari_max,
-                 u1.nom AS nom_usuari_min,
-                 u2.nom AS nom_usuari_max,
-                 a.estat
-             FROM AMISTATS a
-                      JOIN USUARIS u1 ON a.usuari_min = u1.id
-                      JOIN USUARIS u2 ON a.usuari_max = u2.id
-             WHERE a.usuari_min = ? AND a.usuari_max = ?`,
-            [usuariMin, usuariMax]
-        );
+        // Evitar que un usuari s’agregui a si mateix
+        if (id_usuari === id_usuari_amic) {
+            return res.status(400).json({ missatge: 'No pots afegir-te a tu mateix' });
+        }
 
-        res.status(200).json({
-            missatge: 'Sol·licitud acceptada correctament',
-            amistat: amistatActualitzada[0],
-        });
+        // Ordenar els IDs per respectar el CHECK (id_usuari < id_usuari_amic)
+        const usuari_min = Math.min(id_usuari, id_usuari_amic);
+        const usuari_max = Math.max(id_usuari, id_usuari_amic);
+
+        // Comprovar si ja existeix la relació
+        const [existeix] = await connection.execute(`
+            SELECT * FROM AMISTATS
+            WHERE id_usuari = ? AND id_usuari_amic = ?
+        `, [usuari_min, usuari_max]);
+
+        if (existeix.length > 0) {
+            return res.status(409).json({ missatge: 'La relació ja existeix' });
+        }
+
+        // Inserir la nova amistat amb estat 'pendent'
+        await connection.execute(`
+            INSERT INTO AMISTATS (id_usuari, id_usuari_amic, estat)
+            VALUES (?, ?, 'acceptat')
+        `, [usuari_min, usuari_max]);
+
+        res.status(201).json({ missatge: 'Sol·licitud d\'amistat enviada correctament' });
+
     } catch (error) {
-        console.error('Error al acceptar amistat:', error);
+        console.error('Error afegint amistat:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
-

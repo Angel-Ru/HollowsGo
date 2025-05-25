@@ -1,5 +1,5 @@
 import '../../../imports.dart';
-import '../../healthbarwidget.dart';
+import '../../combat/healthbarwidget.dart';
 import 'skin_card.dart';
 import 'skin_interaccions.dart';
 import 'skin_vida_controller.dart';
@@ -50,7 +50,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     );
 
     _skinHealthController.carregarVidaPerSkinsAroundPage(
-      widget.personatge.skins, _currentPage,
+      widget.personatge.skins,
+      _currentPage,
     );
   }
 
@@ -61,7 +62,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
         _currentPage = newPage;
       });
       _skinHealthController.carregarVidaPerSkinsAroundPage(
-        widget.personatge.skins, newPage,
+        widget.personatge.skins,
+        newPage,
       );
     }
   }
@@ -174,38 +176,39 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                     Flexible(
                       fit: FlexFit.loose,
                       child: SkinCard(
-  skin: skin,
-  isSelected: isSkinSelected,
-  isFavorite: isSkinFavorite,
-  isEnemyMode: widget.isEnemyMode,
-  onTap: () {
-    widget.onSkinSelected(skin);
-  },
-  onDoubleTap: () {
-    if (widget.onSkinDeselected != null) {
-      widget.onSkinDeselected!();
-    }
-  },
-  onLongPress: () async {
-    await _skinController.showArmesDialog(skin);
-  },
-  onVialPressed: () async {
-    final novaVida = await _skinHealthController.usarVialISync(skin);
-    if (novaVida != null) {
-      setState(() {
-        _skinHealthController.animarBarraVida = true;
-      });
-      Future.delayed(const Duration(milliseconds: 1100), () {
-        if (mounted) {
-          setState(() {
-            _skinHealthController.animarBarraVida = false;
-          });
-        }
-      });
-    }
-  },
-),
-
+                        skin: skin,
+                        isSelected: isSkinSelected,
+                        isFavorite: isSkinFavorite,
+                        isEnemyMode: widget.isEnemyMode,
+                        onTap: () {
+                          widget.onSkinSelected(skin);
+                        },
+                        onDoubleTap: () {
+                          if (widget.onSkinDeselected != null) {
+                            widget.onSkinDeselected!();
+                          }
+                        },
+                        onLongPress: () async {
+                          await _skinController.showArmesDialog(skin);
+                        },
+                        onVialPressed: () async {
+                          final novaVida =
+                              await _skinHealthController.usarVialISync(skin);
+                          if (novaVida != null) {
+                            setState(() {
+                              _skinHealthController.animarBarraVida = true;
+                            });
+                            Future.delayed(const Duration(milliseconds: 1100),
+                                () {
+                              if (mounted) {
+                                setState(() {
+                                  _skinHealthController.animarBarraVida = false;
+                                });
+                              }
+                            });
+                          }
+                        },
+                      ),
                     ),
                     const SizedBox(width: 4),
                     _buildBarraVida(skin.id),
@@ -228,26 +231,25 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
     });
   }
 
- 
-Widget _buildBarraVida(int skinId) {
-  final vida = _skinHealthController.getVida(skinId);
-  final Skin? skin = widget.personatge.skins.firstWhere(
-    (s) => s.id == skinId,
-    orElse: () => null as Skin,
-  );
+  Widget _buildBarraVida(int skinId) {
+    final vida = _skinHealthController.getVida(skinId);
+    final Skin? skin = widget.personatge.skins.firstWhere(
+      (s) => s.id == skinId,
+      orElse: () => null as Skin,
+    );
 
-  if (vida == null || skin == null || skin.vidaMaxima == null) {
-    return const SizedBox(height: 160);
+    if (vida == null || skin == null || skin.vidaMaxima == null) {
+      return const SizedBox(height: 160);
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(right: 8, top: 12),
+      child: HealthBarWidget(
+        currentHealth: vida,
+        maxHealth: skin.vidaMaxima!,
+        showText: false,
+        isVertical: true,
+      ),
+    );
   }
-
-  return Container(
-    margin: const EdgeInsets.only(right: 8, top: 12),
-    child: HealthBarWidget(
-      currentHealth: vida,
-      maxHealth: skin.vidaMaxima!,
-      showText: false,
-      isVertical: true,
-    ),
-  );
-}
 }
