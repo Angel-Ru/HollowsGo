@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'dialog_content.dart';
 import 'dialog_animations.dart';
+import 'escritor_tinta.dart';
+import 'slash_clipper.dart';
 import 'special_animacio_service.dart';
 
 class SkinRewardDialog extends StatefulWidget {
@@ -37,11 +40,16 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
   late AnimationController _writeController;
   late AnimationController _fadeOutController;
   late AnimationController _slashController;
+  late AnimationController _videoFadeOutController;
   late DialogAnimationManager _animations;
+
+  late final bool _isShinji;
 
   @override
   void initState() {
     super.initState();
+
+    _isShinji = _detectIsShinji(widget.skin);
 
     _animations = DialogAnimationManager(vsync: this);
 
@@ -54,15 +62,28 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
+    _videoFadeOutController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
 
     _startBankaiThenVideo();
+  }
+
+  bool _detectIsShinji(Map<String, dynamic>? skin) {
+    final videoPath = skin?['video_especial'] ?? '';
+    final segments = videoPath.split('/');
+    if (segments.length >= 3) {
+      final folder = segments[2].toLowerCase();
+      return folder == 'shinji';
+    }
+    return false;
   }
 
   Future<void> _startBankaiThenVideo() async {
     final String? videoPath = widget.skin?['video_especial'];
 
     if (videoPath == null || videoPath.isEmpty) {
-      // No hi ha vídeo: no mostrar pantalla negra ni àudio, mostrar contingut directament
       setState(() {
         _showBankaiScreen = false;
         _showDialogContent = true;
@@ -71,7 +92,6 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
       return;
     }
 
-    // Hi ha vídeo: mostrar pantalla negra i reproduir àudio
     setState(() {
       _showBankaiScreen = true;
       _bankaiWritten = false;
@@ -92,10 +112,12 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     _videoController?.addListener(() {
       if (_videoController!.value.position >=
           _videoController!.value.duration) {
-        setState(() {
-          _showDialogContent = true;
+        _videoFadeOutController.forward().then((_) {
+          setState(() {
+            _showDialogContent = true;
+          });
+          _animations.playEntryAnimation();
         });
-        _animations.playEntryAnimation();
       }
     });
   }
@@ -103,7 +125,6 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
   Future<void> _playBankaiAudioWithTyping() async {
     final config = SpecialAnimationService.getConfigForSkin(widget.skin ?? {});
     if (config == null) {
-      // No és una animació especial
       setState(() {
         _showBankaiScreen = false;
         _showDialogContent = true;
@@ -163,6 +184,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     _writeController.dispose();
     _fadeOutController.dispose();
     _slashController.dispose();
+    _videoFadeOutController.dispose();
     _animations.dispose();
     super.dispose();
   }
@@ -217,16 +239,16 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
                                       width: dialogWidth,
                                       height: dialogHeight,
                                       child: CustomPaint(
-                                        painter: _InkWritePainter(
+                                        painter: InkWritePainter(
                                           text: _fullBankaiText,
                                           progress: _writeController.value,
+                                          isShinji: _isShinji,
                                           textStyle: const TextStyle(
                                             fontSize: 64,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.white,
                                             letterSpacing: 8,
-                                            fontFamily:
-                                                'Harukaze', // Usa el nom que vas posar a pubspec.yaml
+                                            fontFamily: 'Harukaze',
                                           ),
                                         ),
                                       ),
@@ -256,8 +278,13 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
                                         child: child,
                                       );
                                     },
-                                    child:
-                                        Chewie(controller: _chewieController!),
+                                    child: FadeTransition(
+                                      opacity: Tween<double>(
+                                              begin: 1.0, end: 0.0)
+                                          .animate(_videoFadeOutController),
+                                      child: Chewie(
+                                          controller: _chewieController!),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -268,73 +295,5 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
               ),
       ),
     );
-  }
-}
-
-class SlashClipper extends CustomClipper<Path> {
-  final double progress;
-
-  SlashClipper(this.progress);
-
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final cutX = size.width * progress;
-    final cutY = size.height * progress;
-
-    path.moveTo(0, 0);
-    path.lineTo(cutX, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, cutY);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(SlashClipper oldClipper) => oldClipper.progress != progress;
-}
-
-class _InkWritePainter extends CustomPainter {
-  final String text;
-  final double progress;
-  final TextStyle textStyle;
-
-  _InkWritePainter(
-      {required this.text, required this.progress, required this.textStyle});
-
-  @override
-void paint(Canvas canvas, Size size) {
-  final characters = text.characters.toList();
-  final countToShow = (characters.length * progress).floor();
-  final visibleText = characters.take(countToShow).join();
-
-  final textPainter = TextPainter(
-    text: TextSpan(
-      text: visibleText,
-      style: textStyle,
-    ),
-    textAlign: TextAlign.center,
-    textDirection: TextDirection.ltr,
-    maxLines: null, // Permet múltiples línies
-  );
-
-  // Limita a l'amplada del canvas
-  textPainter.layout(maxWidth: size.width * 0.9);
-
-  final offset = Offset(
-    (size.width - textPainter.width) / 2,
-    (size.height - textPainter.height) / 2,
-  );
-
-  textPainter.paint(canvas, offset);
-}
-
-
-  @override
-  bool shouldRepaint(covariant _InkWritePainter oldDelegate) {
-    return oldDelegate.progress != progress ||
-        oldDelegate.text != text ||
-        oldDelegate.textStyle != textStyle;
   }
 }

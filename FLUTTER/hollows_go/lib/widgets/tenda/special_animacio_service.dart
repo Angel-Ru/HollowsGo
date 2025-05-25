@@ -19,7 +19,7 @@ class SpecialAnimationService {
       audioAsset: 'special_attack/gin/gin_aud.mp3',
     ),
     'shinji': SpecialAnimationConfig(
-      bankaiText: 'Yōkoso, sakasama no sekai e.',
+      bankaiText: 'Yokoso, sakasama no sekai',
       audioAsset: 'special_attack/shinji/shinji_aud.mp3',
     ),
   };
