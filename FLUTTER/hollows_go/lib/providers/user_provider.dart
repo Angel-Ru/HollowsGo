@@ -269,4 +269,71 @@ class UserProvider with ChangeNotifier {
       return [];
     }
   }
+
+  Future<Map<String, dynamic>> crearAmistat(String emailAmic) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final int? userId = prefs.getInt('userId');
+      final String? token = prefs.getString('token');
+
+      if (userId == null || token == null) {
+        return {'success': false, 'message': 'Usuario no autenticado'};
+      }
+
+      final url = Uri.parse('https://${Config.ip}/usuaris/amics/nova/$userId');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final body = json.encode({
+        'id_usuari': userId,
+        'email_amic': emailAmic,
+      });
+
+      final response = await http.post(url, headers: headers, body: body);
+
+      switch (response.statusCode) {
+        case 201:
+          // Actualizar la lista de amigos localmente
+          notifyListeners();
+          return {
+            'success': true,
+            'message': 'Amistad creada exitosamente',
+            'data': json.decode(response.body)
+          };
+        case 400:
+          return {
+            'success': false,
+            'message': 'No puedes agregarte a ti mismo',
+            'statusCode': 400
+          };
+        case 404:
+          return {
+            'success': false,
+            'message': 'Usuario no encontrado',
+            'statusCode': 404
+          };
+        case 409:
+          return {
+            'success': false,
+            'message': 'Ya son amigos',
+            'statusCode': 409
+          };
+        default:
+          return {
+            'success': false,
+            'message': 'Error inesperado',
+            'statusCode': response.statusCode
+          };
+      }
+    } catch (error) {
+      print('Error en crearAmistad: $error');
+      return {
+        'success': false,
+        'message': 'Error de conexión',
+        'error': error.toString()
+      };
+    }
+  }
 }
