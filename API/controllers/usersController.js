@@ -902,7 +902,7 @@ exports.crearamistat = async (req, res) => {
         // Inserir la nova amistat amb estat 'pendent'
         await connection.execute(`
             INSERT INTO AMISTATS (id_usuari, id_usuari_amic, estat)
-            VALUES (?, ?, 'pendent')
+            VALUES (?, ?, 'acceptat')
         `, [usuari_min, usuari_max]);
 
         res.status(201).json({ missatge: 'Sol·licitud d\'amistat enviada correctament' });
