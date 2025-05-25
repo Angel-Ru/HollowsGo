@@ -858,3 +858,57 @@ exports.obtenirpendents = async (req, res) => {
 };
 
 //  Crear una nova amistat
+exports.crearamistat = async (req, res) => {
+    const { id_usuari, email_amic } = req.body;
+
+    if (!id_usuari || !email_amic) {
+        return res.status(400).json({ missatge: 'Falten dades requerides' });
+    }
+
+    try {
+        const connection = await connectDB();
+
+        // Buscar l’ID de l’usuari amb aquest email
+        const [result] = await connection.execute(
+            'SELECT id FROM USUARIS WHERE email = ?',
+            [email_amic]
+        );
+
+        if (result.length === 0) {
+            return res.status(404).json({ missatge: 'Usuari no trobat amb aquest email' });
+        }
+
+        const id_usuari_amic = result[0].id;
+
+        // Evitar que un usuari s’agregui a si mateix
+        if (id_usuari === id_usuari_amic) {
+            return res.status(400).json({ missatge: 'No pots afegir-te a tu mateix' });
+        }
+
+        // Ordenar els IDs per respectar el CHECK (id_usuari < id_usuari_amic)
+        const usuari_min = Math.min(id_usuari, id_usuari_amic);
+        const usuari_max = Math.max(id_usuari, id_usuari_amic);
+
+        // Comprovar si ja existeix la relació
+        const [existeix] = await connection.execute(`
+            SELECT * FROM AMISTATS
+            WHERE id_usuari = ? AND id_usuari_amic = ?
+        `, [usuari_min, usuari_max]);
+
+        if (existeix.length > 0) {
+            return res.status(409).json({ missatge: 'La relació ja existeix' });
+        }
+
+        // Inserir la nova amistat amb estat 'pendent'
+        await connection.execute(`
+            INSERT INTO AMISTATS (id_usuari, id_usuari_amic, estat)
+            VALUES (?, ?, 'pendent')
+        `, [usuari_min, usuari_max]);
+
+        res.status(201).json({ missatge: 'Sol·licitud d\'amistat enviada correctament' });
+
+    } catch (error) {
+        console.error('Error afegint amistat:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
