@@ -54,6 +54,11 @@ export '/widgets/profile/perfil_header_widget.dart';
 export '/widgets/profile/perfil_stats_widget.dart';
 export '/widgets/dialegueequipament.dart';
 export '/widgets/detailsscreen_card_swiper.dart';
+export '/screens/prefilscreen.dart';
+export '/widgets/home/dialogue_section.dart';
+export '/widgets/home/home_app_bar.dart';
+export '/widgets/home/home_background.dart';
+export '/widgets/home/home_screen_controller.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';

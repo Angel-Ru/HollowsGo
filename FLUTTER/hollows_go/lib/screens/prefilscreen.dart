@@ -1,3 +1,4 @@
+import 'package:hollows_go/screens/amistatsscreen.dart';
 import '../imports.dart';
 
 class PerfilScreen extends StatefulWidget {
@@ -103,81 +104,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: _buildAppBar(),
       body: _buildBody(userProvider, perfilProvider),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar() {
-    return PreferredSize(
-      preferredSize: Size.fromHeight(100),
-      child: Column(
-        children: [
-          AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(right: 16, top: 12),
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: GestureDetector(
-                    onTap: () => _navigateToSettings(context),
-                    child: Container(
-                      padding: EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.settings,
-                        size: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 16, bottom: 8),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () => _pickImage(context),
-                child: Container(
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.edit,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -187,6 +114,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
         children: [
           _buildBackground(),
           Container(color: Colors.black.withOpacity(0.3)),
+
+          // Coloca el SingleChildScrollView primero
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(top: 80),
@@ -211,6 +140,94 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     skinPreferidaImatge: userProvider.skinPreferidaimatge,
                   ),
                 ],
+              ),
+            ),
+          ),
+
+          // Luego coloca los botones para que estén por encima
+          Positioned(
+            top: 115,
+            right: 16,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque, // Añade esto
+              onTap: () => _navigateToSettings(context),
+              child: Container(
+                padding: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.settings,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 160,
+            right: 16,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque, // Añade esto
+              onTap: () => _pickImage(context),
+              child: Container(
+                padding: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.edit,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: 205,
+            right: 16,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque, // Añade esto
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AmistatsScreen()),
+              ),
+              child: Container(
+                padding: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.person_add_alt_1,
+                  size: 20,
+                  color: Colors.white,
+                ),
               ),
             ),
           ),
