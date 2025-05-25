@@ -55,7 +55,4 @@ router.get('/amics/:id', verificacioUsuari.verifyToken, userController.obtenirAm
 // Ruta per veure les sol·licituds pendents d'un usuari
 router.put('/amics/:id/pendents', verificacioUsuari.verifyToken, userController.obtenirpendents);
 
-// Ruta per acceptar una sol·licitud d'amistat
-router.put('/amics/:id/acceptar', verificacioUsuari.verifyToken, userController.acceptarAmistat);
-
 module.exports = router;
