@@ -1,15 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:hollows_go/providers/dialeg_provider.dart';
+import 'package:hollows_go/screens/homescreen.dart';
 import 'package:provider/provider.dart';
-
-import '../widgets/dialogue_widget.dart'; // Assegura't que tens aquest widget
-
-class TutorialStep {
-  final String dialogue;
-  final String imageAsset;
-
-  TutorialStep({required this.dialogue, required this.imageAsset});
-}
+import '../providers/dialeg_provider.dart';
+import '../widgets/dialogue_widget.dart';
 
 class TutorialScreen extends StatefulWidget {
   @override
@@ -17,62 +11,112 @@ class TutorialScreen extends StatefulWidget {
 }
 
 class _TutorialScreenState extends State<TutorialScreen> {
-  final List<TutorialStep> _steps = [
-    TutorialStep(
-      dialogue: "Hola! Sóc Shinji. Et guiaré per l'app.",
-      imageAsset: 'assets/images/shinji_1.png',
-    ),
-    TutorialStep(
-      dialogue:
-          "Aquí tens la configuració per ajustar el volum i la lluminositat.",
-      imageAsset: 'assets/images/shinji_2.png',
-    ),
-    TutorialStep(
-      dialogue: "Si vols, pots tancar sessió des d'aquí.",
-      imageAsset: 'assets/images/shinji_3.png',
-    ),
-  ];
-
-  int _currentStep = 0;
-
-  void _nextStep() {
-    if (_currentStep < _steps.length - 1) {
-      setState(() {
-        _currentStep++;
-      });
-    } else {
-      // Tutorial acabat, pots fer el que vulguis aquí
-      Navigator.pop(context);
-    }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<DialogueProvider>(context, listen: false)
+          .loadTutorialDialogue('tutorial');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final step = _steps[_currentStep];
+    final provider = Provider.of<DialogueProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Tutorial')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Image.asset(step.imageAsset),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              step.dialogue,
-              style: TextStyle(fontSize: 18),
+      body: provider.currentDialogue.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : Stack(
+              children: [
+                // 📸 Fons amb imatge
+                Container(
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(
+                          'lib/images/tutorial_screen/fons_tutorial.jpg'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
+                // 🌫️ Blur + foscor
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.2),
+                  ),
+                ),
+
+                // 🔽 Contingut del tutorial
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      // 🖼️ Imatge del pas actual
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Image.asset(
+                            'lib/images/tutorial_screen/Pas_${provider.currentIndex}.png',
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Text(
+                                  'No s\'ha trobat la imatge',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // 🔘 Botons Enrere / Següent
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          if (!provider.isFirstStep)
+                            ElevatedButton(
+                              onPressed: provider.previousTutorialStep,
+                              child: const Text('Enrere'),
+                            ),
+                          ElevatedButton(
+                            onPressed: () {
+                              if (provider.isLastStep) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => HomeScreen()),
+                                );
+                              } else {
+                                provider.nextTutorialStep();
+                              }
+                            },
+                            child: Text(
+                                provider.isLastStep ? 'Finalitzar' : 'Següent'),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      // 💬 Diàleg del tutorial
+                      DialogueWidget(
+                        characterName: 'Shinji',
+                        nameColor: Colors.blueAccent,
+                        bubbleColor: Colors.blueGrey.shade700.withOpacity(0.85),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ),
-          ElevatedButton(
-            onPressed: _nextStep,
-            child: Text(
-                _currentStep == _steps.length - 1 ? 'Finalitzar' : 'Següent'),
-          ),
-          SizedBox(height: 20),
-        ],
-      ),
     );
   }
 }

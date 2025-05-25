@@ -14,6 +14,9 @@ class DialogueProvider extends ChangeNotifier {
   String get currentImage => _currentImage;
   String get currentCharacter => _currentCharacter;
 
+  /// 👇 Getter públic per accedir a l'índex del diàleg
+  int get currentIndex => _dialogIndex;
+
   // FUNCIONALITAT NORMAL (amb rotació circular i imatge aleatòria)
   Future<void> loadDialogueFromJson(String characterKey) async {
     if (_currentCharacter == characterKey) return;
