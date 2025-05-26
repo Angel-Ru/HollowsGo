@@ -148,6 +148,10 @@ flutter:
     - assets/special_attack/tosen/fons_negre.png
     - assets/special_attack/gin/gin_gacha.mp4
     - assets/special_attack/gin/gin_aud.mp3
+    - assets/special_attack/rukia/rukia_aud.mp3
+    - assets/special_attack/rukia/rukia_vid.mp4
+    - assets/special_attack/rukia/marco_rukia.png
+    - assets/special_attack/rukia/fons_gel.jpg
 
 
     

@@ -182,6 +182,27 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
+
+      case 20:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/rukia/marco_rukia.png',
+          audioAsset: 'special_attack/rukia/rukia_aud.mp3',
+          videoAsset: 'assets/special_attack/rukia/rukia_vid.mp4',
+          damage: 200,
+          rotateScreen: false,
+          onDamageApplied: (damage) {
+            combatProvider.setEnemyFrozen(true); // ❄️ Congelar torn enemic
+            combatProvider.setOverrideBackground(
+                'assets/special_attack/rukia/fons_gel.jpg');
+            combatProvider
+                .setAllyHealth(combatProvider.aliatHealth - 100); // ❄️ Autodany
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
     }
   }
 

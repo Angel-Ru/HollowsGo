@@ -230,6 +230,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                   alignment: Alignment.center,
                   child: MidScreenTurnIndicator(
                     isEnemyTurn: combatProvider.isEnemyTurn,
+                    isEnemyFrozen: combatProvider.enemyFrozen,
                   ),
                 ),
                 Padding(
