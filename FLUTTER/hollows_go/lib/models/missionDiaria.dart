@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import '../config.dart';
+import '../imports.dart';
 
 // Model bàsic per la missió (ajusta segons la resposta real)
 class MissionDiary {
@@ -52,20 +53,32 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
     missionsFuture = fetchMissions(widget.usuariId);
   }
 
-  Future<List<MissionDiary>> fetchMissions(int usuariId) async {
-    final url = Uri.parse('https://${Config.ip}/missions/diaries/$usuariId'); 
-    
-    final response = await http.post(url);
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List missionsJson = data['missions'] ?? [];
 
-      return missionsJson.map((json) => MissionDiary.fromJson(json)).toList();
-    } else {
-      throw Exception('Error carregant missions');
-    }
+Future<List<MissionDiary>> fetchMissions(int usuariId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token') ?? '';
+
+  final url = Uri.parse('https://${Config.ip}/missions/diaries/$usuariId');
+
+  final response = await http.post(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    final List missionsJson = data['missions'] ?? [];
+
+    return missionsJson.map((json) => MissionDiary.fromJson(json)).toList();
+  } else {
+    throw Exception('Error carregant missions');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
