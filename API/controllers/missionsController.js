@@ -70,25 +70,32 @@ exports.incrementarProgresMissio = async (req, res) => {
     return res.status(400).json({ error: 'ID invàlid' });
   }
 
-  try {
-    const connection = await connectDB();
+  let connection;
 
-    // Obtenim progress, objectiu, missio (per buscar la descripcio)
+  try {
+    connection = await connectDB();
+
+    // Iniciem transacció
+    await connection.beginTransaction();
+
+    // Obtenim progress, objectiu, punts i usuari
     const [rows] = await connection.execute(`
-      SELECT md.progress, md.objectiu, md.missio, m.descripcio, md.usuari 
+      SELECT md.progress, md.objectiu, md.usuari, m.punts
       FROM MISSIONS_DIARIES md
       JOIN MISSIONS m ON md.missio = m.id
       WHERE md.id = ?
+      FOR UPDATE
     `, [missioDiariaId]);
 
     if (rows.length === 0) {
+      await connection.rollback();
       return res.status(404).json({ error: 'Missió no trobada' });
     }
 
-    const { progress, objectiu, missio, descripcio, usuari } = rows[0];
+    const { progress, objectiu, usuari, punts } = rows[0];
 
     if (progress >= objectiu) {
-      // Missió ja completada, no fem res
+      await connection.rollback();
       return res.status(200).json({ missatge: 'Missió ja completada' });
     }
 
@@ -100,34 +107,33 @@ exports.incrementarProgresMissio = async (req, res) => {
     `, [missioDiariaId]);
 
     if (result.affectedRows === 0) {
+      await connection.rollback();
       return res.status(404).json({ error: 'Missió no trobada' });
     }
 
-    // Si després d'incrementar progress arribem a l'objectiu, afegim monedes
-    if (progress + 1 >= objectiu) {
-      // Busquem el número de monedes a la descripció amb regex
-      const regex = /(\d+)\s*monedes/i;
-      const match = descripcio.match(regex);
-      if (match) {
-        const monedes = parseInt(match[1]);
-        if (!isNaN(monedes)) {
-          // Actualitzem punts_emmagatzemats usuari
-          await connection.execute(`
-            UPDATE USUARIS
-            SET punts_emmagatzemats = punts_emmagatzemats + ?
-            WHERE id = ?
-          `, [monedes, usuari]);
-        }
-      }
+    // Si després d'incrementar el progress s'arriba a l'objectiu, sumem punts
+    if (progress + 1 >= objectiu && punts && !isNaN(punts)) {
+      await connection.execute(`
+        UPDATE USUARIS
+        SET punts_emmagatzemats = punts_emmagatzemats + ?
+        WHERE id = ?
+      `, [punts, usuari]);
     }
+
+    // Fem commit de la transacció
+    await connection.commit();
 
     res.status(200).json({ missatge: 'Progrés incrementat correctament' });
 
   } catch (err) {
+    if (connection) {
+      await connection.rollback();
+    }
     console.error(err);
     res.status(500).json({ error: 'Error incrementant el progrés de la missió' });
   }
 };
+
 
 
 
