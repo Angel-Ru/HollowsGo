@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-import '../config.dart';
 import '../imports.dart';
 
 // Model bàsic per la missió (ajusta segons la resposta real)
@@ -28,8 +25,8 @@ class MissionDiary {
       id: json['id'],
       usuari: json['usuari'],
       missio: json['missio'],
-      dataAssign: json['data_assign'],
-      nom: json['nom'],
+      dataAssign: json['data_assig'],
+      nom: json['nom_missio'],
       descripcio: json['descripcio'],
     );
   }
