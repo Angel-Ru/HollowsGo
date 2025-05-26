@@ -1,11 +1,7 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // Aquí importes els teus models i providers
 import '../imports.dart';
-
 
 class BibliotecaScreen extends StatefulWidget {
   @override
@@ -115,7 +111,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
       case 1:
         return Colors.blue;
       case 2:
-        return Colors.green;
+        return Colors.tealAccent;
       default:
         return Colors.purple;
     }
@@ -208,7 +204,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                         ),
                         child: Text(
                           'Seleccionar Skin Aleatoria',
@@ -237,7 +234,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                         personatge: personatge,
                         isEnemyMode: _currentMode == 2, // Aquí corregit
                         onSkinSelected: (skin) {
-                          final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+                          final provider =
+                              Provider.of<SkinsEnemicsPersonatgesProvider>(
+                                  context,
+                                  listen: false);
                           if (_currentMode == 0) {
                             provider.setSelectedSkinAliat(skin);
                             setState(() => _randomSkinName = skin.nom);
@@ -248,7 +248,10 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           }
                         },
                         onSkinDeselected: () {
-                          final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+                          final provider =
+                              Provider.of<SkinsEnemicsPersonatgesProvider>(
+                                  context,
+                                  listen: false);
                           setState(() {
                             if (_currentMode == 0) {
                               provider.unselectSkinAliat();
@@ -311,7 +314,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                 icon: Icon(Icons.arrow_back_ios, color: Colors.white),
                 onPressed: () {
                   setState(() {
-                    _currentMode = (_currentMode - 1) < 0 ? 2 : _currentMode - 1;
+                    _currentMode =
+                        (_currentMode - 1) < 0 ? 2 : _currentMode - 1;
                     _resetSelectedSkins();
                   });
                 },
@@ -334,9 +338,14 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
   void _resetSelectedSkins() {
     _randomSkinName = '';
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     provider.unselectSkinAliat();
     provider.unselectSkinQuincy();
     provider.unselectSkinEnemic();
+
+    final dialogueProvider =
+        Provider.of<DialogueProvider>(context, listen: false);
+    dialogueProvider.loadDialogueFromJson(_getDialogueCharacter());
   }
 }

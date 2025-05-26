@@ -40,105 +40,83 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Selecciona una imatge'),
-        ),
-        body: Column(
-          children: [
-            FutureBuilder<String>(
-              future: _avatarActualUrlFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(),
-                  );
-                }
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      body: Stack(
+        children: [
+          Container(color: Colors.black.withOpacity(0.5)),
+          SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                _buildBackButton(),
+                CurrentAvatarDisplay(avatarFuture: _avatarActualUrlFuture),
+                Expanded(
+                  child: FutureBuilder<List<Avatar>>(
+                    future: _avatarFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                if (snapshot.hasError || !snapshot.hasData) {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text('No s\'ha pogut carregar l\'avatar actual.'),
-                  );
-                }
-
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  child: Column(
-                    children: [
-                      const Text('Avatar actual:'),
-                      const SizedBox(height: 8),
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: NetworkImage(snapshot.data!),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            Expanded(
-              child: FutureBuilder<List<Avatar>>(
-                future: _avatarFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    return const Center(
-                        child: Text('Error carregant els avatars'));
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(
-                        child: Text('No hi ha avatars disponibles.'));
-                  }
-
-                  final avatars = snapshot.data!;
-
-                  return GridView.builder(
-                    padding: const EdgeInsets.all(8.0),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 10.0,
-                      mainAxisSpacing: 10.0,
-                    ),
-                    itemCount: avatars.length,
-                    itemBuilder: (context, index) {
-                      final avatar = avatars[index];
-                      return GestureDetector(
-                        onTap: () => _selectAvatar(avatar),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(8.0),
+                      if (snapshot.hasError) {
+                        return const Center(
+                          child: Text(
+                            'Error carregant els avatars',
+                            style: TextStyle(color: Colors.white),
                           ),
-                          clipBehavior: Clip.antiAlias,
-                          child: Image.network(
-                            avatar.url,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.broken_image),
+                        );
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No hi ha avatars disponibles.',
+                            style: TextStyle(color: Colors.white),
                           ),
-                        ),
+                        );
+                      }
+
+                      return AvatarGrid(
+                        avatars: snapshot.data!,
+                        onAvatarSelected: _selectAvatar,
                       );
                     },
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBackButton() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: const Icon(Icons.arrow_back, size: 20, color: Colors.white),
         ),
       ),
     );
