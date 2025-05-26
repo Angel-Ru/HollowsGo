@@ -133,36 +133,23 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       const SizedBox(height: 12),
 
-                      // 🔵 Indicadors de punts progressius
+                      // 🔵 Indicadors de punts progressius - VERSIÓ CORREGIDA
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: () {
-                          int maxDots = 4;
-                          int dotsToShow =
-                              totalSteps < maxDots ? totalSteps : maxDots;
-
-                          int startIndex = provider.currentIndex;
-
-                          if (startIndex > totalSteps - dotsToShow) {
-                            startIndex = totalSteps - dotsToShow;
-                          }
-                          if (startIndex < 0) startIndex = 0;
-
-                          return List<Widget>.generate(dotsToShow, (i) {
-                            int dotIndex = startIndex + i;
-                            bool isActive = dotIndex == provider.currentIndex;
-
-                            return Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: isActive ? 12 : 8,
-                              height: isActive ? 12 : 8,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: isActive ? Colors.white : Colors.white54,
-                              ),
-                            );
-                          });
-                        }(),
+                        children: List<Widget>.generate(totalSteps, (index) {
+                          bool isActive = index == provider.currentIndex;
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: isActive ? 12 : 8,
+                            height: isActive ? 12 : 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isActive
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.5),
+                            ),
+                          );
+                        }),
                       ),
 
                       const SizedBox(height: 12),
@@ -170,7 +157,21 @@ class _TutorialScreenState extends State<TutorialScreen> {
                       if (provider.isLastStep)
                         ElevatedButton(
                           onPressed: _navigateToHome,
-                          child: const Text('Finalitzar'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueGrey.shade700,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 32, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          child: const Text(
+                            'Finalitzar',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
                         ),
 
                       const SizedBox(height: 12),
