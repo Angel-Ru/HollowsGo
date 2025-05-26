@@ -124,14 +124,11 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
-//REVISAR ULTI TOSEN FALTA CONTROLAR QUE TORNI ES BRILLO COM ESTAVA ORIGINALMENT
+
       case 10:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
-        double? originalBrightness;
-
         try {
-          originalBrightness = await ScreenBrightness().current;
           await ScreenBrightness().setScreenBrightness(0.0);
 
           await _executeUlti(
@@ -150,22 +147,18 @@ class UltimateService {
             onEnemyDefeated: () {
               onEnemyDefeated();
             },
-            originalBrightness: originalBrightness,
           );
         } catch (e) {
           debugPrint("Error executant ulti: $e");
-          // També pots restaurar aquí si vols per seguretat
-          if (originalBrightness != null) {
-            try {
-              await ScreenBrightness().setScreenBrightness(originalBrightness);
-            } catch (e) {
-              debugPrint("Error restaurant la brillantor en catch: $e");
-            }
+          try {
+            await ScreenBrightness().setScreenBrightness(0.2);
+          } catch (e) {
+            debugPrint("Error restaurant la brillantor en catch: $e");
           }
         }
         break;
 
-      case 19: // As Nodt - debuff
+      case 19:
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/as_nodt/marco_as_nodt.png',
@@ -194,7 +187,6 @@ class UltimateService {
     required bool rotateScreen,
     required Function(int) onDamageApplied,
     required VoidCallback onEnemyDefeated,
-    double? originalBrightness,
   }) async {
     final videoController = VideoPlayerController.asset(videoAsset);
     await videoController.initialize();
@@ -235,13 +227,10 @@ class UltimateService {
       if (rotateScreen) await _rotateScreenToPortrait();
       onEnemyDefeated();
 
-      // Restaurar brillantor només si s'ha passat originalBrightness
-      if (originalBrightness != null) {
-        try {
-          await ScreenBrightness().setScreenBrightness(originalBrightness);
-        } catch (e) {
-          debugPrint("Error restaurant la brillantor: $e");
-        }
+      try {
+        await ScreenBrightness().setScreenBrightness(0.2);
+      } catch (e) {
+        debugPrint("Error restaurant la brillantor a 0.2: $e");
       }
     }
   }
