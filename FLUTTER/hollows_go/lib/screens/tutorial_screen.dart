@@ -11,13 +11,22 @@ class TutorialScreen extends StatefulWidget {
 }
 
 class _TutorialScreenState extends State<TutorialScreen> {
+  late PageController _pageController;
+
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(viewportFraction: 0.85);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<DialogueProvider>(context, listen: false)
           .loadTutorialDialogue('tutorial');
     });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,69 +62,85 @@ class _TutorialScreenState extends State<TutorialScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      // 🖼️ Imatge del pas actual amb lliscament
+                      // 🖼️ Slider de targetes amb PageView
                       Expanded(
-                        child: GestureDetector(
-                          onHorizontalDragEnd: (details) {
-                            if (details.primaryVelocity != null) {
-                              if (details.primaryVelocity! < -200) {
-                                // Lliscament cap a l'esquerra (següent)
-                                if (!provider.isLastStep) {
-                                  provider.nextTutorialStep();
-                                }
-                              } else if (details.primaryVelocity! > 200) {
-                                // Lliscament cap a la dreta (enrere)
-                                if (!provider.isFirstStep) {
-                                  provider.previousTutorialStep();
-                                }
-                              }
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: provider.currentDialogue.length,
+                          onPageChanged: (index) {
+                            if (index > provider.currentIndex) {
+                              provider.nextTutorialStep();
+                            } else if (index < provider.currentIndex) {
+                              provider.previousTutorialStep();
                             }
                           },
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Image.asset(
-                                  'lib/images/tutorial_screen/Pas_${provider.currentIndex}.png',
-                                  fit: BoxFit.contain,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return const Center(
-                                      child: Text(
-                                        'No s\'ha trobat la imatge',
-                                        style: TextStyle(color: Colors.red),
+                          itemBuilder: (context, index) {
+                            return AnimatedBuilder(
+                              animation: _pageController,
+                              builder: (context, child) {
+                                double value = 1.0;
+                                if (_pageController.position.haveDimensions) {
+                                  value = (_pageController.page ?? 0) - index;
+                                  value =
+                                      (1 - (value.abs() * 0.3)).clamp(0.0, 1.0);
+                                }
+                                return Center(
+                                  child: Transform.scale(
+                                    scale: value,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black26,
+                                            blurRadius: 10,
+                                            offset: Offset(0, 4),
+                                          )
+                                        ],
                                       ),
-                                    );
-                                  },
-                                ),
-                              ),
-
-                              // Fletxa esquerra
-                              if (!provider.isFirstStep)
-                                Positioned(
-                                  left: 0,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: Center(
-                                    child: Icon(Icons.arrow_back_ios,
-                                        color: Colors.white.withOpacity(0.7)),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.asset(
+                                          'lib/images/tutorial_screen/Pas_$index.png',
+                                          fit: BoxFit.contain,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Center(
+                                              child: Text(
+                                                'No s\'ha trobat la imatge',
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
 
-                              // Fletxa dreta
-                              if (!provider.isLastStep)
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: Center(
-                                    child: Icon(Icons.arrow_forward_ios,
-                                        color: Colors.white.withOpacity(0.7)),
-                                  ),
-                                ),
-                            ],
+                      const SizedBox(height: 12),
+
+                      // 🔵 Punts d’indicador de pàgina
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          provider.currentDialogue.length,
+                          (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: provider.currentIndex == index ? 12 : 8,
+                            height: provider.currentIndex == index ? 12 : 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: provider.currentIndex == index
+                                  ? Colors.white
+                                  : Colors.white54,
+                            ),
                           ),
                         ),
                       ),
@@ -139,7 +164,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                       // 💬 Diàleg del tutorial
                       DialogueWidget(
                         characterName: 'KON',
-                        nameColor: const Color.fromARGB(255, 84, 223, 4),
+                        nameColor: const Color.fromARGB(255, 233, 179, 3),
                         bubbleColor: Colors.blueGrey.shade700.withOpacity(0.85),
                       ),
                     ],
