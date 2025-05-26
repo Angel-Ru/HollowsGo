@@ -17,7 +17,7 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     for (const missio of fixes) {
       await connection.execute(`
-        INSERT IGNORE INTO MISSIONS_DIARIES (usuari, missio, data_assign)
+        INSERT IGNORE INTO MISSIONS_DIARIES (usuari, missio, data_assig)
         VALUES (?, ?, ?)
       `, [usuariId, missio.id, avui]);
     }
@@ -33,16 +33,16 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     // 3. Assignar si no existeix
     await connection.execute(`
-      INSERT IGNORE INTO MISSIONS_DIARIES (usuari, missio, data_assign)
+      INSERT IGNORE INTO MISSIONS_DIARIES (usuari, missio, data_assig)
       VALUES (?, ?, ?)
     `, [usuariId, variableDelDia.id, avui]);
 
     // 4. Recuperar les missions diaries assignades avui per l’usuari
     const [missionsAssignades] = await connection.execute(`
-      SELECT md.id, md.usuari, md.missio, md.data_assign, m.nom, m.descripcio
+      SELECT md.id, md.usuari, md.missio, md.data_assig, m.nom, m.descripcio
       FROM MISSIONS_DIARIES md
       JOIN MISSIONS m ON md.missio = m.id
-      WHERE md.usuari = ? AND md.data_assign = ?
+      WHERE md.usuari = ? AND md.data_assig = ?
       ORDER BY md.missio
     `, [usuariId, avui]);
 
