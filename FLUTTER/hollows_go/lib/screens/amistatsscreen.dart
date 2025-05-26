@@ -1,3 +1,5 @@
+import 'package:hollows_go/widgets/dialogue_amic.dart';
+
 import '../imports.dart';
 
 class AmistatsScreen extends StatefulWidget {
@@ -9,8 +11,6 @@ class AmistatsScreen extends StatefulWidget {
 
 class _AmistatsScreenState extends State<AmistatsScreen> {
   late Future<List<Map<String, dynamic>>> _amistatsFuture;
-  final TextEditingController _emailController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -29,46 +29,13 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
     if (mounted) setState(() {});
   }
 
-  Future<void> _afegirAmic() async {
-    final email = _emailController.text.trim();
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Si us plau, introdueix un email')),
-      );
-      return;
-    }
-
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Si us plau, introdueix un email vàlid')),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    final result = await Provider.of<UserProvider>(context, listen: false)
-        .crearAmistat(email);
-
-    setState(() => _isLoading = false);
-    _emailController.clear();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result['message']),
-        backgroundColor: result['success'] ? Colors.green : Colors.red,
+  void _showAfegirAmicDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AfegirAmicDialog(
+        onAmicAfegit: _refreshAmistats,
       ),
     );
-
-    if (result['success']) {
-      _refreshAmistats();
-    }
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
   }
 
   @override
@@ -81,43 +48,14 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: _refreshAmistats,
           ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _showAfegirAmicDialog,
+          ),
         ],
       ),
       body: Column(
         children: [
-          // Secció per afegir nous amics
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: 'Email del nou amic',
-                      border: OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () => _emailController.clear(),
-                      ),
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: _afegirAmic,
-                        child: const Text('Afegir'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                        ),
-                      ),
-              ],
-            ),
-          ),
           const Divider(height: 1),
           // Llista d'amistats
           Expanded(
