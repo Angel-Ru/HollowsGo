@@ -47,11 +47,12 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     // 4. Recuperar les missions assignades avui per l’usuari
     const [missionsAssignades] = await connection.execute(`
-      SELECT md.id, md.usuari, md.missio, md.data_assig, m.nom_missio, m.descripcio
-      FROM MISSIONS_DIARIES md
-      JOIN MISSIONS m ON md.missio = m.id
-      WHERE md.usuari = ? AND md.data_assig = ?
-      ORDER BY md.missio
+      SELECT md.id, md.usuari, md.missio, md.data_assig, md.progress, m.nom_missio, m.descripcio, m.objectiu
+FROM MISSIONS_DIARIES md
+JOIN MISSIONS m ON md.missio = m.id
+WHERE md.usuari = ? AND md.data_assig = ?
+ORDER BY md.missio
+
     `, [usuariId, avui]);
 
     res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAssignades });
@@ -61,4 +62,82 @@ exports.assignarMissionsDiaries = async (req, res) => {
     res.status(500).json({ error: 'Error assignant missions' });
   }
 };
+
+exports.incrementarProgresMissio = async (req, res) => {
+  const missioDiariaId = parseInt(req.params.id);
+
+  if (!missioDiariaId) {
+    return res.status(400).json({ error: 'ID invàlid' });
+  }
+
+  let pool;
+  let connection;
+
+  try {
+    pool = await connectDB();
+    connection = await pool.getConnection();
+
+    await connection.beginTransaction();
+
+    const [rows] = await connection.execute(`
+      SELECT md.progress, m.objectiu, md.usuari, m.punts
+      FROM MISSIONS_DIARIES md
+      JOIN MISSIONS m ON md.missio = m.id
+      WHERE md.id = ?
+      FOR UPDATE
+    `, [missioDiariaId]);
+
+    if (rows.length === 0) {
+      await connection.rollback();
+      connection.release();
+      return res.status(404).json({ error: 'Missió no trobada' });
+    }
+
+    const { progress, objectiu, usuari, punts } = rows[0];
+
+    if (progress >= objectiu) {
+      await connection.rollback();
+      connection.release();
+      return res.status(200).json({ missatge: 'Missió ja completada' });
+    }
+
+    const [result] = await connection.execute(`
+      UPDATE MISSIONS_DIARIES
+      SET progress = progress + 1
+      WHERE id = ?
+    `, [missioDiariaId]);
+
+    if (result.affectedRows === 0) {
+      await connection.rollback();
+      connection.release();
+      return res.status(404).json({ error: 'Missió no trobada' });
+    }
+
+    if (progress + 1 >= objectiu && punts && !isNaN(punts)) {
+      await connection.execute(`
+        UPDATE USUARIS
+        SET punts_emmagatzemats = punts_emmagatzemats + ?
+        WHERE id = ?
+      `, [punts, usuari]);
+    }
+
+    await connection.commit();
+    connection.release();
+
+    res.status(200).json({ missatge: 'Progrés incrementat correctament' });
+
+  } catch (err) {
+    if (connection) {
+      await connection.rollback();
+      connection.release();
+    }
+    console.error(err);
+    res.status(500).json({ error: 'Error incrementant el progrés de la missió' });
+  }
+};
+
+
+
+
+
 

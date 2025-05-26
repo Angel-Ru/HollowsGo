@@ -1,3 +1,5 @@
+import 'package:hollows_go/providers/missions_provider.dart';
+
 import 'imports.dart';
 
 /*
@@ -28,6 +30,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CombatProvider()),
         ChangeNotifierProvider(create: (_) => VialsProvider()),
         ChangeNotifierProvider(create: (_) => HabilitatProvider()),
+        ChangeNotifierProvider(create: (_) => MissionsProvider())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
