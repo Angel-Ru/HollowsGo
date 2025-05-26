@@ -51,7 +51,7 @@ const perfilRoutes = require('../routes/perfilroutes');
 const equipamentRoutes = require('../routes/equipamentRoutes');
 const combatRoutes = require('../routes/combatRoutes');
 const destacatsRoutes = require('../routes/destacatsRoutes');
-const missionsRoutes = require('../routes/destacatsRoutes');
+const missionsRoutes = require('../routes/missionsRoutes');
 
 
 app.use('/personatges', characterRoutes);   // Ruta para personajes

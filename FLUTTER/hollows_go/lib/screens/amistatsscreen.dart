@@ -16,7 +16,6 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
   void initState() {
     super.initState();
     _refreshAmistats();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
@@ -164,14 +163,15 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                SizedBox(height: 10),
                 DialogueWidget(
-                  characterName: 'Orihime Inoue',
-                  nameColor: Colors.pinkAccent,
-                  bubbleColor: Color.fromARGB(220, 255, 240, 245),
+                  characterName: 'Inoue Orihime',
+                  nameColor: Colors.pink,
+                  bubbleColor: Color.fromARGB(212, 238, 238, 238),
                 ),
               ],
             ),
