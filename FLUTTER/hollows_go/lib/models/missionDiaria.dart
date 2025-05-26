@@ -1,7 +1,6 @@
 import '../imports.dart';
-import '../providers/missions_provider.dart'; // Assegura't que tens la IP definida a config.dart
+import '../providers/missions_provider.dart';
 
-// Model bàsic per la missió (ajustat amb progress i objectiu)
 class MissionDiary {
   final int id;
   final int usuari;
@@ -48,29 +47,34 @@ class MissionsDrawer extends StatelessWidget {
     final missions = missionsProvider.missions;
 
     return Drawer(
+      backgroundColor: const Color(0xFF121212), // Gris fosc en lloc de negre
       child: SafeArea(
         child: Column(
           children: [
             ListTile(
               title: Text(
                 'Missions Diaries',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
               trailing: IconButton(
-                icon: Icon(Icons.close),
+                icon: Icon(Icons.close, color: Colors.white70),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
-            Divider(),
+            Divider(color: Colors.grey[800]),
             Expanded(
               child: missions.isEmpty
                   ? FutureBuilder(
                       future: missionsProvider.fetchMissions(usuariId),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
+                          return Center(child: CircularProgressIndicator(color: Colors.tealAccent));
                         } else if (snapshot.hasError) {
-                          return Center(child: Text('Error carregant missions'));
+                          return Center(child: Text('Error carregant missions', style: TextStyle(color: Colors.redAccent)));
                         } else {
                           return _buildMissionList(missions);
                         }
@@ -89,33 +93,62 @@ class MissionsDrawer extends StatelessWidget {
       itemCount: missions.length,
       itemBuilder: (context, index) {
         final missio = missions[index];
-        return Card(
-          margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(missio.nom,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                SizedBox(height: 4),
-                Text(missio.descripcio),
-                SizedBox(height: 12),
-                LinearProgressIndicator(
-                  value: missio.objectiu > 0
-                      ? missio.progress / missio.objectiu
-                      : 0,
-                  minHeight: 8,
-                  backgroundColor: Colors.grey.shade300,
-                  color: Colors.blue,
-                ),
-                SizedBox(height: 6),
-                Text(
-                  '${missio.progress}/${missio.objectiu} completat',
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-                ),
-              ],
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                missio.nom,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                missio.descripcio,
+                style: TextStyle(
+                  color: Colors.grey[300],
+                  fontSize: 14,
+                ),
+              ),
+              SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: LinearProgressIndicator(
+                  value: missio.objectiu > 0 ? missio.progress / missio.objectiu : 0,
+                  minHeight: 10,
+                  backgroundColor: Colors.grey[800],
+                  color: Colors.orangeAccent[400],
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                '${missio.progress}/${missio.objectiu} completat',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                ),
+              ),
+            ],
           ),
         );
       },
