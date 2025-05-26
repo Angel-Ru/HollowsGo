@@ -128,6 +128,14 @@ class UltimateService {
       case 10:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
+        double originalBrightness = 0.2; // default
+        try {
+          originalBrightness = await ScreenBrightness().current;
+        } catch (e) {
+          debugPrint(
+              "No s'ha pogut obtenir la brillantor actual. S'assumeix 0.2");
+        }
+
         try {
           await ScreenBrightness().setScreenBrightness(0.0);
 
@@ -144,16 +152,15 @@ class UltimateService {
               combatProvider.setOverrideBackground(
                   'assets/special_attack/tosen/fons_negre.png');
             },
-            onEnemyDefeated: () {
-              onEnemyDefeated();
-            },
+            onEnemyDefeated: onEnemyDefeated,
           );
         } catch (e) {
           debugPrint("Error executant ulti: $e");
+        } finally {
           try {
-            await ScreenBrightness().setScreenBrightness(0.2);
+            await ScreenBrightness().setScreenBrightness(originalBrightness);
           } catch (e) {
-            debugPrint("Error restaurant la brillantor en catch: $e");
+            debugPrint("Error restaurant la brillantor original: $e");
           }
         }
         break;
@@ -226,12 +233,6 @@ class UltimateService {
     if (combatProvider.enemicHealth <= 0) {
       if (rotateScreen) await _rotateScreenToPortrait();
       onEnemyDefeated();
-
-      try {
-        await ScreenBrightness().setScreenBrightness(0.2);
-      } catch (e) {
-        debugPrint("Error restaurant la brillantor a 0.2: $e");
-      }
     }
   }
 
