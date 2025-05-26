@@ -1,5 +1,7 @@
-import '../imports.dart';
+import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 
 class DialogueProvider extends ChangeNotifier {
   int _dialogIndex = 0;
@@ -77,6 +79,15 @@ class DialogueProvider extends ChangeNotifier {
   void previousTutorialStep() {
     if (_dialogIndex > 0) {
       _dialogIndex--;
+      _currentImage = _getRandomImage();
+      notifyListeners();
+    }
+  }
+
+  /// Nou mètode per establir l'índex manualment
+  void setCurrentIndex(int index) {
+    if (index >= 0 && index < _dialogues.length && index != _dialogIndex) {
+      _dialogIndex = index;
       _currentImage = _getRandomImage();
       notifyListeners();
     }
