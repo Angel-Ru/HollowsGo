@@ -39,38 +39,17 @@ class _TutorialScreenState extends State<TutorialScreen> {
     );
   }
 
-  // Limitem punts a 4 i ajustem quin bloc mostrar segons la posició actual
-  List<int> _visibleDots(int currentIndex, int total) {
-    const maxVisible = 4;
-    if (total <= maxVisible) {
-      return List.generate(total, (i) => i);
-    } else {
-      if (currentIndex <= 1) {
-        return [0, 1, 2, 3];
-      } else if (currentIndex >= total - 2) {
-        return [total - 4, total - 3, total - 2, total - 1];
-      } else {
-        return [
-          currentIndex - 1,
-          currentIndex,
-          currentIndex + 1,
-          currentIndex + 2
-        ];
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<DialogueProvider>(context);
-    final totalSteps = provider.currentDialogue.length;
-    final currentIndex = provider.currentIndex;
+    final totalSteps = provider.dialogues.length;
 
     return Scaffold(
       body: totalSteps == 0
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
+                // Fons amb imatge
                 Container(
                   decoration: const BoxDecoration(
                     image: DecorationImage(
@@ -80,10 +59,14 @@ class _TutorialScreenState extends State<TutorialScreen> {
                     ),
                   ),
                 ),
+
+                // Blur i foscor
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                   child: Container(color: Colors.black.withOpacity(0.2)),
                 ),
+
+                // Contingut del tutorial
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -91,19 +74,15 @@ class _TutorialScreenState extends State<TutorialScreen> {
                       Expanded(
                         child: PageView.builder(
                           controller: _pageController,
-                          physics: currentIndex == totalSteps - 1
-                              ? const NeverScrollableScrollPhysics() // bloqueja swipe a l'últim
-                              : const BouncingScrollPhysics(),
                           itemCount: totalSteps,
+                          physics: provider.isLastStep
+                              ? const NeverScrollableScrollPhysics()
+                              : null, // No deixa fer slide si és l'última diapositiva
                           onPageChanged: (index) {
-                            if (index >= totalSteps) {
-                              _navigateToHome();
-                            } else {
-                              if (index > provider.currentIndex) {
-                                provider.nextTutorialStep();
-                              } else if (index < provider.currentIndex) {
-                                provider.previousTutorialStep();
-                              }
+                            if (index == totalSteps - 1) {
+                              provider.setCurrentIndex(index);
+                            } else if (index < totalSteps) {
+                              provider.setCurrentIndex(index);
                             }
                           },
                           itemBuilder: (context, index) {
@@ -158,27 +137,43 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       const SizedBox(height: 12),
 
-                      // Punts limitats a 4
+                      // Indicador de punts (només mostra 4 màxims, centrats en l'índex actual)
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children:
-                            _visibleDots(currentIndex, totalSteps).map((index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: currentIndex == index ? 12 : 8,
-                            height: currentIndex == index ? 12 : 8,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: currentIndex == index
-                                  ? Colors.white
-                                  : Colors.white54,
-                            ),
-                          );
-                        }).toList(),
+                        children: List.generate(
+                          totalSteps > 4 ? 4 : totalSteps,
+                          (i) {
+                            // Calculem l'índex real a mostrar per evitar tants punts
+                            int startIndex = 0;
+                            if (provider.currentIndex >= totalSteps - 3) {
+                              startIndex = totalSteps - 4;
+                            } else if (provider.currentIndex > 1) {
+                              startIndex = provider.currentIndex - 1;
+                            }
+                            int displayIndex = startIndex + i;
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: provider.currentIndex == displayIndex
+                                  ? 12
+                                  : 8,
+                              height: provider.currentIndex == displayIndex
+                                  ? 12
+                                  : 8,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: provider.currentIndex == displayIndex
+                                    ? Colors.white
+                                    : Colors.white54,
+                              ),
+                            );
+                          },
+                        ),
                       ),
 
                       const SizedBox(height: 12),
 
+                      // Botó finalitzar només a l'últim pas
                       if (provider.isLastStep)
                         ElevatedButton(
                           onPressed: _navigateToHome,
@@ -187,6 +182,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       const SizedBox(height: 12),
 
+                      // Widget diàleg
                       DialogueWidget(
                         characterName: 'KON',
                         nameColor: const Color.fromARGB(255, 233, 179, 3),

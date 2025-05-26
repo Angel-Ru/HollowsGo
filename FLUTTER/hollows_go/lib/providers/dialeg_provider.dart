@@ -10,16 +10,20 @@ class DialogueProvider extends ChangeNotifier {
   String _currentImage = '';
   String _currentCharacter = '';
 
+  // Getter públic per accedir a la llista de diàlegs
+  List<String> get dialogues => _dialogues;
+
+  // Getter públic per accedir al diàleg actual
   String get currentDialogue =>
       _dialogues.isNotEmpty ? _dialogues[_dialogIndex] : "";
 
   String get currentImage => _currentImage;
   String get currentCharacter => _currentCharacter;
 
-  /// 👇 Getter públic per accedir a l'índex del diàleg
+  /// Getter públic per accedir a l'índex del diàleg actual
   int get currentIndex => _dialogIndex;
 
-  // FUNCIONALITAT NORMAL (amb rotació circular i imatge aleatòria)
+  // Carrega diàlegs i imatges d’un personatge des de JSON
   Future<void> loadDialogueFromJson(String characterKey) async {
     if (_currentCharacter == characterKey) return;
 
@@ -46,12 +50,11 @@ class DialogueProvider extends ChangeNotifier {
     if (_dialogues.isEmpty || _characterImages.isEmpty) return;
 
     _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
-
     _currentImage = _getRandomImage();
     notifyListeners();
   }
 
-  // 🔹 Funció específica pel TUTORIAL (imatge aleatòria, diàlegs en ordre)
+  // Funció específica pel tutorial: carrega diàlegs i imatges
   Future<void> loadTutorialDialogue(String characterKey) async {
     final String response =
         await rootBundle.loadString('assets/dialogues.json');
@@ -84,7 +87,7 @@ class DialogueProvider extends ChangeNotifier {
     }
   }
 
-  /// Nou mètode per establir l'índex manualment
+  /// Permet establir l’índex manualment (només dins rang)
   void setCurrentIndex(int index) {
     if (index >= 0 && index < _dialogues.length && index != _dialogIndex) {
       _dialogIndex = index;
