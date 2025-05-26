@@ -83,7 +83,7 @@
         ]
     },
     "Shinji": {
-        "dialogues":[
+        "dialogues": [
             "Jo que pensava que venies a lluitar...",
             "Això no explotarà... crec.",
             "Toca i remena el que vulguis... però no vinguis després plorant.",
@@ -97,12 +97,11 @@
             "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/qcjpt9nf6ynru7zo48b3",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/gmx9v7pklo9aptkqugqg"
         ]
-
     },
     "tutorial": {
-        "dialogues":[
-            "Hola, benvingut a Hollows Go, aquí et podràs enfrontar a Hollows i Quincies per igual, anem a explicar-te un poc com funciona.", 
-            "Això es la pantalla d'Inici, aqui podràs veure una vista general de l'aplicació",                        
+        "dialogues": [
+            "Hola, benvingut a Hollows Go, aquí et podràs enfrontar a Hollows i Quincies per igual, anem a explicar-te un poc com funciona.",
+            "Això es la pantalla d'Inici, aqui podràs veure una vista general de l'aplicació",
             "A la zona d'adalt hi tenim d'esquerre a dreta, les monedes(kans), llavors els vials, i finalment el perfil",
             "A la part d'abaix podem observar els diferents llocs de l'aplicació, ara anirem a la Tenda",
             "A la tenda hi tenim el gacha on podem fer tirades per aconseguir un personatge, una vegada aconseguit un personatge podem anar a la biblioteca",
@@ -120,6 +119,26 @@
             "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/qcjpt9nf6ynru7zo48b3",
             "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/gmx9v7pklo9aptkqugqg"
         ]
+    },
+    "Orihime": {
+        "dialogues": [
+            "Hola! Què tal? Vols ser el meu amic?",
+            "Jo crec que tothom mereix una segona oportunitat... i una tercera!",
+            "És bonic tenir amics que et facin somriure.",
+            "T’imagines una amistat tan forta com el pa amb mantega? Mmmm!",
+            "No importa d’on vens, si el teu cor és amable, jo t’accepto!",
+            "Una vegada vaig fer galetes d’amistat... no van sortir molt bé, però era amb amor!",
+            "Si et sents sol, sempre pots comptar amb mi.",
+            "L’amistat pot curar ferides que ni la meva Shun Shun Rikka pot!"
+        ],
+        "images": [
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/wnow7mqdvfw9htv0bq9l",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/zkjl2bmxghxbpnfyhbms",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/rc6sc80xz5xgw2yfxjjx",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/t0j5cixhhjvburck6ctm",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/rt5q15yruhtjo61pdocq",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/fcbpzky3gkhiooha5sud",
+            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/jd5pk75dpgizvwqmk8ca"
+        ]
     }
-    
 }
