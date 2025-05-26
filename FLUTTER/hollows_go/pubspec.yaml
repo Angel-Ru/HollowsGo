@@ -153,6 +153,9 @@ flutter:
     - assets/special_attack/rukia/rukia_vid.mp4
     - assets/special_attack/rukia/marco_rukia.png
     - assets/special_attack/rukia/fons_gel.jpg
+    - assets/special_attack/unohana/marco_unohana.png
+    - assets/special_attack/unohana/unohana_vid.mp4
+    - assets/special_attack/unohana/unohana_aud.mp3
 
 
     

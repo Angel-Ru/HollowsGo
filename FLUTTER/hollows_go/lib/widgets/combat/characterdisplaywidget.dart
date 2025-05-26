@@ -17,6 +17,8 @@ class CharacterDisplayWidget extends StatelessWidget {
   final double imageSize;
   final double blurSigma;
 
+  final bool isBleeding; // 👈 Nou paràmetre
+
   const CharacterDisplayWidget({
     required this.imageUrl,
     required this.name,
@@ -28,12 +30,12 @@ class CharacterDisplayWidget extends StatelessWidget {
     this.debuffAmount = 0,
     this.imageSize = 100,
     this.blurSigma = 0.8,
+    this.isBleeding = false, // 👈 Valor per defecte
     Key? key,
   }) : super(key: key);
 
   Widget buildStatusIcon() {
     if (isEnemy && debuffAmount > 0) {
-      // Debuff només per enemics, a l'esquerra de la barra
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -49,7 +51,6 @@ class CharacterDisplayWidget extends StatelessWidget {
         ],
       );
     } else if (!isEnemy && buffAmount > 0) {
-      // Buff només per aliats, a la dreta de la barra
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -126,7 +127,7 @@ class CharacterDisplayWidget extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        // Contenidor ampliat per barra + nom + icon estats
+        // Contenidor per barra + nom + estats
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
@@ -141,12 +142,26 @@ class CharacterDisplayWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (isEnemy && debuffAmount > 0) ...[
-                    buildStatusIcon(), // Debuff esquerra de la barra
+                    buildStatusIcon(),
                     const SizedBox(width: 6),
                   ],
                   Expanded(
-                    child: !isEnemy
+                    child: isEnemy
                         ? Row(
+                            children: [
+                              HealthBarWidget(
+                                currentHealth: health,
+                                maxHealth: maxHealth,
+                                showText: false,
+                              ),
+                              if (isBleeding) ...[
+                                const SizedBox(width: 6),
+                                const Icon(Icons.bloodtype,
+                                    color: Colors.red, size: 18),
+                              ],
+                            ],
+                          )
+                        : Row(
                             children: [
                               HealthBarWidget(
                                 currentHealth: health,
@@ -163,16 +178,11 @@ class CharacterDisplayWidget extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          )
-                        : HealthBarWidget(
-                            currentHealth: health,
-                            maxHealth: maxHealth,
-                            showText: false,
                           ),
                   ),
                   if (!isEnemy && buffAmount > 0) ...[
                     const SizedBox(width: 6),
-                    buildStatusIcon(), // Buff dreta de la barra
+                    buildStatusIcon(),
                   ],
                 ],
               ),
