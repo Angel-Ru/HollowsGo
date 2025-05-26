@@ -59,6 +59,8 @@ export '/widgets/home/dialogue_section.dart';
 export '/widgets/home/home_app_bar.dart';
 export '/widgets/home/home_background.dart';
 export '/widgets/home/home_screen_controller.dart';
+export '/widgets/avatar/avatar_grid.dart';
+export '/widgets/avatar/current_avatar_display.dart';
 
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
