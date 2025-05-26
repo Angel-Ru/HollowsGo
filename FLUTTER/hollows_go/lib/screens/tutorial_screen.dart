@@ -108,8 +108,8 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       // 💬 Diàleg del tutorial
                       DialogueWidget(
-                        characterName: 'Shinji',
-                        nameColor: Colors.blueAccent,
+                        characterName: 'KON',
+                        nameColor: const Color.fromARGB(255, 84, 223, 4),
                         bubbleColor: Colors.blueGrey.shade700.withOpacity(0.85),
                       ),
                     ],
