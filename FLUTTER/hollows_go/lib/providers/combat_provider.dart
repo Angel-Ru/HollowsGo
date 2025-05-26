@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import '../config.dart'; // Assegura't que tens aquest fitxer amb la IP de l'API
+import '../config.dart';
 
 class CombatProvider with ChangeNotifier {
   double? _aliatHealth;
@@ -13,6 +14,10 @@ class CombatProvider with ChangeNotifier {
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
   bool _enemyFrozen = false;
+
+  bool _enemyBleeding = false;
+  int _bleedTick = 0;
+
   int _bonusAllyDamage = 0;
   int _enemyAttackDebuff = 0;
 
@@ -30,6 +35,7 @@ class CombatProvider with ChangeNotifier {
   int get bonusAllyDamage => _bonusAllyDamage;
   int get enemyAttackDebuff => _enemyAttackDebuff;
   bool get enemyFrozen => _enemyFrozen;
+  bool get enemyBleeding => _enemyBleeding;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -49,6 +55,12 @@ class CombatProvider with ChangeNotifier {
 
   void setUltiUsed(bool value) {
     _ultiUsed = value;
+    notifyListeners();
+  }
+
+  void healPlayer(int amount) {
+    _aliatHealth = (_aliatHealth ?? 0) + amount;
+    if (_aliatHealth! > 1000) _aliatHealth = 1000; // límit màxim si vols
     notifyListeners();
   }
 
@@ -72,6 +84,22 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void applyBleed() {
+    _enemyBleeding = true;
+    _bleedTick = 0;
+    notifyListeners();
+  }
+
+  void tickBleedDamage() {
+    if (_enemyBleeding && _enemicHealth > 0) {
+      double bleedDamage = 100 * (pow(1.2, _bleedTick) as double);
+      _bleedTick += 1;
+      _enemicHealth -= bleedDamage;
+      if (_enemicHealth < 0) _enemicHealth = 0;
+      notifyListeners();
+    }
+  }
+
   void resetCombat({
     double maxAllyHealth = 1000.0,
     double maxEnemyHealth = 1000.0,
@@ -88,7 +116,9 @@ class CombatProvider with ChangeNotifier {
     _ultiUsed = false;
     _bonusAllyDamage = 0;
     _enemyAttackDebuff = 0;
-    _overrideBackground = null; // ✅ Esborrar fons negre per pròxim combat
+    _enemyBleeding = false;
+    _bleedTick = 0;
+    _overrideBackground = null;
     notifyListeners();
   }
 
@@ -107,7 +137,7 @@ class CombatProvider with ChangeNotifier {
       await Future.delayed(const Duration(milliseconds: 300));
 
       final totalAllyDamage = allyDamage + _bonusAllyDamage;
-      _bonusAllyDamage = 0; // Consumir buff
+      _bonusAllyDamage = 0;
 
       _enemicHealth -= totalAllyDamage;
       if (_enemicHealth < 0) _enemicHealth = 0;
@@ -136,6 +166,8 @@ class CombatProvider with ChangeNotifier {
     int skinId,
     VoidCallback onDefeat,
   ) async {
+    tickBleedDamage(); // 🔴 Aplicar sangrat abans del torn enemic
+
     if (_enemyFrozen) {
       debugPrint('[DEBUG] Torn enemic congelat: no ataca.');
       _isEnemyTurn = false;
