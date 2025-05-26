@@ -6,6 +6,6 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari');
 
 
 // Ruta per assignar missions diaries a un usuari per id
-router.post('/diaries/:usuariId', verificacioUsuari.verifyToken, assignarMissionsDiaries);
+router.post('/diaries/:usuariId', verificacioUsuari.verifyToken, missionsController.assignarMissionsDiaries);
 
 module.exports = router;
