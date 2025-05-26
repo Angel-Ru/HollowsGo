@@ -125,6 +125,24 @@ class UltimateService {
         );
         break;
 
+      case 15:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/unohana/marco_unohana.png',
+          audioAsset: 'special_attack/unohana/unohana_aud.mp3',
+          videoAsset: 'assets/special_attack/unohana/unohana_vid.mp4',
+          damage: 0,
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            combatProvider.healPlayer(400);
+            combatProvider.applyBleed();
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
       case 10:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -194,11 +212,10 @@ class UltimateService {
           damage: 200,
           rotateScreen: false,
           onDamageApplied: (damage) {
-            combatProvider.setEnemyFrozen(true); // ❄️ Congelar torn enemic
+            combatProvider.setEnemyFrozen(true);
             combatProvider.setOverrideBackground(
                 'assets/special_attack/rukia/fons_gel.jpg');
-            combatProvider
-                .setAllyHealth(combatProvider.aliatHealth - 100); // ❄️ Autodany
+            combatProvider.setAllyHealth(combatProvider.aliatHealth - 100);
           },
           onEnemyDefeated: onEnemyDefeated,
         );
