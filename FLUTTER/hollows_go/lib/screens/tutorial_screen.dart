@@ -77,13 +77,9 @@ class _TutorialScreenState extends State<TutorialScreen> {
                           itemCount: totalSteps,
                           physics: provider.isLastStep
                               ? const NeverScrollableScrollPhysics()
-                              : null, // No deixa fer slide si és l'última diapositiva
+                              : null,
                           onPageChanged: (index) {
-                            if (index == totalSteps - 1) {
-                              provider.setCurrentIndex(index);
-                            } else if (index < totalSteps) {
-                              provider.setCurrentIndex(index);
-                            }
+                            provider.setCurrentIndex(index);
                           },
                           itemBuilder: (context, index) {
                             return AnimatedBuilder(
@@ -137,43 +133,40 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       const SizedBox(height: 12),
 
-                      // Indicador de punts (només mostra 4 màxims, centrats en l'índex actual)
+                      // 🔵 Indicadors de punts progressius
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          totalSteps > 4 ? 4 : totalSteps,
-                          (i) {
-                            // Calculem l'índex real a mostrar per evitar tants punts
-                            int startIndex = 0;
-                            if (provider.currentIndex >= totalSteps - 3) {
-                              startIndex = totalSteps - 4;
-                            } else if (provider.currentIndex > 1) {
-                              startIndex = provider.currentIndex - 1;
-                            }
-                            int displayIndex = startIndex + i;
+                        children: () {
+                          int maxDots = 4;
+                          int dotsToShow =
+                              totalSteps < maxDots ? totalSteps : maxDots;
+
+                          int startIndex = provider.currentIndex;
+
+                          if (startIndex > totalSteps - dotsToShow) {
+                            startIndex = totalSteps - dotsToShow;
+                          }
+                          if (startIndex < 0) startIndex = 0;
+
+                          return List<Widget>.generate(dotsToShow, (i) {
+                            int dotIndex = startIndex + i;
+                            bool isActive = dotIndex == provider.currentIndex;
 
                             return Container(
                               margin: const EdgeInsets.symmetric(horizontal: 4),
-                              width: provider.currentIndex == displayIndex
-                                  ? 12
-                                  : 8,
-                              height: provider.currentIndex == displayIndex
-                                  ? 12
-                                  : 8,
+                              width: isActive ? 12 : 8,
+                              height: isActive ? 12 : 8,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: provider.currentIndex == displayIndex
-                                    ? Colors.white
-                                    : Colors.white54,
+                                color: isActive ? Colors.white : Colors.white54,
                               ),
                             );
-                          },
-                        ),
+                          });
+                        }(),
                       ),
 
                       const SizedBox(height: 12),
 
-                      // Botó finalitzar només a l'últim pas
                       if (provider.isLastStep)
                         ElevatedButton(
                           onPressed: _navigateToHome,
@@ -182,7 +175,6 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       const SizedBox(height: 12),
 
-                      // Widget diàleg
                       DialogueWidget(
                         characterName: 'KON',
                         nameColor: const Color.fromARGB(255, 233, 179, 3),
