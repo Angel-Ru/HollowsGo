@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:hollows_go/widgets/dialogue_amic.dart';
+import 'package:hollows_go/widgets/amistats/dialog_amic.dart';
 import '../imports.dart';
 
 class AmistatsScreen extends StatefulWidget {
@@ -53,69 +53,75 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
       ),
       body: Stack(
         children: [
-          // Fondo de pantalla
+          // Fons
           Container(
             width: double.infinity,
             height: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                    'lib/images/amistatsscreen/amistats_fondo.png'), // Asegúrate de tener esta imagen
+                image:
+                    AssetImage('lib/images/amistatsscreen/amistats_fondo.png'),
                 fit: BoxFit.cover,
               ),
             ),
           ),
-          Container(color: Colors.black.withOpacity(0.3)),
 
-          // Contenido principal
+          // Lluminositat suau
+          Container(color: Colors.black.withOpacity(0.15)),
+
+          // Contingut principal
           Column(
             children: [
-              // Barra de título con acciones
+              // Capçalera translúcida
               Padding(
                 padding: const EdgeInsets.only(top: 60, left: 16, right: 16),
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                    child: Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                            color: Colors.white.withOpacity(0.3), width: 1),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
                             icon: Icon(Icons.arrow_back, color: Colors.white),
                             onPressed: () => Navigator.of(context).pop(),
-                          )
+                          ),
+                          Text(
+                            'Les meves amistats',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.refresh, color: Colors.white),
+                                onPressed: _refreshAmistats,
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.add, color: Colors.white),
+                                onPressed: _showAfegirAmicDialog,
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                      Text(
-                        'Les meves amistats',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.refresh, color: Colors.white),
-                            onPressed: _refreshAmistats,
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.add, color: Colors.white),
-                            onPressed: _showAfegirAmicDialog,
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
 
-              // Lista de amigos
+              // Llista d'amistats
               Expanded(
                 child: FutureBuilder<List<Map<String, dynamic>>>(
                   future: _amistatsFuture,
@@ -159,10 +165,11 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
 
                           return Card(
                             margin: EdgeInsets.symmetric(vertical: 8),
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.white.withOpacity(0.15),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            elevation: 4,
                             child: ListTile(
                               leading: CircleAvatar(
                                 backgroundImage:
@@ -171,7 +178,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                             amistat['imatge_perfil_amic'])
                                         : null,
                                 child: amistat['imatge_perfil_amic'] == null
-                                    ? Icon(Icons.person)
+                                    ? Icon(Icons.person, color: Colors.white)
                                     : null,
                               ),
                               title: Text(
@@ -194,7 +201,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
             ],
           ),
 
-          // Diálogo al final
+          // Diàleg Inoue Orihime
           Positioned(
             bottom: 0,
             left: 0,
