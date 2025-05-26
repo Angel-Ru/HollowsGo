@@ -12,7 +12,7 @@ class CombatProvider with ChangeNotifier {
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
-
+  bool _enemyFrozen = false;
   int _bonusAllyDamage = 0;
   int _enemyAttackDebuff = 0;
 
@@ -29,6 +29,7 @@ class CombatProvider with ChangeNotifier {
   bool get ultiUsed => _ultiUsed;
   int get bonusAllyDamage => _bonusAllyDamage;
   int get enemyAttackDebuff => _enemyAttackDebuff;
+  bool get enemyFrozen => _enemyFrozen;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -63,6 +64,11 @@ class CombatProvider with ChangeNotifier {
 
   void setOverrideBackground(String? value) {
     _overrideBackground = value;
+    notifyListeners();
+  }
+
+  void setEnemyFrozen(bool frozen) {
+    _enemyFrozen = frozen;
     notifyListeners();
   }
 
@@ -130,6 +136,14 @@ class CombatProvider with ChangeNotifier {
     int skinId,
     VoidCallback onDefeat,
   ) async {
+    if (_enemyFrozen) {
+      debugPrint('[DEBUG] Torn enemic congelat: no ataca.');
+      _isEnemyTurn = false;
+      _isAttackInProgress = false;
+      notifyListeners();
+      return;
+    }
+
     await Future.delayed(const Duration(seconds: 1));
     _isAllyHit = true;
     notifyListeners();
