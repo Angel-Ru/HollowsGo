@@ -128,9 +128,10 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
-                        child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.pink),
+                        child: Image.asset(
+                          'assets/loading/loading.gif',
+                          width: 60,
+                          height: 60,
                         ),
                       );
                     }

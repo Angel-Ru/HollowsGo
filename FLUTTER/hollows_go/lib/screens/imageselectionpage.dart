@@ -56,7 +56,13 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
                     future: _avatarFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: Image(
+                            image: AssetImage('assets/loading/loading.gif'),
+                            width: 60,
+                            height: 60,
+                          ),
+                        );
                       }
 
                       if (snapshot.hasError) {
