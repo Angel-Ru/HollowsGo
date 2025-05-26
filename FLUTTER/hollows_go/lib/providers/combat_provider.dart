@@ -86,6 +86,7 @@ class CombatProvider with ChangeNotifier {
 
   void applyBleed() {
     if (_enemyBleeding) return;
+
     _enemyBleeding = true;
     _bleedTick = 0;
     notifyListeners();
@@ -171,9 +172,6 @@ class CombatProvider with ChangeNotifier {
     int skinId,
     VoidCallback onDefeat,
   ) async {
-    // Aplica dany per sangrat abans de l’atac enemic
-    processBleedTick();
-
     if (_enemyFrozen) {
       debugPrint('[DEBUG] Torn enemic congelat: no ataca.');
       _isEnemyTurn = false;
@@ -194,6 +192,10 @@ class CombatProvider with ChangeNotifier {
 
     await Future.delayed(const Duration(milliseconds: 500));
     _isAllyHit = false;
+
+    // 🔴 Aplica dany per sangrat després de l'atac
+    processBleedTick();
+
     _isEnemyTurn = false;
     _isAttackInProgress = false;
     notifyListeners();
