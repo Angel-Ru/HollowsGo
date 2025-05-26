@@ -35,39 +35,26 @@ class MissionsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateProgress(int id, int progress) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
+ Future<void> incrementProgress(int id) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token') ?? '';
 
-    final url = Uri.parse('https://${Config.ip}/missions/progres/$id');
+  final url = Uri.parse('https://${Config.ip}/missions/progres/incrementa/$id');
 
-    final response = await http.put(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'progress': progress}),
-    );
+  final response = await http.put(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+    
+  );
 
-    if (response.statusCode == 200) {
-      // Actualitza localment
-      final index = _missions.indexWhere((m) => m.id == id);
-      if (index != -1) {
-        _missions[index] = MissionDiary(
-          id: _missions[index].id,
-          usuari: _missions[index].usuari,
-          missio: _missions[index].missio,
-          dataAssign: _missions[index].dataAssign,
-          nom: _missions[index].nom,
-          descripcio: _missions[index].descripcio,
-          progress: progress,
-          objectiu: _missions[index].objectiu,
-        );
-        notifyListeners();
-      }
-    } else {
-      throw Exception('Error actualitzant progrés');
-    }
+  if (response.statusCode == 200) {
+    
+  } else {
+    throw Exception('Error incrementant progrés');
   }
+}
+
 }
