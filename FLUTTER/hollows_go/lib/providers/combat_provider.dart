@@ -60,7 +60,7 @@ class CombatProvider with ChangeNotifier {
 
   void healPlayer(int amount) {
     _aliatHealth = (_aliatHealth ?? 0) + amount;
-    if (_aliatHealth! > 1000) _aliatHealth = 1000; // límit màxim si vols
+    if (_aliatHealth! > 1000) _aliatHealth = 1000;
     notifyListeners();
   }
 
@@ -85,31 +85,25 @@ class CombatProvider with ChangeNotifier {
   }
 
   void applyBleed() {
-    if (_enemyBleeding) return; // Si ja està actiu, no fer res
-
+    if (_enemyBleeding) return;
     _enemyBleeding = true;
     _bleedTick = 0;
     notifyListeners();
-
-    startBleedLoop();
   }
 
-  // Loop que aplica el dany de sangrat pausadament
-  void startBleedLoop() async {
-    while (_enemyBleeding && _enemicHealth > 0) {
-      await Future.delayed(const Duration(seconds: 1)); // pausa entre ticks
+  // Aplica un "tick" de sangrat (una vegada per torn)
+  void processBleedTick() {
+    if (!_enemyBleeding || _enemicHealth <= 0) return;
 
-      double bleedDamage = 100 * (pow(1.2, _bleedTick) as double);
-      _bleedTick += 1;
-      _enemicHealth -= bleedDamage;
-      if (_enemicHealth < 0) _enemicHealth = 0;
+    double bleedDamage = 100 * (pow(1.2, _bleedTick) as double);
+    _bleedTick += 1;
+    _enemicHealth -= bleedDamage;
+    if (_enemicHealth < 0) _enemicHealth = 0;
 
-      notifyListeners();
+    notifyListeners();
 
-      if (_enemicHealth == 0) {
-        _enemyBleeding = false; // s’acaba el sangrat si mor
-        break;
-      }
+    if (_enemicHealth == 0) {
+      _enemyBleeding = false;
     }
   }
 
@@ -147,8 +141,7 @@ class CombatProvider with ChangeNotifier {
       _isEnemyHit = true;
       notifyListeners();
 
-      await Future.delayed(
-          const Duration(milliseconds: 800)); // pausa més lenta
+      await Future.delayed(const Duration(milliseconds: 800));
 
       final totalAllyDamage = allyDamage + _bonusAllyDamage;
       _bonusAllyDamage = 0;
@@ -178,6 +171,9 @@ class CombatProvider with ChangeNotifier {
     int skinId,
     VoidCallback onDefeat,
   ) async {
+    // Aplica dany per sangrat abans de l’atac enemic
+    processBleedTick();
+
     if (_enemyFrozen) {
       debugPrint('[DEBUG] Torn enemic congelat: no ataca.');
       _isEnemyTurn = false;
@@ -192,11 +188,6 @@ class CombatProvider with ChangeNotifier {
 
     final effectiveDamage = enemyDamage - _enemyAttackDebuff;
     final damage = effectiveDamage > 0 ? effectiveDamage : 0;
-
-    debugPrint('[DEBUFF DEBUG] Ataque enemigo: '
-        'Original=$enemyDamage, '
-        'Debuff=-$_enemyAttackDebuff, '
-        'Total=$damage');
 
     _aliatHealth = (_aliatHealth ?? 0) - damage;
     if (_aliatHealth! < 0) _aliatHealth = 0;
