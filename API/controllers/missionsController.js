@@ -80,7 +80,7 @@ exports.incrementarProgresMissio = async (req, res) => {
     await connection.beginTransaction();
 
     const [rows] = await connection.execute(`
-      SELECT md.progress, md.objectiu, md.usuari, m.punts
+      SELECT md.progress, m.objectiu, md.usuari, m.punts
       FROM MISSIONS_DIARIES md
       JOIN MISSIONS m ON md.missio = m.id
       WHERE md.id = ?
