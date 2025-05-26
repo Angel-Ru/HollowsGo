@@ -1,5 +1,7 @@
 import 'package:hollows_go/imports.dart';
 
+import '../models/missionDiaria.dart';
+
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -71,10 +73,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final uiProvider = Provider.of<UIProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: HomeAppBar(imagePath: _imagePath),
+      appBar: HomeAppBar(
+        imagePath: _imagePath,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.menu_open),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+            tooltip: 'Mostrar missions diaries',
+          )
+        ],
+      ),
+      endDrawer: MissionsDrawer(usuariId: userProvider.userId),
       body: Stack(
         children: [
           HomeBackground(),
@@ -91,8 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (_) => CombatScreen())),
+        onPressed: () =>
+            Navigator.push(context, MaterialPageRoute(builder: (_) => CombatScreen())),
         backgroundColor: Colors.red,
         child: Icon(Icons.sports_martial_arts),
         tooltip: 'Anar a CombatScreen (proves)',

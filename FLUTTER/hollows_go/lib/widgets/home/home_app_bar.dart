@@ -8,7 +8,7 @@ import '../../providers/vials_provider.dart';
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String imagePath;
 
-  const HomeAppBar({required this.imagePath});
+  const HomeAppBar({required this.imagePath, required List<IconButton> actions});
 
   @override
   Size get preferredSize => Size.fromHeight(60);
