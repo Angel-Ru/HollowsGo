@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../imports.dart';
 import '../providers/habilitat_provider.dart';
 import '../providers/missions_provider.dart';
+import '../service/missionsservice.dart';
 import '../widgets/combat/midscreen_turn_indicator.dart';
 
 class CombatScreen extends StatelessWidget {
@@ -36,10 +37,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
     _setRandomBackground();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final combatProvider =
-          Provider.of<CombatProvider>(context, listen: false);
-      final skinsProvider =
-          Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+      final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+      final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
       await skinsProvider.selectRandomSkin();
 
@@ -59,8 +58,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
         keepAllyHealth: true,
       );
 
-      final habilitatProvider =
-          Provider.of<HabilitatProvider>(context, listen: false);
+      final habilitatProvider = Provider.of<HabilitatProvider>(context, listen: false);
 
       if (aliat != null) {
         await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
@@ -69,23 +67,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       }
 
       if (!_partidaJugadaSumada) {
-        final perfilProvider =
-            Provider.of<PerfilProvider>(context, listen: false);
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        final missionsProvider =
-            Provider.of<MissionsProvider>(context, listen: false);
-
-        perfilProvider.sumarPartidaJugada(userProvider.userId);
-
-        final missioJugar = missionsProvider.missions.firstWhere(
-          (m) => m.missio == 2,
-          orElse: () => throw Exception('Missió Jugar no trobada'),
-        );
-        if (missioJugar.progress < missioJugar.objectiu) {
-          missionsProvider.incrementProgress(
-              missioJugar.id);
-        }
-
+        await MissionsLogic.completarMissioJugarPartida(context); // ✅ substituït
         _partidaJugadaSumada = true;
       }
     });
@@ -102,24 +84,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await skinsProvider.fetchEnemyPoints();
 
-    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final missionsProvider =
-        Provider.of<MissionsProvider>(context, listen: false);
-
-    perfilProvider.sumarPartidaGuanyada(userProvider.userId);
-
-    // ✅ MISSIÓ: GUANYAR PARTIDA (ID = 1)
-    final missioGuanyar = missionsProvider.missions.firstWhere(
-  (m) => m.missio == 1,
-  orElse: () => throw Exception('Missió Guanyar no trobada'),
-);
-
-if (missioGuanyar.progress < missioGuanyar.objectiu) {
-  await missionsProvider.incrementProgress(missioGuanyar.id);
-  await missionsProvider.fetchMissions(userProvider.userId); // recarrega missions!
-}
-
+    await MissionsLogic.completarMissioGuanyarPartida(context); // ✅ substituït
 
     showDialog(
       context: context,

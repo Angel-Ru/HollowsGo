@@ -85,18 +85,31 @@ class CombatProvider with ChangeNotifier {
   }
 
   void applyBleed() {
+    if (_enemyBleeding) return; // Si ja està actiu, no fer res
+
     _enemyBleeding = true;
     _bleedTick = 0;
     notifyListeners();
+
+    startBleedLoop();
   }
 
-  void tickBleedDamage() {
-    if (_enemyBleeding && _enemicHealth > 0) {
+  // Loop que aplica el dany de sangrat pausadament
+  void startBleedLoop() async {
+    while (_enemyBleeding && _enemicHealth > 0) {
+      await Future.delayed(const Duration(seconds: 1)); // pausa entre ticks
+
       double bleedDamage = 100 * (pow(1.2, _bleedTick) as double);
       _bleedTick += 1;
       _enemicHealth -= bleedDamage;
       if (_enemicHealth < 0) _enemicHealth = 0;
+
       notifyListeners();
+
+      if (_enemicHealth == 0) {
+        _enemyBleeding = false; // s’acaba el sangrat si mor
+        break;
+      }
     }
   }
 
@@ -134,7 +147,8 @@ class CombatProvider with ChangeNotifier {
       _isEnemyHit = true;
       notifyListeners();
 
-      await Future.delayed(const Duration(milliseconds: 300));
+      await Future.delayed(
+          const Duration(milliseconds: 800)); // pausa més lenta
 
       final totalAllyDamage = allyDamage + _bonusAllyDamage;
       _bonusAllyDamage = 0;
@@ -150,12 +164,10 @@ class CombatProvider with ChangeNotifier {
         await _performEnemyAttack(enemyDamage, skinId, onDefeat);
       } else {
         _isAttackInProgress = false;
-
         await updateSkinVidaActual(
           skinId: skinId,
           vidaActual: _aliatHealth ?? 0,
         );
-
         onVictory();
       }
     }
@@ -166,8 +178,6 @@ class CombatProvider with ChangeNotifier {
     int skinId,
     VoidCallback onDefeat,
   ) async {
-    tickBleedDamage(); // 🔴 Aplicar sangrat abans del torn enemic
-
     if (_enemyFrozen) {
       debugPrint('[DEBUG] Torn enemic congelat: no ataca.');
       _isEnemyTurn = false;
