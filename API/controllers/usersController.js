@@ -815,12 +815,18 @@ exports.obtenirAmistats = async (req, res) => {
                     WHEN a.id_usuari = ? THEN u2.nom
                     ELSE u1.nom
                     END AS nom_amic,
+                CASE
+                    WHEN a.id_usuari = ? THEN av2.url
+                    ELSE av1.url
+                    END AS imatge_perfil_amic,
                 a.estat
             FROM AMISTATS a
                      JOIN USUARIS u1 ON a.id_usuari = u1.id
                      JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+                     LEFT JOIN AVATARS av1 ON u1.imatgeperfil = av1.id
+                     LEFT JOIN AVATARS av2 ON u2.imatgeperfil = av2.id
             WHERE a.id_usuari = ? OR a.id_usuari_amic = ?
-        `, [userId, userId, userId]);
+        `, [userId, userId, userId, userId]);
 
 
         res.status(200).json(amistats);
