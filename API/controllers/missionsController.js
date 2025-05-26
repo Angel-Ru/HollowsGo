@@ -46,6 +46,7 @@ exports.assignarMissionsDiaries = async (req, res) => {
       ORDER BY md.missio
     `, [usuariId, avui]);
 
+    console.log(res)
     res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAssignades });
 
   } catch (err) {
