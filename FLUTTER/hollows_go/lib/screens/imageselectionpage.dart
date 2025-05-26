@@ -14,28 +14,9 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
   late Future<String> _avatarActualUrlFuture;
   final PerfilProvider _perfilProvider = PerfilProvider();
 
-  final List<String> _dialogues = [
-    "Escollir perfil? Si vols, jo t’ajudo… amb una cervesa a la mà!",
-    "Jo sempre escolliria un perfil amb més estil. Què me’n dius?",
-    "Escollir perfil? Jo tinc una copa per cada opció. Tria la que més t’agradi.",
-    "Molt bé, no cal pensar-hi tant… només escull el millor!",
-  ];
-
-  final List<String> _kyorakuImages = [
-    'lib/images/kyoraku_character/kyoraku_1.png',
-    'lib/images/kyoraku_character/kyoraku_2.png',
-    'lib/images/kyoraku_character/kyoraku_3.png',
-    'lib/images/kyoraku_character/kyoraku_4.png',
-    'lib/images/kyoraku_character/kyoraku_5.png',
-  ];
-
-  int _dialogIndex = 0;
-  late String _currentImage;
-
   @override
   void initState() {
     super.initState();
-    _currentImage = _kyorakuImages[0];
     _avatarFuture = _perfilProvider.getAvatars();
 
     SharedPreferences.getInstance().then((prefs) {
@@ -45,17 +26,6 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
           _avatarActualUrlFuture = _perfilProvider.obtenirAvatar(userId);
         });
       }
-    });
-  }
-
-  void _nextDialogue() {
-    setState(() {
-      _dialogIndex = (_dialogIndex + 1) % _dialogues.length;
-      String newImage;
-      do {
-        newImage = _kyorakuImages[Random().nextInt(_kyorakuImages.length)];
-      } while (newImage == _currentImage);
-      _currentImage = newImage;
     });
   }
 
@@ -166,71 +136,6 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
                     },
                   );
                 },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: _nextDialogue,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundImage: AssetImage(_currentImage),
-                      backgroundColor: const Color.fromARGB(255, 245, 181, 234),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _nextDialogue,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            decoration: const BoxDecoration(
-                              color: Color.fromARGB(243, 194, 194, 194),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                topRight: Radius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Shunsui Kyoraku',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 6, 7, 6),
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: const BoxDecoration(
-                              color: Color.fromARGB(255, 245, 181, 234),
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(8),
-                                bottomRight: Radius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              _dialogues[_dialogIndex],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
