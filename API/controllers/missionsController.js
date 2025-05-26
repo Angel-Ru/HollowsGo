@@ -12,19 +12,19 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     // 1. Assignar missions fixes
     const [fixes] = await connection.execute(`
-      SELECT id FROM missions WHERE fixa = TRUE
+      SELECT id FROM MISSIONS WHERE fixa = TRUE
     `);
 
     for (const missio of fixes) {
       await connection.execute(`
-        INSERT IGNORE INTO missions_diaries (usuari, missio, data_assign)
+        INSERT IGNORE INTO MISSIONS_DIARIES (usuari, missio, data_assign)
         VALUES (?, ?, ?)
       `, [usuariId, missio.id, avui]);
     }
 
     // 2. Assignar una variable del dia (rotativa)
     const [variables] = await connection.execute(`
-      SELECT id FROM missions WHERE fixa = FALSE ORDER BY id
+      SELECT id FROM MISSIONS WHERE fixa = FALSE ORDER BY id
     `);
 
     const dia = new Date();
@@ -33,15 +33,15 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     // 3. Assignar si no existeix
     await connection.execute(`
-      INSERT IGNORE INTO missions_diaries (usuari, missio, data_assign)
+      INSERT IGNORE INTO MISSIONS_DIARIES (usuari, missio, data_assign)
       VALUES (?, ?, ?)
     `, [usuariId, variableDelDia.id, avui]);
 
     // 4. Recuperar les missions diaries assignades avui per l’usuari
     const [missionsAssignades] = await connection.execute(`
       SELECT md.id, md.usuari, md.missio, md.data_assign, m.nom, m.descripcio
-      FROM missions_diaries md
-      JOIN missions m ON md.missio = m.id
+      FROM MISSIONS_DIARIES md
+      JOIN MISSIONS m ON md.missio = m.id
       WHERE md.usuari = ? AND md.data_assign = ?
       ORDER BY md.missio
     `, [usuariId, avui]);
