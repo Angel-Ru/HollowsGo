@@ -70,15 +70,15 @@ exports.incrementarProgresMissio = async (req, res) => {
     return res.status(400).json({ error: 'ID invàlid' });
   }
 
+  let pool;
   let connection;
 
   try {
-    connection = await connectDB();
+    pool = await connectDB();
+    connection = await pool.getConnection();
 
-    // Iniciem transacció
     await connection.beginTransaction();
 
-    // Obtenim progress, objectiu, punts i usuari
     const [rows] = await connection.execute(`
       SELECT md.progress, md.objectiu, md.usuari, m.punts
       FROM MISSIONS_DIARIES md
@@ -89,6 +89,7 @@ exports.incrementarProgresMissio = async (req, res) => {
 
     if (rows.length === 0) {
       await connection.rollback();
+      connection.release();
       return res.status(404).json({ error: 'Missió no trobada' });
     }
 
@@ -96,10 +97,10 @@ exports.incrementarProgresMissio = async (req, res) => {
 
     if (progress >= objectiu) {
       await connection.rollback();
+      connection.release();
       return res.status(200).json({ missatge: 'Missió ja completada' });
     }
 
-    // Incrementem progress
     const [result] = await connection.execute(`
       UPDATE MISSIONS_DIARIES
       SET progress = progress + 1
@@ -108,10 +109,10 @@ exports.incrementarProgresMissio = async (req, res) => {
 
     if (result.affectedRows === 0) {
       await connection.rollback();
+      connection.release();
       return res.status(404).json({ error: 'Missió no trobada' });
     }
 
-    // Si després d'incrementar el progress s'arriba a l'objectiu, sumem punts
     if (progress + 1 >= objectiu && punts && !isNaN(punts)) {
       await connection.execute(`
         UPDATE USUARIS
@@ -120,19 +121,21 @@ exports.incrementarProgresMissio = async (req, res) => {
       `, [punts, usuari]);
     }
 
-    // Fem commit de la transacció
     await connection.commit();
+    connection.release();
 
     res.status(200).json({ missatge: 'Progrés incrementat correctament' });
 
   } catch (err) {
     if (connection) {
       await connection.rollback();
+      connection.release();
     }
     console.error(err);
     res.status(500).json({ error: 'Error incrementant el progrés de la missió' });
   }
 };
+
 
 
 
