@@ -13,7 +13,11 @@ class CurrentAvatarDisplay extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
             padding: EdgeInsets.all(16.0),
-            child: CircularProgressIndicator(),
+            child: Image(
+              image: AssetImage('assets/loading/loading.gif'),
+              width: 60,
+              height: 60,
+            ),
           );
         }
 
