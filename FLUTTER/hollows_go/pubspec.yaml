@@ -149,6 +149,7 @@ flutter:
     - assets/special_attack/gin/gin_gacha.mp4
     - assets/special_attack/gin/gin_aud.mp3
 
+
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
