@@ -1,8 +1,7 @@
-import 'package:http/http.dart' as http;
-
 import '../imports.dart';
+import '../providers/missions_provider.dart'; // Assegura't que tens la IP definida a config.dart
 
-// Model bàsic per la missió (ajusta segons la resposta real)
+// Model bàsic per la missió (ajustat amb progress i objectiu)
 class MissionDiary {
   final int id;
   final int usuari;
@@ -10,6 +9,8 @@ class MissionDiary {
   final String dataAssign;
   final String nom;
   final String descripcio;
+  final int progress;
+  final int objectiu;
 
   MissionDiary({
     required this.id,
@@ -18,6 +19,8 @@ class MissionDiary {
     required this.dataAssign,
     required this.nom,
     required this.descripcio,
+    required this.progress,
+    required this.objectiu,
   });
 
   factory MissionDiary.fromJson(Map<String, dynamic> json) {
@@ -28,63 +31,31 @@ class MissionDiary {
       dataAssign: json['data_assig'],
       nom: json['nom_missio'],
       descripcio: json['descripcio'],
+      progress: json['progress'] ?? 0,
+      objectiu: json['objectiu'] ?? 1,
     );
   }
 }
 
-class MissionsDrawer extends StatefulWidget {
+class MissionsDrawer extends StatelessWidget {
   final int usuariId;
 
   const MissionsDrawer({Key? key, required this.usuariId}) : super(key: key);
 
   @override
-  _MissionsDrawerState createState() => _MissionsDrawerState();
-}
-
-class _MissionsDrawerState extends State<MissionsDrawer> {
-  late Future<List<MissionDiary>> missionsFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    missionsFuture = fetchMissions(widget.usuariId);
-  }
-
-
-
-Future<List<MissionDiary>> fetchMissions(int usuariId) async {
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('token') ?? '';
-
-  final url = Uri.parse('https://${Config.ip}/missions/diaries/$usuariId');
-
-  final response = await http.post(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    final List missionsJson = data['missions'] ?? [];
-
-    return missionsJson.map((json) => MissionDiary.fromJson(json)).toList();
-  } else {
-    throw Exception('Error carregant missions');
-  }
-}
-
-
-  @override
   Widget build(BuildContext context) {
+    final missionsProvider = Provider.of<MissionsProvider>(context);
+    final missions = missionsProvider.missions;
+
     return Drawer(
       child: SafeArea(
         child: Column(
           children: [
             ListTile(
-              title: Text('Missions Diaries', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+              title: Text(
+                'Missions Diaries',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
               trailing: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () => Navigator.of(context).pop(),
@@ -92,36 +63,62 @@ Future<List<MissionDiary>> fetchMissions(int usuariId) async {
             ),
             Divider(),
             Expanded(
-              child: FutureBuilder<List<MissionDiary>>(
-                future: missionsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error carregant missions'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No hi ha missions assignades'));
-                  }
-
-                  final missions = snapshot.data!;
-
-                  return ListView.builder(
-                    itemCount: missions.length,
-                    itemBuilder: (context, index) {
-                      final missio = missions[index];
-                      return ListTile(
-                        leading: Icon(Icons.task_alt),
-                        title: Text(missio.nom),
-                        subtitle: Text(missio.descripcio),
-                      );
-                    },
-                  );
-                },
-              ),
+              child: missions.isEmpty
+                  ? FutureBuilder(
+                      future: missionsProvider.fetchMissions(usuariId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(child: Text('Error carregant missions'));
+                        } else {
+                          return _buildMissionList(missions);
+                        }
+                      },
+                    )
+                  : _buildMissionList(missions),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildMissionList(List<MissionDiary> missions) {
+    return ListView.builder(
+      itemCount: missions.length,
+      itemBuilder: (context, index) {
+        final missio = missions[index];
+        return Card(
+          margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(missio.nom,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                SizedBox(height: 4),
+                Text(missio.descripcio),
+                SizedBox(height: 12),
+                LinearProgressIndicator(
+                  value: missio.objectiu > 0
+                      ? missio.progress / missio.objectiu
+                      : 0,
+                  minHeight: 8,
+                  backgroundColor: Colors.grey.shade300,
+                  color: Colors.blue,
+                ),
+                SizedBox(height: 6),
+                Text(
+                  '${missio.progress}/${missio.objectiu} completat',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
