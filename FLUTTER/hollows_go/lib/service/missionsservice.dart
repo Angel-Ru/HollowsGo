@@ -8,7 +8,7 @@ class MissionsLogic {
     final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
-
+    missionsProvider.fetchMissions(userProvider.userId);
     perfilProvider.sumarPartidaJugada(userProvider.userId);
 
     final missioJugar = missionsProvider.missions.firstWhere(
@@ -25,7 +25,9 @@ class MissionsLogic {
     final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
+    
 
+    missionsProvider.fetchMissions(userProvider.userId);
     perfilProvider.sumarPartidaGuanyada(userProvider.userId);
 
     final missioGuanyar = missionsProvider.missions.firstWhere(
