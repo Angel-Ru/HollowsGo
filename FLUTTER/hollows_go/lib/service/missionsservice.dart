@@ -4,22 +4,50 @@ import '../providers/perfil_provider.dart';
 import '../providers/user_provider.dart';
 
 class MissionsLogic {
-  static Future<void> completarMissioJugarPartida(context) async {
-    final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
-    missionsProvider.fetchMissions(userProvider.userId);
-    perfilProvider.sumarPartidaJugada(userProvider.userId);
+  static Future<void> completarMissioJugarPartida(context, {required dynamic aliatSkin}) async {
+  final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
 
-    final missioJugar = missionsProvider.missions.firstWhere(
-      (m) => m.missio == 2,
-      orElse: () => throw Exception('Missió Jugar no trobada'),
-    );
+  await missionsProvider.fetchMissions(userProvider.userId);
+  perfilProvider.sumarPartidaJugada(userProvider.userId);
 
-    if (missioJugar.progress < missioJugar.objectiu) {
-      await missionsProvider.incrementProgress(missioJugar.id);
-    }
+  // Missió Jugar (2)
+  final missioJugar = missionsProvider.missions.firstWhere(
+    (m) => m.missio == 2,
+    orElse: () => throw Exception('Missió Jugar no trobada'),
+  );
+
+  if (missioJugar.progress < missioJugar.objectiu) {
+    await missionsProvider.incrementProgress(missioJugar.id);
   }
+
+  // Missió 5: si raça == 0, incrementa missió 5
+  try {
+    final missio5 = missionsProvider.missions.firstWhere((m) => m.missio == 5);
+    if (aliatSkin != null && aliatSkin.raca == 1) {
+      if (missio5.progress < missio5.objectiu) {
+        await missionsProvider.incrementProgress(missio5.id);
+      }
+    }
+  } catch (_) {
+    // Missió 5 no trobada, no fem res
+  }
+
+  // Missió 6: si raça == 1, incrementa missió 6
+  try {
+    final missio6 = missionsProvider.missions.firstWhere((m) => m.missio == 6);
+    if (aliatSkin != null && aliatSkin.raca == 0) {
+      if (missio6.progress < missio6.objectiu) {
+        await missionsProvider.incrementProgress(missio6.id);
+      }
+    }
+  } catch (_) {
+    
+  }
+}
+
+
 
   static Future<void> completarMissioGuanyarPartida(context) async {
     final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);

@@ -67,9 +67,13 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       }
 
       if (!_partidaJugadaSumada) {
-        await MissionsLogic.completarMissioJugarPartida(context); // ✅ substituït
-        _partidaJugadaSumada = true;
-      }
+  final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+  final aliatSkin = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
+
+  await MissionsLogic.completarMissioJugarPartida(context, aliatSkin: aliatSkin);
+  _partidaJugadaSumada = true;
+}
+
     });
   }
 
