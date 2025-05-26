@@ -256,6 +256,7 @@ class UserProvider with ChangeNotifier {
           return {
             'nom_amic': amic['nom_amic'],
             'estat': amic['estat'],
+            'imatge_perfil_amic': amic['imatge_perfil_amic'],
           };
         }).toList();
 

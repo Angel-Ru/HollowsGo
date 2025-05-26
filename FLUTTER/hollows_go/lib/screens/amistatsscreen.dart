@@ -48,12 +48,6 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
         child: ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: AppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.white.withOpacity(0.5),
-              elevation: 0,
-              title: null,
-            ),
           ),
         ),
       ),
@@ -66,7 +60,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                    'lib/images/amistats_fondo.png'), // Asegúrate de tener esta imagen
+                    'lib/images/amistatsscreen/amistats_fondo.png'), // Asegúrate de tener esta imagen
                 fit: BoxFit.cover,
               ),
             ),
@@ -171,8 +165,14 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                             ),
                             child: ListTile(
                               leading: CircleAvatar(
-                                backgroundColor: Colors.pink.withOpacity(0.3),
-                                child: Icon(Icons.book, color: Colors.white),
+                                backgroundImage:
+                                    amistat['imatge_perfil_amic'] != null
+                                        ? NetworkImage(
+                                            amistat['imatge_perfil_amic'])
+                                        : null,
+                                child: amistat['imatge_perfil_amic'] == null
+                                    ? Icon(Icons.person)
+                                    : null,
                               ),
                               title: Text(
                                 nom,

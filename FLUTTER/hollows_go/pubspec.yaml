@@ -112,6 +112,7 @@ flutter:
     - lib/images/detailsscreen/
     - lib/images/settings_screen/
     - lib/images/tutorial_screen/
+    - lib/images/amistatsscreen/
     - assets/special_attack/shinji/shinji_aud.mp3
     - assets/special_attack/shinji/marco_shinji.png
     - assets/special_attack/shinji/shinji_vid.mp4
