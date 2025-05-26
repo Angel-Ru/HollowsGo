@@ -1,7 +1,4 @@
 import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 // Aquí importes els teus models i providers
 import '../imports.dart';
@@ -346,5 +343,9 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     provider.unselectSkinAliat();
     provider.unselectSkinQuincy();
     provider.unselectSkinEnemic();
+
+    final dialogueProvider =
+        Provider.of<DialogueProvider>(context, listen: false);
+    dialogueProvider.loadDialogueFromJson(_getDialogueCharacter());
   }
 }
