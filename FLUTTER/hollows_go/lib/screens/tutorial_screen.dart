@@ -12,6 +12,7 @@ class TutorialScreen extends StatefulWidget {
 
 class _TutorialScreenState extends State<TutorialScreen> {
   late PageController _pageController;
+  bool _navigating = false;
 
   @override
   void initState() {
@@ -29,16 +30,26 @@ class _TutorialScreenState extends State<TutorialScreen> {
     super.dispose();
   }
 
+  void _navigateToHome() {
+    if (_navigating) return;
+    _navigating = true;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => HomeScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<DialogueProvider>(context);
+    final totalSteps = provider.currentDialogue.length;
 
     return Scaffold(
-      body: provider.currentDialogue.isEmpty
+      body: totalSteps == 0
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
-                // 📸 Fons amb imatge
+                // 📸 Fons
                 Container(
                   decoration: const BoxDecoration(
                     image: DecorationImage(
@@ -49,29 +60,32 @@ class _TutorialScreenState extends State<TutorialScreen> {
                   ),
                 ),
 
-                // 🌫️ Blur + foscor
+                // 🌫️ Blur
                 BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                  child: Container(
-                    color: Colors.black.withOpacity(0.2),
-                  ),
+                  child: Container(color: Colors.black.withOpacity(0.2)),
                 ),
 
-                // 🔽 Contingut del tutorial
+                // 🔽 Contingut
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      // 🖼️ Slider de targetes amb PageView
+                      // 🖼️ Imatges amb card slider
                       Expanded(
                         child: PageView.builder(
                           controller: _pageController,
-                          itemCount: provider.currentDialogue.length,
+                          itemCount: totalSteps,
                           onPageChanged: (index) {
-                            if (index > provider.currentIndex) {
-                              provider.nextTutorialStep();
-                            } else if (index < provider.currentIndex) {
-                              provider.previousTutorialStep();
+                            // Evita avançar més del final
+                            if (index >= totalSteps) {
+                              _navigateToHome();
+                            } else {
+                              if (index > provider.currentIndex) {
+                                provider.nextTutorialStep();
+                              } else if (index < provider.currentIndex) {
+                                provider.previousTutorialStep();
+                              }
                             }
                           },
                           itemBuilder: (context, index) {
@@ -126,11 +140,11 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       const SizedBox(height: 12),
 
-                      // 🔵 Punts d’indicador de pàgina
+                      // 🔵 Punts d’indicador
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
-                          provider.currentDialogue.length,
+                          totalSteps,
                           (index) => Container(
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             width: provider.currentIndex == index ? 12 : 8,
@@ -147,21 +161,16 @@ class _TutorialScreenState extends State<TutorialScreen> {
 
                       const SizedBox(height: 12),
 
-                      // 🔘 Botó finalitzar només si és l'últim pas
+                      // 🔘 Botó final
                       if (provider.isLastStep)
                         ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (_) => HomeScreen()),
-                            );
-                          },
+                          onPressed: _navigateToHome,
                           child: const Text('Finalitzar'),
                         ),
 
                       const SizedBox(height: 12),
 
-                      // 💬 Diàleg del tutorial
+                      // 💬 Diàleg
                       DialogueWidget(
                         characterName: 'KON',
                         nameColor: const Color.fromARGB(255, 233, 179, 3),
