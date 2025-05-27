@@ -95,7 +95,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     await skinsProvider.fetchEnemyPoints();
 
-    await MissionsLogic.completarMissioGuanyarPartida(context); // ✅ substituït
+    await MissionsLogic.completarMissioGuanyarPartida(context);
 
     showDialog(
       context: context,
