@@ -60,5 +60,8 @@ router.post('/', verificacioUsuari.verifyToken,verificacioUsuari.verifyAdminDB, 
 //Ruta per borrar una skin
 router.delete('/:id', verificacioUsuari.verifyToken, verificacioUsuari.verifyAdminDB, skinsController.borrarSkinId);
 
+// Ruta per obtenir skin seleccionada
+router.get('/seleccionada/:id', verificacioUsuari.verifyToken, skinsController.getSkinSeleccionada);
+
 
 module.exports = router;
