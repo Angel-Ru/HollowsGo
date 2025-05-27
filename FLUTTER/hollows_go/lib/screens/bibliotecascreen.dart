@@ -19,33 +19,31 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     _loadInitialDialogue();
   }
 
-Future<void> _loadUserData() async {
-  final prefs = await SharedPreferences.getInstance();
-  final userId = prefs.getInt('userId');
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId');
 
-  if (userId == null) {
-    print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
-    return;
+    if (userId == null) {
+      print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
+      return;
+    }
+
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+
+    await provider.fetchPersonatgesAmbSkins(userId.toString());
+    await provider.fetchEnemicsAmbSkins(userId.toString());
+    await provider.fetchPersonatgesAmbSkinsQuincys(userId.toString());
+
+    // Aquí carreguem la skin seleccionada des del backend segons userId
+    await provider.getSkinSeleccionada(userId);
+
+    // Un cop carregada la skin seleccionada, actualitzem l'estat per refrescar UI
+    setState(() {
+      // Si vols, pots actualitzar variables locals aquí, però normalment
+      // només cridem setState per refrescar la UI que llegeix del provider.
+    });
   }
-
-  final provider =
-      Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-
-  await provider.fetchPersonatgesAmbSkins(userId.toString());
-  await provider.fetchEnemicsAmbSkins(userId.toString());
-  await provider.fetchPersonatgesAmbSkinsQuincys(userId.toString());
-
-  // Aquí carreguem la skin seleccionada des del backend segons userId
-  await provider.getSkinSeleccionada(userId);
-
-  // Un cop carregada la skin seleccionada, actualitzem l'estat per refrescar UI
-  setState(() {
-    // Si vols, pots actualitzar variables locals aquí, però normalment
-    // només cridem setState per refrescar la UI que llegeix del provider.
-  });
-}
-
-
 
   void _loadInitialDialogue() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
