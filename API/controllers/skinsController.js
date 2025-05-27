@@ -2111,7 +2111,6 @@ exports.getSkinSeleccionada = async (req, res) => {
         const userId = parseInt(req.params.id);
         const connection = await connectDB();
 
-        // Obtenir la fila seleccionada de USUARI_SKIN_ARMES junt amb dades de skin i personatge
         const [seleccio] = await connection.execute(`
             SELECT usa.id AS usuari_skin_arma_id,
                    s.id AS skin_id,
@@ -2121,10 +2120,10 @@ exports.getSkinSeleccionada = async (req, res) => {
                    p.nom AS nom_personatge,
                    p.vida_base AS vida_personatge
             FROM USUARI_SKIN_ARMES usa
-                     INNER JOIN SKINS s ON usa.skin = s.id
-                     INNER JOIN PERSONATGES p ON s.personatge = p.id
+            INNER JOIN SKINS s ON usa.skin = s.id
+            INNER JOIN PERSONATGES p ON s.personatge = p.id
             WHERE usa.usuari = ? AND usa.seleccionat = true
-                LIMIT 1
+            LIMIT 1
         `, [userId]);
 
         if (seleccio.length === 0) {
@@ -2132,10 +2131,8 @@ exports.getSkinSeleccionada = async (req, res) => {
         }
 
         const skinSeleccionada = seleccio[0];
-        
-        console.log(res);
 
-        res.status(200).json({
+        const resposta = {
             usuari_skin_arma_id: skinSeleccionada.usuari_skin_arma_id,
             skin: {
                 id: skinSeleccionada.skin_id,
@@ -2145,12 +2142,18 @@ exports.getSkinSeleccionada = async (req, res) => {
                 personatge_nom: skinSeleccionada.nom_personatge,
                 vida: skinSeleccionada.vida_personatge
             }
-        });
+        };
+
+        console.log("Resposta enviada:", resposta);  // Aquí veuràs la data que envies al client
+
+        res.status(200).json(resposta);
+
     } catch (error) {
         console.error('Error obtenint la skin seleccionada:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
+
 
 
 
