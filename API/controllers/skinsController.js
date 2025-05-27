@@ -2221,7 +2221,7 @@ exports.llevarSkinSeleccionada = async (req, res) => {
         const connection = await connectDB();
 
         // 1. Desseleccionem totes les skins de l'usuari
-        await connection.execute(`
+       const [result] =  await connection.execute(`
       UPDATE USUARI_SKIN_ARMES 
       SET seleccionat = FALSE 
       WHERE usuari = ?
