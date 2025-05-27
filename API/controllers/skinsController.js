@@ -2111,18 +2111,44 @@ exports.getSkinSeleccionada = async (req, res) => {
         const userId = parseInt(req.params.id);
         const connection = await connectDB();
 
-        const [resultat] = await connection.execute(
-            `SELECT id, usuari, skin, arma, vida_actual, seleccionat
-             FROM USUARI_SKIN_ARMES
-             WHERE usuari = ? AND seleccionat = true`,
-            [userId]
-        );
+        // Obtenir la fila seleccionada de USUARI_SKIN_ARMES junt amb dades de skin i personatge
+        const [seleccio] = await connection.execute(`
+            SELECT usa.id AS usuari_skin_arma_id,
+                   s.id AS skin_id,
+                   s.nom AS skin_nom,
+                   s.categoria,
+                   s.imatge,
+                   p.nom AS nom_personatge,
+                   p.vida_base AS vida_personatge
+            FROM USUARI_SKIN_ARMES usa
+                     INNER JOIN SKINS s ON usa.skin = s.id
+                     INNER JOIN PERSONATGES p ON s.personatge = p.id
+            WHERE usa.usuari = ? AND usa.seleccionat = true
+                LIMIT 1
+        `, [userId]);
 
-        res.status(200).json(resultat);
+        if (seleccio.length === 0) {
+            return res.status(404).json({ missatge: 'No hi ha cap skin seleccionada.' });
+        }
+
+        const skinSeleccionada = seleccio[0];
+
+        res.status(200).json({
+            usuari_skin_arma_id: skinSeleccionada.usuari_skin_arma_id,
+            skin: {
+                id: skinSeleccionada.skin_id,
+                nom: skinSeleccionada.skin_nom,
+                categoria: skinSeleccionada.categoria,
+                imatge: skinSeleccionada.imatge,
+                personatge_nom: skinSeleccionada.nom_personatge,
+                vida: skinSeleccionada.vida_personatge
+            }
+        });
     } catch (error) {
         console.error('Error obtenint la skin seleccionada:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
+
 
 
