@@ -58,9 +58,11 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void healPlayer(int amount) {
+  void healPlayer(int amount, int maxHealth) {
     _aliatHealth = (_aliatHealth ?? 0) + amount;
-    if (_aliatHealth! > 1000) _aliatHealth = 1000;
+    if (_aliatHealth! > maxHealth) {
+      _aliatHealth = maxHealth.toDouble();
+    }
     notifyListeners();
   }
 
