@@ -119,22 +119,28 @@ class CombatProvider with ChangeNotifier {
     required double enemyMaxHealth,
     required int enemyAttack,
   }) {
+    // Partim el nom per la meitat
     int midIndex = (enemyName.length / 2).ceil();
     String modifiedName = enemyName.substring(0, midIndex);
 
+    // Reduïm la vida màxima a la meitat
     double newMaxHealth = enemyMaxHealth / 2;
 
-    // Cal ajustar la vida actual respecte la nova màxima
-    double newHealth =
-        _enemicHealth > newMaxHealth ? newMaxHealth : _enemicHealth;
+    // Ajustem la vida actual per tal que no sigui més gran que la nova màxima
+    if (_enemicHealth > newMaxHealth) {
+      _enemicHealth = newMaxHealth;
+    }
 
-    // Assignem valors amb els setters per notificar listeners i actualitzar la UI
-    setEnemyMaxHealth(newMaxHealth);
-    setEnemyHealth(newHealth);
-    setEnemyName(modifiedName);
+    // Actualitzem vida màxima i vida actual a la vegada per evitar inconsistències
+    _enemyMaxHealth = newMaxHealth;
 
+    // Actualitza el nom
+    _enemyName = modifiedName;
+
+    // Debuff d’atac (la meitat)
     int attackDebuff = (enemyAttack / 2).floor();
 
+    // Notifiquem el canvi
     notifyListeners();
 
     return {

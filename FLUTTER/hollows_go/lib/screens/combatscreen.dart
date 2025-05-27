@@ -248,7 +248,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                             'lib/images/combatscreen_images/aizen_combat.png',
                         name: enemyName,
                         health: combatProvider.enemicHealth,
-                        maxHealth: skins.enemic?.vida ?? 1000,
+                        maxHealth: combatProvider.enemyMaxHealth.toInt(),
                         isHit: combatProvider.isEnemyHit,
                         isEnemy: true,
                         debuffAmount: combatProvider.enemyAttackDebuff,

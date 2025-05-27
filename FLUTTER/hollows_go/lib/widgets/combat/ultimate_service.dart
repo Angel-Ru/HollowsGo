@@ -122,17 +122,14 @@ class UltimateService {
 
           // Aquesta funció es crida un cop ha acabat tot (àudio, vídeo i tinta)
           onDamageApplied: (_) {
-            // Mostrem l'efecte de tinta
             combatProvider.triggerIchibeUltiEffect();
 
-            // Apliquem l'efecte ulti d'Ichibe i obtenim resultats
             final result = combatProvider.ichibeUltimateEffect(
               enemyName: enemyName,
               enemyMaxHealth: enemyMaxHealth,
               enemyAttack: enemyAttack,
             );
 
-            // Aplica el debuff d’atac a la UI
             combatProvider.applyEnemyAttackDebuff(result['attackDebuff']);
           },
 
