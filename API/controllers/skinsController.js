@@ -2086,7 +2086,7 @@ exports.gachaMultiHO = async (req, res) => {
 
 // Obtenir skin seleccionada
 exports.getSkinSeleccionada = async (req, res) => {
-    const { usuari } = req.params;
+    const { id: usuari } = req.params;
 
     if (!usuari) {
         return res.status(400).json({ error: 'usuariId és requerit' });
