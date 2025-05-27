@@ -252,6 +252,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         isHit: combatProvider.isEnemyHit,
                         isEnemy: true,
                         debuffAmount: combatProvider.enemyAttackDebuff,
+                        isBleeding: combatProvider.enemyBleeding,
+                        isFrozen: combatProvider.enemyFrozen,
                       ),
                       Spacer(),
                       CharacterDisplayWidget(
