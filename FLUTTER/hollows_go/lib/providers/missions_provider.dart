@@ -56,5 +56,23 @@ class MissionsProvider with ChangeNotifier {
     throw Exception('Error incrementant progrés');
   }
 }
+Future<void> assignarMissionsTitols(int usuariId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token') ?? '';
+
+  final url = Uri.parse('https://${Config.ip}/missions/titols/$usuariId');
+
+  final response = await http.post(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Error assignant missions de títol');
+  }
+}
 
 }

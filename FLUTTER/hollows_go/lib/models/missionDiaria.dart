@@ -41,6 +41,11 @@ class MissionsDrawer extends StatelessWidget {
 
   const MissionsDrawer({Key? key, required this.usuariId}) : super(key: key);
 
+  Future<void> _assignarIMostrarMissions(MissionsProvider missionsProvider, int usuariId) async {
+  await missionsProvider.assignarMissionsTitols(usuariId); // Assignar les de títol
+  await missionsProvider.fetchMissions(usuariId);          // Carregar totes les missions diaries
+}
+
   @override
   Widget build(BuildContext context) {
     final missionsProvider = Provider.of<MissionsProvider>(context);
@@ -69,7 +74,7 @@ class MissionsDrawer extends StatelessWidget {
             Expanded(
               child: missions.isEmpty
                   ? FutureBuilder(
-                      future: missionsProvider.fetchMissions(usuariId),
+                      future: _assignarIMostrarMissions(missionsProvider, usuariId),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator(color: Colors.tealAccent));

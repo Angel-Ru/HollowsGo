@@ -592,10 +592,23 @@ exports.gachaSimulacio = async (req, res) => {
             return res.status(400).send('No tens prou monedes per fer la tirada.');
         }
 
+        // Funció per obtenir carpeta segons skin i habilitat, només si personatge és Kenpachi
+        function getCarpetaKenpachi(nomSkin, nomHabilitat) {
+            const s = (str) => str.toLowerCase();
+            if ((nomSkin && s(nomSkin).includes('tybw')) || (nomHabilitat && s(nomHabilitat).includes('tybw'))) {
+                return 'kenpachi_tybw';
+            }
+            if ((nomSkin && s(nomSkin).includes('aura')) || (nomHabilitat && s(nomHabilitat).includes('aura'))) {
+                return 'kenpachi_ull';
+            }
+            // fallback si cal
+            return 'kenpachi';
+        }
+
         // 🔄 Simular que sempre toca la skin amb ID 237
         const [simulatedSkinResult] = await connection.execute(
             'SELECT * FROM SKINS WHERE id = ?',
-            [233]
+            [225]
         );
 
         if (simulatedSkinResult.length === 0) {
@@ -610,26 +623,33 @@ exports.gachaSimulacio = async (req, res) => {
             [randomSkin.id]
         );
 
+        let nomHabilitat = '';
         if (habilitatResult.length > 0) {
             randomSkin.habilitat_llegendaria = habilitatResult[0];
+            nomHabilitat = habilitatResult[0].nom;
+        }
 
-            // 🧠 Agafar el nom del personatge per crear el path del vídeo
-            const [personatgeResult] = await connection.execute(
-                'SELECT nom FROM PERSONATGES WHERE id = ?',
-                [randomSkin.personatge]
-            );
+        // 🧠 Agafar el nom del personatge per crear el path del vídeo
+        const [personatgeResult] = await connection.execute(
+            'SELECT nom FROM PERSONATGES WHERE id = ?',
+            [randomSkin.personatge]
+        );
 
-            if (personatgeResult.length > 0) {
-                const personatgeNom = personatgeResult[0].nom;
+        if (personatgeResult.length > 0) {
+            const personatgeNom = personatgeResult[0].nom;
 
-                const carpeta = personatgeNom
+            let carpeta = '';
+            if (personatgeNom.toLowerCase() === 'kenpachi') {
+                carpeta = getCarpetaKenpachi(randomSkin.nom, nomHabilitat);
+            } else {
+                carpeta = personatgeNom
                     .toLowerCase()
                     .replace(/[^\w]/g, '_')   // substitueix espais i símbols
                     .replace(/_+/g, '_')       // agrupa múltiples guions baixos
                     .replace(/^_+|_+$/g, '');  // elimina guions al principi/final
-
-                randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
             }
+
+            randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
         }
 
         // Comprovar si l'usuari ja té la skin
@@ -687,6 +707,7 @@ exports.gachaSimulacio = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 
@@ -2090,18 +2111,44 @@ exports.getSkinSeleccionada = async (req, res) => {
         const userId = parseInt(req.params.id);
         const connection = await connectDB();
 
-        const [resultat] = await connection.execute(
-            `SELECT id, usuari, skin, arma, vida_actual, seleccionat
-             FROM USUARI_SKIN_ARMES
-             WHERE usuari = ? AND seleccionat = true`,
-            [userId]
-        );
+        // Obtenir la fila seleccionada de USUARI_SKIN_ARMES junt amb dades de skin i personatge
+        const [seleccio] = await connection.execute(`
+            SELECT usa.id AS usuari_skin_arma_id,
+                   s.id AS skin_id,
+                   s.nom AS skin_nom,
+                   s.categoria,
+                   s.imatge,
+                   p.nom AS nom_personatge,
+                   p.vida_base AS vida_personatge
+            FROM USUARI_SKIN_ARMES usa
+                     INNER JOIN SKINS s ON usa.skin = s.id
+                     INNER JOIN PERSONATGES p ON s.personatge = p.id
+            WHERE usa.usuari = ? AND usa.seleccionat = true
+                LIMIT 1
+        `, [userId]);
 
-        res.status(200).json(resultat);
+        if (seleccio.length === 0) {
+            return res.status(404).json({ missatge: 'No hi ha cap skin seleccionada.' });
+        }
+
+        const skinSeleccionada = seleccio[0];
+
+        res.status(200).json({
+            usuari_skin_arma_id: skinSeleccionada.usuari_skin_arma_id,
+            skin: {
+                id: skinSeleccionada.skin_id,
+                nom: skinSeleccionada.skin_nom,
+                categoria: skinSeleccionada.categoria,
+                imatge: skinSeleccionada.imatge,
+                personatge_nom: skinSeleccionada.nom_personatge,
+                vida: skinSeleccionada.vida_personatge
+            }
+        });
     } catch (error) {
         console.error('Error obtenint la skin seleccionada:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
+
 
 

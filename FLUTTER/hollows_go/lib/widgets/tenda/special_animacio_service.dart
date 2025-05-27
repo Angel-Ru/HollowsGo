@@ -22,6 +22,14 @@ class SpecialAnimationService {
       bankaiText: 'Yokoso, sakasama no sekai',
       audioAsset: 'special_attack/shinji/shinji_aud.mp3',
     ),
+    'kenpachi_tybw': SpecialAnimationConfig(
+      bankaiText: 'Nome Nozarashi',
+      audioAsset: 'special_attack/kenpachi_tybw/kenpachi_tybw_aud.mp3',
+    ),
+    'kenpachi_ull': SpecialAnimationConfig(
+      bankaiText: 'Bankai Aura',
+      audioAsset: 'special_attack/kenpachi_ull/kenpachi_ull_aud.mp3',
+    ),
   };
 
   static SpecialAnimationConfig? getConfigForSkin(Map<String, dynamic> skin) {
