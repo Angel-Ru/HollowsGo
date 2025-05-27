@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hollows_go/providers/skins_enemics_personatges.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:video_player/video_player.dart';
@@ -128,6 +129,12 @@ class UltimateService {
       case 15:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
+        final skinProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(
+            context,
+            listen: false);
+        final maxHealth = skinProvider.selectedSkinAliat?.vidaMaxima ??
+            1000; // Vida màxima de la skin
+
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/unohana/marco_unohana.png',
@@ -136,8 +143,8 @@ class UltimateService {
           damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) {
-            combatProvider.healPlayer(400);
-            combatProvider.applyBleed();
+            combatProvider.healPlayer(400, maxHealth); // Cura amb límit màxim
+            combatProvider.applyBleed(); // Aplica sagnat
           },
           onEnemyDefeated: onEnemyDefeated,
         );
