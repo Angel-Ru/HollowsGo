@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/widgets/combat/healthbarwidget.dart';
+import 'package:provider/provider.dart';
 
 class CharacterDisplayWidget extends StatefulWidget {
   final String imageUrl;
@@ -20,7 +21,7 @@ class CharacterDisplayWidget extends StatefulWidget {
   final bool isBleeding;
   final bool isFrozen;
 
-  final bool showInkEffect; // 🔥 Nou parametre
+  final bool showInkEffect;
 
   const CharacterDisplayWidget({
     required this.imageUrl,
@@ -35,7 +36,7 @@ class CharacterDisplayWidget extends StatefulWidget {
     this.blurSigma = 0.8,
     this.isBleeding = false,
     this.isFrozen = false,
-    this.showInkEffect = false, // 🔥 Nou parametre
+    this.showInkEffect = false,
     Key? key,
   }) : super(key: key);
 
@@ -58,11 +59,8 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
 
   void _startInkAnimation() async {
     setState(() => _opacity = 1.0);
-
     await Future.delayed(const Duration(milliseconds: 250)); // fade in
-
-    await Future.delayed(const Duration(milliseconds: 500)); // visible
-
+    await Future.delayed(const Duration(milliseconds: 500)); // stay
     setState(() => _opacity = 0.0); // fade out
   }
 
@@ -108,6 +106,11 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
     final double blur =
         widget.isEnemy ? widget.blurSigma * 1.2 : widget.blurSigma;
     final BorderRadius imageBorderRadius = BorderRadius.circular(10);
+
+    // Per mostrar el nom tallat, consultem el CombatProvider
+    final combatProvider = Provider.of<CombatProvider>(context);
+    final String displayName =
+        widget.isEnemy ? combatProvider.enemyName : widget.name;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -155,28 +158,25 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                 ),
               ),
 
-              // 🔥 Ink splash effect (fade in/out)
-              AnimatedOpacity(
-                opacity: _opacity,
-                duration: const Duration(milliseconds: 250), // fade in
-                curve: Curves.easeIn,
-                onEnd: () {
-                  if (_opacity == 0.0) setState(() {}); // ensures rebuild
-                },
-                child: Image.asset(
-                  'assets/special_attack/ichibe/imatge_tinta.png',
-                  fit: BoxFit.cover,
-                  width: containerSize,
-                  height: containerSize,
+              // 🔥 Efecte de tinta només si és enemic
+              if (widget.isEnemy)
+                AnimatedOpacity(
+                  opacity: _opacity,
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeIn,
+                  child: Image.asset(
+                    'assets/special_attack/ichibe/imatge_tinta.png',
+                    fit: BoxFit.cover,
+                    width: containerSize,
+                    height: containerSize,
+                  ),
                 ),
-              ),
             ],
           ),
         ),
-
         const SizedBox(height: 8),
 
-        // Nom + barra
+        // Nom i barra de vida
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
@@ -186,7 +186,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Row amb debuffs / barra de vida
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -260,7 +259,7 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
               ),
               const SizedBox(height: 6),
               Text(
-                widget.name,
+                displayName,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
