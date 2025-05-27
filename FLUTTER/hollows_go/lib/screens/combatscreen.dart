@@ -246,7 +246,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                       CharacterDisplayWidget(
                         imageUrl: skins.enemic?.imatge ??
                             'lib/images/combatscreen_images/aizen_combat.png',
-                        name: enemyName,
+                        name: combatProvider.enemyName,
                         health: combatProvider.enemicHealth,
                         maxHealth: combatProvider.enemyMaxHealth.toInt(),
                         isHit: combatProvider.isEnemyHit,
