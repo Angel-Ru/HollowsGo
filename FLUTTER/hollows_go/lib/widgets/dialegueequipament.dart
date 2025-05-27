@@ -2,6 +2,8 @@ import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/providers/armes_provider.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../service/missionsservice.dart';
+
 
 Future<void> mostrarDialegArmesPredefinides({
   required BuildContext context,
@@ -172,6 +174,7 @@ Future<void> mostrarDialegArmesPredefinides({
                                     );
                                     provider.fetchPersonatgesAmbSkins(usuariId.toString());
                                     if (ok) {
+                                      await MissionsLogic.completarMissioEquiparArma(context);
                                       Navigator.of(context).pop();
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
