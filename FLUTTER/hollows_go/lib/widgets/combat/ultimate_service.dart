@@ -106,44 +106,38 @@ class UltimateService {
           listen: false,
         );
 
-        // 1. Obtenim dades originals de l'enemic
+// Obtenim dades originals de l'enemic
         final enemyName = skinProvider.selectedSkin?.personatgeNom ?? "Enemic";
         final enemyMaxHealth =
             (skinProvider.selectedSkin?.vida ?? 1000).toDouble();
         final enemyAttack = (skinProvider.selectedSkin?.malTotal ?? 50) * 2;
 
-        // 2. Apliquem efecte d’Ichibe (logica dins CombatProvider)
-        final result = combatProvider.ichibeUltimateEffect(
-          enemyName: enemyName,
-          enemyMaxHealth: enemyMaxHealth,
-          enemyAttack: enemyAttack,
-        );
-
-        // 3. Executem l’animació amb vídeo, so i efecte visual
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/ichibe/marco_ichibe.png',
           audioAsset: 'special_attack/ichibe/ichibe_aud.mp3',
           videoAsset: 'assets/special_attack/ichibe/ichibe_vid.mp4',
-          damage: 0, // No es fa dany directe, només efecte de debuff
+          damage: 0, // No hi ha dany directe
           rotateScreen: false,
+
+          // Aquesta funció es crida un cop ha acabat tot (àudio, vídeo i tinta)
           onDamageApplied: (_) {
-            // Triga uns frames a mostrar la tinta (es fa després del vídeo)
+            // Mostrem l'efecte de tinta
             combatProvider.triggerIchibeUltiEffect();
 
-            // Aplica debuff d’atac (valor calculat pel provider)
+            // Apliquem l'efecte ulti d'Ichibe i obtenim resultats
+            final result = combatProvider.ichibeUltimateEffect(
+              enemyName: enemyName,
+              enemyMaxHealth: enemyMaxHealth,
+              enemyAttack: enemyAttack,
+            );
+
+            // Aplica el debuff d’atac a la UI
             combatProvider.applyEnemyAttackDebuff(result['attackDebuff']);
-
-            // Canvia el nom visual de l’enemic
-            combatProvider.setEnemyName(result['modifiedName']);
-
-            // Actualitza la vida màxima i la vida actual de l'enemic
-            combatProvider.setEnemyMaxHealth(result['newMaxHealth']);
           },
+
           onEnemyDefeated: onEnemyDefeated,
         );
-        break;
-
       case 11:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);

@@ -218,6 +218,8 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                             children: [
                               HealthBarWidget(
                                 currentHealth: widget.health,
+
+                                /// HA DE QUEDAR REFLECTIT EL NOU CANVI DE VIDA ACTUAL I VIDA MAXIMA AMB LA ULTI DE ICHIBE
                                 maxHealth: widget.maxHealth,
                                 showText: false,
                               ),
