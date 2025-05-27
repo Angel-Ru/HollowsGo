@@ -136,6 +136,53 @@ exports.incrementarProgresMissio = async (req, res) => {
   }
 };
 
+exports.assignarMissionsTitols = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) return res.status(400).json({ error: 'Usuari invàlid' });
+
+  try {
+    const connection = await connectDB();
+
+    // 1. Obtenir els títols dels personatges que té l'usuari via BIBLIOTECA
+    const [titolsUsuari] = await connection.execute(`
+      SELECT t.id AS titol_id
+      FROM BIBLIOTECA b
+      JOIN PERSONATGES p ON b.personatge_id = p.id
+      JOIN TITOLS t ON t.personatge = p.id
+      WHERE b.user_id = ?
+    `, [usuariId]);
+
+    // 2. Obtenir totes les missions de tipus 1 (de títol)
+    const [missionsTipus1] = await connection.execute(`
+      SELECT id FROM MISSIONS WHERE tipus = 1
+    `);
+
+    // 3. Per cada títol, assignar cada missió si no existeix
+    for (const { titol_id } of titolsUsuari) {
+      for (const { id: missio_id } of missionsTipus1) {
+        const [existeix] = await connection.execute(`
+          SELECT 1 FROM MISSIONS_TITOLS
+          WHERE titol = ? AND missio = ? AND usuari = ?
+        `, [titol_id, missio_id, usuariId]);
+
+        if (existeix.length === 0) {
+          await connection.execute(`
+            INSERT INTO MISSIONS_TITOLS (titol, missio, usuari)
+            VALUES (?, ?, ?)
+          `, [titol_id, missio_id, usuariId]);
+        }
+      }
+    }
+
+    res.status(200).json({ missatge: 'Missions de títol assignades correctament!' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error assignant missions de títol' });
+  }
+};
+
+
 
 
 

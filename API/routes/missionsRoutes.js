@@ -8,7 +8,8 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari');
 // Ruta per assignar missions diaries a un usuari per id
 router.post('/diaries/:usuariId', verificacioUsuari.verifyToken, missionsController.assignarMissionsDiaries);
 
-router.put('/progres/incrementa/:id', missionsController.incrementarProgresMissio);
+router.put('/progres/incrementa/:id', verificacioUsuari.verifyToken, missionsController.incrementarProgresMissio);
 
+router.post('/titols/:usuariId', verificacioUsuari.verifyToken, missionsController.assignarMissionsTitols);
 
 module.exports = router;
