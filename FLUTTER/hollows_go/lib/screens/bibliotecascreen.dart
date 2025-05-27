@@ -30,16 +30,9 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-
     await provider.fetchPersonatgesAmbSkins(userId.toString());
     await provider.fetchEnemicsAmbSkins(userId.toString());
     await provider.fetchPersonatgesAmbSkinsQuincys(userId.toString());
-
-    // NUEVO: cargar la skin seleccionada desde BD y actualizar provider
-    await provider.getSkinSeleccionada(userId);
-
-    // Después de cargar, puedes actualizar el estado para mostrarla
-    setState(() {});
   }
 
   void _loadInitialDialogue() {
