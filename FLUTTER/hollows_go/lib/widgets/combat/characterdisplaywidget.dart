@@ -18,6 +18,7 @@ class CharacterDisplayWidget extends StatelessWidget {
   final double blurSigma;
 
   final bool isBleeding;
+  final bool isFrozen;
 
   const CharacterDisplayWidget({
     required this.imageUrl,
@@ -31,6 +32,7 @@ class CharacterDisplayWidget extends StatelessWidget {
     this.imageSize = 100,
     this.blurSigma = 0.8,
     this.isBleeding = false,
+    this.isFrozen = false,
     Key? key,
   }) : super(key: key);
 
@@ -141,7 +143,7 @@ class CharacterDisplayWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Per l'enemic: debuffs i sangrat a l'esquerra
+                  // Per l'enemic: debuffs, sangrat i congelació a l'esquerra
                   if (isEnemy) ...[
                     if (debuffAmount > 0) ...[
                       buildStatusIcon(),
@@ -155,9 +157,17 @@ class CharacterDisplayWidget extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                     ],
+                    if (isFrozen) ...[
+                      Image.asset(
+                        'assets/special_attack/rukia/icone_gel.png',
+                        width: 18,
+                        height: 18,
+                      ),
+                      const SizedBox(width: 6),
+                    ],
                   ],
 
-                  // Barra de vida (aliat o enemic)
+                  // Barra de vida
                   Expanded(
                     child: isEnemy
                         ? Row(
