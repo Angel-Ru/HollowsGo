@@ -2097,7 +2097,11 @@ exports.getSkinSeleccionada = async (req, res) => {
             [userId]
         );
 
-        res.status(200).json(resultat);
+        if (resultat.length > 0) {
+            res.status(200).json({ skinSeleccionada: resultat[0] });
+        } else {
+            res.status(404).json({ missatge: 'No hi ha cap skin seleccionada.' });
+        }
     } catch (error) {
         console.error('Error obtenint la skin seleccionada:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
