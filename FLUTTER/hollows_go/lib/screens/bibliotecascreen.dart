@@ -34,8 +34,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     await provider.fetchPersonatgesAmbSkins(userId.toString());
     await provider.fetchEnemicsAmbSkins(userId.toString());
     await provider.fetchPersonatgesAmbSkinsQuincys(userId.toString());
-
-    // Aquí carreguem la skin seleccionada des del backend segons userId
     await provider.getSkinSeleccionada(userId);
   }
 
@@ -279,11 +277,31 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                                     Text('Skin actualitzada correctament!')),
                           );
                         },
-                        onSkinDeselected: () {
+                        onSkinDeselected: () async {
                           final provider =
                               Provider.of<SkinsEnemicsPersonatgesProvider>(
                                   context,
                                   listen: false);
+                          final prefs = await SharedPreferences.getInstance();
+                          final userId = prefs.getInt('userId');
+
+                          if (userId == null) {
+                            print("No s'ha trobat l'ID de l'usuari.");
+                            return;
+                          }
+
+                          // Crida al mètode del provider per deseleccionar la skin al backend
+                          await provider.llevarkinSeleccionada(userId);
+
+                          // Refresca les dades
+                          await provider
+                              .fetchPersonatgesAmbSkins(userId.toString());
+                          await provider
+                              .fetchEnemicsAmbSkins(userId.toString());
+                          await provider.fetchPersonatgesAmbSkinsQuincys(
+                              userId.toString());
+
+                          // Actualitza la UI
                           setState(() {
                             if (_currentMode == 0) {
                               provider.unselectSkinAliat();
@@ -294,6 +312,12 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                               provider.unselectSkinEnemic();
                             }
                           });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('Skin deseleccionada correctament!')),
+                          );
                         },
                         selectedSkin: selectedSkin,
                       ),

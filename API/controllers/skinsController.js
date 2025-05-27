@@ -2213,7 +2213,6 @@ exports.updateSkinSeleccionada = async (req, res) => {
 exports.llevarSkinSeleccionada = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
-        const skinId = parseInt(req.body.skin); // Esperem que la nova skin seleccionada vingui al body com a "skin"
 
         if (isNaN(userId) || isNaN(skinId)) {
             return res.status(400).json({ missatge: 'ID d’usuari o skin invàlid.' });

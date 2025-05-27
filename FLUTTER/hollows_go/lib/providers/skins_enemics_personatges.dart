@@ -573,4 +573,37 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
       print('Error a actualitzarSkinSeleccionada: $error');
     }
   }
+
+  Future<void> llevarkinSeleccionada(int userId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
+      }
+
+      final url = Uri.parse('$_baseUrl/skins/seleccionada/llevar/$userId');
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('Skin seleccionada llevada correctament.');
+
+        await getSkinSeleccionada(userId);
+      } else if (response.statusCode == 404) {
+        print('No s’ha trobat la skin per a aquest usuari.');
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error a actualitzarSkinSeleccionada: $error');
+    }
+  }
 }
