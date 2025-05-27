@@ -143,7 +143,7 @@ exports.assignarMissionsTitols = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // 1. Obtenir els títols dels personatges que té l'usuari via BIBLIOTECA
+    
     const [titolsUsuari] = await connection.execute(`
       SELECT t.id AS titol_id
       FROM BIBLIOTECA b

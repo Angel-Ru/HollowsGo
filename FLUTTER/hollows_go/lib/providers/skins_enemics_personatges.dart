@@ -122,6 +122,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Metode que selecciona s'enemic de forma random
   Future<void> selectRandomSkin() async {
     try {
       final prefs = await SharedPreferences.getInstance();
