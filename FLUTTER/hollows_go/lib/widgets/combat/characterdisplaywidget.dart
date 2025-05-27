@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/widgets/combat/healthbarwidget.dart';
 
-class CharacterDisplayWidget extends StatelessWidget {
+class CharacterDisplayWidget extends StatefulWidget {
   final String imageUrl;
   final String name;
   final double health;
@@ -20,6 +20,8 @@ class CharacterDisplayWidget extends StatelessWidget {
   final bool isBleeding;
   final bool isFrozen;
 
+  final bool showInkEffect; // 🔥 Nou parametre
+
   const CharacterDisplayWidget({
     required this.imageUrl,
     required this.name,
@@ -33,17 +35,45 @@ class CharacterDisplayWidget extends StatelessWidget {
     this.blurSigma = 0.8,
     this.isBleeding = false,
     this.isFrozen = false,
+    this.showInkEffect = false, // 🔥 Nou parametre
     Key? key,
   }) : super(key: key);
 
+  @override
+  State<CharacterDisplayWidget> createState() => _CharacterDisplayWidgetState();
+}
+
+class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
+    with SingleTickerProviderStateMixin {
+  double _opacity = 0.0;
+
+  @override
+  void didUpdateWidget(CharacterDisplayWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.showInkEffect && !oldWidget.showInkEffect) {
+      _startInkAnimation();
+    }
+  }
+
+  void _startInkAnimation() async {
+    setState(() => _opacity = 1.0);
+
+    await Future.delayed(const Duration(milliseconds: 250)); // fade in
+
+    await Future.delayed(const Duration(milliseconds: 500)); // visible
+
+    setState(() => _opacity = 0.0); // fade out
+  }
+
   Widget buildStatusIcon() {
-    if (isEnemy && debuffAmount > 0) {
+    if (widget.isEnemy && widget.debuffAmount > 0) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.arrow_downward, color: Colors.red, size: 18),
           Text(
-            '-$debuffAmount',
+            '-${widget.debuffAmount}',
             style: const TextStyle(
               color: Colors.red,
               fontWeight: FontWeight.bold,
@@ -52,13 +82,13 @@ class CharacterDisplayWidget extends StatelessWidget {
           ),
         ],
       );
-    } else if (!isEnemy && buffAmount > 0) {
+    } else if (!widget.isEnemy && widget.buffAmount > 0) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Icon(Icons.arrow_upward, color: Colors.green, size: 18),
           Text(
-            '+$buffAmount',
+            '+${widget.buffAmount}',
             style: const TextStyle(
               color: Colors.green,
               fontWeight: FontWeight.bold,
@@ -74,8 +104,9 @@ class CharacterDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double scaleFactor = 1.9;
-    final double containerSize = imageSize * scaleFactor;
-    final double blur = isEnemy ? blurSigma * 1.2 : blurSigma;
+    final double containerSize = widget.imageSize * scaleFactor;
+    final double blur =
+        widget.isEnemy ? widget.blurSigma * 1.2 : widget.blurSigma;
     final BorderRadius imageBorderRadius = BorderRadius.circular(10);
 
     return Column(
@@ -96,7 +127,7 @@ class CharacterDisplayWidget extends StatelessWidget {
                     child: FittedBox(
                       fit: BoxFit.contain,
                       child: Image.network(
-                        imageUrl,
+                        widget.imageUrl,
                         alignment: Alignment.center,
                         color: Colors.black.withOpacity(0.05),
                         colorBlendMode: BlendMode.darken,
@@ -109,18 +140,34 @@ class CharacterDisplayWidget extends StatelessWidget {
                 scale: scaleFactor,
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 300),
-                  opacity: isHit ? 0.5 : 1.0,
+                  opacity: widget.isHit ? 0.5 : 1.0,
                   child: ClipRRect(
                     borderRadius: imageBorderRadius,
                     child: FittedBox(
                       fit: BoxFit.contain,
                       child: Image.network(
-                        imageUrl,
+                        widget.imageUrl,
                         alignment: Alignment.center,
                         errorBuilder: (_, __, ___) => const Icon(Icons.error),
                       ),
                     ),
                   ),
+                ),
+              ),
+
+              // 🔥 Ink splash effect (fade in/out)
+              AnimatedOpacity(
+                opacity: _opacity,
+                duration: const Duration(milliseconds: 250), // fade in
+                curve: Curves.easeIn,
+                onEnd: () {
+                  if (_opacity == 0.0) setState(() {}); // ensures rebuild
+                },
+                child: Image.asset(
+                  'assets/special_attack/ichibe/imatge_tinta.png',
+                  fit: BoxFit.cover,
+                  width: containerSize,
+                  height: containerSize,
                 ),
               ),
             ],
@@ -129,7 +176,7 @@ class CharacterDisplayWidget extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        // Contenidor per barra + nom + estats
+        // Nom + barra
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
@@ -139,48 +186,45 @@ class CharacterDisplayWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Row amb debuffs / barra de vida
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Per l'enemic: debuffs, sangrat i congelació a l'esquerra
-                  if (isEnemy) ...[
-                    if (debuffAmount > 0) ...[
+                  if (widget.isEnemy) ...[
+                    if (widget.debuffAmount > 0) ...[
                       buildStatusIcon(),
                       const SizedBox(width: 6),
                     ],
-                    if (isBleeding) ...[
+                    if (widget.isBleeding)
                       Image.asset(
                         'assets/special_attack/unohana/icone_sang.png',
                         width: 18,
                         height: 18,
                       ),
-                      const SizedBox(width: 6),
-                    ],
-                    if (isFrozen) ...[
-                      Image.asset(
-                        'assets/special_attack/rukia/icone_gel.png',
-                        width: 18,
-                        height: 18,
+                    if (widget.isFrozen)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6),
+                        child: Image.asset(
+                          'assets/special_attack/rukia/icone_gel.png',
+                          width: 18,
+                          height: 18,
+                        ),
                       ),
-                      const SizedBox(width: 6),
-                    ],
                   ],
-
-                  // Barra de vida
                   Expanded(
-                    child: isEnemy
+                    child: widget.isEnemy
                         ? Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               HealthBarWidget(
-                                currentHealth: health,
-                                maxHealth: maxHealth,
+                                currentHealth: widget.health,
+                                maxHealth: widget.maxHealth,
                                 showText: false,
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                "${health.toInt()}/$maxHealth",
+                                "${widget.health.toInt()}/${widget.maxHealth}",
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -192,7 +236,7 @@ class CharacterDisplayWidget extends StatelessWidget {
                         : Row(
                             children: [
                               Text(
-                                "${health.toInt()}/$maxHealth",
+                                "${widget.health.toInt()}/${widget.maxHealth}",
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -201,27 +245,22 @@ class CharacterDisplayWidget extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               HealthBarWidget(
-                                currentHealth: health,
-                                maxHealth: maxHealth,
+                                currentHealth: widget.health,
+                                maxHealth: widget.maxHealth,
                                 showText: false,
                               ),
                             ],
                           ),
                   ),
-
-                  // Per l'aliat: buffs a la dreta
-                  if (!isEnemy && buffAmount > 0) ...[
+                  if (!widget.isEnemy && widget.buffAmount > 0) ...[
                     const SizedBox(width: 6),
                     buildStatusIcon(),
                   ],
                 ],
               ),
-
               const SizedBox(height: 6),
-
-              // Nom sota la barra
               Text(
-                name,
+                widget.name,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

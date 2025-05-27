@@ -8,12 +8,15 @@ import '../config.dart';
 class CombatProvider with ChangeNotifier {
   double? _aliatHealth;
   double _enemicHealth = 1000.0;
+  double _enemyMaxHealth = 1000.0; // Afegeixo aquesta variable per maxHealth
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
   bool _enemyFrozen = false;
+  String _enemyName = "Enemic";
+  bool _ichibeJustUsedUlti = false;
 
   bool _enemyBleeding = false;
   int _bleedTick = 0;
@@ -27,6 +30,7 @@ class CombatProvider with ChangeNotifier {
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
   double get enemicHealth => _enemicHealth;
+  double get enemyMaxHealth => _enemyMaxHealth;
   bool get isEnemyTurn => _isEnemyTurn;
   bool get isEnemyHit => _isEnemyHit;
   bool get isAllyHit => _isAllyHit;
@@ -36,6 +40,8 @@ class CombatProvider with ChangeNotifier {
   int get enemyAttackDebuff => _enemyAttackDebuff;
   bool get enemyFrozen => _enemyFrozen;
   bool get enemyBleeding => _enemyBleeding;
+  String get enemyName => _enemyName;
+  bool get ichibeJustUsedUlti => _ichibeJustUsedUlti;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -45,6 +51,20 @@ class CombatProvider with ChangeNotifier {
 
   void setEnemyHealth(double value) {
     _enemicHealth = value;
+    notifyListeners();
+  }
+
+  void setEnemyMaxHealth(double value) {
+    _enemyMaxHealth = value;
+    // Opcional: Si la vida actual supera la nova màxima, la reduïm també
+    if (_enemicHealth > _enemyMaxHealth) {
+      _enemicHealth = _enemyMaxHealth;
+    }
+    notifyListeners();
+  }
+
+  void setEnemyName(String value) {
+    _enemyName = value;
     notifyListeners();
   }
 
@@ -94,6 +114,46 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Map<String, dynamic> ichibeUltimateEffect({
+    required String enemyName,
+    required double enemyMaxHealth,
+    required int enemyAttack,
+  }) {
+    // Partim el nom per la meitat
+    int midIndex = (enemyName.length / 2).ceil();
+    String modifiedName = enemyName.substring(0, midIndex);
+
+    // Reduïm la vida màxima i la vida actual a la meitat
+    double newMaxHealth = enemyMaxHealth / 2;
+    _enemicHealth = _enemicHealth > newMaxHealth ? newMaxHealth : _enemicHealth;
+
+    // Actualitza la vida màxima i el nom
+    setEnemyMaxHealth(newMaxHealth);
+    setEnemyName(modifiedName);
+
+    // Debuff és la meitat de l'atac enemic
+    int attackDebuff = (enemyAttack / 2).floor();
+
+    notifyListeners();
+
+    return {
+      'modifiedName': modifiedName,
+      'newMaxHealth': newMaxHealth,
+      'attackDebuff': attackDebuff,
+    };
+  }
+
+  void triggerIchibeUltiEffect() {
+    _ichibeJustUsedUlti = true;
+    notifyListeners();
+
+    // Revertir el flag després de 1 segon per acabar l’animació
+    Future.delayed(const Duration(seconds: 1), () {
+      _ichibeJustUsedUlti = false;
+      notifyListeners();
+    });
+  }
+
   // Aplica un "tick" de sangrat (una vegada per torn)
   void processBleedTick() {
     if (!_enemyBleeding || _enemicHealth <= 0) return;
@@ -119,6 +179,8 @@ class CombatProvider with ChangeNotifier {
       _aliatHealth = maxAllyHealth;
     }
     _enemicHealth = maxEnemyHealth;
+    _enemyMaxHealth = maxEnemyHealth;
+    _enemyName = "Enemic";
     _isEnemyTurn = false;
     _isEnemyHit = false;
     _isAllyHit = false;

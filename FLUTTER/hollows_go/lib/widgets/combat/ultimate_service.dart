@@ -98,6 +98,45 @@ class UltimateService {
         );
         break;
 
+      case 10:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+        final skinProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(
+            context,
+            listen: false);
+
+        final enemyName = skinProvider.selectedSkin?.personatgeNom ?? "Enemic";
+        final enemyMaxHealth =
+            (skinProvider.selectedSkin?.vida ?? 1000).toDouble();
+        final enemyAttack = (skinProvider.selectedSkin?.malTotal ?? 50) * 2;
+
+        final result = combatProvider.ichibeUltimateEffect(
+          enemyName: enemyName,
+          enemyMaxHealth: enemyMaxHealth,
+          enemyAttack: enemyAttack,
+        );
+
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/ichibe/marco_ichibe.png',
+          audioAsset: 'special_attack/ichibe/ichibe_aud.mp3',
+          videoAsset: 'assets/special_attack/ichibe/ichibe_vid.mp4',
+          damage: 0, // No es fa dany directe, s'aplica debuff
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            // Aplica el debuff d'atac retornat pel mètode
+            combatProvider.applyEnemyAttackDebuff(result['attackDebuff']);
+
+            // Actualitza el nom de l'enemic (si tens algun mètode per això)
+            combatProvider.setEnemyName(result['modifiedName']);
+
+            // Actualitza la vida màxima i la vida actual
+            combatProvider.setEnemyMaxHealth(result['newMaxHealth']);
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
       case 11:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -150,7 +189,7 @@ class UltimateService {
         );
         break;
 
-      case 10:
+      case 18:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
         double originalBrightness = 0.2; // default

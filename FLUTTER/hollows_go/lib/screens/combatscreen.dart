@@ -254,6 +254,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         debuffAmount: combatProvider.enemyAttackDebuff,
                         isBleeding: combatProvider.enemyBleeding,
                         isFrozen: combatProvider.enemyFrozen,
+                        showInkEffect:
+                            combatProvider.ichibeJustUsedUlti, // 🔥 Aquí
                       ),
                       Spacer(),
                       CharacterDisplayWidget(
