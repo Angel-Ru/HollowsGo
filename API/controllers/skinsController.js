@@ -2086,17 +2086,18 @@ exports.gachaMultiHO = async (req, res) => {
 
 // Obtenir skin seleccionada
 exports.getSkinSeleccionada = async (req, res) => {
-    const { id: usuari } = req.params;
+    // Parseamos id a número entero
+    const usuari = parseInt(req.params.id, 10);
 
-    if (!usuari) {
-        return res.status(400).json({ error: 'usuariId és requerit' });
+    if (isNaN(usuari)) {
+        return res.status(400).json({ error: 'usuariId ha de ser un número vàlid' });
     }
 
     try {
         const result = await pool.query(
-            `SELECT skin 
-       FROM USUARIS_SKINS_ARMES 
-       WHERE usuari = $1 AND seleccionat = TRUE`,
+            `SELECT skin
+             FROM USUARI_SKIN_ARMES
+             WHERE usuari = $1 AND seleccionat = TRUE`,
             [usuari]
         );
 
@@ -2104,9 +2105,10 @@ exports.getSkinSeleccionada = async (req, res) => {
             return res.status(404).json({ message: 'No hi ha cap skin seleccionada' });
         }
 
+        // Devolver la skin seleccionada
         res.status(200).json({ skinSeleccionada: result.rows[0] });
     } catch (error) {
         console.error('Error obtenint skin seleccionada:', error);
-        res.status(500).json({ error: 'Error intern del servidor' });
+        res.status(500).json({ error: 'Error intern del servidor', details: error.message });
     }
 };
