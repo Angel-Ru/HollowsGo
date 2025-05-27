@@ -1,7 +1,6 @@
-import 'package:provider/provider.dart';
+import '../imports.dart';
 import '../providers/missions_provider.dart';
-import '../providers/perfil_provider.dart';
-import '../providers/user_provider.dart';
+
 
 class MissionsLogic {
   static Future<void> completarMissioJugarPartida(context, {required dynamic aliatSkin}) async {
@@ -12,7 +11,7 @@ class MissionsLogic {
   await missionsProvider.fetchMissions(userProvider.userId);
   perfilProvider.sumarPartidaJugada(userProvider.userId);
 
-  // Missió Jugar (2)
+  
   final missioJugar = missionsProvider.missions.firstWhere(
     (m) => m.missio == 2,
     orElse: () => throw Exception('Missió Jugar no trobada'),
@@ -22,7 +21,7 @@ class MissionsLogic {
     await missionsProvider.incrementProgress(missioJugar.id);
   }
 
-  // Missió 5: si raça == 0, incrementa missió 5
+ 
   try {
     final missio5 = missionsProvider.missions.firstWhere((m) => m.missio == 5);
     if (aliatSkin != null && aliatSkin.raca == 1) {
@@ -31,10 +30,10 @@ class MissionsLogic {
       }
     }
   } catch (_) {
-    // Missió 5 no trobada, no fem res
+   
   }
 
-  // Missió 6: si raça == 1, incrementa missió 6
+  
   try {
     final missio6 = missionsProvider.missions.firstWhere((m) => m.missio == 6);
     if (aliatSkin != null && aliatSkin.raca == 0) {
@@ -46,8 +45,6 @@ class MissionsLogic {
     
   }
 }
-
-
 
   static Future<void> completarMissioGuanyarPartida(context) async {
     final perfilProvider = Provider.of<PerfilProvider>(context, listen: false);
@@ -65,7 +62,42 @@ class MissionsLogic {
 
     if (missioGuanyar.progress < missioGuanyar.objectiu) {
       await missionsProvider.incrementProgress(missioGuanyar.id);
-      await missionsProvider.fetchMissions(userProvider.userId); // recarrega
+      await missionsProvider.fetchMissions(userProvider.userId);
     }
   }
+
+ static Future<void> completarMissioEquiparArma(BuildContext context) async {
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
+
+  await missionsProvider.fetchMissions(userProvider.userId);
+
+  final possibles = missionsProvider.missions.where((m) => m.missio == 4);
+  if (possibles.isEmpty) return; 
+
+  final missioEquipar = possibles.first;
+
+  if (missioEquipar.progress < missioEquipar.objectiu) {
+    await missionsProvider.incrementProgress(missioEquipar.id);
+    await missionsProvider.fetchMissions(userProvider.userId);
+  }
+}
+
+static Future<void> completarMissioVial(BuildContext context) async {
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
+
+  await missionsProvider.fetchMissions(userProvider.userId);
+
+  final possibles = missionsProvider.missions.where((m) => m.missio == 3);
+  if (possibles.isEmpty) return; 
+
+  final missioEquipar = possibles.first;
+
+  if (missioEquipar.progress < missioEquipar.objectiu) {
+    await missionsProvider.incrementProgress(missioEquipar.id);
+    await missionsProvider.fetchMissions(userProvider.userId);
+  }
+}
+
 }
