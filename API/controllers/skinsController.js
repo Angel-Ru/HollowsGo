@@ -2214,7 +2214,7 @@ exports.llevarSkinSeleccionada = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
 
-        if (isNaN(userId) || isNaN(skinId)) {
+        if (isNaN(userId)) {
             return res.status(400).json({ missatge: 'ID d’usuari o skin invàlid.' });
         }
 
