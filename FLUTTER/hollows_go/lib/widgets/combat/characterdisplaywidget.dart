@@ -148,7 +148,11 @@ class CharacterDisplayWidget extends StatelessWidget {
                       const SizedBox(width: 6),
                     ],
                     if (isBleeding) ...[
-                      const Icon(Icons.bloodtype, color: Colors.red, size: 18),
+                      Image.asset(
+                        'assets/special_attack/unohana/icone_sang.png',
+                        width: 18,
+                        height: 18,
+                      ),
                       const SizedBox(width: 6),
                     ],
                   ],
@@ -177,12 +181,6 @@ class CharacterDisplayWidget extends StatelessWidget {
                           )
                         : Row(
                             children: [
-                              HealthBarWidget(
-                                currentHealth: health,
-                                maxHealth: maxHealth,
-                                showText: false,
-                              ),
-                              const SizedBox(width: 8),
                               Text(
                                 "${health.toInt()}/$maxHealth",
                                 style: const TextStyle(
@@ -190,6 +188,12 @@ class CharacterDisplayWidget extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
+                              ),
+                              const SizedBox(width: 8),
+                              HealthBarWidget(
+                                currentHealth: health,
+                                maxHealth: maxHealth,
+                                showText: false,
                               ),
                             ],
                           ),
