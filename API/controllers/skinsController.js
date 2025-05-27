@@ -2105,54 +2105,71 @@ exports.gachaMultiHO = async (req, res) => {
     }
 };
 
-// Obtenir la skin seleccionada per un usuari
 exports.getSkinSeleccionada = async (req, res) => {
-    try {
-        const userId = parseInt(req.params.id);
-        const connection = await connectDB();
+  try {
+    const userId = parseInt(req.params.id);
+    const connection = await connectDB();
 
-        const [seleccio] = await connection.execute(`
-            SELECT usa.id AS usuari_skin_arma_id,
-                   s.id AS skin_id,
-                   s.nom AS skin_nom,
-                   s.categoria,
-                   s.imatge,
-                   p.nom AS nom_personatge,
-                   p.vida_base AS vida_personatge
-            FROM USUARI_SKIN_ARMES usa
-            INNER JOIN SKINS s ON usa.skin = s.id
-            INNER JOIN PERSONATGES p ON s.personatge = p.id
-            WHERE usa.usuari = ? AND usa.seleccionat = true
-            LIMIT 1
-        `, [userId]);
+    // Consulta modificada que inclou dades d'atac i armes (similar a l'altre endpoint)
+    const [seleccio] = await connection.execute(`
+      SELECT usa.id AS usuari_skin_arma_id,
+             s.id AS skin_id,
+             s.nom AS skin_nom,
+             s.categoria,
+             s.imatge,
+             s.raça,
+             p.nom AS nom_personatge,
+             p.vida_base AS vida_personatge,
+             p.mal_base AS mal_base_personatge,
+             a.mal AS mal_arma,
+             a.nom AS atac_nom,
+             ar.buff_atac AS atac_buff
+      FROM USUARI_SKIN_ARMES usa
+      INNER JOIN SKINS s ON usa.skin = s.id
+      INNER JOIN PERSONATGES p ON s.personatge = p.id
+      LEFT JOIN SKINS_ARMES sa ON s.id = sa.skin
+      LEFT JOIN ARMES ar ON sa.arma = ar.id
+      LEFT JOIN ATACS a ON s.atac = a.id
+      WHERE usa.usuari = ? AND usa.seleccionat = true
+      LIMIT 1
+    `, [userId]);
 
-        if (seleccio.length === 0) {
-            return res.status(404).json({ missatge: 'No hi ha cap skin seleccionada.' });
-        }
-
-        const skinSeleccionada = seleccio[0];
-
-        const resposta = {
-            usuari_skin_arma_id: skinSeleccionada.usuari_skin_arma_id,
-            skin: {
-                id: skinSeleccionada.skin_id,
-                nom: skinSeleccionada.skin_nom,
-                categoria: skinSeleccionada.categoria,
-                imatge: skinSeleccionada.imatge,
-                personatge_nom: skinSeleccionada.nom_personatge,
-                vida: skinSeleccionada.vida_personatge
-            }
-        };
-
-        console.log("Resposta enviada:", resposta);  // Aquí veuràs la data que envies al client
-
-        res.status(200).json(resposta);
-
-    } catch (error) {
-        console.error('Error obtenint la skin seleccionada:', error);
-        res.status(500).json({ missatge: 'Error intern del servidor' });
+    if (seleccio.length === 0) {
+      return res.status(404).json({ missatge: 'No hi ha cap skin seleccionada.' });
     }
+
+    const skinSeleccionada = seleccio[0];
+
+    // Calcula mal_total sumant mal_base, mal_arma i atac_buff
+    const malTotal = (skinSeleccionada.mal_base_personatge || 0) +
+                     (skinSeleccionada.mal_arma || 0) +
+                     (skinSeleccionada.atac_buff || 0);
+
+    const resposta = {
+      usuari_skin_arma_id: skinSeleccionada.usuari_skin_arma_id,
+      skin: {
+        id: skinSeleccionada.skin_id,
+        nom: skinSeleccionada.skin_nom,
+        categoria: skinSeleccionada.categoria,
+        imatge: skinSeleccionada.imatge,
+        personatge_nom: skinSeleccionada.nom_personatge,
+        vida: skinSeleccionada.vida_personatge,
+        mal_total: malTotal,
+        atac_nom: skinSeleccionada.atac_nom,
+        raça: skinSeleccionada.raça
+      }
+    };
+
+    console.log("Resposta enviada:", resposta);
+
+    res.status(200).json(resposta);
+
+  } catch (error) {
+    console.error('Error obtenint la skin seleccionada:', error);
+    res.status(500).json({ missatge: 'Error intern del servidor' });
+  }
 };
+
 
 
 
