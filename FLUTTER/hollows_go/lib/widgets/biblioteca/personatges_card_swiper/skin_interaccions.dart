@@ -1,3 +1,5 @@
+import 'package:hollows_go/service/missionsservice.dart';
+
 import '../../../imports.dart';
 
 
@@ -36,24 +38,28 @@ class SkinInteractionController {
   }
 
   Future<double?> useVialAndFetchHealth(Skin skin) async {
-    if (isEnemyMode) return null;
-    final vialsProvider = Provider.of<VialsProvider>(context, listen: false);
-    final success = await vialsProvider.utilitzarVial(
-      usuariId: usuariId,
-      skinId: skin.id,
-    );
+  if (isEnemyMode) return null;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success ? 'Vial utilitzat correctament!' : 'No tens vials disponibles.',
-        ),
+  final vialsProvider = Provider.of<VialsProvider>(context, listen: false);
+  final success = await vialsProvider.utilitzarVial(
+    usuariId: usuariId,
+    skinId: skin.id,
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        success ? 'Vial utilitzat correctament!' : 'No tens vials disponibles.',
       ),
-    );
+    ),
+  );
 
-    if (!success) return null;
+  if (!success) return null;
 
-    final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    return await combatProvider.fetchSkinVidaActual(skin.id);
-  }
+  await MissionsLogic.completarMissioVial(context);
+
+  final combatProvider = Provider.of<CombatProvider>(context, listen: false);
+  return await combatProvider.fetchSkinVidaActual(skin.id);
+}
+
 }

@@ -1,4 +1,4 @@
-import '../imports.dart';
+import '../../../imports.dart';
 
 class SelectedSkinCard extends StatelessWidget {
   final Skin skin;
