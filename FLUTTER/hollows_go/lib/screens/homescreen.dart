@@ -33,7 +33,11 @@ class _HomeScreenState extends State<HomeScreen> {
           .fetchVials(userProvider.userId);
       Provider.of<DialogueProvider>(context, listen: false)
           .loadDialogueFromJson("ichigo");
+
+          
       await _controller.loadUserData();
+      final selectedProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+      selectedProvider.getSkinSeleccionada(userProvider.userId);
     });
   }
 

@@ -2105,6 +2105,7 @@ exports.gachaMultiHO = async (req, res) => {
     }
 };
 
+// Obtenir la skin seleccionada per un usuari
 exports.getSkinSeleccionada = async (req, res) => {
   try {
     const userId = parseInt(req.params.id);
@@ -2170,7 +2171,40 @@ exports.getSkinSeleccionada = async (req, res) => {
   }
 };
 
+// Actualitzar la skin seleccionada per un usuari
+exports.updateSkinSeleccionada = async (req, res) => {
+    try {
+        const userId = parseInt(req.params.id);
+        const skinId = parseInt(req.body.skin); // Esperem que la nova skin seleccionada vingui al body com a "skin"
 
+        if (isNaN(userId) || isNaN(skinId)) {
+            return res.status(400).json({ missatge: 'ID d’usuari o skin invàlid.' });
+        }
 
+        const connection = await connectDB();
 
+        // 1. Desseleccionem totes les skins de l'usuari
+        await connection.execute(`
+      UPDATE USUARI_SKIN_ARMES 
+      SET seleccionat = FALSE 
+      WHERE usuari = ?
+    `, [userId]);
 
+        // 2. Seleccionem la nova skin
+        const [result] = await connection.execute(`
+      UPDATE USUARI_SKIN_ARMES 
+      SET seleccionat = TRUE 
+      WHERE usuari = ? AND skin = ?
+    `, [userId, skinId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ missatge: 'No s’ha trobat la skin per a aquest usuari.' });
+        }
+
+        res.status(200).json({ missatge: 'Skin seleccionada actualitzada correctament.' });
+
+    } catch (error) {
+        console.error('Error actualitzant la skin seleccionada:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
