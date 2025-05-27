@@ -33,6 +33,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     await provider.fetchPersonatgesAmbSkins(userId.toString());
     await provider.fetchEnemicsAmbSkins(userId.toString());
     await provider.fetchPersonatgesAmbSkinsQuincys(userId.toString());
+    await provider.getSkinSeleccionada(userId);
   }
 
   void _loadInitialDialogue() {
