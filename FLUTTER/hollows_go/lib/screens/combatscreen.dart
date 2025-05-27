@@ -49,15 +49,16 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
           skinsProvider.selectedSkinEnemic;
       final enemic = skinsProvider.selectedSkin;
 
-      // 🟢 Assignem nom i vida màxima de l’enemic al CombatProvider
-      final enemySkinName = enemic?.personatgeNom ?? 'Enemic';
-      final enemySkinHealth = (enemic?.vida ?? 1000).toDouble();
+      // ✅ Només assignem nom i vida si tenim un enemic vàlid
+      if (enemic != null) {
+        final enemySkinName = enemic.personatgeNom;
+        final enemySkinHealth = (enemic.vida ?? 1000).toDouble();
 
-      if (combatProvider.enemyName == "Enemic") {
-        combatProvider.setEnemyName(enemySkinName);
+        print("🔥 Assignant nom correcte a l'enemic: $enemySkinName");
+        combatProvider.setEnemyName(enemySkinName!);
+        combatProvider.setEnemyMaxHealth(enemySkinHealth);
+        combatProvider.setEnemyHealth(enemySkinHealth);
       }
-      combatProvider.setEnemyMaxHealth(enemySkinHealth);
-      combatProvider.setEnemyHealth(enemySkinHealth);
 
       if (aliat?.id != null) {
         await combatProvider.fetchSkinVidaActual(aliat!.id);

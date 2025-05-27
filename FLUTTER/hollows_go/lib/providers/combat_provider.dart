@@ -8,24 +8,23 @@ import '../config.dart';
 class CombatProvider with ChangeNotifier {
   double? _aliatHealth;
   double _enemicHealth = 1000.0;
-  double _enemyMaxHealth = 1000.0; // Afegeixo aquesta variable per maxHealth
+  double _enemyMaxHealth = 1000.0;
+
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
   bool _isAttackInProgress = false;
   bool _ultiUsed = false;
   bool _enemyFrozen = false;
-  String _enemyName = "Enemic";
+  bool _enemyBleeding = false;
   bool _ichibeJustUsedUlti = false;
 
-  bool _enemyBleeding = false;
   int _bleedTick = 0;
-
   int _bonusAllyDamage = 0;
   int _enemyAttackDebuff = 0;
 
+  String _enemyName = "Enemic";
   String? _overrideBackground;
-  String? get overrideBackground => _overrideBackground;
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -42,6 +41,7 @@ class CombatProvider with ChangeNotifier {
   bool get enemyBleeding => _enemyBleeding;
   String get enemyName => _enemyName;
   bool get ichibeJustUsedUlti => _ichibeJustUsedUlti;
+  String? get overrideBackground => _overrideBackground;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -50,13 +50,12 @@ class CombatProvider with ChangeNotifier {
   }
 
   void setEnemyHealth(double value) {
-    _enemicHealth = value;
+    _enemicHealth = value.clamp(0, _enemyMaxHealth);
     notifyListeners();
   }
 
   void setEnemyMaxHealth(double value) {
     _enemyMaxHealth = value;
-    // Opcional: Si la vida actual supera la nova màxima, la reduïm també
     if (_enemicHealth > _enemyMaxHealth) {
       _enemicHealth = _enemyMaxHealth;
     }
@@ -64,6 +63,7 @@ class CombatProvider with ChangeNotifier {
   }
 
   void setEnemyName(String value) {
+    print("🔁 setEnemyName cridat amb: $value");
     _enemyName = value;
     notifyListeners();
   }
@@ -75,6 +75,16 @@ class CombatProvider with ChangeNotifier {
 
   void setUltiUsed(bool value) {
     _ultiUsed = value;
+    notifyListeners();
+  }
+
+  void setOverrideBackground(String? value) {
+    _overrideBackground = value;
+    notifyListeners();
+  }
+
+  void setEnemyFrozen(bool value) {
+    _enemyFrozen = value;
     notifyListeners();
   }
 
@@ -96,19 +106,8 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setOverrideBackground(String? value) {
-    _overrideBackground = value;
-    notifyListeners();
-  }
-
-  void setEnemyFrozen(bool frozen) {
-    _enemyFrozen = frozen;
-    notifyListeners();
-  }
-
   void applyBleed() {
     if (_enemyBleeding) return;
-
     _enemyBleeding = true;
     _bleedTick = 0;
     notifyListeners();
@@ -119,28 +118,19 @@ class CombatProvider with ChangeNotifier {
     required double enemyMaxHealth,
     required int enemyAttack,
   }) {
-    // Partim el nom per la meitat
     int midIndex = (enemyName.length / 2).ceil();
     String modifiedName = enemyName.substring(0, midIndex);
 
-    // Reduïm la vida màxima a la meitat
     double newMaxHealth = enemyMaxHealth / 2;
-
-    // Ajustem la vida actual per tal que no sigui més gran que la nova màxima
     if (_enemicHealth > newMaxHealth) {
       _enemicHealth = newMaxHealth;
     }
 
-    // Actualitzem vida màxima i vida actual a la vegada per evitar inconsistències
     _enemyMaxHealth = newMaxHealth;
-
-    // Actualitza el nom
     _enemyName = modifiedName;
 
-    // Debuff d’atac (la meitat)
     int attackDebuff = (enemyAttack / 2).floor();
 
-    // Notifiquem el canvi
     notifyListeners();
 
     return {
@@ -154,14 +144,12 @@ class CombatProvider with ChangeNotifier {
     _ichibeJustUsedUlti = true;
     notifyListeners();
 
-    // Revertir el flag després de 1 segon per acabar l’animació
     Future.delayed(const Duration(seconds: 1), () {
       _ichibeJustUsedUlti = false;
       notifyListeners();
     });
   }
 
-  // Aplica un "tick" de sangrat (una vegada per torn)
   void processBleedTick() {
     if (!_enemyBleeding || _enemicHealth <= 0) return;
 
@@ -187,7 +175,6 @@ class CombatProvider with ChangeNotifier {
     }
     _enemicHealth = maxEnemyHealth;
     _enemyMaxHealth = maxEnemyHealth;
-    _enemyName = "Enemic";
     _isEnemyTurn = false;
     _isEnemyHit = false;
     _isAllyHit = false;
@@ -230,9 +217,7 @@ class CombatProvider with ChangeNotifier {
       } else {
         _isAttackInProgress = false;
         await updateSkinVidaActual(
-          skinId: skinId,
-          vidaActual: _aliatHealth ?? 0,
-        );
+            skinId: skinId, vidaActual: _aliatHealth ?? 0);
         onVictory();
       }
     }
@@ -255,16 +240,13 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = true;
     notifyListeners();
 
-    final effectiveDamage = enemyDamage - _enemyAttackDebuff;
-    final damage = effectiveDamage > 0 ? effectiveDamage : 0;
-
-    _aliatHealth = (_aliatHealth ?? 0) - damage;
+    final effectiveDamage = max(0, enemyDamage - _enemyAttackDebuff);
+    _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
     if (_aliatHealth! < 0) _aliatHealth = 0;
 
     await Future.delayed(const Duration(milliseconds: 500));
     _isAllyHit = false;
 
-    // 🔴 Aplica dany per sangrat després de l'atac
     processBleedTick();
 
     _isEnemyTurn = false;
@@ -272,10 +254,7 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
 
     if (_aliatHealth! <= 0) {
-      await updateSkinVidaActual(
-        skinId: skinId,
-        vidaActual: _aliatHealth!,
-      );
+      await updateSkinVidaActual(skinId: skinId, vidaActual: _aliatHealth!);
       onDefeat();
     }
   }
