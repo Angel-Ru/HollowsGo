@@ -2132,6 +2132,8 @@ exports.getSkinSeleccionada = async (req, res) => {
         }
 
         const skinSeleccionada = seleccio[0];
+        
+        console.log(res);
 
         res.status(200).json({
             usuari_skin_arma_id: skinSeleccionada.usuari_skin_arma_id,

@@ -491,7 +491,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   Future<Skin?> getSkinSeleccionada(int id) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token'); // Obtenir el token
+      String? token = prefs.getString('token');
 
       if (token == null) {
         print("No s'ha trobat cap token. L'usuari no està autenticat.");
@@ -509,8 +509,8 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        if (data.containsKey('skinSeleccionada')) {
-          return Skin.fromJson(data['skinSeleccionada']);
+        if (data.containsKey('skin')) {
+          return Skin.fromJson(data['skin']);
         } else {
           print('No s\'ha trobat cap skin seleccionada al JSON.');
           return null;
