@@ -37,8 +37,10 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
     _setRandomBackground();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-      final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+      final combatProvider =
+          Provider.of<CombatProvider>(context, listen: false);
+      final skinsProvider =
+          Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
       await skinsProvider.selectRandomSkin();
 
@@ -58,7 +60,8 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
         keepAllyHealth: true,
       );
 
-      final habilitatProvider = Provider.of<HabilitatProvider>(context, listen: false);
+      final habilitatProvider =
+          Provider.of<HabilitatProvider>(context, listen: false);
 
       if (aliat != null) {
         await habilitatProvider.loadHabilitatPerSkinId(aliat.id);
@@ -67,13 +70,17 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       }
 
       if (!_partidaJugadaSumada) {
-  final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-  final aliatSkin = skinsProvider.selectedSkinAliat ?? skinsProvider.selectedSkinQuincy ?? skinsProvider.selectedSkinEnemic;
+        final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(
+            context,
+            listen: false);
+        final aliatSkin = skinsProvider.selectedSkinAliat ??
+            skinsProvider.selectedSkinQuincy ??
+            skinsProvider.selectedSkinEnemic;
 
-  await MissionsLogic.completarMissioJugarPartida(context, aliatSkin: aliatSkin);
-  _partidaJugadaSumada = true;
-}
-
+        await MissionsLogic.completarMissioJugarPartida(context,
+            aliatSkin: aliatSkin);
+        _partidaJugadaSumada = true;
+      }
     });
   }
 
@@ -230,9 +237,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                 Align(
                   alignment: Alignment.center,
                   child: MidScreenTurnIndicator(
-                    isEnemyTurn: combatProvider.isEnemyTurn,
-                    isEnemyFrozen: combatProvider.enemyFrozen,
-                  ),
+                      isEnemyTurn: combatProvider.isEnemyTurn),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
