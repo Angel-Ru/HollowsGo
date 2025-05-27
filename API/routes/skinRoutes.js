@@ -63,5 +63,7 @@ router.delete('/:id', verificacioUsuari.verifyToken, verificacioUsuari.verifyAdm
 // Ruta per obtenir skin seleccionada
 router.get('/seleccionada/:id', verificacioUsuari.verifyToken, skinsController.getSkinSeleccionada);
 
+// Ruta per actualitzar la skin seleccionada
+router.put('/seleccionada/actuliatzar/:id', verificacioUsuari.verifyToken, skinsController.updateSkinSeleccionada());
 
 module.exports = router;
