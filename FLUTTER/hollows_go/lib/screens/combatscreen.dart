@@ -49,6 +49,16 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
           skinsProvider.selectedSkinEnemic;
       final enemic = skinsProvider.selectedSkin;
 
+      // 🟢 Assignem nom i vida màxima de l’enemic al CombatProvider
+      final enemySkinName = enemic?.personatgeNom ?? 'Enemic';
+      final enemySkinHealth = (enemic?.vida ?? 1000).toDouble();
+
+      if (combatProvider.enemyName == "Enemic") {
+        combatProvider.setEnemyName(enemySkinName);
+      }
+      combatProvider.setEnemyMaxHealth(enemySkinHealth);
+      combatProvider.setEnemyHealth(enemySkinHealth);
+
       if (aliat?.id != null) {
         await combatProvider.fetchSkinVidaActual(aliat!.id);
       }
@@ -70,13 +80,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       }
 
       if (!_partidaJugadaSumada) {
-        final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(
-            context,
-            listen: false);
-        final aliatSkin = skinsProvider.selectedSkinAliat ??
-            skinsProvider.selectedSkinQuincy ??
-            skinsProvider.selectedSkinEnemic;
-
+        final aliatSkin = aliat;
         await MissionsLogic.completarMissioJugarPartida(context,
             aliatSkin: aliatSkin);
         _partidaJugadaSumada = true;
@@ -125,7 +129,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
   }
 
   Future<bool> _onWillPop() async {
-    final salir = await showDialog<bool>(
+    final sortir = await showDialog<bool>(
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.black,
@@ -198,7 +202,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       ),
     );
 
-    if (salir == true) {
+    if (sortir == true) {
       SystemNavigator.pop();
     }
 
@@ -222,8 +226,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
         final String allyName = skins.aliat?.nom ?? "Desconegut Aliat";
         final int aliatDamage = skins.aliat?.malTotal ?? 300;
         final String techniqueName = skins.aliat?.atac ?? "Tècnica desconeguda";
-        final String enemyName =
-            skins.enemic?.personatgeNom ?? "Desconegut Enemic";
         final int enemicDamage = (skins.enemic?.malTotal ?? 50) * 2;
 
         return WillPopScope(
@@ -246,7 +248,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                       CharacterDisplayWidget(
                         imageUrl: skins.enemic?.imatge ??
                             'lib/images/combatscreen_images/aizen_combat.png',
-                        name: combatProvider.enemyName,
+                        name: combatProvider.enemyName, // ✅ Ús del nom correcte
                         health: combatProvider.enemicHealth,
                         maxHealth: combatProvider.enemyMaxHealth.toInt(),
                         isHit: combatProvider.isEnemyHit,
@@ -254,8 +256,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         debuffAmount: combatProvider.enemyAttackDebuff,
                         isBleeding: combatProvider.enemyBleeding,
                         isFrozen: combatProvider.enemyFrozen,
-                        showInkEffect:
-                            combatProvider.ichibeJustUsedUlti, // 🔥 Aquí
+                        showInkEffect: combatProvider.ichibeJustUsedUlti,
                       ),
                       Spacer(),
                       CharacterDisplayWidget(
