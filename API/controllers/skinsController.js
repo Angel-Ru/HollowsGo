@@ -2091,7 +2091,7 @@ exports.getSkinSeleccionada = async (req, res) => {
         const connection = await connectDB();
 
         const [resultat] = await connection.execute(
-            `SELECT usuari, personatge, skin, arma, seleccionat
+            `SELECT id, usuari, skin, arma, vida_actual, seleccionat
              FROM USUARI_SKIN_ARMES
              WHERE usuari = ? AND seleccionat = true`,
             [userId]
