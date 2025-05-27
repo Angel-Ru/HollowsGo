@@ -37,12 +37,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
     // Aquí carreguem la skin seleccionada des del backend segons userId
     await provider.getSkinSeleccionada(userId);
-
-    // Un cop carregada la skin seleccionada, actualitzem l'estat per refrescar UI
-    setState(() {
-      // Si vols, pots actualitzar variables locals aquí, però normalment
-      // només cridem setState per refrescar la UI que llegeix del provider.
-    });
   }
 
   void _loadInitialDialogue() {
@@ -243,19 +237,47 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                       child: PersonatgesCardSwiper(
                         personatge: personatge,
                         isEnemyMode: _currentMode == 2, // Aquí corregit
-                        onSkinSelected: (skin) {
+                        onSkinSelected: (skin) async {
                           final provider =
                               Provider.of<SkinsEnemicsPersonatgesProvider>(
                                   context,
                                   listen: false);
-                          if (_currentMode == 0) {
-                            provider.setSelectedSkinAliat(skin);
-                            setState(() => _randomSkinName = skin.nom);
-                          } else if (_currentMode == 1) {
-                            provider.setSelectedSkinQuincy(skin);
-                          } else {
-                            provider.setSelectedSkinEnemic(skin);
+                          final prefs = await SharedPreferences.getInstance();
+                          final userId = prefs.getInt('userId');
+
+                          if (userId == null) {
+                            print("No s'ha trobat l'ID de l'usuari.");
+                            return;
                           }
+
+                          // Actualitza la skin seleccionada al backend
+                          await provider.actualitzarSkinSeleccionada(
+                              userId, skin.id);
+
+                          // Torna a fer els GET per refrescar les dades
+                          await provider
+                              .fetchPersonatgesAmbSkins(userId.toString());
+                          await provider
+                              .fetchEnemicsAmbSkins(userId.toString());
+                          await provider.fetchPersonatgesAmbSkinsQuincys(
+                              userId.toString());
+
+// Assigna la skin localment
+                          setState(() {
+                            if (_currentMode == 0) {
+                              provider.setSelectedSkinAliat(skin);
+                              _randomSkinName = skin.nom;
+                            } else if (_currentMode == 1) {
+                              provider.setSelectedSkinQuincy(skin);
+                            } else {
+                              provider.setSelectedSkinEnemic(skin);
+                            }
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('Skin actualitzada correctament!')),
+                          );
                         },
                         onSkinDeselected: () {
                           final provider =

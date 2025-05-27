@@ -489,55 +489,88 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   }
 
   Future<void> getSkinSeleccionada(int id) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('token');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
 
-    if (token == null) {
-      print("No s'ha trobat cap token. L'usuari no està autenticat.");
-      return;
-    }
-
-    final url = Uri.parse('$_baseUrl/skins/seleccionada/$id');
-    final response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      if (data.containsKey('skin')) {
-        final skin = Skin.fromJson(data['skin']);
-
-
-        // Assignar-la segons la categoria
-        switch (skin.raca) {
-          case 0:
-            setSelectedSkinQuincy(skin);
-            break;
-          case 1:
-            setSelectedSkinAliat(skin);
-            break;
-          case 2:
-            setSelectedSkinEnemic(skin);
-            break;
-        }
-
-        notifyListeners(); // <- Important per actualitzar la UI
-      } else {
-        print('No s\'ha trobat cap skin seleccionada al JSON.');
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
       }
-    } else if (response.statusCode == 404) {
-      print('No hi ha cap skin seleccionada.');
-    } else {
-      print('Error en la resposta: ${response.statusCode}');
-    }
-  } catch (error) {
-    print('Error a getSkinSeleccionada: $error');
-  }
-}
 
+      final url = Uri.parse('$_baseUrl/skins/seleccionada/$id');
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data.containsKey('skin')) {
+          final skin = Skin.fromJson(data['skin']);
+
+          // Assignar-la segons la categoria
+          switch (skin.raca) {
+            case 0:
+              setSelectedSkinQuincy(skin);
+              break;
+            case 1:
+              setSelectedSkinAliat(skin);
+              break;
+            case 2:
+              setSelectedSkinEnemic(skin);
+              break;
+          }
+
+          notifyListeners(); // <- Important per actualitzar la UI
+        } else {
+          print('No s\'ha trobat cap skin seleccionada al JSON.');
+        }
+      } else if (response.statusCode == 404) {
+        print('No hi ha cap skin seleccionada.');
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error a getSkinSeleccionada: $error');
+    }
+  }
+
+  Future<void> actualitzarSkinSeleccionada(int userId, int skinId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      if (token == null) {
+        print("No s'ha trobat cap token. L'usuari no està autenticat.");
+        return;
+      }
+
+      final url = Uri.parse('$_baseUrl/skins/seleccionada/actuliatzar/$userId');
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'skin': skinId}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Skin seleccionada actualitzada correctament.');
+
+        // Un cop actualitzada, pots refrescar la selecció actual:
+        await getSkinSeleccionada(userId);
+      } else if (response.statusCode == 404) {
+        print('No s’ha trobat la skin per a aquest usuari.');
+      } else {
+        print('Error en la resposta: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error a actualitzarSkinSeleccionada: $error');
+    }
+  }
 }
