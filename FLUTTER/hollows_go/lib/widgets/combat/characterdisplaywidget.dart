@@ -162,7 +162,7 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
               if (widget.isEnemy)
                 AnimatedOpacity(
                   opacity: _opacity,
-                  duration: const Duration(milliseconds: 250),
+                  duration: const Duration(milliseconds: 500),
                   curve: Curves.easeIn,
                   child: Image.asset(
                     'assets/special_attack/ichibe/imatge_tinta.png',
