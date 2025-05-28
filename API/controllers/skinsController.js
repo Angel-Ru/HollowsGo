@@ -2160,7 +2160,7 @@ exports.getSkinSeleccionada = async (req, res) => {
         imatge: skinSeleccionada.imatge,
         personatge_nom: skinSeleccionada.nom_personatge,
         vida: vidaActual,
-        vida_maxima: skinSeleccionada.vida_base_personatge,
+        vida_maxima: skinSeleccionada.vida_base,
         mal_total: malTotal,
         atac_nom: skinSeleccionada.atac_nom,
         raça: skinSeleccionada.raça
