@@ -143,44 +143,104 @@ exports.assignarMissionsTitols = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    
     const [titolsUsuari] = await connection.execute(`
       SELECT t.id AS titol_id
-      FROM BIBLIOTECA b
-      JOIN PERSONATGES p ON b.personatge_id = p.id
-      JOIN TITOLS t ON t.personatge = p.id
-      WHERE b.user_id = ?
+      FROM usuari_skins_armes usa
+      JOIN BIBLIOTECA b ON b.personatge_id = usa.personatge_id AND b.user_id = usa.usuari_id
+      JOIN TITOLS t ON t.personatge = usa.personatge_id
+      WHERE usa.usuari_id = ? AND usa.seleccionat = 1
     `, [usuariId]);
 
-    // 2. Obtenir totes les missions de tipus 1 (de títol)
-    const [missionsTipus1] = await connection.execute(`
-      SELECT id FROM MISSIONS WHERE tipus_missio = 1
-    `);
-
-    // 3. Per cada títol, assignar cada missió si no existeix
-    for (const { titol_id } of titolsUsuari) {
-      for (const { id: missio_id } of missionsTipus1) {
-        const [existeix] = await connection.execute(`
-          SELECT 1 FROM MISSIONS_TITOLS
-          WHERE titol = ? AND missio = ? AND usuari = ?
-        `, [titol_id, missio_id, usuariId]);
-
-        if (existeix.length === 0) {
-          await connection.execute(`
-            INSERT INTO MISSIONS_TITOLS (titol, missio, usuari)
-            VALUES (?, ?, ?)
-          `, [titol_id, missio_id, usuariId]);
-        }
-      }
+    if (titolsUsuari.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap títol del personatge seleccionat per aquest usuari' });
     }
 
-    res.status(200).json({ missatge: 'Missions de títol assignades correctament!' });
+    const titolId = titolsUsuari[0].titol_id;
+
+
+    const [missions] = await connection.execute(`
+      SELECT 
+        m.id,
+        m.nom_missio,
+        m.descripcio,
+        m.objectiu,
+        mt.progres
+      FROM MISSIONS_TITOLS mt
+      JOIN MISSIONS m ON m.id = mt.missio
+      WHERE mt.titol = ? AND mt.usuari = ? AND m.tipus_missio = 1
+    `, [titolId, usuariId]);
+
+    res.status(200).json({
+      missatge: 'Missions de títol recuperades correctament',
+      titol_id: titolId,
+      missions
+    });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Error assignant missions de títol' });
+    res.status(500).json({ error: 'Error recuperant les missions de títol' });
   }
 };
+
+
+exports.getMissionTitol = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) return res.status(400).json({ error: 'Usuari invàlid' });
+
+  try {
+    const connection = await connectDB();
+
+    // 1. Obtenir el títol del personatge seleccionat (via skin seleccionat)
+    const [titolsUsuari] = await connection.execute(`
+      SELECT 
+        t.id AS titol_id,
+        t.nom AS nom_titol
+      FROM usuari_skins_armes usa
+      JOIN SKINS s ON s.id = usa.skin
+      JOIN TITOLS t ON t.personatge = s.personatge
+      WHERE usa.usuari = ? AND usa.seleccionat = 1
+    `, [usuariId]);
+
+    if (titolsUsuari.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap títol del personatge seleccionat per aquest usuari' });
+    }
+
+    const { titol_id: titolId, nom_titol: nomTitol } = titolsUsuari[0];
+
+    // 2. Obtenir la missió del títol amb el progrés (una sola)
+    const [missions] = await connection.execute(`
+      SELECT 
+        m.id,
+        m.nom_missio,
+        m.descripcio,
+        m.objectiu,
+        mt.progres
+      FROM MISSIONS_TITOLS mt
+      JOIN MISSIONS m ON m.id = mt.missio
+      WHERE mt.titol = ? AND mt.usuari = ? AND m.tipus_missio = 1
+      LIMIT 1
+    `, [titolId, usuariId]);
+
+    if (missions.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap missió associada a aquest títol' });
+    }
+
+    const missio = missions[0];
+
+    res.status(200).json({
+      missatge: 'Missió de títol recuperada correctament',
+      titol_id: titolId,
+      nom_titol: nomTitol,
+      missio
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error recuperant la missió de títol' });
+  }
+};
+
+
 
 
 
