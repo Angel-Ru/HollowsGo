@@ -194,7 +194,7 @@ exports.getMissionTitol = async (req, res) => {
     const [titolsUsuari] = await connection.execute(`
       SELECT 
         t.id AS titol_id,
-        t.nom AS nom_titol
+        t.nom_titol AS nom_titol
       FROM USUARI_SKIN_ARMES usa
       JOIN SKINS s ON s.id = usa.skin
       JOIN TITOLS t ON t.personatge = s.personatge
