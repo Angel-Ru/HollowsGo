@@ -195,7 +195,7 @@ exports.getMissionTitol = async (req, res) => {
       SELECT 
         t.id AS titol_id,
         t.nom AS nom_titol
-      FROM usuari_skins_armes usa
+      FROM USUARI_SKIN_ARMES usa
       JOIN SKINS s ON s.id = usa.skin
       JOIN TITOLS t ON t.personatge = s.personatge
       WHERE usa.usuari = ? AND usa.seleccionat = 1
