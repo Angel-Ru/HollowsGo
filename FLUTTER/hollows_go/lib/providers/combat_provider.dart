@@ -132,19 +132,19 @@ class CombatProvider with ChangeNotifier {
   }
 
   Future<void> decrementDoomCounter({VoidCallback? onEnemyDefeated}) async {
-  if (_turnsUntilEnemyDies > 0) {
-    _turnsUntilEnemyDies--;
-    if (_turnsUntilEnemyDies == 0) {
-      await Future.delayed(const Duration(milliseconds: 600)); // Pausa visual
-      setEnemyHealth(0);
-      clearDoomEffect();
-      if (onEnemyDefeated != null) {
-        onEnemyDefeated();
+    if (_turnsUntilEnemyDies > 0) {
+      _turnsUntilEnemyDies--;
+      if (_turnsUntilEnemyDies == 0) {
+        await Future.delayed(const Duration(milliseconds: 600)); // Pausa visual
+        setEnemyHealth(0);
+        clearDoomEffect();
+        if (onEnemyDefeated != null) {
+          onEnemyDefeated();
+        }
       }
+      notifyListeners();
     }
-    notifyListeners();
   }
-}
 
   void clearDoomEffect() {
     _turnsUntilEnemyDies = -1;
@@ -187,7 +187,7 @@ class CombatProvider with ChangeNotifier {
     });
   }
 
-  void processBleedTick() {
+  void processBleedTick({VoidCallback? onEnemyDefeated}) {
     if (!_enemyBleeding || _enemicHealth <= 0) return;
 
     double bleedDamage = 100 * (pow(1.2, _bleedTick) as double);
@@ -199,6 +199,17 @@ class CombatProvider with ChangeNotifier {
 
     if (_enemicHealth == 0) {
       _enemyBleeding = false;
+      clearDoomEffect();
+      if (onEnemyDefeated != null) {
+        onEnemyDefeated();
+      }
+    }
+  }
+
+  void checkVictory(VoidCallback onVictory) {
+    if (_enemicHealth <= 0) {
+      clearDoomEffect();
+      onVictory();
     }
   }
 
@@ -290,10 +301,10 @@ class CombatProvider with ChangeNotifier {
       if (_aliatHealth! < 0) _aliatHealth = 0;
     }
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 600));
     _isAllyHit = false;
 
-    processBleedTick();
+    processBleedTick(onEnemyDefeated: onVictory);
 
     _isEnemyTurn = false;
     _isAttackInProgress = false;
