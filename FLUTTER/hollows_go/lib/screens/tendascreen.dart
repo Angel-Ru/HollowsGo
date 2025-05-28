@@ -1,6 +1,8 @@
 import 'dart:ui';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:hollows_go/widgets/tenda/paypal_payment_widget.dart';
+
 import '../imports.dart';
+import 'package:flutter_paypal/flutter_paypal.dart';
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -205,18 +207,28 @@ class _TendaScreenState extends State<TendaScreen> {
     );
   }
 
-  Widget _monedaOption(String title, String price) {
+  Widget _monedaOption(String title, String priceDisplay) {
+    // Extraure el valor numèric del preu (ex: "0,99 €" → "0.99")
+    final priceValue =
+        priceDisplay.replaceAll('€', '').replaceAll(',', '.').trim();
+
     return Card(
       color: Colors.white.withOpacity(0.85),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: EdgeInsets.only(bottom: 16),
       child: ListTile(
         title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        trailing:
-            Text(price, style: TextStyle(color: Colors.green, fontSize: 16)),
+        trailing: Text(priceDisplay,
+            style: TextStyle(color: Colors.green, fontSize: 16)),
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Funció de compra encara no implementada')),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaypalPaymentScreen(
+                totalAmount: priceValue,
+                itemName: title,
+              ),
+            ),
           );
         },
       ),
