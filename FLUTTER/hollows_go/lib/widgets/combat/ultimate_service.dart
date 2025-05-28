@@ -184,6 +184,34 @@ class UltimateService {
         );
         break;
 
+      case 14:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/senjumaru/marco_senjumaru.png',
+          audioAsset: 'special_attack/senjumaru/senjumaru_aud.mp3',
+          videoAsset: 'assets/special_attack/senjumaru/senjumaru_vid.mp4',
+          damage: 0, // No fem dany al primer torn
+          rotateScreen: false,
+          onDamageApplied: (_) async {
+            // Torn 1: Cap acció de dany directa
+
+            // Torn 2: Després de delay, es fa dany letal
+            await Future.delayed(const Duration(seconds: 1));
+
+            double currentEnemyHealth = combatProvider.enemicHealth;
+            int lethalDamage = currentEnemyHealth.ceil() + 1000;
+
+            combatProvider.setEnemyHealth(0); // Assegura mort
+            onDamageApplied(lethalDamage); // Notifica que s'ha aplicat el dany
+            onEnemyDefeated(); // Crida la funció de derrota enemiga
+          },
+          onEnemyDefeated: () {},
+        );
+        break;
+
       case 15:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);

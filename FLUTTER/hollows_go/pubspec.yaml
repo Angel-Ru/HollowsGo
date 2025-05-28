@@ -168,6 +168,10 @@ flutter:
     - assets/special_attack/yhwach/yhwach_aud.mp3
     - assets/special_attack/yhwach/marco_yhwach.png
     - assets/special_attack/yhwach/icone_escut.png
+    - assets/special_attack/senjumaru/senjumaru_vid.mp4
+    - assets/special_attack/senjumaru/senjumaru_aud.mp3
+    - assets/special_attack/senjumaru/marco_senjumaru.png
+
 
 
 
