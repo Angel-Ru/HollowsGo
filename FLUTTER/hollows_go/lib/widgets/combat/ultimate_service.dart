@@ -127,7 +127,6 @@ class UltimateService {
           listen: false,
         );
 
-// Obtenim dades originals de l'enemic
         final enemyName = skinProvider.selectedSkin?.personatgeNom ?? "Enemic";
         final enemyMaxHealth =
             (skinProvider.selectedSkin?.vida ?? 1000).toDouble();
@@ -140,8 +139,6 @@ class UltimateService {
           videoAsset: 'assets/special_attack/ichibe/ichibe_vid.mp4',
           damage: 0, // No hi ha dany directe
           rotateScreen: false,
-
-          // Aquesta funció es crida un cop ha acabat tot (àudio, vídeo i tinta)
           onDamageApplied: (_) {
             combatProvider.triggerIchibeUltiEffect();
 
@@ -153,9 +150,10 @@ class UltimateService {
 
             combatProvider.applyEnemyAttackDebuff(result['attackDebuff']);
           },
-
           onEnemyDefeated: onEnemyDefeated,
         );
+        break;
+
       case 11:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -196,11 +194,12 @@ class UltimateService {
           damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) async {
-            // Aplica l'estat de "destí segellat"
-            combatProvider.applyDoomEffect();
+            combatProvider.applyDoomEffect(); // posa el comptador a 2
           },
-          onEnemyDefeated:
-              () {}, // No fem res aquí: serà gestionat automàticament
+          onEnemyDefeated: () {
+            // Normalment no s'hauria d'executar aquí perquè la mort és diferida
+          },
+          skipDeathCheck: true, // NO comprovar mort immediatament
         );
         break;
 
@@ -317,6 +316,7 @@ class UltimateService {
     required bool rotateScreen,
     required Function(int) onDamageApplied,
     required VoidCallback onEnemyDefeated,
+    bool skipDeathCheck = false, // nou paràmetre
   }) async {
     final videoController = VideoPlayerController.asset(videoAsset);
     await videoController.initialize();
@@ -353,7 +353,8 @@ class UltimateService {
     onDamageApplied(damage);
 
     final combatProvider = Provider.of<CombatProvider>(context, listen: false);
-    if (combatProvider.enemicHealth <= 0) {
+
+    if (!skipDeathCheck && combatProvider.enemicHealth <= 0) {
       if (rotateScreen) await _rotateScreenToPortrait();
       onEnemyDefeated();
     }
