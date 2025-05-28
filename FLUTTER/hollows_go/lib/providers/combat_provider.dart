@@ -269,8 +269,9 @@ class CombatProvider with ChangeNotifier {
   Future<void> _performEnemyAttack(
     int enemyDamage,
     int skinId,
-    VoidCallback onDefeat,
-  ) async {
+    VoidCallback onDefeat, {
+    VoidCallback? onVictory, // ➕ Afegit com a paràmetre opcional
+  }) async {
     if (_enemyFrozen) {
       _isEnemyTurn = false;
       _isAttackInProgress = false;
@@ -301,6 +302,9 @@ class CombatProvider with ChangeNotifier {
       await updateSkinVidaActual(skinId: skinId, vidaActual: _aliatHealth!);
       onDefeat();
     }
+
+    // ✅ Ara s'executa el Doom després de l'atac enemic
+    decrementDoomCounter(onEnemyDefeated: onVictory);
   }
 
   Future<void> updateSkinVidaActual({
