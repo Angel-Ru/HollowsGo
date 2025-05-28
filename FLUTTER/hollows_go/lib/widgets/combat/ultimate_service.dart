@@ -98,6 +98,27 @@ class UltimateService {
         );
         break;
 
+      case 9:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
+
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/yhwach/marco_yhwach.png',
+          audioAsset: 'special_attack/yhwach/yhwach_aud.mp3',
+          videoAsset: 'assets/special_attack/yhwach/yhwach_vid.mp4',
+          damage: 0, // No fa dany directe
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            // Activa la immunitat del jugador per evitar dany enemic
+            combatProvider.setPlayerImmune(true);
+            debugPrint(
+                "🛡️ Escut de Yhwach activat! L'aliat ara és immune al pròxim atac.");
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
       case 10:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);

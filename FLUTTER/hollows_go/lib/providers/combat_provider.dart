@@ -18,6 +18,7 @@ class CombatProvider with ChangeNotifier {
   bool _enemyFrozen = false;
   bool _enemyBleeding = false;
   bool _ichibeJustUsedUlti = false;
+  bool _playerImmune = false;
 
   int _bleedTick = 0;
   int _bonusAllyDamage = 0;
@@ -42,6 +43,7 @@ class CombatProvider with ChangeNotifier {
   String get enemyName => _enemyName;
   bool get ichibeJustUsedUlti => _ichibeJustUsedUlti;
   String? get overrideBackground => _overrideBackground;
+  bool get playerImmune => _playerImmune;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -85,6 +87,11 @@ class CombatProvider with ChangeNotifier {
 
   void setEnemyFrozen(bool value) {
     _enemyFrozen = value;
+    notifyListeners();
+  }
+
+  void setPlayerImmune(bool value) {
+    _playerImmune = value;
     notifyListeners();
   }
 
@@ -240,9 +247,14 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = true;
     notifyListeners();
 
-    final effectiveDamage = max(0, enemyDamage - _enemyAttackDebuff);
-    _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
-    if (_aliatHealth! < 0) _aliatHealth = 0;
+    // 🛡️ COMPROVACIÓ DE LA IMMUNITAT
+    if (!_playerImmune) {
+      final effectiveDamage = max(0, enemyDamage - _enemyAttackDebuff);
+      _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
+      if (_aliatHealth! < 0) _aliatHealth = 0;
+    } else {
+      debugPrint('[DEBUG] Jugador immune: no rep dany.');
+    }
 
     await Future.delayed(const Duration(milliseconds: 500));
     _isAllyHit = false;
