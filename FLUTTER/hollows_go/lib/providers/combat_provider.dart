@@ -130,11 +130,15 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void decrementDoomCounter() {
+  void decrementDoomCounter({VoidCallback? onVictory}) {
     if (_turnsUntilEnemyDies > 0) {
       _turnsUntilEnemyDies--;
       if (_turnsUntilEnemyDies == 0) {
         setEnemyHealth(0);
+        if (onVictory != null) {
+          onVictory();
+        }
+        clearDoomEffect(); // També netegem l'estat aquí si convé
       }
       notifyListeners();
     }
