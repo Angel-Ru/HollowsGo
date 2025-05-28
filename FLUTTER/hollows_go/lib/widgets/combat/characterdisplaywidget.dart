@@ -20,6 +20,7 @@ class CharacterDisplayWidget extends StatefulWidget {
 
   final bool isBleeding;
   final bool isFrozen;
+  final bool isImmune;
 
   final bool showInkEffect;
 
@@ -36,6 +37,7 @@ class CharacterDisplayWidget extends StatefulWidget {
     this.blurSigma = 0.8,
     this.isBleeding = false,
     this.isFrozen = false,
+    this.isImmune = false,
     this.showInkEffect = false,
     Key? key,
   }) : super(key: key);
@@ -59,9 +61,9 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
 
   void _startInkAnimation() async {
     setState(() => _opacity = 1.0);
-    await Future.delayed(const Duration(milliseconds: 250)); // fade in
-    await Future.delayed(const Duration(milliseconds: 500)); // stay
-    setState(() => _opacity = 0.0); // fade out
+    await Future.delayed(const Duration(milliseconds: 250));
+    await Future.delayed(const Duration(milliseconds: 500));
+    setState(() => _opacity = 0.0);
   }
 
   Widget buildStatusIcon() {
@@ -107,7 +109,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
         widget.isEnemy ? widget.blurSigma * 1.2 : widget.blurSigma;
     final BorderRadius imageBorderRadius = BorderRadius.circular(10);
 
-    // Per mostrar el nom tallat, consultem el CombatProvider
     final combatProvider = Provider.of<CombatProvider>(context);
     final String displayName =
         widget.isEnemy ? combatProvider.enemyName : widget.name;
@@ -157,8 +158,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                   ),
                 ),
               ),
-
-              // 🔥 Efecte de tinta només si és enemic
               if (widget.isEnemy)
                 AnimatedOpacity(
                   opacity: _opacity,
@@ -175,8 +174,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
           ),
         ),
         const SizedBox(height: 8),
-
-        // Nom i barra de vida
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
@@ -211,6 +208,32 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                         ),
                       ),
                   ],
+                  if (!widget.isEnemy) ...[
+                    if (widget.isBleeding)
+                      Image.asset(
+                        'assets/special_attack/unohana/icone_sang.png',
+                        width: 18,
+                        height: 18,
+                      ),
+                    if (widget.isFrozen)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6),
+                        child: Image.asset(
+                          'assets/special_attack/rukia/icone_gel.png',
+                          width: 18,
+                          height: 18,
+                        ),
+                      ),
+                    if (widget.isImmune)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6),
+                        child: Image.asset(
+                          'assets/special_attack/yhwach/icone_escut.png',
+                          width: 18,
+                          height: 18,
+                        ),
+                      ),
+                  ],
                   Expanded(
                     child: widget.isEnemy
                         ? Row(
@@ -218,8 +241,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                             children: [
                               HealthBarWidget(
                                 currentHealth: widget.health,
-
-                                /// HA DE QUEDAR REFLECTIT EL NOU CANVI DE VIDA ACTUAL I VIDA MAXIMA AMB LA ULTI DE ICHIBE
                                 maxHealth: widget.maxHealth,
                                 showText: false,
                               ),
