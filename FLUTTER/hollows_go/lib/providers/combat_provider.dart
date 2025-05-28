@@ -23,8 +23,6 @@ class CombatProvider with ChangeNotifier {
   int _bleedTick = 0;
   int _bonusAllyDamage = 0;
   int _enemyAttackDebuff = 0;
-
-  // Doom effect: quantitat de torns fins que l'enemic mori (-1 = inactiu)
   int _turnsUntilEnemyDies = -1;
 
   String _enemyName = "Enemic";
@@ -69,7 +67,6 @@ class CombatProvider with ChangeNotifier {
   }
 
   void setEnemyName(String value) {
-    print("🔁 setEnemyName cridat amb: $value");
     _enemyName = value;
     notifyListeners();
   }
@@ -101,9 +98,7 @@ class CombatProvider with ChangeNotifier {
 
   void healPlayer(int amount, int maxHealth) {
     _aliatHealth = (_aliatHealth ?? 0) + amount;
-    if (_aliatHealth! > maxHealth) {
-      _aliatHealth = maxHealth.toDouble();
-    }
+    if (_aliatHealth! > maxHealth) _aliatHealth = maxHealth.toDouble();
     notifyListeners();
   }
 
@@ -124,9 +119,8 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Afegeixo el Doom effect
   void applyDoomEffect() {
-    _turnsUntilEnemyDies = 2; // Morirà al segon torn enemic
+    _turnsUntilEnemyDies = 2;
     notifyListeners();
   }
 
@@ -136,9 +130,7 @@ class CombatProvider with ChangeNotifier {
       if (_turnsUntilEnemyDies == 0) {
         setEnemyHealth(0);
         clearDoomEffect();
-        if (onEnemyDefeated != null) {
-          onEnemyDefeated(); // crida aquí el diàleg de victòria
-        }
+        if (onEnemyDefeated != null) onEnemyDefeated();
       }
       notifyListeners();
     }
@@ -166,7 +158,6 @@ class CombatProvider with ChangeNotifier {
     _enemyName = modifiedName;
 
     int attackDebuff = (enemyAttack / 2).floor();
-
     notifyListeners();
 
     return {
@@ -206,9 +197,7 @@ class CombatProvider with ChangeNotifier {
     double maxEnemyHealth = 1000.0,
     bool keepAllyHealth = false,
   }) {
-    if (!keepAllyHealth) {
-      _aliatHealth = maxAllyHealth;
-    }
+    if (!keepAllyHealth) _aliatHealth = maxAllyHealth;
     _enemicHealth = maxEnemyHealth;
     _enemyMaxHealth = maxEnemyHealth;
     _isEnemyTurn = false;
@@ -247,7 +236,6 @@ class CombatProvider with ChangeNotifier {
 
       _isEnemyHit = false;
 
-      // Si l'enemic ha mort aquí, netegem el Doom i guanyem
       if (_enemicHealth <= 0) {
         clearDoomEffect();
         _isAttackInProgress = false;
@@ -260,15 +248,12 @@ class CombatProvider with ChangeNotifier {
       _isEnemyTurn = true;
       notifyListeners();
 
-      // Quan és el torn enemic, decrementem el Doom
       decrementDoomCounter(onEnemyDefeated: () async {
-        clearDoomEffect(); // per seguretat
+        clearDoomEffect();
         _isAttackInProgress = false;
         await updateSkinVidaActual(
-          skinId: skinId,
-          vidaActual: _aliatHealth ?? 0,
-        );
-        onVictory(); // 🔥 Mostrarà el diàleg de victòria
+            skinId: skinId, vidaActual: _aliatHealth ?? 0);
+        onVictory();
       });
 
       await _performEnemyAttack(enemyDamage, skinId, onDefeat);
@@ -281,7 +266,6 @@ class CombatProvider with ChangeNotifier {
     VoidCallback onDefeat,
   ) async {
     if (_enemyFrozen) {
-      debugPrint('[DEBUG] Torn enemic congelat: no ataca.');
       _isEnemyTurn = false;
       _isAttackInProgress = false;
       notifyListeners();
@@ -292,13 +276,10 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = true;
     notifyListeners();
 
-    // 🛡️ COMPROVACIÓ DE LA IMMUNITAT
     if (!_playerImmune) {
       final effectiveDamage = max(0, enemyDamage - _enemyAttackDebuff);
       _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
       if (_aliatHealth! < 0) _aliatHealth = 0;
-    } else {
-      debugPrint('[DEBUG] Jugador immune: no rep dany.');
     }
 
     await Future.delayed(const Duration(milliseconds: 500));
@@ -325,10 +306,7 @@ class CombatProvider with ChangeNotifier {
       final token = prefs.getString('token');
       final usuariId = prefs.getInt('userId');
 
-      if (token == null || usuariId == null) {
-        print("Token o usuari_id no disponible");
-        return;
-      }
+      if (token == null || usuariId == null) return;
 
       final response = await http.put(
         Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
@@ -342,11 +320,9 @@ class CombatProvider with ChangeNotifier {
         }),
       );
 
-      if (response.statusCode == 200) {
-        print("Vida actualitzada correctament.");
-      } else {
+      if (response.statusCode != 200) {
         print(
-            "Error al actualitzar vida: ${response.statusCode}, ${response.body}");
+            "Error actualitzant vida: ${response.statusCode}, ${response.body}");
       }
     } catch (e) {
       print("Error en updateSkinVidaActual: $e");
@@ -359,28 +335,21 @@ class CombatProvider with ChangeNotifier {
       final token = prefs.getString('token');
       final usuariId = prefs.getInt('userId');
 
-      if (token == null || usuariId == null) {
-        print("Token o usuari_id no disponible");
-        return null;
-      }
+      if (token == null || usuariId == null) return null;
 
       final response = await http.get(
         Uri.parse(
             'https://${Config.ip}/combats/vida/$skinId?usuari_id=$usuariId'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final vida = (data['vida_actual'] as num).toDouble();
         setAllyHealth(vida);
-        print("Vida actual obtinguda: $vida");
         return vida;
       } else {
-        print(
-            "Error al obtenir vida: ${response.statusCode}, ${response.body}");
+        print("Error obtenint vida: ${response.statusCode}, ${response.body}");
         return null;
       }
     } catch (e) {
