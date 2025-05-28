@@ -127,23 +127,24 @@ class CombatProvider with ChangeNotifier {
   }
 
   void applyDoomEffect() {
-    _turnsUntilEnemyDies = 2;
+    _turnsUntilEnemyDies = 3;
     notifyListeners();
   }
 
-  void decrementDoomCounter({VoidCallback? onEnemyDefeated}) {
-    if (_turnsUntilEnemyDies > 0) {
-      _turnsUntilEnemyDies--;
-      if (_turnsUntilEnemyDies == 0) {
-        setEnemyHealth(0);
-        clearDoomEffect();
-        if (onEnemyDefeated != null) {
-          onEnemyDefeated();
-        }
+  Future<void> decrementDoomCounter({VoidCallback? onEnemyDefeated}) async {
+  if (_turnsUntilEnemyDies > 0) {
+    _turnsUntilEnemyDies--;
+    if (_turnsUntilEnemyDies == 0) {
+      await Future.delayed(const Duration(milliseconds: 600)); // Pausa visual
+      setEnemyHealth(0);
+      clearDoomEffect();
+      if (onEnemyDefeated != null) {
+        onEnemyDefeated();
       }
-      notifyListeners();
     }
+    notifyListeners();
   }
+}
 
   void clearDoomEffect() {
     _turnsUntilEnemyDies = -1;
