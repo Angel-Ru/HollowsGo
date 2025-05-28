@@ -314,6 +314,86 @@ exports.incrementarProgresTitol = async (req, res) => {
   }
 };
 
+exports.assignarMissionsArmes = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) return res.status(400).json({ error: 'Usuari invàlid' });
+
+  try {
+    const connection = await connectDB();
+
+    // 1. Obtenir totes les files de la biblioteca de l'usuari
+    const [biblioteca] = await connection.execute(`
+      SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ?
+    `, [usuariId]);
+
+    if (biblioteca.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat biblioteca per l\'usuari' });
+    }
+
+    // 2. Treure totes les skins separades per coma i juntar-les en un array
+    let skinsUsuari = [];
+    for (const fila of biblioteca) {
+      if (fila.skins) {
+        const skinsArray = fila.skins.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        skinsUsuari = skinsUsuari.concat(skinsArray);
+      }
+    }
+
+    if (skinsUsuari.length === 0) {
+      return res.status(404).json({ error: 'No s\'han trobat skins a la biblioteca' });
+    }
+
+    // Convertir els ids a números
+    skinsUsuari = skinsUsuari.map(Number).filter(n => !isNaN(n));
+
+    // 3. Obtenir les armes relacionades amb aquestes skins (sense filtrar tipus)
+    const placeholdersSkins = skinsUsuari.map(() => '?').join(',');
+
+    const [armesUsuari] = await connection.execute(`
+      SELECT DISTINCT sa.arma
+      FROM SKINS_ARMES sa
+      WHERE sa.skin IN (${placeholdersSkins})
+    `, skinsUsuari);
+
+    if (armesUsuari.length === 0) {
+      return res.status(404).json({ error: 'No s\'han trobat armes per aquestes skins' });
+    }
+
+    // 4. Obtenir la missió de tipus 2 (només una)
+    const [missionsTipus2] = await connection.execute(`
+      SELECT id FROM MISSIONS WHERE tipus_missio = 2 LIMIT 1
+    `);
+
+    if (missionsTipus2.length === 0) {
+      return res.status(404).json({ error: 'No s\'han trobat missions de tipus 2' });
+    }
+
+    const missio_id = missionsTipus2[0].id;
+
+    // 5. Assignar la missió a cada arma de l'usuari, si no existeix ja
+    for (const { arma } of armesUsuari) {
+      const [existeix] = await connection.execute(`
+        SELECT 1 FROM MISSIONS_ARMES
+        WHERE missio = ? AND arma = ? AND usuari = ?
+      `, [missio_id, arma, usuariId]);
+
+      if (existeix.length === 0) {
+        await connection.execute(`
+          INSERT INTO MISSIONS_ARMES (missio, arma, usuari)
+          VALUES (?, ?, ?)
+        `, [missio_id, arma, usuariId]);
+      }
+    }
+
+    res.status(200).json({ missatge: 'Missions d’armes assignades correctament!' });
+
+  } catch (err) {
+    console.error('Error assignant missions d’armes:', err);
+    res.status(500).json({ error: 'Error assignant missions d’armes' });
+  }
+};
+
+
 
 
 

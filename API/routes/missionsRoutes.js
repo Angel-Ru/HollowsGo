@@ -16,5 +16,6 @@ router.post('/titols/:usuariId', verificacioUsuari.verifyToken, missionsControll
 
 router.patch('/titol/progres/incrementa/:usuariId', verificacioUsuari.verifyToken, missionsController.incrementarProgresTitol);
 
+router.post('/armes/:usuariId', missionsController.assignarMissionsArmes)
 
 module.exports = router;
