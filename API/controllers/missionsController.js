@@ -333,7 +333,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     // 2. Treure totes les skins separades per coma i juntar-les en un array
     let skinsUsuari = [];
     for (const fila of biblioteca) {
-      if (fila.skins) {
+      if (fila.skin_ids) {
         const skinsArray = fila.skins.split(',').map(s => s.trim()).filter(s => s.length > 0);
         skinsUsuari = skinsUsuari.concat(skinsArray);
       }
