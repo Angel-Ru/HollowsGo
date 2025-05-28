@@ -49,7 +49,7 @@ class CombatProvider with ChangeNotifier {
 
   // SETTERS
   void setAllyHealth(double value) {
-    _aliatHealth = value;
+    _aliatHealth = value.clamp(0, double.infinity);
     notifyListeners();
   }
 
@@ -138,11 +138,15 @@ class CombatProvider with ChangeNotifier {
         await Future.delayed(const Duration(milliseconds: 600)); // Pausa visual
         setEnemyHealth(0);
         clearDoomEffect();
+        _enemyBleeding = false; // Assegurem que bleed s'atura
+        _isAttackInProgress = false; // No deixar bloquejat
+        notifyListeners();
         if (onEnemyDefeated != null) {
           onEnemyDefeated();
         }
+      } else {
+        notifyListeners();
       }
-      notifyListeners();
     }
   }
 
@@ -200,6 +204,8 @@ class CombatProvider with ChangeNotifier {
     if (_enemicHealth == 0) {
       _enemyBleeding = false;
       clearDoomEffect();
+      _isAttackInProgress = false; // Evitem bloqueig
+      notifyListeners();
       if (onEnemyDefeated != null) {
         onEnemyDefeated();
       }
@@ -256,9 +262,11 @@ class CombatProvider with ChangeNotifier {
       if (_enemicHealth < 0) _enemicHealth = 0;
 
       _isEnemyHit = false;
+      notifyListeners();
 
       if (_enemicHealth <= 0) {
         clearDoomEffect();
+        _enemyBleeding = false;
         _isAttackInProgress = false;
         await updateSkinVidaActual(
             skinId: skinId, vidaActual: _aliatHealth ?? 0);
@@ -269,11 +277,11 @@ class CombatProvider with ChangeNotifier {
       _isEnemyTurn = true;
       notifyListeners();
 
-      // ❌ Treta d’aquí la crida a decrementDoomCounter
+      // Atac enemic
+      await _performEnemyAttack(enemyDamage, skinId, onDefeat,
+          onVictory: onVictory);
 
-      await _performEnemyAttack(enemyDamage, skinId, onDefeat);
-
-      // ✅ Aplicar Doom després de l’atac enemic
+      // Aplicar Doom després d’atac enemic
       decrementDoomCounter(onEnemyDefeated: onVictory);
     }
   }
@@ -282,7 +290,7 @@ class CombatProvider with ChangeNotifier {
     int enemyDamage,
     int skinId,
     VoidCallback onDefeat, {
-    VoidCallback? onVictory, // ➕ Afegit com a paràmetre opcional
+    VoidCallback? onVictory,
   }) async {
     if (_enemyFrozen) {
       _isEnemyTurn = false;
@@ -304,7 +312,10 @@ class CombatProvider with ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 600));
     _isAllyHit = false;
 
-    processBleedTick(onEnemyDefeated: onVictory);
+    // Process bleed tick només si enemic viu
+    if (_enemyBleeding && _enemicHealth > 0) {
+      processBleedTick(onEnemyDefeated: onVictory);
+    }
 
     _isEnemyTurn = false;
     _isAttackInProgress = false;
@@ -315,7 +326,7 @@ class CombatProvider with ChangeNotifier {
       onDefeat();
     }
 
-    // ✅ Ara s'executa el Doom després de l'atac enemic
+    // Executa Doom després
     decrementDoomCounter(onEnemyDefeated: onVictory);
   }
 
