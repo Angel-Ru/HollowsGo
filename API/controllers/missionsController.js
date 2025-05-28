@@ -185,12 +185,17 @@ exports.assignarMissionsTitols = async (req, res) => {
 
 exports.getMissionTitol = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
-  if (!usuariId) return res.status(400).json({ error: 'Usuari invàlid' });
+  if (!usuariId) {
+    console.warn('Usuari ID invàlid:', req.params.usuariId);
+    return res.status(400).json({ error: 'Usuari invàlid' });
+  }
 
   try {
     const connection = await connectDB();
 
-    // 1. Obtenir el títol del personatge seleccionat (via skin seleccionat)
+    // Log inicial
+    console.log(`Buscant títol per usuari ${usuariId}`);
+
     const [titolsUsuari] = await connection.execute(`
       SELECT 
         t.id AS titol_id,
@@ -201,13 +206,17 @@ exports.getMissionTitol = async (req, res) => {
       WHERE usa.usuari = ? AND usa.seleccionat = 1
     `, [usuariId]);
 
+    console.log('Resultat titolsUsuari:', titolsUsuari);
+
     if (titolsUsuari.length === 0) {
+      console.warn(`Cap títol trobat per usuari ${usuariId}`);
       return res.status(404).json({ error: 'No s\'ha trobat cap títol del personatge seleccionat per aquest usuari' });
     }
 
     const { titol_id: titolId, nom_titol: nomTitol } = titolsUsuari[0];
 
-    // 2. Obtenir la missió del títol amb el progrés (una sola)
+    console.log(`Títol seleccionat: ID=${titolId}, Nom="${nomTitol}"`);
+
     const [missions] = await connection.execute(`
       SELECT 
         m.id,
@@ -221,11 +230,16 @@ exports.getMissionTitol = async (req, res) => {
       LIMIT 1
     `, [titolId, usuariId]);
 
+    console.log('Resultat missió:', missions);
+
     if (missions.length === 0) {
+      console.warn(`No s'ha trobat cap missió pel títol ${titolId} i usuari ${usuariId}`);
       return res.status(404).json({ error: 'No s\'ha trobat cap missió associada a aquest títol' });
     }
 
     const missio = missions[0];
+
+    console.log('Missió retornada:', missio);
 
     res.status(200).json({
       missatge: 'Missió de títol recuperada correctament',
@@ -235,10 +249,12 @@ exports.getMissionTitol = async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
+    console.error('Error al recuperar la missió de títol:', err.message);
+    console.error(err.stack);
     res.status(500).json({ error: 'Error recuperant la missió de títol' });
   }
 };
+
 
 
 
