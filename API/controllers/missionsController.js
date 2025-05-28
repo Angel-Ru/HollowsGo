@@ -323,7 +323,7 @@ exports.assignarMissionsArmes = async (req, res) => {
 
     // 1. Obtenir totes les files de la biblioteca de l'usuari
     const [biblioteca] = await connection.execute(`
-      SELECT skins FROM BIBLIOTECA WHERE user_id = ?
+      SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ?
     `, [usuariId]);
 
     if (biblioteca.length === 0) {
