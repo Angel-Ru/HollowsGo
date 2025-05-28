@@ -257,9 +257,12 @@ class CombatProvider with ChangeNotifier {
       _isEnemyTurn = true;
       notifyListeners();
 
-      decrementDoomCounter(onEnemyDefeated: onVictory);
+      // ❌ Treta d’aquí la crida a decrementDoomCounter
 
       await _performEnemyAttack(enemyDamage, skinId, onDefeat);
+
+      // ✅ Aplicar Doom després de l’atac enemic
+      decrementDoomCounter(onEnemyDefeated: onVictory);
     }
   }
 
