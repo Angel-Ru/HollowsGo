@@ -268,6 +268,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         maxHealth: skins.aliat?.vidaMaxima ?? 1000,
                         isHit: combatProvider.isAllyHit,
                         buffAmount: combatProvider.bonusAllyDamage,
+                        isImmune: combatProvider.playerImmune,
                       ),
                       SizedBox(height: 20),
                       CombatActionButtons(
