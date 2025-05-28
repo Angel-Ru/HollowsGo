@@ -2111,7 +2111,6 @@ exports.getSkinSeleccionada = async (req, res) => {
     const userId = parseInt(req.params.id);
     const connection = await connectDB();
 
-    // Consulta modificada que inclou dades d'atac i armes (similar a l'altre endpoint)
     const [seleccio] = await connection.execute(`
       SELECT usa.id AS usuari_skin_arma_id,
              s.id AS skin_id,
@@ -2120,11 +2119,12 @@ exports.getSkinSeleccionada = async (req, res) => {
              s.imatge,
              s.raça,
              p.nom AS nom_personatge,
-             p.vida_base AS vida_personatge,
+             p.vida_base AS vida_base_personatge,
              p.mal_base AS mal_base_personatge,
              a.mal AS mal_arma,
              a.nom AS atac_nom,
-             ar.buff_atac AS atac_buff
+             ar.buff_atac AS atac_buff,
+             usa.vida_actual
       FROM USUARI_SKIN_ARMES usa
       INNER JOIN SKINS s ON usa.skin = s.id
       INNER JOIN PERSONATGES p ON s.personatge = p.id
@@ -2146,6 +2146,11 @@ exports.getSkinSeleccionada = async (req, res) => {
                      (skinSeleccionada.mal_arma || 0) +
                      (skinSeleccionada.atac_buff || 0);
 
+    // Vida: si hi ha vida_actual, la utilitza, sinó la vida base del personatge
+    const vidaActual = skinSeleccionada.vida_actual !== null && skinSeleccionada.vida_actual !== undefined
+                      ? skinSeleccionada.vida_actual
+                      : skinSeleccionada.vida_base_personatge;
+
     const resposta = {
       usuari_skin_arma_id: skinSeleccionada.usuari_skin_arma_id,
       skin: {
@@ -2154,7 +2159,8 @@ exports.getSkinSeleccionada = async (req, res) => {
         categoria: skinSeleccionada.categoria,
         imatge: skinSeleccionada.imatge,
         personatge_nom: skinSeleccionada.nom_personatge,
-        vida: skinSeleccionada.vida_personatge,
+        vida: vidaActual,
+        vidaMaxima: skinSeleccionada.vida_base_personatge,
         mal_total: malTotal,
         atac_nom: skinSeleccionada.atac_nom,
         raça: skinSeleccionada.raça
@@ -2170,6 +2176,7 @@ exports.getSkinSeleccionada = async (req, res) => {
     res.status(500).json({ missatge: 'Error intern del servidor' });
   }
 };
+
 
 // Actualitzar la skin seleccionada per un usuari
 exports.updateSkinSeleccionada = async (req, res) => {

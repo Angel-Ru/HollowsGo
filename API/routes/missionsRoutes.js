@@ -14,4 +14,7 @@ router.put('/progres/incrementa/:id', verificacioUsuari.verifyToken, missionsCon
 
 router.post('/titols/:usuariId', verificacioUsuari.verifyToken, missionsController.assignarMissionsTitols);
 
+router.patch('/titol/progres/incrementa/:usuariId', verificacioUsuari.verifyToken, missionsController.incrementarProgresTitol);
+
+
 module.exports = router;
