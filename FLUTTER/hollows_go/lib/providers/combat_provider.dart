@@ -24,6 +24,9 @@ class CombatProvider with ChangeNotifier {
   int _bonusAllyDamage = 0;
   int _enemyAttackDebuff = 0;
 
+  // Doom effect: quantitat de torns fins que l'enemic mori (-1 = inactiu)
+  int _turnsUntilEnemyDies = -1;
+
   String _enemyName = "Enemic";
   String? _overrideBackground;
 
@@ -44,6 +47,7 @@ class CombatProvider with ChangeNotifier {
   bool get ichibeJustUsedUlti => _ichibeJustUsedUlti;
   String? get overrideBackground => _overrideBackground;
   bool get playerImmune => _playerImmune;
+  int get turnsUntilEnemyDies => _turnsUntilEnemyDies;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -120,6 +124,27 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Afegeixo el Doom effect
+  void applyDoomEffect() {
+    _turnsUntilEnemyDies = 2; // Morirà al segon torn enemic
+    notifyListeners();
+  }
+
+  void decrementDoomCounter() {
+    if (_turnsUntilEnemyDies > 0) {
+      _turnsUntilEnemyDies--;
+      if (_turnsUntilEnemyDies == 0) {
+        setEnemyHealth(0);
+      }
+      notifyListeners();
+    }
+  }
+
+  void clearDoomEffect() {
+    _turnsUntilEnemyDies = -1;
+    notifyListeners();
+  }
+
   Map<String, dynamic> ichibeUltimateEffect({
     required String enemyName,
     required double enemyMaxHealth,
@@ -192,6 +217,7 @@ class CombatProvider with ChangeNotifier {
     _enemyBleeding = false;
     _bleedTick = 0;
     _overrideBackground = null;
+    clearDoomEffect();
     notifyListeners();
   }
 
@@ -216,17 +242,24 @@ class CombatProvider with ChangeNotifier {
       if (_enemicHealth < 0) _enemicHealth = 0;
 
       _isEnemyHit = false;
-      _isEnemyTurn = _enemicHealth > 0;
-      notifyListeners();
 
-      if (_enemicHealth > 0) {
-        await _performEnemyAttack(enemyDamage, skinId, onDefeat);
-      } else {
+      // Si l'enemic ha mort aquí, netegem el Doom i guanyem
+      if (_enemicHealth <= 0) {
+        clearDoomEffect();
         _isAttackInProgress = false;
         await updateSkinVidaActual(
             skinId: skinId, vidaActual: _aliatHealth ?? 0);
         onVictory();
+        return;
       }
+
+      _isEnemyTurn = true;
+      notifyListeners();
+
+      // Quan és el torn enemic, decrementem el Doom
+      decrementDoomCounter();
+
+      await _performEnemyAttack(enemyDamage, skinId, onDefeat);
     }
   }
 
