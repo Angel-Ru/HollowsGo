@@ -105,7 +105,7 @@ class MissionsProvider with ChangeNotifier {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
 
-  final url = Uri.parse('https://${Config.ip}/missions/titol/progres/$missioId');
+  final url = Uri.parse('https://${Config.ip}/missions/titol/progres/incrementa/$missioId');
 
   final response = await http.patch(
     url,
