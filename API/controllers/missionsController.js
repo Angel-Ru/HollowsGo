@@ -334,7 +334,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     let skinsUsuari = [];
     for (const fila of biblioteca) {
       if (fila.skin_ids) {
-        const skinsArray = fila.skins.split(',').map(s => s.trim()).filter(s => s.length > 0);
+        const skinsArray = fila.skin_ids.split(',').map(s => s.trim()).filter(s => s.length > 0);
         skinsUsuari = skinsUsuari.concat(skinsArray);
       }
     }
