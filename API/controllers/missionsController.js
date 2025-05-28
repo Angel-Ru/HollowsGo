@@ -404,6 +404,74 @@ exports.assignarMissionsArmes = async (req, res) => {
   }
 };
 
+exports.getMissionArma = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) return res.status(400).json({ error: 'Usuari invàlid' });
+
+  try {
+    const connection = await connectDB();
+
+    // Obtenir l'arma seleccionada i el seu nom
+    const [armaSeleccionada] = await connection.execute(`
+      SELECT a.id AS arma_id, a.nom AS nom_arma
+      FROM USUARI_SKIN_ARMES usa
+      JOIN SKINS_ARMES sa ON sa.skin = usa.skin
+      JOIN ARMES a ON sa.arma = a.id
+      WHERE usa.usuari = ? AND usa.seleccionat = 1
+      LIMIT 1
+    `, [usuariId]);
+
+    if (armaSeleccionada.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap arma seleccionada per aquest usuari' });
+    }
+
+    const { arma_id: armaId, nom_arma: nomArma } = armaSeleccionada[0];
+
+    const tipusMissioSeq = [2, 3, 4];
+    let missioFinal = null;
+
+    for (const tipus of tipusMissioSeq) {
+      const [resultat] = await connection.execute(`
+        SELECT 
+          m.id,
+          m.nom_missio,
+          m.descripcio,
+          m.objectiu,
+          ma.progres
+        FROM MISSIONS_ARMES ma
+        JOIN MISSIONS m ON m.id = ma.missio
+        WHERE ma.usuari = ? AND ma.arma = ? AND m.tipus_missio = ?
+        LIMIT 1
+      `, [usuariId, armaId, tipus]);
+
+      if (resultat.length === 0) continue;
+
+      const missio = resultat[0];
+
+      if (missio.progres < missio.objectiu) {
+        missioFinal = missio;
+        break;
+      } else {
+        missioFinal = missio;
+      }
+    }
+
+    if (!missioFinal) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap missió per aquesta arma' });
+    }
+
+    res.status(200).json({
+      missatge: 'Missió d\'arma recuperada correctament',
+      arma: nomArma,
+      missio: missioFinal
+    });
+
+  } catch (err) {
+    console.error('Error al recuperar la missió d\'arma:', err);
+    res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
+  }
+};
+
 
 
 

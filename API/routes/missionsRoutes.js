@@ -7,6 +7,7 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari');
 
 router.get('/titol/:usuariId', verificacioUsuari.verifyToken, missionsController.getMissionTitol)
 
+router.get('/arma/:usuariId', missionsController.getMissionArma);
 // Ruta per assignar missions diaries a un usuari per id
 router.post('/diaries/:usuariId', verificacioUsuari.verifyToken, missionsController.assignarMissionsDiaries);
 
@@ -16,6 +17,7 @@ router.post('/titols/:usuariId', verificacioUsuari.verifyToken, missionsControll
 
 router.patch('/titol/progres/incrementa/:usuariId', verificacioUsuari.verifyToken, missionsController.incrementarProgresTitol);
 
-router.post('/armes/:usuariId', missionsController.assignarMissionsArmes)
+router.post('/armes/:usuariId', verificacioUsuari.verifyToken, missionsController.assignarMissionsArmes)
+
 
 module.exports = router;
