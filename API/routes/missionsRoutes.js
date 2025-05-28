@@ -5,6 +5,8 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari');
 
 
 
+router.get('/titol/:usuariId', verificacioUsuari.verifyToken, missionsController.getMissionTitol)
+
 // Ruta per assignar missions diaries a un usuari per id
 router.post('/diaries/:usuariId', verificacioUsuari.verifyToken, missionsController.assignarMissionsDiaries);
 
