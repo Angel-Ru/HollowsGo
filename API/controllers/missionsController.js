@@ -254,6 +254,65 @@ exports.getMissionTitol = async (req, res) => {
   }
 };
 
+exports.incrementarProgresTitol = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) {
+    return res.status(400).json({ error: 'Usuari ID invàlid' });
+  }
+
+  try {
+    const connection = await connectDB();
+
+    // Obtenim el titol seleccionat per l'usuari
+    const [titolsUsuari] = await connection.execute(`
+      SELECT t.id AS titol_id
+      FROM USUARI_SKIN_ARMES usa
+      JOIN SKINS s ON s.id = usa.skin
+      JOIN TITOLS t ON t.personatge = s.personatge
+      WHERE usa.usuari = ? AND usa.seleccionat = 1
+    `, [usuariId]);
+
+    if (titolsUsuari.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap títol seleccionat per aquest usuari' });
+    }
+
+    const titolId = titolsUsuari[0].titol_id;
+
+    // Obtenim la missió activa del títol
+    const [missions] = await connection.execute(`
+      SELECT mt.missio, mt.progres, m.objectiu
+      FROM MISSIONS_TITOLS mt
+      JOIN MISSIONS m ON m.id = mt.missio
+      WHERE mt.titol = ? AND mt.usuari = ? AND m.tipus_missio = 1
+      LIMIT 1
+    `, [titolId, usuariId]);
+
+    if (missions.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap missió de títol per aquest usuari' });
+    }
+
+    const { missio, progres, objectiu } = missions[0];
+
+    if (progres >= objectiu) {
+      return res.status(200).json({ missatge: 'La missió ja està completada', progres });
+    }
+
+    const nouProgres = progres + 1;
+
+    // Actualitzem el progres
+    await connection.execute(`
+      UPDATE MISSIONS_TITOLS
+      SET progres = ?
+      WHERE titol = ? AND usuari = ? AND missio = ?
+    `, [nouProgres, titolId, usuariId, missio]);
+
+    res.status(200).json({ missatge: 'Progrés actualitzat correctament', progres: nouProgres });
+
+  } catch (err) {
+    console.error('Error incrementant el progres:', err.message);
+    res.status(500).json({ error: 'Error al incrementar el progres de la missió' });
+  }
+};
 
 
 

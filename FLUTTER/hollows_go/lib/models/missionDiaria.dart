@@ -37,10 +37,29 @@ class MissionDiary {
   }
 }
 
-class MissionsDrawer extends StatelessWidget {
+
+
+class MissionsDrawer extends StatefulWidget {
   final int usuariId;
 
   const MissionsDrawer({Key? key, required this.usuariId}) : super(key: key);
+
+  @override
+  _MissionsDrawerState createState() => _MissionsDrawerState();
+}
+
+class _MissionsDrawerState extends State<MissionsDrawer> {
+  late Future<void> _loadFutures;
+
+  @override
+  void initState() {
+    super.initState();
+    final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
+    _loadFutures = Future.wait([
+      missionsProvider.fetchMissions(widget.usuariId),
+      missionsProvider.fetchMissioTitol(widget.usuariId),
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +73,7 @@ class MissionsDrawer extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              title: Text(
+              title: const Text(
                 'Missions Diaries',
                 style: TextStyle(
                   fontSize: 22,
@@ -63,27 +82,32 @@ class MissionsDrawer extends StatelessWidget {
                 ),
               ),
               trailing: IconButton(
-                icon: Icon(Icons.close, color: Colors.white70),
+                icon: const Icon(Icons.close, color: Colors.white70),
                 onPressed: () => Navigator.of(context).pop(),
               ),
             ),
             Divider(color: Colors.grey[800]),
             Expanded(
               child: FutureBuilder(
-                future: missionsProvider.assignarIObtenirTitol(usuariId),
+                future: _loadFutures,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator(color: Colors.tealAccent));
+                    return const Center(child: CircularProgressIndicator(color: Colors.tealAccent));
                   } else if (snapshot.hasError) {
-                    return Center(child: Text('Error carregant missions', style: TextStyle(color: Colors.redAccent)));
+                    return Center(
+                      child: Text(
+                        'Error carregant missions',
+                        style: TextStyle(color: Colors.redAccent),
+                      ),
+                    );
                   } else {
                     return SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Missions Diaries
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             child: Text(
                               'Missions Diaries',
                               style: TextStyle(
@@ -105,7 +129,7 @@ class MissionsDrawer extends StatelessWidget {
                           else
                             ...missions.map((missio) => _buildMissionCard(missio)).toList(),
 
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
 
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -113,14 +137,14 @@ class MissionsDrawer extends StatelessWidget {
                           ),
 
                           // Missió Títol
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                             child: Text(
                               'Missió de Títol',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.orangeAccent[400],
+                                color: Colors.orangeAccent,
                               ),
                             ),
                           ),
@@ -136,7 +160,7 @@ class MissionsDrawer extends StatelessWidget {
                               ),
                             ),
 
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                         ],
                       ),
                     );
@@ -154,7 +178,7 @@ class MissionsDrawer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [Color(0xFF1E1E1E), Color(0xFF2A2A2A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -164,7 +188,7 @@ class MissionsDrawer extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
             blurRadius: 8,
-            offset: Offset(0, 4),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -174,13 +198,13 @@ class MissionsDrawer extends StatelessWidget {
         children: [
           Text(
             missio.nom,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 18,
               color: Colors.white,
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
             missio.descripcio,
             style: TextStyle(
@@ -188,7 +212,7 @@ class MissionsDrawer extends StatelessWidget {
               fontSize: 14,
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: LinearProgressIndicator(
@@ -198,7 +222,7 @@ class MissionsDrawer extends StatelessWidget {
               color: Colors.orangeAccent[400],
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
             '${missio.progress}/${missio.objectiu} completat',
             style: TextStyle(
@@ -212,99 +236,95 @@ class MissionsDrawer extends StatelessWidget {
   }
 
   Widget _buildMissioTitolCard(MissionTitol missioTitol) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [Colors.deepOrange.shade800, Colors.deepOrange.shade900],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      borderRadius: BorderRadius.circular(18),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.35),
-          blurRadius: 12,
-          offset: Offset(0, 6),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey.shade900, Colors.orange.shade600],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-      ],
-    ),
-    padding: const EdgeInsets.all(20),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Títol destacat
-        Row(
-          children: [
-            Icon(Icons.emoji_events, color: Colors.amber[300], size: 28),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Títol que aconseguiràs:',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.orange[100],
-                  fontWeight: FontWeight.bold,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.emoji_events, color: Colors.amber[300], size: 28),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Títol que aconseguiràs:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.orange[100],
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            missioTitol.nomTitol,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.amber[200],
+              letterSpacing: 0.8,
             ),
-          ],
-        ),
-        SizedBox(height: 4),
-        Text(
-          missioTitol.nomTitol,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.amber[200],
-            letterSpacing: 0.8,
           ),
-        ),
-        Divider(color: Colors.orange[300], thickness: 1.2, height: 24),
+          Divider(color: Colors.orange[300], thickness: 1.2, height: 24),
 
-        // Nom i descripció de la missió
-        Text(
-          missioTitol.nomMissio,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+          Text(
+            missioTitol.nomMissio,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
-        ),
-        SizedBox(height: 8),
-        Text(
-          missioTitol.descripcio,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.white70,
+          const SizedBox(height: 8),
+          Text(
+            missioTitol.descripcio,
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.white70,
+            ),
           ),
-        ),
-        SizedBox(height: 16),
+          const SizedBox(height: 16),
 
-        // Barra de progrés
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: LinearProgressIndicator(
-            value: missioTitol.objectiu > 0
-                ? missioTitol.progres / missioTitol.objectiu
-                : 0,
-            minHeight: 12,
-            backgroundColor: Colors.orange[800],
-            color: Colors.orangeAccent[100],
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: LinearProgressIndicator(
+              value: missioTitol.objectiu > 0
+                  ? missioTitol.progres / missioTitol.objectiu
+                  : 0,
+              minHeight: 12,
+              backgroundColor: Colors.orangeAccent[400],
+              color: Colors.orangeAccent[100],
+            ),
           ),
-        ),
-        SizedBox(height: 6),
-        Text(
-          '${missioTitol.progres}/${missioTitol.objectiu} completat',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.orange[100],
-            fontWeight: FontWeight.w600,
+          const SizedBox(height: 6),
+          Text(
+            '${missioTitol.progres}/${missioTitol.objectiu} completat',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.orange[100],
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
-}
-
+        ],
+      ),
+    );
+  }
 }
