@@ -137,7 +137,7 @@ class CombatProvider with ChangeNotifier {
         setEnemyHealth(0);
         clearDoomEffect();
         if (onEnemyDefeated != null) {
-          onEnemyDefeated();
+          onEnemyDefeated(); // crida aquí el diàleg de victòria
         }
       }
       notifyListeners();
@@ -261,7 +261,15 @@ class CombatProvider with ChangeNotifier {
       notifyListeners();
 
       // Quan és el torn enemic, decrementem el Doom
-      decrementDoomCounter();
+      decrementDoomCounter(onEnemyDefeated: () async {
+        clearDoomEffect(); // per seguretat
+        _isAttackInProgress = false;
+        await updateSkinVidaActual(
+          skinId: skinId,
+          vidaActual: _aliatHealth ?? 0,
+        );
+        onVictory(); // 🔥 Mostrarà el diàleg de victòria
+      });
 
       await _performEnemyAttack(enemyDamage, skinId, onDefeat);
     }
