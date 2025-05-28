@@ -2119,7 +2119,7 @@ exports.getSkinSeleccionada = async (req, res) => {
              s.imatge,
              s.raça,
              p.nom AS nom_personatge,
-             p.vida_base AS vida_base_personatge,
+             p.vida_base,
              p.mal_base AS mal_base_personatge,
              a.mal AS mal_arma,
              a.nom AS atac_nom,

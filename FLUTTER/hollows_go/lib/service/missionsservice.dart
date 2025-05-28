@@ -10,7 +10,7 @@ class MissionsLogic {
 
   await missionsProvider.fetchMissions(userProvider.userId);
   perfilProvider.sumarPartidaJugada(userProvider.userId);
-
+  await missionsProvider.incrementarProgresMissioTitol(userProvider.userId);
   
   final missioJugar = missionsProvider.missions.firstWhere(
     (m) => m.missio == 2,
