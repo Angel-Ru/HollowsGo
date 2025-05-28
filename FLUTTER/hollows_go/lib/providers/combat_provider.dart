@@ -248,13 +248,7 @@ class CombatProvider with ChangeNotifier {
       _isEnemyTurn = true;
       notifyListeners();
 
-      decrementDoomCounter(onEnemyDefeated: () async {
-        clearDoomEffect();
-        _isAttackInProgress = false;
-        await updateSkinVidaActual(
-            skinId: skinId, vidaActual: _aliatHealth ?? 0);
-        onVictory();
-      });
+      decrementDoomCounter(onEnemyDefeated: onVictory);
 
       await _performEnemyAttack(enemyDamage, skinId, onDefeat);
     }
