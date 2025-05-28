@@ -918,3 +918,40 @@ exports.crearamistat = async (req, res) => {
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
+
+// Sumar monedes comprades a l'usuari
+exports.afegirMonedesUsuari = async (req, res) => {
+    const { nom, monedes } = req.body;
+
+    if (!nom || !monedes) {
+        return res.status(400).send("Falten dades: 'nom' o 'monedes'");
+    }
+
+    try {
+        const connection = await connectDB();
+
+        // Primer, agafa els punts actuals
+        const [rows] = await connection.execute(
+            'SELECT punts_emmagatzemats FROM USUARIS WHERE nom = ?',
+            [nom]
+        );
+
+        if (rows.length === 0) {
+            return res.status(404).send("Usuari no trobat.");
+        }
+
+        const puntsActuals = rows[0].punts_emmagatzemats || 0;
+        const nousPunts = puntsActuals + parseInt(monedes);
+
+        // Actualitza els punts
+        await connection.execute(
+            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE nom = ?',
+            [nousPunts, nom]
+        );
+
+        res.send({ missatge: "Monedes afegides correctament", punts: nousPunts });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error amb la base de dades');
+    }
+};

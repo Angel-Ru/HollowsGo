@@ -58,4 +58,7 @@ router.put('/amics/:id/pendents', verificacioUsuari.verifyToken, userController.
 // Ruta per afegir un amic
 router.post('/amics/nova/:id', verificacioUsuari.verifyToken, userController.crearamistat);
 
+// Ruta per sumar monedes comprades a l'usuari
+router.put('/punts/sumar/:nom', verificacioUsuari.verifyToken, userController.afegirMonedesUsuari);
+
 module.exports = router;

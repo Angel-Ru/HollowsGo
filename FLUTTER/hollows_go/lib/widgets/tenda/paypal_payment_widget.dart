@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+import '../../imports.dart';
 import 'package:flutter_paypal/flutter_paypal.dart';
 
-class PaypalPaymentScreen extends StatelessWidget {
+class PaypalPaymentScreen extends StatefulWidget {
   final String totalAmount;
   final String itemName;
 
@@ -11,6 +11,11 @@ class PaypalPaymentScreen extends StatelessWidget {
     required this.itemName,
   }) : super(key: key);
 
+  @override
+  _PaypalPaymentScreenState createState() => _PaypalPaymentScreenState();
+}
+
+class _PaypalPaymentScreenState extends State<PaypalPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return UsePaypal(
@@ -24,21 +29,21 @@ class PaypalPaymentScreen extends StatelessWidget {
       transactions: [
         {
           "amount": {
-            "total": totalAmount,
+            "total": widget.totalAmount,
             "currency": "EUR",
             "details": {
-              "subtotal": totalAmount,
+              "subtotal": widget.totalAmount,
               "shipping": '0',
               "shipping_discount": 0,
             }
           },
-          "description": "Compra de monedes ($itemName)",
+          "description": "Compra de monedes (${widget.itemName})",
           "item_list": {
             "items": [
               {
-                "name": itemName,
+                "name": widget.itemName,
                 "quantity": 1,
-                "price": totalAmount,
+                "price": widget.totalAmount,
                 "currency": "EUR",
               }
             ],
@@ -48,15 +53,22 @@ class PaypalPaymentScreen extends StatelessWidget {
       note: "Contacta amb nosaltres per qualsevol dubte.",
       onSuccess: (params) {
         print("✅ Compra completada: $params");
-        Navigator.of(context).pop(); // tornar a la pantalla anterior
+        if (mounted) {
+          Navigator.of(context)
+              .pop(TendaScreen()); // tornar a la pantalla anterior
+        }
       },
       onError: (error) {
         print("❌ Error a la compra: $error");
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       },
       onCancel: (params) {
         print("⚠️ Compra cancel·lada: $params");
-        Navigator.of(context).pop();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
       },
     );
   }
