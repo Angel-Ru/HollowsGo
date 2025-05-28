@@ -321,7 +321,7 @@ exports.assignarMissionsArmes = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // 1. Obtenir totes les files de la biblioteca de l'usuari
+    // 1. Obtenir biblioteca
     const [biblioteca] = await connection.execute(`
       SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ?
     `, [usuariId]);
@@ -330,7 +330,7 @@ exports.assignarMissionsArmes = async (req, res) => {
       return res.status(404).json({ error: 'No s\'ha trobat biblioteca per l\'usuari' });
     }
 
-    // 2. Treure totes les skins separades per coma i juntar-les en un array
+    // 2. Treure skins i convertir a array
     let skinsUsuari = [];
     for (const fila of biblioteca) {
       if (fila.skin_ids) {
@@ -338,20 +338,17 @@ exports.assignarMissionsArmes = async (req, res) => {
         skinsUsuari = skinsUsuari.concat(skinsArray);
       }
     }
-
     if (skinsUsuari.length === 0) {
       return res.status(404).json({ error: 'No s\'han trobat skins a la biblioteca' });
     }
-
-    // Convertir els ids a números
     skinsUsuari = skinsUsuari.map(Number).filter(n => !isNaN(n));
 
-    // 3. Obtenir les armes relacionades amb aquestes skins (sense filtrar tipus)
+    // 3. Obtenir armes amb categoria
     const placeholdersSkins = skinsUsuari.map(() => '?').join(',');
-
     const [armesUsuari] = await connection.execute(`
-      SELECT DISTINCT sa.arma
+      SELECT DISTINCT sa.arma, a.categoria
       FROM SKINS_ARMES sa
+      JOIN ARMES a ON sa.arma = a.id
       WHERE sa.skin IN (${placeholdersSkins})
     `, skinsUsuari);
 
@@ -359,19 +356,33 @@ exports.assignarMissionsArmes = async (req, res) => {
       return res.status(404).json({ error: 'No s\'han trobat armes per aquestes skins' });
     }
 
-    // 4. Obtenir la missió de tipus 2 (només una)
-    const [missionsTipus2] = await connection.execute(`
-      SELECT id FROM MISSIONS WHERE tipus_missio = 2 LIMIT 1
-    `);
+    // 4. Obtenir les missions per tipus 2, 3 i 4
+    const tipusMissio = [2, 3, 4];
+    const missions = {};
 
-    if (missionsTipus2.length === 0) {
-      return res.status(404).json({ error: 'No s\'han trobat missions de tipus 2' });
+    for (const tipus of tipusMissio) {
+      const [result] = await connection.execute(`
+        SELECT id FROM MISSIONS WHERE tipus_missio = ? LIMIT 1
+      `, [tipus]);
+
+      if (result.length === 0) {
+        return res.status(404).json({ error: `No s'han trobat missions de tipus ${tipus}` });
+      }
+
+      missions[tipus] = result[0].id;
     }
 
-    const missio_id = missionsTipus2[0].id;
+    // 5. Assignar missió segons categoria
+    for (const { arma, categoria } of armesUsuari) {
+      let tipus;
 
-    // 5. Assignar la missió a cada arma de l'usuari, si no existeix ja
-    for (const { arma } of armesUsuari) {
+      if (categoria === 0) tipus = 2;
+      else if (categoria === 1) tipus = 3;
+      else if (categoria === 2) tipus = 4;
+      else continue; // Ignorem categories no contemplades
+
+      const missio_id = missions[tipus];
+
       const [existeix] = await connection.execute(`
         SELECT 1 FROM MISSIONS_ARMES
         WHERE missio = ? AND arma = ? AND usuari = ?
@@ -392,6 +403,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     res.status(500).json({ error: 'Error assignant missions d’armes' });
   }
 };
+
 
 
 
