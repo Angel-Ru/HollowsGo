@@ -119,6 +119,13 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void processTurn({VoidCallback? onEnemyDefeated}) {
+    if (_turnsUntilEnemyDies > 0) {
+      decrementDoomCounter(onEnemyDefeated: onEnemyDefeated);
+    }
+    notifyListeners();
+  }
+
   void applyDoomEffect() {
     _turnsUntilEnemyDies = 2;
     notifyListeners();
@@ -130,7 +137,9 @@ class CombatProvider with ChangeNotifier {
       if (_turnsUntilEnemyDies == 0) {
         setEnemyHealth(0);
         clearDoomEffect();
-        if (onEnemyDefeated != null) onEnemyDefeated();
+        if (onEnemyDefeated != null) {
+          onEnemyDefeated();
+        }
       }
       notifyListeners();
     }
