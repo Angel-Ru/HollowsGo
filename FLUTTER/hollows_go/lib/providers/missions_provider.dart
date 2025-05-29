@@ -150,6 +150,28 @@ Future<void> fetchMissioArma(int usuariId) async {
       throw Exception('Error carregant missió de títol');
     }
   }
+Future<void> incrementarProgresMissioArma(int usuariId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token') ?? '';
+
+  final url = Uri.parse('https://${Config.ip}/missions/arma/progres/incrementa/$usuariId');
+
+  final response = await http.patch(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
+
+  if (response.statusCode == 200) {
+   
+    fetchMissioArma(usuariId);
+    notifyListeners();
+  } else {
+    throw Exception('Error incrementant progrés de la missió d\'arma');
+  }
+}
 
 
 }
