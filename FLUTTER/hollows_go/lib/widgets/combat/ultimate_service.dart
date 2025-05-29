@@ -194,12 +194,12 @@ class UltimateService {
           damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) async {
-            // ✅ Aplica efecte de compte enrere de 2 torns
-            combatProvider.applyDoomEffect();
-            debugPrint("[ULTI SENJUMARU] 🔮 Doom activat per a 2 torns");
+            // Activem tota la lògica de la ulti amb flags i doom comptador
+            combatProvider.triggerSenjumaruUltiEffect();
+            debugPrint("[ULTI SENJUMARU] 🔮 Doom activat per a 3 torns");
           },
           onEnemyDefeated: () {
-            // ❌ No s'executa aquí — la mort es gestiona al final del compte enrere
+            // La mort es gestiona quan el comptador arriba a zero, no aquí.
           },
           skipDeathCheck: true,
         );

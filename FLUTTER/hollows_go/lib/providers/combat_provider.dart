@@ -29,6 +29,9 @@ class CombatProvider with ChangeNotifier {
   String _enemyName = "Enemic";
   String? _overrideBackground;
 
+  // Nova propietat per a les imatges dels efectes
+  List<String> _threadEffectImages = [];
+
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
   double get enemicHealth => _enemicHealth;
@@ -49,10 +52,16 @@ class CombatProvider with ChangeNotifier {
   int get turnsUntilEnemyDies => _turnsUntilEnemyDies;
   bool get senjumaruJustUsedUlti => _senjumaruJustUsedUlti;
 
+  // Getter nou per a les imatges
+  List<String> get threadEffectImages => _threadEffectImages;
+
   String get currentTelaAsset {
+    if (!_ultiUsed || (!_senjumaruJustUsedUlti && _turnsUntilEnemyDies < 0)) {
+      return '';
+    }
+
     switch (_turnsUntilEnemyDies) {
       case 3:
-      case 1:
         return 'assets/special_attack/senjumaru/tela_1.png';
       case 2:
         return 'assets/special_attack/senjumaru/tela_2.png';
@@ -110,6 +119,22 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Noves funcions per a les imatges threadEffectImages
+  void setThreadEffectImages(List<String> newImages) {
+    _threadEffectImages = newImages;
+    notifyListeners();
+  }
+
+  void addThreadEffectImage(String imagePath) {
+    _threadEffectImages.add(imagePath);
+    notifyListeners();
+  }
+
+  void clearThreadEffectImages() {
+    _threadEffectImages.clear();
+    notifyListeners();
+  }
+
   void healPlayer(int amount, int maxHealth) {
     _aliatHealth = (_aliatHealth ?? 0) + amount;
     if (_aliatHealth! > maxHealth) _aliatHealth = maxHealth.toDouble();
@@ -154,8 +179,8 @@ class CombatProvider with ChangeNotifier {
         await Future.delayed(const Duration(milliseconds: 600)); // Pausa visual
         setEnemyHealth(0);
         clearDoomEffect();
-        _enemyBleeding = false; // Assegurem que bleed s'atura
-        _isAttackInProgress = false; // No deixar bloquejat
+        _enemyBleeding = false; // Atura bleed
+        _isAttackInProgress = false; // Desbloqueja
         notifyListeners();
         if (onEnemyDefeated != null) {
           onEnemyDefeated();
@@ -228,6 +253,8 @@ class CombatProvider with ChangeNotifier {
 
   void triggerSenjumaruUltiEffect() {
     _senjumaruJustUsedUlti = true;
+    setUltiUsed(true);
+    applyDoomEffect();
     notifyListeners();
 
     Future.delayed(const Duration(seconds: 1), () {
@@ -262,6 +289,7 @@ class CombatProvider with ChangeNotifier {
     _bleedTick = 0;
     _overrideBackground = null;
     clearDoomEffect();
+    clearThreadEffectImages(); // també netegem les imatges
     notifyListeners();
   }
 
