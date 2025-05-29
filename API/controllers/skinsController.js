@@ -2151,7 +2151,7 @@ exports.getSkinSeleccionada = async (req, res) => {
 
     // Obtenir l'arma equipada (pot no existir)
     const [armaEquip] = await connection.execute(`
-      SELECT ar.mal AS mal_arma
+      SELECT ar.buff_atac AS mal_arma
       FROM USUARI_SKIN_ARMES usa
       JOIN SKINS_ARMES sa ON usa.skin = sa.skin
       JOIN ARMES ar ON sa.arma = ar.id
