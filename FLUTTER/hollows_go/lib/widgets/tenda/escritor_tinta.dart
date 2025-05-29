@@ -99,39 +99,42 @@ class InkWritePainter extends CustomPainter {
 
   // Funció per tallar text en línies segons l'amplada maxWidth i estil
   List<String> _splitTextIntoLines(String text, TextStyle style, double maxWidth) {
-    final words = text.split(' ');
-    List<String> lines = [];
-    String currentLine = '';
+  final words = text.split(' ');
+  List<String> lines = [];
+  String currentLine = '';
 
-    for (final word in words) {
-      final testLine = currentLine.isEmpty ? word : '$currentLine $word';
+  for (final word in words) {
+    final testLine = currentLine.isEmpty ? word : '$currentLine $word';
 
-      final painter = TextPainter(
-        text: TextSpan(text: testLine, style: style),
-        textDirection: TextDirection.ltr,
-      );
-      painter.layout();
+    final painter = TextPainter(
+      text: TextSpan(text: testLine, style: style),
+      textDirection: TextDirection.ltr,
+    );
+    painter.layout();
 
-      if (painter.width > maxWidth) {
-        if (currentLine.isNotEmpty) {
-          lines.add(currentLine);
-          currentLine = word;
-        } else {
-          // paraula sola molt llarga, afegim igual
-          lines.add(word);
-          currentLine = '';
-        }
+    final totalWidth = painter.width + (testLine.length - 1) * 4;
+
+    if (totalWidth > maxWidth) {
+      if (currentLine.isNotEmpty) {
+        lines.add(currentLine);
+        currentLine = word;
       } else {
-        currentLine = testLine;
+        // paraula sola molt llarga, afegim igual
+        lines.add(word);
+        currentLine = '';
       }
+    } else {
+      currentLine = testLine;
     }
-
-    if (currentLine.isNotEmpty) {
-      lines.add(currentLine);
-    }
-
-    return lines;
   }
+
+  if (currentLine.isNotEmpty) {
+    lines.add(currentLine);
+  }
+
+  return lines;
+}
+
 
   @override
   bool shouldRepaint(covariant InkWritePainter oldDelegate) {
