@@ -241,6 +241,7 @@ exports.getTitolsComplets = async (req, res) => {
     res.status(500).json({ error: 'Error intern del servidor' });
   }
 };
+
 exports.getTitolUsuari = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
   if (!usuariId) {
@@ -254,7 +255,7 @@ exports.getTitolUsuari = async (req, res) => {
     const [rows] = await connection.execute(`
       SELECT titol
       FROM PERFIL_USUARI
-      WHERE id = ?
+      WHERE usuari = ?
     `, [usuariId]);
 
     if (rows.length === 0) {
