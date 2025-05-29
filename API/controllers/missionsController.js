@@ -432,7 +432,7 @@ exports.getMissionArma = async (req, res) => {
     let missioFinal = null;
 
     for (const tipus of tipusMissioSeq) {
-      const [resultat] = await connection.execute(`
+      const [missions] = await connection.execute(`
         SELECT 
           m.id,
           m.nom_missio,
@@ -442,18 +442,19 @@ exports.getMissionArma = async (req, res) => {
         FROM MISSIONS_ARMES ma
         JOIN MISSIONS m ON m.id = ma.missio
         WHERE ma.usuari = ? AND ma.arma = ? AND m.tipus_missio = ?
-        LIMIT 1
       `, [usuariId, armaId, tipus]);
 
-      if (resultat.length === 0) continue;
+      if (missions.length === 0) continue;
 
-      const missio = resultat[0];
+      // Busquem la primera missió no completada
+      const missioNoCompleta = missions.find(m => m.progres < m.objectiu);
 
-      if (missio.progres < missio.objectiu) {
-        missioFinal = missio;
+      if (missioNoCompleta) {
+        missioFinal = missioNoCompleta;
         break;
       } else {
-        missioFinal = missio;
+        // Si totes estan completes, agafem la darrera com a fallback
+        missioFinal = missions[missions.length - 1];
       }
     }
 
@@ -472,6 +473,7 @@ exports.getMissionArma = async (req, res) => {
     res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
   }
 };
+
 
 exports.incrementarProgresArma = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
