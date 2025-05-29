@@ -270,7 +270,7 @@ exports.getTitolUsuari = async (req, res) => {
 
     // Opcional: obtenir més info del títol, per exemple el nom
     const [titolData] = await connection.execute(`
-      SELECT id, nom_titol
+      SELECT id as titol_id, nom_titol
       FROM TITOLS
       WHERE id = ?
     `, [titolId]);

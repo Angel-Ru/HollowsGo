@@ -77,6 +77,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
       if (mounted) {
         setState(() {
           _titolUsuari = titol?.nomTitol;
+          print("Títol carregat per l'usuari $userId: ${titol?.nomTitol}");
+
         });
       }
     } catch (e) {
