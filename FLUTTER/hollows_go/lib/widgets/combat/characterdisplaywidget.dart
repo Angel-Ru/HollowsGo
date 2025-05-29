@@ -158,7 +158,7 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                   ),
                 ),
               ),
-              if (widget.isEnemy)
+              if (widget.isEnemy) ...[
                 AnimatedOpacity(
                   opacity: _opacity,
                   duration: const Duration(milliseconds: 500),
@@ -170,6 +170,30 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                     height: containerSize,
                   ),
                 ),
+                Consumer<CombatProvider>(
+                  builder: (context, combatProvider, _) {
+                    if (!combatProvider.senjumaruEffectActive)
+                      return const SizedBox.shrink();
+
+                    final String effectAsset =
+                        combatProvider.senjumaruAttackCount == 0
+                            ? 'assets/special_attack/senjumaru/tela_1.png'
+                            : 'assets/special_attack/senjumaru/tela_2.png';
+
+                    return AnimatedOpacity(
+                      opacity: 1.0,
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeIn,
+                      child: Image.asset(
+                        effectAsset,
+                        fit: BoxFit.cover,
+                        width: containerSize,
+                        height: containerSize,
+                      ),
+                    );
+                  },
+                ),
+              ],
             ],
           ),
         ),

@@ -181,7 +181,7 @@ class UltimateService {
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
-//ULTI SENJUMARU
+
       case 14:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -193,13 +193,11 @@ class UltimateService {
           videoAsset: 'assets/special_attack/senjumaru/senjumaru_vid.mp4',
           damage: 0,
           rotateScreen: false,
-          onDamageApplied: (_) async {
-            debugPrint("[ULTI SENJUMARU] 🔮 Doom activat per a 3 torns");
+          onDamageApplied: (_) {
+            combatProvider.activateSenjumaruEffect();
           },
-          onEnemyDefeated: () {
-            // Mort gestionada al final comptador
-          },
-          skipDeathCheck: true,
+          onEnemyDefeated: onEnemyDefeated,
+          skipDeathCheck: true, // perquè el final ve pel comptador
         );
         break;
 

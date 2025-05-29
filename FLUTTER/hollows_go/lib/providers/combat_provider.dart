@@ -9,7 +9,6 @@ class CombatProvider with ChangeNotifier {
   double? _aliatHealth;
   double _enemicHealth = 1000.0;
   double _enemyMaxHealth = 1000.0;
-
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
@@ -19,6 +18,8 @@ class CombatProvider with ChangeNotifier {
   bool _enemyBleeding = false;
   bool _ichibeJustUsedUlti = false;
   bool _playerImmune = false;
+  bool _senjumaruEffectActive = false;
+  int _senjumaruAttackCount = 0;
 
   int _bleedTick = 0;
   int _bonusAllyDamage = 0;
@@ -44,6 +45,8 @@ class CombatProvider with ChangeNotifier {
   bool get ichibeJustUsedUlti => _ichibeJustUsedUlti;
   String? get overrideBackground => _overrideBackground;
   bool get playerImmune => _playerImmune;
+  bool get senjumaruEffectActive => _senjumaruEffectActive;
+  int get senjumaruAttackCount => _senjumaruAttackCount;
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -114,6 +117,32 @@ class CombatProvider with ChangeNotifier {
     if (_enemyBleeding) return;
     _enemyBleeding = true;
     _bleedTick = 0;
+    notifyListeners();
+  }
+
+  void activateSenjumaruEffect() {
+    _senjumaruEffectActive = true;
+    _senjumaruAttackCount = 0;
+
+    // Aquí notifiquem el widget per mostrar la primera imatge (via listener o algun state)
+    notifyListeners();
+  }
+
+  void registerEnemyAttack() {
+    if (_senjumaruEffectActive) {
+      _senjumaruAttackCount++;
+
+      notifyListeners(); // per actualitzar el widget visualment
+
+      if (_senjumaruAttackCount >= 2) {
+        _senjumaruEffectActive = false;
+        killEnemy();
+      }
+    }
+  }
+
+  void killEnemy() {
+    _enemicHealth = 0;
     notifyListeners();
   }
 
@@ -262,6 +291,9 @@ class CombatProvider with ChangeNotifier {
       final effectiveDamage = max(0, enemyDamage - _enemyAttackDebuff);
       _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
       if (_aliatHealth! < 0) _aliatHealth = 0;
+
+      // Aquí registrem l'atac de l'enemic per la ulti Senjumaru
+      registerEnemyAttack();
     }
 
     await Future.delayed(const Duration(milliseconds: 600));
