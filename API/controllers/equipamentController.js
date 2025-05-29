@@ -3,11 +3,11 @@ const { connectDB, sql } = require('../config/dbConfig');
 
 exports.getArmesPredefinidesPerSkin = async (req, res) => {
   try {
-    const { skin_id, usuari_id } = req.params;  // Ara agafem usuari_id també
+    const { skin_id, usuari_id } = req.params;
     const connection = await connectDB();
 
-    // Obtenim les armes predefinides per la skin
-    const [armes] = await connection.execute(
+    // Obtenim les armes associades a la skin
+    const [armesTotals] = await connection.execute(
       `SELECT a.id, a.nom, a.categoria, a.buff_atac
        FROM SKINS_ARMES sa
        JOIN ARMES a ON sa.arma = a.id
@@ -15,8 +15,27 @@ exports.getArmesPredefinidesPerSkin = async (req, res) => {
       [skin_id]
     );
 
-    if (armes.length === 0) {
+    if (armesTotals.length === 0) {
       return res.status(404).send('No s’han trobat armes per a aquesta skin.');
+    }
+
+    // Filtrar les armes que tenen TOTES les missions completades
+    const armesCompletades = [];
+
+    for (const arma of armesTotals) {
+      const [missions] = await connection.execute(
+        `SELECT ma.progres, m.objectiu
+         FROM MISSIONS_ARMES ma
+         JOIN MISSIONS m ON ma.missio = m.id
+         WHERE ma.usuari = ? AND ma.arma = ?`,
+        [usuari_id, arma.id]
+      );
+
+      // Comprovem que totes les missions estiguin completades
+      const totesCompletades = missions.length > 0 && missions.every(m => Number(m.progres) >= Number(m.objectiu));
+      if (totesCompletades) {
+        armesCompletades.push(arma);
+      }
     }
 
     // Obtenim l'arma equipada (si n'hi ha) per l'usuari i la skin
@@ -31,7 +50,7 @@ exports.getArmesPredefinidesPerSkin = async (req, res) => {
     const armaEquipada = armaEquipadaRows.length > 0 ? armaEquipadaRows[0] : null;
 
     return res.status(200).json({
-      armesPredefinides: armes,
+      armesPredefinides: armesCompletades,
       armaEquipada,
     });
   } catch (err) {
@@ -39,6 +58,7 @@ exports.getArmesPredefinidesPerSkin = async (req, res) => {
     res.status(500).send("Error en obtenir les armes predefinides.");
   }
 };
+
 
 
 exports.equiparArmaASkin = async (req, res) => {
