@@ -420,12 +420,11 @@ exports.getMissionArma = async (req, res) => {
     `, [usuariId]);
 
     if (skinsSeleccionats.length === 0) {
-      return res.status(404).json({ error: 'No s\'ha trobat cap skin seleccionat per aquest usuari' });
+      return res.status(200).json({ missatge: 'L\'usuari no té cap skin seleccionat. No hi ha missions disponibles.' });
     }
 
     // 2. Obtenir totes les armes associades als skins seleccionats
     const skinsIds = skinsSeleccionats.map(s => s.skin);
-    // Construim la query per agafar totes les armes d’aquests skins
     const placeholders = skinsIds.map(() => '?').join(',');
     const [armes] = await connection.execute(`
       SELECT DISTINCT a.id AS arma_id, a.nom AS nom_arma
@@ -435,14 +434,13 @@ exports.getMissionArma = async (req, res) => {
     `, skinsIds);
 
     if (armes.length === 0) {
-      return res.status(404).json({ error: 'No s\'han trobat armes associades als skins seleccionats' });
+      return res.status(200).json({ missatge: 'No s\'han trobat armes associades als skins seleccionats. No hi ha missions disponibles.' });
     }
 
-    // 3. Per cada arma, buscar missions no completades per tipus missió
+    // 3. Cercar la primera missió no completada per cada arma i tipus
     const tipusMissioSeq = [2, 3, 4];
     let missioFinal = null;
 
-    // Recorrer armes i tipus fins trobar la primera missió no completada
     for (const { arma_id: armaId, nom_arma: nomArma } of armes) {
       for (const tipus of tipusMissioSeq) {
         const [missions] = await connection.execute(`
@@ -465,6 +463,7 @@ exports.getMissionArma = async (req, res) => {
           break;
         }
       }
+
       if (missioFinal) break;
     }
 
@@ -491,6 +490,7 @@ exports.getMissionArma = async (req, res) => {
     res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
   }
 };
+
 
 
 
