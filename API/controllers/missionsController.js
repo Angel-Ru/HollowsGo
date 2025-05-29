@@ -444,16 +444,17 @@ exports.getMissionArma = async (req, res) => {
         WHERE ma.usuari = ? AND ma.arma = ? AND m.tipus_missio = ?
       `, [usuariId, armaId, tipus]);
 
+      console.log(`Missions tipus ${tipus}:`, missions);
+
       if (missions.length === 0) continue;
 
-      // Busquem la primera missió no completada
-      const missioNoCompleta = missions.find(m => m.progres < m.objectiu);
+      // Convertim a números per seguretat
+      const missioNoCompleta = missions.find(m => Number(m.progres) < Number(m.objectiu));
 
       if (missioNoCompleta) {
         missioFinal = missioNoCompleta;
         break;
       } else {
-        // Si totes estan completes, agafem la darrera com a fallback
         missioFinal = missions[missions.length - 1];
       }
     }
@@ -473,6 +474,7 @@ exports.getMissionArma = async (req, res) => {
     res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
   }
 };
+
 
 
 exports.incrementarProgresArma = async (req, res) => {
