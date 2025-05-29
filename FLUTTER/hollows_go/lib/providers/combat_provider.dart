@@ -293,8 +293,7 @@ class CombatProvider with ChangeNotifier {
       _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
       if (_aliatHealth! < 0) _aliatHealth = 0;
 
-      // Aquí registrem l'atac de l'enemic per la ulti Senjumaru
-      registerEnemyAttack();
+      registerEnemyAttack(onVictory: onVictory);
     }
 
     await Future.delayed(const Duration(milliseconds: 600));
