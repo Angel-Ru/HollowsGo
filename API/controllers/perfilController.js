@@ -241,3 +241,51 @@ exports.getTitolsComplets = async (req, res) => {
     res.status(500).json({ error: 'Error intern del servidor' });
   }
 };
+exports.getTitolUsuari = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) {
+    return res.status(400).json({ error: 'Usuari invàlid' });
+  }
+
+  try {
+    const connection = await connectDB();
+
+    // Obtenim el titol_id de PERFIL_USUARI
+    const [rows] = await connection.execute(`
+      SELECT titol
+      FROM PERFIL_USUARI
+      WHERE id = ?
+    `, [usuariId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Usuari no trobat' });
+    }
+
+    const titolId = rows[0].titol;
+
+    if (!titolId) {
+      return res.status(200).json({ missatge: 'L’usuari no té cap títol assignat' });
+    }
+
+    // Opcional: obtenir més info del títol, per exemple el nom
+    const [titolData] = await connection.execute(`
+      SELECT id, nom_titol
+      FROM TITOLS
+      WHERE id = ?
+    `, [titolId]);
+
+    if (titolData.length === 0) {
+      return res.status(404).json({ error: 'Títol no trobat' });
+    }
+
+    res.status(200).json({
+      missatge: 'Títol de l’usuari recuperat correctament',
+      titol: titolData[0]
+    });
+
+  } catch (err) {
+    console.error('Error recuperant títol de l’usuari:', err.message);
+    res.status(500).json({ error: 'Error intern del servidor' });
+  }
+};
+

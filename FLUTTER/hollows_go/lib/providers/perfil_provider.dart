@@ -258,4 +258,42 @@ class PerfilProvider with ChangeNotifier {
   }
 }
 
+Future<Titol?> fetchTitolUsuari(int userId) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("Token no disponible a SharedPreferences");
+      return null;
+    }
+
+    final response = await http.get(
+      Uri.parse('https://${Config.ip}/usuaris/titol/$userId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['titol'] == null) return null;
+
+      return Titol.fromJson(data['titol']);
+    } else if (response.statusCode == 404) {
+      print('Usuari o títol no trobat');
+      return null;
+    } else {
+      print('Error carregant títol usuari: ${response.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Error a fetchTitolUsuari: $e');
+    return null;
+  }
+}
+
+
 }

@@ -12,6 +12,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   int _nivell = 1;
   int _expEmmagatzemada = 0;
   int _expMaxima = 100;
+  String? _titolUsuari; // Nova variable per guardar el títol
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
     perfilProvider.fetchPerfilData(userId);
     _loadAvatar(userId, perfilProvider);
     _loadUserLevel(userId, perfilProvider);
+    _loadTitolUsuari(userId, perfilProvider); // Carregar títol usuari
   }
 
   Future<void> _loadUserLevel(int userId, PerfilProvider perfilProvider) async {
@@ -66,6 +68,19 @@ class _PerfilScreenState extends State<PerfilScreen> {
       }
     } catch (e) {
       print('Error obtenint avatar: $e');
+    }
+  }
+
+  Future<void> _loadTitolUsuari(int userId, PerfilProvider perfilProvider) async {
+    try {
+      final titol = await perfilProvider.fetchTitolUsuari(userId);
+      if (mounted) {
+        setState(() {
+          _titolUsuari = titol?.nomTitol;
+        });
+      }
+    } catch (e) {
+      print('Error obtenint títol usuari: $e');
     }
   }
 
@@ -115,7 +130,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
           _buildBackground(),
           Container(color: Colors.black.withOpacity(0.3)),
 
-          // Coloca el SingleChildScrollView primero
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(top: 80),
@@ -129,7 +143,14 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     expMaxima: _expMaxima,
                   ),
                   SizedBox(height: 20),
-                  PerfilHeader(username: userProvider.username, userId: userProvider.userId,),
+
+                  // Passem el títol a PerfilHeader
+                  PerfilHeader(
+                    username: userProvider.username,
+                    userId: userProvider.userId,
+                    titolUsuari: _titolUsuari,
+                  ),
+
                   SizedBox(height: 30),
                   PerfilStats(
                     partidesJugades: perfilProvider.partidesJugades,
@@ -144,12 +165,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
           ),
 
-          // Luego coloca los botones para que estén por encima
+          // Botons posicionats com abans
           Positioned(
             top: 115,
             right: 16,
             child: GestureDetector(
-              behavior: HitTestBehavior.opaque, // Añade esto
+              behavior: HitTestBehavior.opaque,
               onTap: () => _navigateToSettings(context),
               child: Container(
                 padding: EdgeInsets.all(6),
@@ -177,7 +198,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
             top: 160,
             right: 16,
             child: GestureDetector(
-              behavior: HitTestBehavior.opaque, // Añade esto
+              behavior: HitTestBehavior.opaque,
               onTap: () => _pickImage(context),
               child: Container(
                 padding: EdgeInsets.all(6),
@@ -205,7 +226,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
             top: 205,
             right: 16,
             child: GestureDetector(
-              behavior: HitTestBehavior.opaque, // Añade esto
+              behavior: HitTestBehavior.opaque,
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => AmistatsScreen()),
