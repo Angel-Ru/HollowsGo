@@ -12,7 +12,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
   int _nivell = 1;
   int _expEmmagatzemada = 0;
   int _expMaxima = 100;
-  String? _titolUsuari; // Nova variable per guardar el títol
 
   @override
   void initState() {
@@ -32,25 +31,19 @@ class _PerfilScreenState extends State<PerfilScreen> {
     perfilProvider.fetchPerfilData(userId);
     _loadAvatar(userId, perfilProvider);
     _loadUserLevel(userId, perfilProvider);
-    _loadTitolUsuari(userId, perfilProvider); // Carregar títol usuari
+
+    // Carreguem i guardem el títol dins PerfilProvider (fa notifyListeners)
+    perfilProvider.carregarTitolUsuari(userId);
   }
 
   Future<void> _loadUserLevel(int userId, PerfilProvider perfilProvider) async {
     try {
-      print('Obteniendo datos de experiencia para usuario: $userId');
       final expData = await perfilProvider.getexpuser(userId);
-      print('Datos crudos recibidos: ${expData.toString()}');
-
       if (mounted) {
         setState(() {
           _nivell = expData['nivell'] ?? 1;
           _expEmmagatzemada = expData['exp_emmagatzemada'] ?? 0;
           _expMaxima = expData['exp_max'] ?? 200;
-
-          print('Valores asignados:');
-          print('Nivel: $_nivell');
-          print('Exp almacenada: $_expEmmagatzemada');
-          print('Exp máxima: $_expMaxima');
         });
       }
     } catch (e) {
@@ -68,21 +61,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
       }
     } catch (e) {
       print('Error obtenint avatar: $e');
-    }
-  }
-
-  Future<void> _loadTitolUsuari(int userId, PerfilProvider perfilProvider) async {
-    try {
-      final titol = await perfilProvider.fetchTitolUsuari(userId);
-      if (mounted) {
-        setState(() {
-          _titolUsuari = titol?.nomTitol;
-          print("Títol carregat per l'usuari $userId: ${titol?.nomTitol}");
-
-        });
-      }
-    } catch (e) {
-      print('Error obtenint títol usuari: $e');
     }
   }
 
@@ -116,8 +94,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context, listen: true);
-    final perfilProvider = Provider.of<PerfilProvider>(context, listen: true);
+    final userProvider = Provider.of<UserProvider>(context);
+    final perfilProvider = Provider.of<PerfilProvider>(context);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -137,23 +115,23 @@ class _PerfilScreenState extends State<PerfilScreen> {
               padding: const EdgeInsets.only(top: 80),
               child: Column(
                 children: [
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   PerfilAvatar(
                     imagePath: _imagePath,
                     nivell: _nivell,
                     expEmmagatzemada: _expEmmagatzemada,
                     expMaxima: _expMaxima,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                  // Passem el títol a PerfilHeader
+                  // Ara passem directament el títol guardat dins PerfilProvider
                   PerfilHeader(
                     username: userProvider.username,
                     userId: userProvider.userId,
-                    titolUsuari: _titolUsuari,
+                    
                   ),
 
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                   PerfilStats(
                     partidesJugades: perfilProvider.partidesJugades,
                     partidesGuanyades: perfilProvider.partidesGuanyades,
@@ -167,7 +145,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
             ),
           ),
 
-          // Botons posicionats com abans
+          // Botons posats igual que abans (Settings, Edit Image, Amistats)
           Positioned(
             top: 115,
             right: 16,
@@ -175,7 +153,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               behavior: HitTestBehavior.opaque,
               onTap: () => _navigateToSettings(context),
               child: Container(
-                padding: EdgeInsets.all(6),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
@@ -183,11 +161,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
                       blurRadius: 4,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.settings,
                   size: 20,
                   color: Colors.white,
@@ -203,7 +181,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
               behavior: HitTestBehavior.opaque,
               onTap: () => _pickImage(context),
               child: Container(
-                padding: EdgeInsets.all(6),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
@@ -211,11 +189,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
                       blurRadius: 4,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.edit,
                   size: 20,
                   color: Colors.white,
@@ -234,7 +212,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 MaterialPageRoute(builder: (context) => AmistatsScreen()),
               ),
               child: Container(
-                padding: EdgeInsets.all(6),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
@@ -242,11 +220,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
                       blurRadius: 4,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.person_add_alt_1,
                   size: 20,
                   color: Colors.white,
@@ -261,7 +239,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   Widget _buildBackground() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage('lib/images/Hirako.png'),
           fit: BoxFit.cover,

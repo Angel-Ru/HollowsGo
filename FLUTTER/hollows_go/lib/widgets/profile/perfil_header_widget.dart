@@ -6,13 +6,11 @@ import '../../models/titol.dart';
 class PerfilHeader extends StatelessWidget {
   final String username;
   final int userId;
-  final String? titolUsuari; // Nou camp per passar el nom del títol
 
   const PerfilHeader({
     Key? key,
     required this.username,
     required this.userId,
-    this.titolUsuari,
   }) : super(key: key);
 
   void _mostrarDialegTitols(BuildContext context) async {
@@ -36,7 +34,8 @@ class PerfilHeader extends StatelessWidget {
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.orange.shade300.withOpacity(0.8), width: 1),
+              border: Border.all(
+                  color: Colors.orange.shade300.withOpacity(0.8), width: 1),
             ),
             child: FutureBuilder<List<Titol>>(
               future: perfilProvider.fetchTitolsComplets(userId),
@@ -63,7 +62,8 @@ class PerfilHeader extends StatelessWidget {
                       TextButton(
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.orangeAccent.shade200,
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -116,11 +116,13 @@ class PerfilHeader extends StatelessWidget {
                                 color: Colors.black.withOpacity(0.4),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(color: Colors.orange.shade300, width: 1),
+                                  side: BorderSide(
+                                      color: Colors.orange.shade300, width: 1),
                                 ),
                                 margin: const EdgeInsets.symmetric(vertical: 8),
                                 child: ListTile(
-                                  leading: Icon(Icons.military_tech_sharp, color: Colors.amber.shade300),
+                                  leading: Icon(Icons.military_tech_sharp,
+                                      color: Colors.amber.shade300),
                                   title: Text(
                                     titol.nomTitol,
                                     style: const TextStyle(
@@ -129,6 +131,18 @@ class PerfilHeader extends StatelessWidget {
                                       color: Colors.orange,
                                     ),
                                   ),
+                                  onTap: () async {
+                                    await perfilProvider.actualitzarTitolUsuari(
+                                        userId, titol.id);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              'Títol actualitzat a "${titol.nomTitol}"')),
+                                    );
+
+                                    Navigator.of(context).pop();
+                                  },
                                 ),
                               );
                             },
@@ -138,7 +152,8 @@ class PerfilHeader extends StatelessWidget {
                       TextButton(
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.orangeAccent.shade200,
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -166,6 +181,9 @@ class PerfilHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final perfilProvider = Provider.of<PerfilProvider>(context);
+    final titol = perfilProvider.titolUsuari?.nomTitol ?? 'Sense títol';
+
     return Column(
       children: [
         Text(
@@ -181,7 +199,7 @@ class PerfilHeader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              titolUsuari ?? 'Sense títol',
+              titol,
               style: const TextStyle(
                 color: Colors.white70,
                 fontSize: 16,
