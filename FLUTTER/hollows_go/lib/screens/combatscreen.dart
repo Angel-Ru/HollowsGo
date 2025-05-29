@@ -258,7 +258,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         isBleeding: combatProvider.enemyBleeding,
                         isFrozen: combatProvider.enemyFrozen,
                         showInkEffect: combatProvider.ichibeJustUsedUlti,
-                        threadEffectImages: combatProvider.threadEffectImages,
                       ),
                       Spacer(),
                       CharacterDisplayWidget(
@@ -284,26 +283,6 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                     ],
                   ),
                 ),
-
-                // *** AQUEST ÉS EL CANVI CLAU: MOSTRAR LA TELA DE SENJUMARU ***
-                if (combatProvider.currentTelaAsset.isNotEmpty)
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      ignoring: !combatProvider.showTela,
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
-                        opacity: combatProvider.showTela ? 1.0 : 0.0,
-                        child: Container(
-                          color: Colors.black.withOpacity(0.6),
-                          alignment: Alignment.center,
-                          child: Image.asset(
-                            combatProvider.currentTelaAsset,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),
