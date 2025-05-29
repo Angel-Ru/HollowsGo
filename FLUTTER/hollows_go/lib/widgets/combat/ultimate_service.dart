@@ -277,7 +277,8 @@ class UltimateService {
       case 18:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
-        double originalBrightness = 0.2; // default
+        double originalBrightness = 0.2;
+
         try {
           originalBrightness = await ScreenBrightness().current;
         } catch (e) {
@@ -285,9 +286,20 @@ class UltimateService {
               "No s'ha pogut obtenir la brillantor actual. S'assumeix 0.2");
         }
 
-        try {
-          await ScreenBrightness().setScreenBrightness(0.0);
+        bool shouldRestoreBrightness = true;
 
+        void restoreBrightnessIfNeeded() async {
+          if (shouldRestoreBrightness) {
+            try {
+              await ScreenBrightness().setScreenBrightness(originalBrightness);
+              shouldRestoreBrightness = false;
+            } catch (e) {
+              debugPrint("Error restaurant la brillantor original: $e");
+            }
+          }
+        }
+
+        try {
           await _executeUlti(
             context,
             imageAsset: 'assets/special_attack/tosen/marco_tosen.png',
@@ -295,23 +307,34 @@ class UltimateService {
             videoAsset: 'assets/special_attack/tosen/tosen_vid.mp4',
             damage: 0,
             rotateScreen: false,
-            onDamageApplied: (_) {
+            onDamageApplied: (_) async {
+              try {
+                await ScreenBrightness().setScreenBrightness(0.0); // ara
+              } catch (e) {
+                debugPrint("No s'ha pogut baixar la brillantor: $e");
+              }
+
               combatProvider.buffPlayerAttack(100);
               combatProvider.applyEnemyAttackDebuff(150);
               combatProvider.setOverrideBackground(
                   'assets/special_attack/tosen/fons_negre.png');
             },
-            onEnemyDefeated: onEnemyDefeated,
+            onEnemyDefeated: () {
+              restoreBrightnessIfNeeded();
+              onEnemyDefeated(); // original callback
+            },
+            skipDeathCheck: false,
           );
         } catch (e) {
           debugPrint("Error executant ulti: $e");
-        } finally {
-          try {
-            await ScreenBrightness().setScreenBrightness(originalBrightness);
-          } catch (e) {
-            debugPrint("Error restaurant la brillantor original: $e");
-          }
+          restoreBrightnessIfNeeded();
         }
+
+        // Comprovació de derrota manual
+        if (combatProvider.aliatHealth <= 0) {
+          restoreBrightnessIfNeeded();
+        }
+
         break;
 
       //ULTI AS NODT
