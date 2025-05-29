@@ -84,6 +84,39 @@ class UserProvider with ChangeNotifier {
     fetchUserPoints();
   }
 
+  Future<void> sumarPuntsUsuari(int puntsASumar) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      int? userId =
+          prefs.getInt('userId'); // Assegura’t que guardes aquest ID en login
+
+      if (userId == null || token == null) {
+        print("Usuari o token no disponibles");
+        return;
+      }
+
+      final url = Uri.parse(
+          'https://${Config.ip}/usuaris/punts/comprats/$userId/$puntsASumar');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.put(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        print("Punts afegits correctament");
+        refreshPoints(); // Opcional: refresca el recompte de punts
+      } else {
+        print(
+            "Error al sumar punts: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("Error a sumarPuntsUsuari: $e");
+    }
+  }
+
   Future<void> fetchFavoritePersonatgeSkin() async {
     try {
       final prefs = await SharedPreferences.getInstance();
