@@ -51,14 +51,13 @@ class CombatProvider with ChangeNotifier {
   bool get playerImmune => _playerImmune;
   int get turnsUntilEnemyDies => _turnsUntilEnemyDies;
   bool get senjumaruJustUsedUlti => _senjumaruJustUsedUlti;
+  bool get showTela => currentTelaAsset.isNotEmpty;
 
   // Getter nou per a les imatges
   List<String> get threadEffectImages => _threadEffectImages;
 
   String get currentTelaAsset {
-    if (!_ultiUsed || (!_senjumaruJustUsedUlti && _turnsUntilEnemyDies < 0)) {
-      return '';
-    }
+    if (!_senjumaruJustUsedUlti && _turnsUntilEnemyDies < 0) return '';
 
     switch (_turnsUntilEnemyDies) {
       case 3:
@@ -170,28 +169,26 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void clearDoomEffect() {
+    _turnsUntilEnemyDies = -1;
+    notifyListeners();
+  }
+
   Future<void> decrementDoomCounter({VoidCallback? onEnemyDefeated}) async {
     if (_turnsUntilEnemyDies > 0) {
       _turnsUntilEnemyDies--;
       notifyListeners();
 
       if (_turnsUntilEnemyDies == 0) {
-        await Future.delayed(const Duration(milliseconds: 600)); // Pausa visual
+        await Future.delayed(const Duration(milliseconds: 600));
         setEnemyHealth(0);
         clearDoomEffect();
-        _enemyBleeding = false; // Atura bleed
-        _isAttackInProgress = false; // Desbloqueja
+        _enemyBleeding = false;
+        _isAttackInProgress = false;
         notifyListeners();
-        if (onEnemyDefeated != null) {
-          onEnemyDefeated();
-        }
+        if (onEnemyDefeated != null) onEnemyDefeated();
       }
     }
-  }
-
-  void clearDoomEffect() {
-    _turnsUntilEnemyDies = -1;
-    notifyListeners();
   }
 
   Map<String, dynamic> ichibeUltimateEffect({
@@ -254,7 +251,7 @@ class CombatProvider with ChangeNotifier {
   void triggerSenjumaruUltiEffect() {
     _senjumaruJustUsedUlti = true;
     setUltiUsed(true);
-    applyDoomEffect();
+    applyDoomEffect(); // Comptador doom = 3
     notifyListeners();
 
     Future.delayed(const Duration(seconds: 1), () {
