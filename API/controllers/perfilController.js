@@ -290,3 +290,48 @@ exports.getTitolUsuari = async (req, res) => {
   }
 };
 
+exports.actualitzarTitolUsuari = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  const { titolId } = req.body;
+
+  if (!usuariId || !titolId) {
+    return res.status(400).json({ error: 'Usuari o títol invàlid' });
+  }
+
+  try {
+    const connection = await connectDB();
+
+    // Comprovar que l'usuari existeix
+    const [usuariRows] = await connection.execute(`
+      SELECT * FROM PERFIL_USUARI WHERE usuari = ?
+    `, [usuariId]);
+
+    if (usuariRows.length === 0) {
+      return res.status(404).json({ error: 'Usuari no trobat' });
+    }
+
+    // Comprovar que el títol existeix
+    const [titolRows] = await connection.execute(`
+      SELECT * FROM TITOLS WHERE id = ?
+    `, [titolId]);
+
+    if (titolRows.length === 0) {
+      return res.status(404).json({ error: 'Títol no trobat' });
+    }
+
+    // Actualitzar només el títol
+    await connection.execute(`
+      UPDATE PERFIL_USUARI
+      SET titol = ?
+      WHERE usuari = ?
+    `, [titolId, usuariId]);
+
+    res.status(200).json({ missatge: 'Títol actualitzat correctament' });
+
+  } catch (err) {
+    console.error('Error al patch del títol:', err.message);
+    res.status(500).json({ error: 'Error intern del servidor' });
+  }
+};
+
+
