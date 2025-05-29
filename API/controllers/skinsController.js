@@ -2139,7 +2139,7 @@ exports.getSkinSeleccionada = async (req, res) => {
 
     // Obtenir el mal i nom de l'atac
     const [ataque] = await connection.execute(`
-      SELECT mal AS mal_atac, nom AS atac_nom, buff_atac AS atac_buff
+      SELECT mal AS mal_atac, nom AS atac_nom
       FROM ATACS
       WHERE id = ?
       LIMIT 1
@@ -2147,7 +2147,7 @@ exports.getSkinSeleccionada = async (req, res) => {
 
     const malAtac = ataque.length > 0 ? ataque[0].mal_atac : 0;
     const atacNom = ataque.length > 0 ? ataque[0].atac_nom : null;
-    const atacBuff = ataque.length > 0 ? ataque[0].atac_buff : 0;
+    
 
     // Obtenir l'arma equipada (pot no existir)
     const [armaEquip] = await connection.execute(`
@@ -2164,9 +2164,8 @@ exports.getSkinSeleccionada = async (req, res) => {
     // Calcula mal_total sumant mal_base_personatge, mal_arma (si hi ha) i mal_atac + buff
     const malTotal = (skinSeleccionada.mal_base_personatge || 0) +
                      malArma +
-                     malAtac +
-                     (atacBuff || 0);
-
+                     malAtac;
+                     
     // Vida: si hi ha vida_actual, la utilitza, sinó la vida base del personatge
     const vidaActual = (skinSeleccionada.vida_actual !== null && skinSeleccionada.vida_actual !== undefined)
                       ? skinSeleccionada.vida_actual

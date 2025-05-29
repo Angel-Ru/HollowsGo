@@ -166,7 +166,7 @@ class CombatProvider with ChangeNotifier {
   }
 
   void applyDoomEffect() {
-    _turnsUntilEnemyDies = 3;
+    _turnsUntilEnemyDies = 2;
     notifyListeners();
   }
 
