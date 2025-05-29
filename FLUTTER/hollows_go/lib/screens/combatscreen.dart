@@ -249,7 +249,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                       CharacterDisplayWidget(
                         imageUrl: skins.enemic?.imatge ??
                             'lib/images/combatscreen_images/aizen_combat.png',
-                        name: combatProvider.enemyName, // ✅ Ús del nom correcte
+                        name: combatProvider.enemyName,
                         health: combatProvider.enemicHealth,
                         maxHealth: combatProvider.enemyMaxHealth.toInt(),
                         isHit: combatProvider.isEnemyHit,
@@ -258,6 +258,10 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         isBleeding: combatProvider.enemyBleeding,
                         isFrozen: combatProvider.enemyFrozen,
                         showInkEffect: combatProvider.ichibeJustUsedUlti,
+                        showSenjumaruEffect:
+                            combatProvider.senjumaruEffectActive,
+                        senjumaruAttackCount:
+                            combatProvider.senjumaruAttackCount,
                       ),
                       Spacer(),
                       CharacterDisplayWidget(
