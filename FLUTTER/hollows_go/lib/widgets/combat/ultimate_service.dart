@@ -194,12 +194,11 @@ class UltimateService {
           damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) async {
-            // Activem tota la lògica de la ulti amb flags i doom comptador
             combatProvider.triggerSenjumaruUltiEffect();
             debugPrint("[ULTI SENJUMARU] 🔮 Doom activat per a 3 torns");
           },
           onEnemyDefeated: () {
-            // La mort es gestiona quan el comptador arriba a zero, no aquí.
+            // Mort gestionada al final comptador
           },
           skipDeathCheck: true,
         );
