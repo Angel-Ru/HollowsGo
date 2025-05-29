@@ -51,8 +51,17 @@ class _PaypalPaymentScreenState extends State<PaypalPaymentScreen> {
         }
       ],
       note: "Contacta amb nosaltres per qualsevol dubte.",
-      onSuccess: (params) {
+      onSuccess: (params) async {
         print("✅ Compra completada: $params");
+        final monedes = int.tryParse(widget.itemName.split(" ").first);
+        print(monedes);
+
+        if (!mounted) return;
+
+        if (monedes != null) {
+          await Provider.of<UserProvider>(context, listen: false)
+              .sumarPuntsUsuari(monedes);
+        }
         if (mounted) {
           Navigator.of(context)
               .pop(TendaScreen()); // tornar a la pantalla anterior
