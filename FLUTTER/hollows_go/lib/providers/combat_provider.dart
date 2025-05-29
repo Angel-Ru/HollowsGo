@@ -128,22 +128,23 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void registerEnemyAttack() {
+  void registerEnemyAttack({VoidCallback? onVictory}) {
     if (_senjumaruEffectActive) {
       _senjumaruAttackCount++;
-
-      notifyListeners(); // per actualitzar el widget visualment
-
+      notifyListeners();
       if (_senjumaruAttackCount >= 2) {
         _senjumaruEffectActive = false;
-        killEnemy();
+        killEnemy(onVictory: onVictory);
       }
     }
   }
 
-  void killEnemy() {
+  void killEnemy({VoidCallback? onVictory}) {
     _enemicHealth = 0;
     notifyListeners();
+    if (onVictory != null) {
+      onVictory();
+    }
   }
 
   Map<String, dynamic> ichibeUltimateEffect({
