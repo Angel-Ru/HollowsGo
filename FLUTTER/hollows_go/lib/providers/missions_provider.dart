@@ -129,27 +129,37 @@ class MissionsProvider with ChangeNotifier {
 }
 
 Future<void> fetchMissioArma(int usuariId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token') ?? '';
 
-    final url = Uri.parse('https://${Config.ip}/missions/arma/$usuariId');
+  final url = Uri.parse('https://${Config.ip}/missions/arma/$usuariId');
 
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      _missioArma = MissionArma.fromJson(data);
-      notifyListeners();
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    if (data.containsKey('missio')) {
+      // Tenim la missió dins 'missio'
+      _missioArma = MissionArma.fromJson(data['missio']);
     } else {
-      throw Exception('Error carregant missió de títol');
+      
+      _missioArma = null;
+      debugPrint('Missió arma no disponible: ${data['missatge']}');
     }
+
+    notifyListeners();
+  } else {
+    throw Exception('Error carregant missió d\'arma');
   }
+}
+
 Future<void> incrementarProgresMissioArma(int usuariId) async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
