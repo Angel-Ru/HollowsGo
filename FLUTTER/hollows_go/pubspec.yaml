@@ -173,6 +173,8 @@ flutter:
     - assets/special_attack/senjumaru/senjumaru_vid.mp4
     - assets/special_attack/senjumaru/senjumaru_aud.mp3
     - assets/special_attack/senjumaru/marco_senjumaru.png
+    - assets/special_attack/senjumaru/tela_1.png
+    - assets/special_attack/senjumaru/tela_2.png
     - assets/special_attack/ichigo/marco_ichigo.png
     - assets/special_attack/ichigo/ichigo_vid.mp4
     - assets/special_attack/ichigo/ichigo_aud.mp3

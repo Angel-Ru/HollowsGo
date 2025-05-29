@@ -19,6 +19,7 @@ class CombatProvider with ChangeNotifier {
   bool _enemyBleeding = false;
   bool _ichibeJustUsedUlti = false;
   bool _playerImmune = false;
+  bool _senjumaruJustUsedUlti = false;
 
   int _bleedTick = 0;
   int _bonusAllyDamage = 0;
@@ -46,6 +47,15 @@ class CombatProvider with ChangeNotifier {
   String? get overrideBackground => _overrideBackground;
   bool get playerImmune => _playerImmune;
   int get turnsUntilEnemyDies => _turnsUntilEnemyDies;
+  bool get senjumaruJustUsedUlti => _senjumaruJustUsedUlti;
+  String get currentTelaAsset {
+    if (_turnsUntilEnemyDies == 3 || _turnsUntilEnemyDies == 1) {
+      return 'assets/special_attack/senjumaru/tela_1.png';
+    } else if (_turnsUntilEnemyDies == 2) {
+      return 'assets/special_attack/senjumaru/tela_2.png';
+    }
+    return '';
+  }
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -210,6 +220,16 @@ class CombatProvider with ChangeNotifier {
         onEnemyDefeated();
       }
     }
+  }
+
+  void triggerSenjumaruUltiEffect() {
+    _senjumaruJustUsedUlti = true;
+    notifyListeners();
+
+    Future.delayed(const Duration(seconds: 1), () {
+      _senjumaruJustUsedUlti = false;
+      notifyListeners();
+    });
   }
 
   void checkVictory(VoidCallback onVictory) {

@@ -23,6 +23,7 @@ class CharacterDisplayWidget extends StatefulWidget {
   final bool isImmune;
 
   final bool showInkEffect;
+  final bool showThreadEffect; // <-- AFEGIT
 
   const CharacterDisplayWidget({
     required this.imageUrl,
@@ -39,6 +40,7 @@ class CharacterDisplayWidget extends StatefulWidget {
     this.isFrozen = false,
     this.isImmune = false,
     this.showInkEffect = false,
+    this.showThreadEffect = false, // <-- AFEGIT
     Key? key,
   }) : super(key: key);
 
@@ -168,6 +170,16 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                     fit: BoxFit.cover,
                     width: containerSize,
                     height: containerSize,
+                  ),
+                ),
+              // SENJUMARU THREAD EFFECT AFEGIT
+              if (widget.showThreadEffect)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Image.asset(
+                      'assets/special_attack/senjumaru/fils_tela.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
             ],

@@ -258,6 +258,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         isBleeding: combatProvider.enemyBleeding,
                         isFrozen: combatProvider.enemyFrozen,
                         showInkEffect: combatProvider.ichibeJustUsedUlti,
+                        showThreadEffect: combatProvider.senjumaruJustUsedUlti,
                       ),
                       Spacer(),
                       CharacterDisplayWidget(
@@ -265,7 +266,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                             'lib/images/combatscreen_images/bleach_combat.png',
                         name: allyName,
                         health: combatProvider.aliatHealth,
-                        maxHealth: skins.aliat.vidaMaxima ,
+                        maxHealth: skins.aliat.vidaMaxima,
                         isHit: combatProvider.isAllyHit,
                         buffAmount: combatProvider.bonusAllyDamage,
                         isImmune: combatProvider.playerImmune,
