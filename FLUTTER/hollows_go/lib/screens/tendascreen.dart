@@ -199,9 +199,9 @@ class _TendaScreenState extends State<TendaScreen> {
           ),
           SizedBox(height: 30),
           _monedaOption("100 monedes", "0,99 €"),
-          _monedaOption("550 monedes", "4,49 €"),
-          _monedaOption("1200 monedes", "9,99 €"),
-          _monedaOption("2500 monedes", "19,99 €"),
+          _monedaOption("500 monedes", "4,49 €"),
+          _monedaOption("1000 monedes", "7,99 €"),
+          _monedaOption("1500 monedes", "14,99 €"),
         ],
       ),
     );
