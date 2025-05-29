@@ -18,4 +18,6 @@ router.get('/exp/:userId', verificacioUsuari.verifyToken, perfilController.getal
 
 router.get('/titols/:usuariId', verificacioUsuari.verifyToken, perfilController.getTitolsComplets)
 
+router.get('/titol/:usuariId', perfilController.getTitolUsuari)
+
 module.exports = router;
