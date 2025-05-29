@@ -269,7 +269,7 @@ Future<Titol?> fetchTitolUsuari(int userId) async {
     }
 
     final response = await http.get(
-      Uri.parse('https://${Config.ip}/usuaris/titol/$userId'),
+      Uri.parse('https://${Config.ip}/perfils/titol/$userId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
