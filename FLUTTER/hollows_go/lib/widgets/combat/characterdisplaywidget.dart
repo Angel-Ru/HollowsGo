@@ -24,8 +24,6 @@ class CharacterDisplayWidget extends StatefulWidget {
 
   final bool showInkEffect;
 
-  final List<String> threadEffectImages;
-
   const CharacterDisplayWidget({
     required this.imageUrl,
     required this.name,
@@ -41,7 +39,6 @@ class CharacterDisplayWidget extends StatefulWidget {
     this.isFrozen = false,
     this.isImmune = false,
     this.showInkEffect = false,
-    this.threadEffectImages = const [],
     Key? key,
   }) : super(key: key);
 
@@ -56,6 +53,7 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
   @override
   void didUpdateWidget(CharacterDisplayWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (widget.showInkEffect && !oldWidget.showInkEffect) {
       _startInkAnimation();
     }
@@ -124,7 +122,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Fons amb blur
               Transform.scale(
                 scale: scaleFactor,
                 child: ImageFiltered(
@@ -143,7 +140,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                   ),
                 ),
               ),
-              // Imatge principal
               Transform.scale(
                 scale: scaleFactor,
                 child: AnimatedOpacity(
@@ -162,7 +158,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                   ),
                 ),
               ),
-              // Efecte de tinta
               if (widget.isEnemy)
                 AnimatedOpacity(
                   opacity: _opacity,
@@ -173,18 +168,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                     fit: BoxFit.cover,
                     width: containerSize,
                     height: containerSize,
-                  ),
-                ),
-              // Teles aplicades a l'enemic
-              if (widget.threadEffectImages.isNotEmpty)
-                ...widget.threadEffectImages.map(
-                  (imagePath) => Positioned.fill(
-                    child: IgnorePointer(
-                      child: Image.asset(
-                        imagePath,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
                   ),
                 ),
             ],
@@ -202,6 +185,7 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (widget.isEnemy) ...[
                     if (widget.debuffAmount > 0) ...[

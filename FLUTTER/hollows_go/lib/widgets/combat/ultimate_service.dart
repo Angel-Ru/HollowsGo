@@ -194,7 +194,6 @@ class UltimateService {
           damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) async {
-            combatProvider.triggerSenjumaruUltiEffect();
             debugPrint("[ULTI SENJUMARU] 🔮 Doom activat per a 3 torns");
           },
           onEnemyDefeated: () {

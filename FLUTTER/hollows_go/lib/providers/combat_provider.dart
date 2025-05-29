@@ -19,18 +19,13 @@ class CombatProvider with ChangeNotifier {
   bool _enemyBleeding = false;
   bool _ichibeJustUsedUlti = false;
   bool _playerImmune = false;
-  bool _senjumaruJustUsedUlti = false;
 
   int _bleedTick = 0;
   int _bonusAllyDamage = 0;
   int _enemyAttackDebuff = 0;
-  int _turnsUntilEnemyDies = -1;
 
   String _enemyName = "Enemic";
   String? _overrideBackground;
-
-  // Nova propietat per a les imatges dels efectes
-  List<String> _threadEffectImages = [];
 
   // GETTERS
   double get aliatHealth => _aliatHealth ?? 0.0;
@@ -49,25 +44,6 @@ class CombatProvider with ChangeNotifier {
   bool get ichibeJustUsedUlti => _ichibeJustUsedUlti;
   String? get overrideBackground => _overrideBackground;
   bool get playerImmune => _playerImmune;
-  int get turnsUntilEnemyDies => _turnsUntilEnemyDies;
-  bool get senjumaruJustUsedUlti => _senjumaruJustUsedUlti;
-  bool get showTela => currentTelaAsset.isNotEmpty;
-
-  // Getter nou per a les imatges
-  List<String> get threadEffectImages => _threadEffectImages;
-
-  String get currentTelaAsset {
-    if (!_senjumaruJustUsedUlti && _turnsUntilEnemyDies < 0) return '';
-
-    switch (_turnsUntilEnemyDies) {
-      case 3:
-        return 'assets/special_attack/senjumaru/tela_1.png';
-      case 2:
-        return 'assets/special_attack/senjumaru/tela_2.png';
-      default:
-        return '';
-    }
-  }
 
   // SETTERS
   void setAllyHealth(double value) {
@@ -118,22 +94,6 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Noves funcions per a les imatges threadEffectImages
-  void setThreadEffectImages(List<String> newImages) {
-    _threadEffectImages = newImages;
-    notifyListeners();
-  }
-
-  void addThreadEffectImage(String imagePath) {
-    _threadEffectImages.add(imagePath);
-    notifyListeners();
-  }
-
-  void clearThreadEffectImages() {
-    _threadEffectImages.clear();
-    notifyListeners();
-  }
-
   void healPlayer(int amount, int maxHealth) {
     _aliatHealth = (_aliatHealth ?? 0) + amount;
     if (_aliatHealth! > maxHealth) _aliatHealth = maxHealth.toDouble();
@@ -155,40 +115,6 @@ class CombatProvider with ChangeNotifier {
     _enemyBleeding = true;
     _bleedTick = 0;
     notifyListeners();
-  }
-
-  void processTurn({VoidCallback? onEnemyDefeated}) {
-    if (_turnsUntilEnemyDies > 0) {
-      decrementDoomCounter(onEnemyDefeated: onEnemyDefeated);
-    }
-    notifyListeners();
-  }
-
-  void applyDoomEffect() {
-    _turnsUntilEnemyDies = 2;
-    notifyListeners();
-  }
-
-  void clearDoomEffect() {
-    _turnsUntilEnemyDies = -1;
-    notifyListeners();
-  }
-
-  Future<void> decrementDoomCounter({VoidCallback? onEnemyDefeated}) async {
-    if (_turnsUntilEnemyDies > 0) {
-      _turnsUntilEnemyDies--;
-      notifyListeners();
-
-      if (_turnsUntilEnemyDies == 0) {
-        await Future.delayed(const Duration(milliseconds: 600));
-        setEnemyHealth(0);
-        clearDoomEffect();
-        _enemyBleeding = false;
-        _isAttackInProgress = false;
-        notifyListeners();
-        if (onEnemyDefeated != null) onEnemyDefeated();
-      }
-    }
   }
 
   Map<String, dynamic> ichibeUltimateEffect({
@@ -239,8 +165,7 @@ class CombatProvider with ChangeNotifier {
 
     if (_enemicHealth == 0) {
       _enemyBleeding = false;
-      clearDoomEffect();
-      _isAttackInProgress = false; // Evitem bloqueig
+      _isAttackInProgress = false;
       notifyListeners();
       if (onEnemyDefeated != null) {
         onEnemyDefeated();
@@ -248,21 +173,8 @@ class CombatProvider with ChangeNotifier {
     }
   }
 
-  void triggerSenjumaruUltiEffect() {
-    _senjumaruJustUsedUlti = true;
-    setUltiUsed(true);
-    applyDoomEffect(); // Comptador doom = 3
-    notifyListeners();
-
-    Future.delayed(const Duration(seconds: 1), () {
-      _senjumaruJustUsedUlti = false;
-      notifyListeners();
-    });
-  }
-
   void checkVictory(VoidCallback onVictory) {
     if (_enemicHealth <= 0) {
-      clearDoomEffect();
       onVictory();
     }
   }
@@ -285,8 +197,6 @@ class CombatProvider with ChangeNotifier {
     _enemyBleeding = false;
     _bleedTick = 0;
     _overrideBackground = null;
-    clearDoomEffect();
-    clearThreadEffectImages(); // també netegem les imatges
     notifyListeners();
   }
 
@@ -314,7 +224,6 @@ class CombatProvider with ChangeNotifier {
       notifyListeners();
 
       if (_enemicHealth <= 0) {
-        clearDoomEffect();
         _enemyBleeding = false;
         _isAttackInProgress = false;
         await updateSkinVidaActual(
@@ -329,9 +238,6 @@ class CombatProvider with ChangeNotifier {
       // Atac enemic
       await _performEnemyAttack(enemyDamage, skinId, onDefeat,
           onVictory: onVictory);
-
-      // Aplicar Doom després d’atac enemic
-      decrementDoomCounter(onEnemyDefeated: onVictory);
     }
   }
 
@@ -374,9 +280,6 @@ class CombatProvider with ChangeNotifier {
       await updateSkinVidaActual(skinId: skinId, vidaActual: _aliatHealth!);
       onDefeat();
     }
-
-    // Executa Doom després
-    decrementDoomCounter(onEnemyDefeated: onVictory);
   }
 
   Future<void> updateSkinVidaActual({
