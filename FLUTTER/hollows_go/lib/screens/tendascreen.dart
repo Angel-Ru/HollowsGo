@@ -208,9 +208,10 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   Widget _monedaOption(String title, String priceDisplay) {
-    // Extraure el valor numèric del preu (ex: "0,99 €" → "0.99")
     final priceValue =
         priceDisplay.replaceAll('€', '').replaceAll(',', '.').trim();
+
+    final puntsComprats = int.tryParse(title.split(' ').first) ?? 0;
 
     return Card(
       color: Colors.white.withOpacity(0.85),
@@ -227,6 +228,7 @@ class _TendaScreenState extends State<TendaScreen> {
               builder: (context) => PaypalPaymentScreen(
                 totalAmount: priceValue,
                 itemName: title,
+                puntsComprats: puntsComprats,
               ),
             ),
           );
@@ -234,4 +236,5 @@ class _TendaScreenState extends State<TendaScreen> {
       ),
     );
   }
+  // Aquí pots afegir més opcions de compra de monedes si cal
 }
