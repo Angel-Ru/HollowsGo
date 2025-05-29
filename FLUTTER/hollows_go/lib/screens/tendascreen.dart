@@ -195,6 +195,13 @@ class _TendaScreenState extends State<TendaScreen> {
               fontSize: 28,
               color: Colors.white,
               fontWeight: FontWeight.bold,
+              shadows: [
+                Shadow(
+                  offset: Offset(2, 2),
+                  blurRadius: 4.0,
+                  color: Colors.black.withOpacity(0.7),
+                ),
+              ],
             ),
           ),
           SizedBox(height: 30),
