@@ -37,9 +37,10 @@ class UltimateService {
           imageAsset: 'assets/special_attack/shinji/marco_shinji.png',
           audioAsset: 'special_attack/shinji/shinji_aud.mp3',
           videoAsset: 'assets/special_attack/shinji/shinji_vid.mp4',
-          damage: 200,
+          damage: 0,
           rotateScreen: true,
           onDamageApplied: (_) {
+            onDamageApplied(200);
             combatProvider.applyEnemyAttackDebuff(100);
           },
           onEnemyDefeated: onEnemyDefeated,
@@ -201,12 +202,13 @@ class UltimateService {
           imageAsset: 'assets/special_attack/aizen/marco_aizen.png',
           audioAsset: 'special_attack/aizen/aizen_aud.mp3',
           videoAsset: 'assets/special_attack/aizen/aizen_vid.mp4',
-          damage: 400,
+          damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) {
             final combatProvider =
                 Provider.of<CombatProvider>(context, listen: false);
             combatProvider.applyEnemyAttackDebuff(100);
+            onDamageApplied(400);
           },
           onEnemyDefeated: onEnemyDefeated,
         );

@@ -129,7 +129,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     expMaxima: _expMaxima,
                   ),
                   SizedBox(height: 20),
-                  PerfilHeader(username: userProvider.username),
+                  PerfilHeader(username: userProvider.username, userId: userProvider.userId,),
                   SizedBox(height: 30),
                   PerfilStats(
                     partidesJugades: perfilProvider.partidesJugades,
