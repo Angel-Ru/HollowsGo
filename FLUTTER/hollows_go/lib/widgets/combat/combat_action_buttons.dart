@@ -65,7 +65,7 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
       ),
       child: Row(
         children: [
-          // Botón LLUITA con Tooltip al mantener pulsado
+          // Botó LLUITA amb Tooltip
           Expanded(
             flex: 3,
             child: Tooltip(
@@ -101,56 +101,65 @@ class _CombatActionButtonsState extends State<CombatActionButtons> {
           ),
           const SizedBox(width: 10),
 
-          // Botón ULTI
+          // Botó ULTI amb Tooltip personalitzat
           Expanded(
             flex: 1,
-            child: Container(
-              height: 60,
-              decoration: BoxDecoration(
-                color: !hasUltimate
-                    ? Colors.blueGrey
-                    : ultiUsed
-                        ? Colors.grey
-                        : Colors.yellow,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 5,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: IconButton(
-                icon: Icon(
-                  hasUltimate ? Icons.auto_awesome : Icons.lock,
-                  color:
-                      ultiUsed || !hasUltimate ? Colors.black54 : Colors.white,
+            child: Tooltip(
+              message: hasUltimate
+                  ? habilitat!.efecte
+                  : 'No té habilitat llegendària',
+              waitDuration: const Duration(milliseconds: 500),
+              preferBelow: false,
+              child: Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  color: !hasUltimate
+                      ? Colors.blueGrey
+                      : ultiUsed
+                          ? Colors.grey
+                          : Colors.yellow,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                    ),
+                  ],
                 ),
-                onPressed: (!canAct || ultiUsed || !hasUltimate)
-                    ? null
-                    : () async {
-                        widget.combatProvider.setUltiUsed(true);
+                child: IconButton(
+                  icon: Icon(
+                    hasUltimate ? Icons.auto_awesome : Icons.lock,
+                    color: ultiUsed || !hasUltimate
+                        ? Colors.black54
+                        : Colors.white,
+                  ),
+                  onPressed: (!canAct || ultiUsed || !hasUltimate)
+                      ? null
+                      : () async {
+                          widget.combatProvider.setUltiUsed(true);
 
-                        await UltimateService().executeUltimateForSkin(
-                          context: context,
-                          onDamageApplied: (damageDealt) async {
-                            final newHealth =
-                                widget.combatProvider.enemicHealth -
-                                    damageDealt;
-                            widget.combatProvider.setEnemyHealth(newHealth);
+                          await UltimateService().executeUltimateForSkin(
+                            context: context,
+                            onDamageApplied: (damageDealt) async {
+                              final newHealth =
+                                  widget.combatProvider.enemicHealth -
+                                      damageDealt;
+                              widget.combatProvider.setEnemyHealth(newHealth);
 
-                            if (newHealth <= 0) {
-                              await widget.combatProvider.updateSkinVidaActual(
-                                skinId: widget.skinId,
-                                vidaActual: widget.combatProvider.aliatHealth,
-                              );
-                              await _handleVictory();
-                            }
-                          },
-                          onEnemyDefeated: _handleVictory,
-                        );
-                      },
+                              if (newHealth <= 0) {
+                                await widget.combatProvider
+                                    .updateSkinVidaActual(
+                                  skinId: widget.skinId,
+                                  vidaActual: widget.combatProvider.aliatHealth,
+                                );
+                                await _handleVictory();
+                              }
+                            },
+                            onEnemyDefeated: _handleVictory,
+                          );
+                        },
+                ),
               ),
             ),
           ),
