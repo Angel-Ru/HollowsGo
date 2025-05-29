@@ -1,14 +1,18 @@
 import '../../imports.dart';
 import 'package:flutter_paypal/flutter_paypal.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class PaypalPaymentScreen extends StatefulWidget {
   final String totalAmount;
   final String itemName;
+  final int puntsComprats;
 
   const PaypalPaymentScreen({
     Key? key,
     required this.totalAmount,
     required this.itemName,
+    required this.puntsComprats,
   }) : super(key: key);
 
   @override
@@ -16,6 +20,39 @@ class PaypalPaymentScreen extends StatefulWidget {
 }
 
 class _PaypalPaymentScreenState extends State<PaypalPaymentScreen> {
+  Future<void> sumarPuntsUsuari(int puntsASumar) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      int? userId = prefs.getInt('userId');
+
+      if (userId == null || token == null) {
+        print("Usuari o token no disponibles");
+        return;
+      }
+
+      final url = Uri.parse(
+          'https://${Config.ip}/usuaris/punts/comprats/$userId/$puntsASumar');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.put(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        print("Punts afegits correctament");
+        // Si tens un mètode per refrescar punts, el pots cridar aquí.
+        // refreshPoints();
+      } else {
+        print(
+            "Error al sumar punts: ${response.statusCode} - ${response.body}");
+      }
+    } catch (e) {
+      print("Error a sumarPuntsUsuari: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return UsePaypal(
@@ -53,18 +90,13 @@ class _PaypalPaymentScreenState extends State<PaypalPaymentScreen> {
       note: "Contacta amb nosaltres per qualsevol dubte.",
       onSuccess: (params) async {
         print("✅ Compra completada: $params");
-        final monedes = int.tryParse(widget.itemName.split(" ").first);
-        print(monedes);
 
-        if (!mounted) return;
+        await sumarPuntsUsuari(widget.puntsComprats);
 
-        if (monedes != null) {
-          await Provider.of<UserProvider>(context, listen: false)
-              .sumarPuntsUsuari(monedes);
-        }
         if (mounted) {
-          Navigator.of(context)
-              .pop(TendaScreen()); // tornar a la pantalla anterior
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => TendaScreen()),
+          );
         }
       },
       onError: (error) {
