@@ -24,6 +24,10 @@ class CharacterDisplayWidget extends StatefulWidget {
 
   final bool showInkEffect;
 
+  // NOVES PROPIETATS per Senjumaru
+  final bool showSenjumaruEffect;
+  final int senjumaruAttackCount;
+
   const CharacterDisplayWidget({
     required this.imageUrl,
     required this.name,
@@ -39,6 +43,8 @@ class CharacterDisplayWidget extends StatefulWidget {
     this.isFrozen = false,
     this.isImmune = false,
     this.showInkEffect = false,
+    this.showSenjumaruEffect = false, // per defecte false
+    this.senjumaruAttackCount = 0, // per defecte 0
     Key? key,
   }) : super(key: key);
 
@@ -159,6 +165,7 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                 ),
               ),
               if (widget.isEnemy) ...[
+                // Efecte tinta Ichibe
                 AnimatedOpacity(
                   opacity: _opacity,
                   duration: const Duration(milliseconds: 500),
@@ -170,29 +177,22 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                     height: containerSize,
                   ),
                 ),
-                Consumer<CombatProvider>(
-                  builder: (context, combatProvider, _) {
-                    if (!combatProvider.senjumaruEffectActive)
-                      return const SizedBox.shrink();
 
-                    final String effectAsset =
-                        combatProvider.senjumaruAttackCount == 0
-                            ? 'assets/special_attack/senjumaru/tela_1.png'
-                            : 'assets/special_attack/senjumaru/tela_2.png';
-
-                    return AnimatedOpacity(
-                      opacity: 1.0,
-                      duration: const Duration(milliseconds: 800),
-                      curve: Curves.easeIn,
-                      child: Image.asset(
-                        effectAsset,
-                        fit: BoxFit.cover,
-                        width: containerSize,
-                        height: containerSize,
-                      ),
-                    );
-                  },
-                ),
+                // Efecte tela Senjumaru
+                if (widget.showSenjumaruEffect)
+                  AnimatedOpacity(
+                    opacity: 1.0,
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeIn,
+                    child: Image.asset(
+                      widget.senjumaruAttackCount == 0
+                          ? 'assets/special_attack/senjumaru/tela_1.png'
+                          : 'assets/special_attack/senjumaru/tela_2.png',
+                      fit: BoxFit.cover,
+                      width: containerSize,
+                      height: containerSize,
+                    ),
+                  ),
               ],
             ],
           ),

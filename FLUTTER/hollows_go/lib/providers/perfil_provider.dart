@@ -1,3 +1,4 @@
+import 'package:hollows_go/models/titol.dart';
 import 'package:http/http.dart' as http;
 import '../imports.dart';
 
@@ -221,4 +222,39 @@ class PerfilProvider with ChangeNotifier {
       throw e;
     }
   }
+  Future<List<Titol>> fetchTitolsComplets(int userId) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (token == null) {
+      print("Token no disponible a SharedPreferences");
+      return [];
+    }
+
+    final response = await http.get(
+      Uri.parse('https://${Config.ip}/missions/titols/$userId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final titolsJson = data['titols'] as List<dynamic>?;
+
+      if (titolsJson == null) return [];
+
+      return titolsJson.map((e) => Titol.fromJson(e)).toList();
+    } else {
+      print('Error carregant títols completats: ${response.body}');
+      return [];
+    }
+  } catch (e) {
+    print('Error a fetchTitolsComplets: $e');
+    return [];
+  }
+}
+
 }
