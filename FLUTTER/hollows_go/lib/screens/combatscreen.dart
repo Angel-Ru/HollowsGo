@@ -258,7 +258,10 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         isBleeding: combatProvider.enemyBleeding,
                         isFrozen: combatProvider.enemyFrozen,
                         showInkEffect: combatProvider.ichibeJustUsedUlti,
-                        showThreadEffect: combatProvider.senjumaruJustUsedUlti,
+                        threadEffectImages: [
+                          'assets/special_attack/senjumaru/tela_1.png',
+                          'assets/special_attack/senjumaru/tela_2.png',
+                        ],
                       ),
                       Spacer(),
                       CharacterDisplayWidget(

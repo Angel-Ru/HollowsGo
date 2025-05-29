@@ -23,7 +23,8 @@ class CharacterDisplayWidget extends StatefulWidget {
   final bool isImmune;
 
   final bool showInkEffect;
-  final bool showThreadEffect; // <-- AFEGIT
+
+  final List<String> threadEffectImages; // <-- NOVA PROPIETAT
 
   const CharacterDisplayWidget({
     required this.imageUrl,
@@ -40,7 +41,7 @@ class CharacterDisplayWidget extends StatefulWidget {
     this.isFrozen = false,
     this.isImmune = false,
     this.showInkEffect = false,
-    this.showThreadEffect = false, // <-- AFEGIT
+    this.threadEffectImages = const [], // <-- INICIALITZAT
     Key? key,
   }) : super(key: key);
 
@@ -172,16 +173,17 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                     height: containerSize,
                   ),
                 ),
-              // SENJUMARU THREAD EFFECT AFEGIT
-              if (widget.showThreadEffect)
-                Positioned.fill(
+              // Mostrar totes les teles aplicades damunt l'enemic
+              ...widget.threadEffectImages.map(
+                (imagePath) => Positioned.fill(
                   child: IgnorePointer(
                     child: Image.asset(
-                      'assets/special_attack/senjumaru/fils_tela.png',
+                      imagePath,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),

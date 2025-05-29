@@ -48,13 +48,17 @@ class CombatProvider with ChangeNotifier {
   bool get playerImmune => _playerImmune;
   int get turnsUntilEnemyDies => _turnsUntilEnemyDies;
   bool get senjumaruJustUsedUlti => _senjumaruJustUsedUlti;
+
   String get currentTelaAsset {
-    if (_turnsUntilEnemyDies == 3 || _turnsUntilEnemyDies == 1) {
-      return 'assets/special_attack/senjumaru/tela_1.png';
-    } else if (_turnsUntilEnemyDies == 2) {
-      return 'assets/special_attack/senjumaru/tela_2.png';
+    switch (_turnsUntilEnemyDies) {
+      case 3:
+      case 1:
+        return 'assets/special_attack/senjumaru/tela_1.png';
+      case 2:
+        return 'assets/special_attack/senjumaru/tela_2.png';
+      default:
+        return '';
     }
-    return '';
   }
 
   // SETTERS
@@ -144,6 +148,8 @@ class CombatProvider with ChangeNotifier {
   Future<void> decrementDoomCounter({VoidCallback? onEnemyDefeated}) async {
     if (_turnsUntilEnemyDies > 0) {
       _turnsUntilEnemyDies--;
+      notifyListeners();
+
       if (_turnsUntilEnemyDies == 0) {
         await Future.delayed(const Duration(milliseconds: 600)); // Pausa visual
         setEnemyHealth(0);
@@ -154,8 +160,6 @@ class CombatProvider with ChangeNotifier {
         if (onEnemyDefeated != null) {
           onEnemyDefeated();
         }
-      } else {
-        notifyListeners();
       }
     }
   }
