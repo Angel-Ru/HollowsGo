@@ -108,27 +108,31 @@ exports.getPuntsUsuari = async (req, res) => {
 
 // Sumar punts que ha comprat l'usuari
 exports.sumarPuntsUsuari = async (req, res) => {
-    const {punts, id} = req.body;
+    const punts = parseInt(req.params.punts, 10);
+    const id = parseInt(req.params.id, 10);
 
-    if (typeof punts !== 'number' || typeof id !== 'number') {
-        return res.status(400).send("Cal proporcionar 'punts' i 'id' com a números.");
+    if (isNaN(punts) || isNaN(id)) {
+        return res.status(400).send("Els paràmetres 'punts' i 'id' han de ser números vàlids.");
     }
+
     try {
         const connection = await connectDB();
         const [result] = await connection.execute(
             'UPDATE USUARIS SET punts_emmagatzemats = punts_emmagatzemats + ? WHERE id = ?;',
             [punts, id]
         );
-        if (result.length === 0) {
-            return res.status(404).send("No s'ha trobat cap usuari amb aquest nom.");
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send("No s'ha trobat cap usuari amb aquest ID.");
         }
 
-        res.send(result);
+        res.send({ missatge: "Punts afegits correctament.", afectats: result.affectedRows });
     } catch (err) {
         console.error(err);
         res.status(500).send('Error amb la consulta');
     }
 };
+
 
 /*
 exports.crearUsuariNormal = async (req, res) => {
