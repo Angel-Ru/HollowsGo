@@ -3,7 +3,6 @@ import 'package:video_player/video_player.dart';
 import '../imports.dart';
 import '../service/audioservice.dart';
 import 'dart:math';
-
 import '../widgets/tenda/dialog_animations.dart';
 
 class CombatIntroVideoScreen extends StatefulWidget {
@@ -11,11 +10,12 @@ class CombatIntroVideoScreen extends StatefulWidget {
   _CombatIntroVideoScreenState createState() => _CombatIntroVideoScreenState();
 }
 
-class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> with TickerProviderStateMixin {
-  late VideoPlayerController _videoController;
+class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen>
+    with TickerProviderStateMixin {
+  VideoPlayerController? _videoController;
   late DialogAnimationManager _animationManager;
   bool _navigated = false;
-  late Widget _combatScreen;
+  bool _isVideoReady = false;
 
   final List<String> musiquesDies = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/DIA/l7lo9rvit62uevuq1kjh',
@@ -34,31 +34,34 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> with Ti
   @override
   void initState() {
     super.initState();
-    _combatScreen = CombatScreen();
     _animationManager = DialogAnimationManager(vsync: this);
-    _inicitalitzarVideo();
+    _initVideo();
   }
 
-  void _inicitalitzarVideo() {
-    _videoController = VideoPlayerController.asset('lib/videos/animacion_combate.mp4')
-      ..initialize().then((_) {
-        setState(() {});
-        _videoController.play();
-        _animationManager.playEntryAnimation(); // fade in
-        _startListeners();
-        _preloadCombatImages();
-      });
-  }
+  Future<void> _initVideo() async {
+    final result = await VideoService.initAssetVideo(
+      assetPath: 'lib/videos/animacion_combate.mp4',
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: false,
+      showControls: false,
+      onVideoEnd: () async {
+        if (!_navigated) {
+          _navigated = true;
+          await _animationManager.fadeController.reverse();
+          await _iniciarMusica();
+          _navigateToCombat();
+        }
+      },
+    );
 
-  void _startListeners() {
-    _videoController.addListener(() async {
-      if (_videoController.value.position >= _videoController.value.duration && !_navigated) {
-        _navigated = true;
-        await _animationManager.fadeController.reverse(); // fade out
-        await _iniciarMusica();
-        _navigateToCombat();
-      }
-    });
+    if (result != null) {
+      _videoController = result.videoController;
+      _isVideoReady = true;
+      _animationManager.playEntryAnimation();
+      _preloadCombatImages();
+      setState(() {});
+    }
   }
 
   Future<void> _iniciarMusica() async {
@@ -70,19 +73,25 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> with Ti
   }
 
   Future<void> _preloadCombatImages() async {
-    final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+    final provider =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
     try {
       await provider.selectRandomSkin();
-      final aliat = provider.selectedSkinAliat ?? provider.selectedSkinQuincy ?? provider.selectedSkinEnemic;
+      final aliat = provider.selectedSkinAliat ??
+          provider.selectedSkinQuincy ??
+          provider.selectedSkinEnemic;
       final enemic = provider.selectedSkin;
-      final aliatImageUrl = aliat?.imatge ?? 'lib/images/combatscreen_images/bleach_combat.png';
-      final enemicImageUrl = enemic?.imatge ?? 'lib/images/combatscreen_images/aizen_combat.png';
+      final aliatImageUrl =
+          aliat?.imatge ?? 'lib/images/combatscreen_images/bleach_combat.png';
+      final enemicImageUrl =
+          enemic?.imatge ?? 'lib/images/combatscreen_images/aizen_combat.png';
 
       await precacheImage(NetworkImage(aliatImageUrl), context);
       await precacheImage(NetworkImage(enemicImageUrl), context);
 
       for (int i = 1; i <= 5; i++) {
-        final backgroundPath = 'lib/images/combatscreen_images/fondo_combat_$i.png';
+        final backgroundPath =
+            'lib/images/combatscreen_images/fondo_combat_$i.png';
         await precacheImage(AssetImage(backgroundPath), context);
       }
     } catch (e) {
@@ -92,7 +101,9 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> with Ti
 
   void _navigateToCombat() async {
     final provider = Provider.of<CombatProvider>(context, listen: false);
-    final skin = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false).selectedSkin;
+    final skin =
+        Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false)
+            .selectedSkin;
     final skinId = skin?.id;
 
     if (skinId != null) {
@@ -106,7 +117,7 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> with Ti
 
   @override
   void dispose() {
-    _videoController.dispose();
+    VideoService.disposeControllers(videoController: _videoController);
     _animationManager.dispose();
     super.dispose();
   }
@@ -116,15 +127,17 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen> with Ti
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: _videoController.value.isInitialized
+        child: (_isVideoReady &&
+                _videoController != null &&
+                _videoController!.value.isInitialized)
             ? FadeTransition(
                 opacity: _animationManager.fadeAnimation,
                 child: AspectRatio(
-                  aspectRatio: _videoController.value.aspectRatio,
-                  child: VideoPlayer(_videoController),
+                  aspectRatio: _videoController!.value.aspectRatio,
+                  child: VideoPlayer(_videoController!),
                 ),
               )
-            : SizedBox.shrink(),
+            : const SizedBox.shrink(),
       ),
     );
   }
