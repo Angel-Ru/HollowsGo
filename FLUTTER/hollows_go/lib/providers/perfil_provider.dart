@@ -222,6 +222,7 @@ class PerfilProvider with ChangeNotifier {
       throw e;
     }
   }
+  
   Future<List<Titol>> fetchTitolsComplets(int userId) async {
   try {
     final prefs = await SharedPreferences.getInstance();
@@ -233,7 +234,7 @@ class PerfilProvider with ChangeNotifier {
     }
 
     final response = await http.get(
-      Uri.parse('https://${Config.ip}/missions/titols/$userId'),
+      Uri.parse('https://${Config.ip}/perfils/titols/$userId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',

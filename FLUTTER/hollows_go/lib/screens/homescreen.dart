@@ -1,5 +1,4 @@
 import 'package:hollows_go/imports.dart';
-
 import '../models/missionDiaria.dart';
 import '../widgets/missions/mission_drawer.dart';
 
@@ -8,15 +7,27 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   late final HomeScreenController _controller;
   String _imagePath = '';
   Timer? _timer;
+  bool _mostrarDetallsSkin = false;
+
+  late AnimationController _expandController;
+  late Animation<double> _expandAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = HomeScreenController(context);
+
+    _expandController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 400),
+    );
+    _expandAnimation =
+        CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -29,15 +40,19 @@ class _HomeScreenState extends State<HomeScreen> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.fetchUserPoints();
       _timer = Timer.periodic(
-          Duration(seconds: 5), (_) => userProvider.fetchUserPoints());
+        Duration(seconds: 5),
+        (_) => userProvider.fetchUserPoints(),
+      );
+
       Provider.of<VialsProvider>(context, listen: false)
           .fetchVials(userProvider.userId);
+
       Provider.of<DialogueProvider>(context, listen: false)
           .loadDialogueFromJson("ichigo");
 
-          
       await _controller.loadUserData();
-      final selectedProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+      final selectedProvider =
+          Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
       selectedProvider.getSkinSeleccionada(userProvider.userId);
     });
   }
@@ -45,7 +60,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _expandController.dispose();
     super.dispose();
+  }
+
+  Skin? _getSkinSeleccionada(SkinsEnemicsPersonatgesProvider provider) {
+    return provider.selectedSkinQuincy ??
+        provider.selectedSkinAliat ??
+        provider.selectedSkinEnemic;
   }
 
   Widget _getSelectedScreenWithKey(int index) {
@@ -75,10 +97,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _toggleExpand() {
+    setState(() {
+      _mostrarDetallsSkin = !_mostrarDetallsSkin;
+      if (_mostrarDetallsSkin) {
+        _expandController.forward();
+      } else {
+        _expandController.reverse();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final uiProvider = Provider.of<UIProvider>(context);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    final double topMargin =
+        MediaQuery.of(context).padding.top + kToolbarHeight;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -96,7 +132,53 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           HomeBackground(),
+
+          // Targeta de skin animada
+          Consumer<SkinsEnemicsPersonatgesProvider>(
+            builder: (context, provider, _) {
+              final skin = _getSkinSeleccionada(provider);
+              if (skin == null) return SizedBox();
+
+              return AnimatedAlign(
+                alignment: _mostrarDetallsSkin
+                    ? Alignment.center
+                    : Alignment.topCenter,
+                duration: Duration(milliseconds: 500),
+                curve: Curves.easeInOut,
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      top: _mostrarDetallsSkin ? 0 : topMargin,
+                      left: 16,
+                      right: 16),
+                  child: ScaleTransition(
+                    scale: _expandAnimation,
+                    child: _buildExpandedCard(skin),
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // Targeta petita (visible només si no està expandida)
+          Consumer<SkinsEnemicsPersonatgesProvider>(
+            builder: (context, provider, _) {
+              final skin = _getSkinSeleccionada(provider);
+              if (skin == null || _mostrarDetallsSkin) return SizedBox();
+
+              return Positioned(
+                top: topMargin,
+                left: 16,
+                right: 16,
+                child: GestureDetector(
+                  onTap: _toggleExpand,
+                  child: _buildSmallCard(skin),
+                ),
+              );
+            },
+          ),
+
           if (uiProvider.selectedMenuOpt == 0) DialogueSection(),
+
           AnimatedSwitcher(
             duration: Duration(milliseconds: 600),
             switchInCurve: Curves.easeInOut,
@@ -109,8 +191,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () =>
-            Navigator.push(context, MaterialPageRoute(builder: (_) => CombatScreen())),
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => CombatScreen()),
+        ),
         backgroundColor: Colors.red,
         child: Icon(Icons.sports_martial_arts),
         tooltip: 'Anar a CombatScreen (proves)',
@@ -121,4 +205,175 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Widget _buildSmallCard(Skin skin) {
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black54),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              skin.imatge ?? '',
+              width: 60,
+              height: 60,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  Icon(Icons.broken_image, color: Colors.white),
+            ),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              skin.nom,
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
+            ),
+          ),
+          AnimatedBuilder(
+            animation: _expandController,
+            builder: (context, child) {
+              return Transform.rotate(
+                angle: _expandController.value * 3.1416,
+                child: child,
+              );
+            },
+            child: IconButton(
+              icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+              onPressed: _toggleExpand,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExpandedCard(Skin skin) {
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.black.withOpacity(0.3),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: Colors.black, width: 2),
+    ),
+    padding: EdgeInsets.all(20),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.network(
+                skin.imatge ?? '',
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    Icon(Icons.broken_image, color: Colors.white),
+              ),
+            ),
+            // Franja negra translúcida a sota amb el nom
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.6),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(16),
+                    bottomRight: Radius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  skin.nom,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(1, 1),
+                        color: Colors.black,
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+            // Botó per plegar
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: Icon(Icons.keyboard_arrow_up,
+                    color: Colors.grey, size: 32),
+                onPressed: _toggleExpand,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        _DetallsSkinCard(skin),
+      ],
+    ),
+  );
+}
+
+
+/// 🔽 Detalls de la skin
+Widget _DetallsSkinCard(Skin skin) {
+  String getNomRaca(int? raca) {
+    switch (raca) {
+      case 0:
+        return 'Quincy';
+      case 1:
+        return 'Shinigami';
+      case 2:
+        return 'Hollow / Enemic';
+      default:
+        return 'Desconegut';
+    }
+  }
+
+  return Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.black.withOpacity(0.3),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (skin.vidaMaxima != null && skin.currentHealth != null)
+          Text(
+            'Vida: ${skin.currentHealth} / ${skin.vidaMaxima}',
+            style: TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+        if (skin.raca != null)
+          Text(
+            'Raça: ${getNomRaca(skin.raca)}',
+            style: TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+        if (skin.malTotal != null)
+          Text(
+            'Mal: ${skin.malTotal}',
+            style: TextStyle(color: Colors.grey, fontSize: 14),
+          ),
+      ],
+    ),
+  );
+}
 }
