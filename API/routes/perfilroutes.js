@@ -16,6 +16,6 @@ router.put('/skin/update/:userId', verificacioUsuari.verifyToken, perfilControll
 // Obtenir tot lo de l'exp de l'usuari
 router.get('/exp/:userId', verificacioUsuari.verifyToken, perfilController.getallExp);
 
-router.get('/titols/:usuariId', perfilController.getTitolsComplets)
+router.get('/titols/:usuariId', verificacioUsuari.verifyToken, perfilController.getTitolsComplets)
 
 module.exports = router;
