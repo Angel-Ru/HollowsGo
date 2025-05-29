@@ -43,8 +43,8 @@ class CharacterDisplayWidget extends StatefulWidget {
     this.isFrozen = false,
     this.isImmune = false,
     this.showInkEffect = false,
-    this.showSenjumaruEffect = false, // per defecte false
-    this.senjumaruAttackCount = 0, // per defecte 0
+    this.showSenjumaruEffect = false,
+    this.senjumaruAttackCount = 0,
     Key? key,
   }) : super(key: key);
 
@@ -178,20 +178,33 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                   ),
                 ),
 
-                // Efecte tela Senjumaru
+                // Efecte tela Senjumaru (amb les dues teles apilades i fadeIn)
                 if (widget.showSenjumaruEffect)
-                  AnimatedOpacity(
-                    opacity: 1.0,
-                    duration: const Duration(milliseconds: 800),
-                    curve: Curves.easeIn,
-                    child: Image.asset(
-                      widget.senjumaruAttackCount == 0
-                          ? 'assets/special_attack/senjumaru/tela_1.png'
-                          : 'assets/special_attack/senjumaru/tela_2.png',
-                      fit: BoxFit.cover,
-                      width: containerSize,
-                      height: containerSize,
-                    ),
+                  Stack(
+                    children: [
+                      AnimatedOpacity(
+                        opacity: widget.senjumaruAttackCount == 0 ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 800),
+                        curve: Curves.easeIn,
+                        child: Image.asset(
+                          'assets/special_attack/senjumaru/tela_1.png',
+                          fit: BoxFit.cover,
+                          width: containerSize,
+                          height: containerSize,
+                        ),
+                      ),
+                      AnimatedOpacity(
+                        opacity: widget.senjumaruAttackCount == 1 ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 800),
+                        curve: Curves.easeIn,
+                        child: Image.asset(
+                          'assets/special_attack/senjumaru/tela_2.png',
+                          fit: BoxFit.cover,
+                          width: containerSize,
+                          height: containerSize,
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ],
