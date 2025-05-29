@@ -178,6 +178,13 @@ flutter:
     - assets/special_attack/ichigo/marco_ichigo.png
     - assets/special_attack/ichigo/ichigo_vid.mp4
     - assets/special_attack/ichigo/ichigo_aud.mp3
+    - assets/special_attack/aizen/aizen_vid.mp4
+    - assets/special_attack/aizen/marco_aizen.png
+    - assets/special_attack/aizen/aizen_aud.mp3
+    - assets/special_attack/gin/gin_vid.mp4
+    - assets/special_attack/gin/gin_aud.mp3
+    - assets/special_attack/gin/marco_gin.png
+
 
 
 

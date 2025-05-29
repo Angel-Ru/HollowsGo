@@ -28,19 +28,25 @@ class UltimateService {
     }
 
     switch (habilitat.id) {
+      //ULTI SHINJI
       case 3:
+        final combatProvider =
+            Provider.of<CombatProvider>(context, listen: false);
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/shinji/marco_shinji.png',
           audioAsset: 'special_attack/shinji/shinji_aud.mp3',
           videoAsset: 'assets/special_attack/shinji/shinji_vid.mp4',
-          damage: 100,
+          damage: 200,
           rotateScreen: true,
-          onDamageApplied: onDamageApplied,
+          onDamageApplied: (_) {
+            combatProvider.applyEnemyAttackDebuff(100);
+          },
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
 
+      //ULTI YAMAMOTO
       case 4:
         await _executeUlti(
           context,
@@ -54,6 +60,7 @@ class UltimateService {
         );
         break;
 
+      //ULTI KENPACHI ARC NOU
       case 6:
         await _executeUlti(
           context,
@@ -69,6 +76,7 @@ class UltimateService {
         );
         break;
 
+      //ULTI KENPACHI PARCHE
       case 7:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -85,19 +93,21 @@ class UltimateService {
         );
         break;
 
+      //ULTI ICHIGO
       case 8:
         await _executeUlti(
           context,
           imageAsset: 'assets/special_attack/ichigo/marco_ichigo.png',
           audioAsset: 'special_attack/ichigo/ichigo_aud.mp3',
           videoAsset: 'assets/special_attack/ichigo/ichigo_vid.mp4',
-          damage: 350,
+          damage: 400,
           rotateScreen: false,
           onDamageApplied: onDamageApplied,
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
 
+      //ULTI YHWACH
       case 9:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -107,10 +117,9 @@ class UltimateService {
           imageAsset: 'assets/special_attack/yhwach/marco_yhwach.png',
           audioAsset: 'special_attack/yhwach/yhwach_aud.mp3',
           videoAsset: 'assets/special_attack/yhwach/yhwach_vid.mp4',
-          damage: 0, // No fa dany directe
+          damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) {
-            // Activa la immunitat del jugador per evitar dany enemic
             combatProvider.setPlayerImmune(true);
             debugPrint(
                 "🛡️ Escut de Yhwach activat! L'aliat ara és immune al pròxim atac.");
@@ -119,6 +128,7 @@ class UltimateService {
         );
         break;
 
+      //ULTI ICHIBE
       case 10:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -137,7 +147,7 @@ class UltimateService {
           imageAsset: 'assets/special_attack/ichibe/marco_ichibe.png',
           audioAsset: 'special_attack/ichibe/ichibe_aud.mp3',
           videoAsset: 'assets/special_attack/ichibe/ichibe_vid.mp4',
-          damage: 0, // No hi ha dany directe
+          damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) {
             combatProvider.triggerIchibeUltiEffect();
@@ -154,6 +164,7 @@ class UltimateService {
         );
         break;
 
+      //ULTI GRIMMJOW
       case 11:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -169,6 +180,7 @@ class UltimateService {
         );
         break;
 
+      //ULTI ULQUIORRA
       case 12:
         await _executeUlti(
           context,
@@ -182,6 +194,25 @@ class UltimateService {
         );
         break;
 
+      //ULTI AIZEN
+      case 13:
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/aizen/marco_aizen.png',
+          audioAsset: 'special_attack/aizen/aizen_aud.mp3',
+          videoAsset: 'assets/special_attack/aizen/aizen_vid.mp4',
+          damage: 400,
+          rotateScreen: false,
+          onDamageApplied: (_) {
+            final combatProvider =
+                Provider.of<CombatProvider>(context, listen: false);
+            combatProvider.applyEnemyAttackDebuff(100);
+          },
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
+      //ULTI SENJUMARU
       case 14:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -197,10 +228,11 @@ class UltimateService {
             combatProvider.activateSenjumaruEffect();
           },
           onEnemyDefeated: onEnemyDefeated,
-          skipDeathCheck: true, // perquè el final ve pel comptador
+          skipDeathCheck: true,
         );
         break;
 
+      //ULTI UNOHANA
       case 15:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -218,13 +250,28 @@ class UltimateService {
           damage: 0,
           rotateScreen: false,
           onDamageApplied: (_) {
-            combatProvider.healPlayer(400, maxHealth); // Cura amb límit màxim
-            combatProvider.applyBleed(); // Aplica sagnat
+            combatProvider.healPlayer(400, maxHealth);
+            combatProvider.applyBleed();
           },
           onEnemyDefeated: onEnemyDefeated,
         );
         break;
 
+      //ULTI GIN
+      case 16:
+        await _executeUlti(
+          context,
+          imageAsset: 'assets/special_attack/gin/marco_gin.png',
+          audioAsset: 'special_attack/gin/gin_aud.mp3',
+          videoAsset: 'assets/special_attack/gin/gin_vid.mp4',
+          damage: 450,
+          rotateScreen: false,
+          onDamageApplied: onDamageApplied,
+          onEnemyDefeated: onEnemyDefeated,
+        );
+        break;
+
+      //ULTI TOSEN
       case 18:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -265,6 +312,7 @@ class UltimateService {
         }
         break;
 
+      //ULTI AS NODT
       case 19:
         await _executeUlti(
           context,
@@ -283,6 +331,7 @@ class UltimateService {
         );
         break;
 
+      //ULTI RUKIA
       case 20:
         final combatProvider =
             Provider.of<CombatProvider>(context, listen: false);
@@ -314,7 +363,7 @@ class UltimateService {
     required bool rotateScreen,
     required Function(int) onDamageApplied,
     required VoidCallback onEnemyDefeated,
-    bool skipDeathCheck = false, // nou paràmetre
+    bool skipDeathCheck = false,
   }) async {
     final videoController = VideoPlayerController.asset(videoAsset);
     await videoController.initialize();
