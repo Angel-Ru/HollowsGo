@@ -18,9 +18,10 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     if (missionsExistents[0].count === 0) {
       // 1. Assignar missions fixes
-      const [fixes] = await connection.execute(`
-        SELECT id FROM MISSIONS WHERE fixa = TRUE
-      `);
+      // 1. Assignar missions fixes de tipus 0
+const [fixes] = await connection.execute(`
+  SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus = 0
+`);
 
       for (const missio of fixes) {
         await connection.execute(`
@@ -31,8 +32,8 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
       // 2. Assignar una variable del dia (rotativa)
       const [variables] = await connection.execute(`
-        SELECT id FROM MISSIONS WHERE fixa = FALSE ORDER BY id
-      `);
+  SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus = 0 ORDER BY id
+`);
 
       const dia = new Date();
       const index = dia.getDate() % variables.length;
