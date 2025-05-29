@@ -13,7 +13,7 @@ router.get('/perfil/:id', verificacioUsuari.verifyToken, userController.mostrarD
 router.get('/punts/:nom', verificacioUsuari.verifyToken, userController.getPuntsUsuari);
 
 // Ruta per sumar els punts comprats per un usuari
-router.put('/punts/comprats/:id', userController.sumarPuntsUsuari());
+router.put('/punts/comprats/:id/:punts', userController.sumarPuntsUsuari);
 
 // Ruta per obtenir els avatars
 router.get('/avatars', verificacioUsuari.verifyToken, userController.llistarAvatars);
