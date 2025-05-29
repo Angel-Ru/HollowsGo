@@ -18,9 +18,10 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     if (missionsExistents[0].count === 0) {
       // 1. Assignar missions fixes
-      const [fixes] = await connection.execute(`
-        SELECT id FROM MISSIONS WHERE fixa = TRUE
-      `);
+      // 1. Assignar missions fixes de tipus 0
+const [fixes] = await connection.execute(`
+  SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus = 0
+`);
 
       for (const missio of fixes) {
         await connection.execute(`
@@ -31,8 +32,8 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
       // 2. Assignar una variable del dia (rotativa)
       const [variables] = await connection.execute(`
-        SELECT id FROM MISSIONS WHERE fixa = FALSE ORDER BY id
-      `);
+  SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus = 0 ORDER BY id
+`);
 
       const dia = new Date();
       const index = dia.getDate() % variables.length;
@@ -404,6 +405,167 @@ exports.assignarMissionsArmes = async (req, res) => {
   }
 };
 
+exports.getMissionArma = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) return res.status(400).json({ error: 'Usuari invàlid' });
+
+  try {
+    const connection = await connectDB();
+
+    // 1. Obtenir tots els skins seleccionats per l'usuari
+    const [skinsSeleccionats] = await connection.execute(`
+      SELECT skin
+      FROM USUARI_SKIN_ARMES
+      WHERE usuari = ? AND seleccionat = 1
+    `, [usuariId]);
+
+    if (skinsSeleccionats.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap skin seleccionat per aquest usuari' });
+    }
+
+    // 2. Obtenir totes les armes associades als skins seleccionats
+    const skinsIds = skinsSeleccionats.map(s => s.skin);
+    // Construim la query per agafar totes les armes d’aquests skins
+    const placeholders = skinsIds.map(() => '?').join(',');
+    const [armes] = await connection.execute(`
+      SELECT DISTINCT a.id AS arma_id, a.nom AS nom_arma
+      FROM SKINS_ARMES sa
+      JOIN ARMES a ON sa.arma = a.id
+      WHERE sa.skin IN (${placeholders})
+    `, skinsIds);
+
+    if (armes.length === 0) {
+      return res.status(404).json({ error: 'No s\'han trobat armes associades als skins seleccionats' });
+    }
+
+    // 3. Per cada arma, buscar missions no completades per tipus missió
+    const tipusMissioSeq = [2, 3, 4];
+    let missioFinal = null;
+
+    // Recorrer armes i tipus fins trobar la primera missió no completada
+    for (const { arma_id: armaId, nom_arma: nomArma } of armes) {
+      for (const tipus of tipusMissioSeq) {
+        const [missions] = await connection.execute(`
+          SELECT 
+            m.id,
+            m.nom_missio,
+            m.descripcio,
+            m.objectiu,
+            ma.progres
+          FROM MISSIONS_ARMES ma
+          JOIN MISSIONS m ON m.id = ma.missio
+          WHERE ma.usuari = ? AND ma.arma = ? AND m.tipus_missio = ?
+        `, [usuariId, armaId, tipus]);
+
+        if (missions.length === 0) continue;
+
+        const missioNoCompleta = missions.find(m => Number(m.progres) < Number(m.objectiu));
+        if (missioNoCompleta) {
+          missioFinal = { ...missioNoCompleta, armaId, nomArma, tipusMissio: tipus };
+          break;
+        }
+      }
+      if (missioFinal) break;
+    }
+
+    if (!missioFinal) {
+      return res.status(200).json({ missatge: 'Totes les missions estan completades per totes les armes associades als skins seleccionats' });
+    }
+
+    // 4. Retornar la missió trobada amb l’arma associada
+    res.status(200).json({
+      missatge: 'Missió d\'arma recuperada correctament',
+      arma: missioFinal.nomArma,
+      missio: {
+        id: missioFinal.id,
+        nom_missio: missioFinal.nom_missio,
+        descripcio: missioFinal.descripcio,
+        objectiu: missioFinal.objectiu,
+        progres: missioFinal.progres,
+        tipus_missio: missioFinal.tipusMissio
+      }
+    });
+
+  } catch (err) {
+    console.error('Error al recuperar la missió d\'arma:', err);
+    res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
+  }
+};
+
+
+
+
+exports.incrementarProgresArma = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) {
+    return res.status(400).json({ error: 'Usuari ID invàlid' });
+  }
+
+  try {
+    const connection = await connectDB();
+
+    // Obtenim l'arma seleccionada per l'usuari
+    const [armesUsuari] = await connection.execute(`
+      SELECT a.id AS arma_id
+      FROM USUARI_SKIN_ARMES usa
+      JOIN SKINS_ARMES sa ON sa.skin = usa.skin
+      JOIN ARMES a ON sa.arma = a.id
+      WHERE usa.usuari = ? AND usa.seleccionat = 1
+      LIMIT 1
+    `, [usuariId]);
+
+    if (armesUsuari.length === 0) {
+      return res.status(404).json({ error: 'No s\'ha trobat cap arma seleccionada per aquest usuari' });
+    }
+
+    const armaId = armesUsuari[0].arma_id;
+
+    const tipusMissioSeq = [2, 3, 4];
+    let missioActualitzada = null;
+
+    for (const tipus of tipusMissioSeq) {
+      const [missions] = await connection.execute(`
+        SELECT ma.missio, ma.progres, m.objectiu
+        FROM MISSIONS_ARMES ma
+        JOIN MISSIONS m ON m.id = ma.missio
+        WHERE ma.arma = ? AND ma.usuari = ? AND m.tipus_missio = ?
+        LIMIT 1
+      `, [armaId, usuariId, tipus]);
+
+      if (missions.length === 0) continue;
+
+      const { missio, progres, objectiu } = missions[0];
+
+      if (progres < objectiu) {
+        const nouProgres = progres + 1;
+
+        await connection.execute(`
+          UPDATE MISSIONS_ARMES
+          SET progres = ?
+          WHERE arma = ? AND usuari = ? AND missio = ?
+        `, [nouProgres, armaId, usuariId, missio]);
+
+        missioActualitzada = {
+          missatge: `Progrés de la missió de tipus ${tipus} incrementat correctament`,
+          missio,
+          progres: nouProgres,
+          tipus
+        };
+        break;
+      }
+    }
+
+    if (!missioActualitzada) {
+      return res.status(200).json({ missatge: 'Totes les missions ja estan completades. No hi ha res a incrementar.' });
+    }
+
+    res.status(200).json(missioActualitzada);
+
+  } catch (err) {
+    console.error('Error incrementant el progres de la missió d\'arma:', err.message);
+    res.status(500).json({ error: 'Error al incrementar el progres de la missió d\'arma' });
+  }
+};
 
 
 

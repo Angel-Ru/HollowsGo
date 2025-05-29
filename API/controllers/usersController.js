@@ -106,6 +106,34 @@ exports.getPuntsUsuari = async (req, res) => {
     }
 };
 
+// Sumar punts que ha comprat l'usuari
+exports.sumarPuntsUsuari = async (req, res) => {
+    const punts = parseInt(req.params.punts, 10);
+    const id = parseInt(req.params.id, 10);
+
+    if (isNaN(punts) || isNaN(id)) {
+        return res.status(400).send("Els paràmetres 'punts' i 'id' han de ser números vàlids.");
+    }
+
+    try {
+        const connection = await connectDB();
+        const [result] = await connection.execute(
+            'UPDATE USUARIS SET punts_emmagatzemats = punts_emmagatzemats + ? WHERE id = ?;',
+            [punts, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send("No s'ha trobat cap usuari amb aquest ID.");
+        }
+
+        res.send({ missatge: "Punts afegits correctament.", afectats: result.affectedRows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error amb la consulta');
+    }
+};
+
+
 /*
 exports.crearUsuariNormal = async (req, res) => {
     try {
@@ -916,42 +944,5 @@ exports.crearamistat = async (req, res) => {
     } catch (error) {
         console.error('Error afegint amistat:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
-    }
-};
-
-// Sumar monedes comprades a l'usuari
-exports.afegirMonedesUsuari = async (req, res) => {
-    const { nom, monedes } = req.body;
-
-    if (!nom || !monedes) {
-        return res.status(400).send("Falten dades: 'nom' o 'monedes'");
-    }
-
-    try {
-        const connection = await connectDB();
-
-        // Primer, agafa els punts actuals
-        const [rows] = await connection.execute(
-            'SELECT punts_emmagatzemats FROM USUARIS WHERE nom = ?',
-            [nom]
-        );
-
-        if (rows.length === 0) {
-            return res.status(404).send("Usuari no trobat.");
-        }
-
-        const puntsActuals = rows[0].punts_emmagatzemats || 0;
-        const nousPunts = puntsActuals + parseInt(monedes);
-
-        // Actualitza els punts
-        await connection.execute(
-            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE nom = ?',
-            [nousPunts, nom]
-        );
-
-        res.send({ missatge: "Monedes afegides correctament", punts: nousPunts });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error amb la base de dades');
     }
 };

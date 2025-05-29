@@ -12,6 +12,9 @@ router.get('/perfil/:id', verificacioUsuari.verifyToken, userController.mostrarD
 // Ruta per obtenir els punts d'un usuari per nom (accessible per a tots, però requereix token)
 router.get('/punts/:nom', verificacioUsuari.verifyToken, userController.getPuntsUsuari);
 
+// Ruta per sumar els punts comprats per un usuari
+router.put('/punts/comprats/:id/:punts', userController.sumarPuntsUsuari);
+
 // Ruta per obtenir els avatars
 router.get('/avatars', verificacioUsuari.verifyToken, userController.llistarAvatars);
 
@@ -32,7 +35,6 @@ router.post('/admin/', verificacioUsuari.verifyToken, verificacioUsuari.verifyAd
 
 // Ruta per eliminar un usuari per ID (només accessible per a administradors)
 router.delete('/:id', verificacioUsuari.verifyToken, verificacioUsuari.verifyAdminDB, userController.borrarUsuari);
-
 
 //Ruta per modificar la imatge de perfil de l'usuari
 router.put('/actualitzaravatar', verificacioUsuari.verifyToken, userController.actualitzarAvatar);
@@ -57,8 +59,5 @@ router.put('/amics/:id/pendents', verificacioUsuari.verifyToken, userController.
 
 // Ruta per afegir un amic
 router.post('/amics/nova/:id', verificacioUsuari.verifyToken, userController.crearamistat);
-
-// Ruta per sumar monedes comprades a l'usuari
-router.put('/punts/sumar/:nom', verificacioUsuari.verifyToken, userController.afegirMonedesUsuari);
 
 module.exports = router;
