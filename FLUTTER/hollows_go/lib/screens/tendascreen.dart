@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/service/audioservice.dart';
 import 'package:provider/provider.dart';
 import 'package:hollows_go/widgets/tenda/paypal_payment_widget.dart';
 
@@ -46,36 +47,20 @@ class _TendaScreenState extends State<TendaScreen> {
     'lib/images/fondo_tendascreen/Yoruichi.jpg',
   ];
   int _currentImageIndex = 0;
-  late AudioPlayer _audioPlayer;
 
   @override
   void initState() {
     super.initState();
     _startBackgroundRotation();
 
-    _audioPlayer = AudioPlayer();
-    _playBackgroundMusic();
+    // No cal crear un AudioPlayer aquí si AudioService ho gestiona
+    AudioService.instance.playTendaMusic();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
       dialogueProvider.loadDialogueFromJson('urahara');
     });
-  }
-
-  void _playBackgroundMusic() async {
-    final List<String> musicUrls = [
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dq2skhigp8ml5kjysdl8',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/n47sbuwwhjntfd5tplpl',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/wqjoawsw8v7igikmuym4',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/nzvkinzhqcoor7hdb72n',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dtofpubrwmruyye4kajd',
-    ];
-
-    final randomUrl = (musicUrls..shuffle()).first;
-
-    await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    await _audioPlayer.play(UrlSource(randomUrl));
   }
 
   void _startBackgroundRotation() {
@@ -91,7 +76,6 @@ class _TendaScreenState extends State<TendaScreen> {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -103,7 +87,8 @@ class _TendaScreenState extends State<TendaScreen> {
       builder: (context) {
         return Dialog(
           backgroundColor: Colors.black.withOpacity(0.7),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Container(
             padding: EdgeInsets.all(16),
             constraints: BoxConstraints(maxWidth: 350),
@@ -133,7 +118,8 @@ class _TendaScreenState extends State<TendaScreen> {
                       skin['imageUrl'],
                       height: 180,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image, size: 100, color: Colors.grey),
+                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image,
+                          size: 100, color: Colors.grey),
                     ),
                   )
                 else
@@ -156,7 +142,8 @@ class _TendaScreenState extends State<TendaScreen> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green[700],
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text("Tancar"),
@@ -255,7 +242,8 @@ class _TendaScreenState extends State<TendaScreen> {
               // Carta Skin del Dia
               Card(
                 color: Colors.black.withOpacity(0.5),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 elevation: 8,
                 child: Padding(
                   padding: EdgeInsets.all(16),
@@ -275,10 +263,12 @@ class _TendaScreenState extends State<TendaScreen> {
                         label: Text("Veure Skin"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green[700],
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                         onPressed: () {
-                          _showSkinDelDiaDialog(context, gachaProvider.latestSkin);
+                          _showSkinDelDiaDialog(
+                              context, gachaProvider.latestSkin);
                         },
                       ),
                     ],

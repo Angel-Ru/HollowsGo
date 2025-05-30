@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:hollows_go/imports.dart';
+import 'package:hollows_go/service/audioservice.dart';
 import '../models/missionDiaria.dart';
 import '../widgets/missions/mission_drawer.dart';
 
@@ -19,8 +20,6 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
 
-  late AudioPlayer _audioPlayer;
-
   @override
   void initState() {
     super.initState();
@@ -33,8 +32,7 @@ class _HomeScreenState extends State<HomeScreen>
     _expandAnimation =
         CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
 
-    _audioPlayer = AudioPlayer();
-    _playBackgroundMusic();
+    AudioService.instance.playHomeMusic();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -64,31 +62,10 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
-  void _playBackgroundMusic() async {
-    final List<String> musicUrls = [
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
-      // Afegeix més URL vàlides si en tens més
-    ];
-
-    // Filtra URL buides
-    final filteredUrls =
-        musicUrls.where((url) => url.trim().isNotEmpty).toList();
-
-    if (filteredUrls.isNotEmpty) {
-      final randomUrl = (filteredUrls..shuffle()).first;
-
-      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer.play(UrlSource(randomUrl));
-    } else {
-      print("Cap URL de música vàlida disponible.");
-    }
-  }
-
   @override
   void dispose() {
     _timer?.cancel();
     _expandController.dispose();
-    _audioPlayer.dispose();
     super.dispose();
   }
 
