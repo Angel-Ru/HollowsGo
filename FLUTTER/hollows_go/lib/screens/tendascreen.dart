@@ -1,8 +1,10 @@
 import 'dart:ui';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:hollows_go/widgets/tenda/paypal_payment_widget.dart';
 
 import '../imports.dart';
-import 'package:flutter_paypal/flutter_paypal.dart';
 
 class TendaScreen extends StatefulWidget {
   @override
@@ -94,6 +96,79 @@ class _TendaScreenState extends State<TendaScreen> {
     super.dispose();
   }
 
+  // Diàleg modal per mostrar la Skin del Dia
+  void _showSkinDelDiaDialog(BuildContext context, Map<String, dynamic>? skin) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black.withOpacity(0.7),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Container(
+            padding: EdgeInsets.all(16),
+            constraints: BoxConstraints(maxWidth: 350),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Skin del Dia",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.greenAccent,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(1, 1),
+                        blurRadius: 3,
+                        color: Colors.black45,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 16),
+                if (skin != null && skin['imageUrl'] != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      skin['imageUrl'],
+                      height: 180,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image, size: 100, color: Colors.grey),
+                    ),
+                  )
+                else
+                  Container(
+                    height: 180,
+                    alignment: Alignment.center,
+                    child: Text(
+                      "No hi ha cap skin disponible avui.",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                SizedBox(height: 16),
+                if (skin != null && skin['description'] != null)
+                  Text(
+                    skin['description'],
+                    style: TextStyle(color: Colors.white70),
+                    textAlign: TextAlign.center,
+                  ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[700],
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Tancar"),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final gachaProvider = Provider.of<GachaProvider>(context);
@@ -175,6 +250,42 @@ class _TendaScreenState extends State<TendaScreen> {
           child: Column(
             children: [
               GachaBannerWidget(),
+              SizedBox(height: 20),
+
+              // Carta Skin del Dia
+              Card(
+                color: Colors.black.withOpacity(0.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                elevation: 8,
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Skin del Dia',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.greenAccent,
+                        ),
+                      ),
+                      SizedBox(height: 12),
+                      ElevatedButton.icon(
+                        icon: Icon(Icons.visibility),
+                        label: Text("Veure Skin"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green[700],
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        onPressed: () {
+                          _showSkinDelDiaDialog(context, gachaProvider.latestSkin);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
               SizedBox(height: 10),
             ],
           ),
@@ -243,5 +354,4 @@ class _TendaScreenState extends State<TendaScreen> {
       ),
     );
   }
-  // Aquí pots afegir més opcions de compra de monedes si cal
 }

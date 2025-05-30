@@ -1,14 +1,15 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
 import 'dialog_content.dart';
 import 'dialog_animations.dart';
 import 'escritor_tinta.dart';
 import 'slash_clipper.dart';
 import 'special_animacio_service.dart';
+import '../../service/videoservice.dart';
 
 class SkinRewardDialog extends StatefulWidget {
   final Map<String, dynamic>? skin;
@@ -50,7 +51,6 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     super.initState();
 
     _isShinji = _detectIsShinji(widget.skin);
-
     _animations = DialogAnimationManager(vsync: this);
 
     _writeController = AnimationController(vsync: this);
@@ -104,22 +104,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     });
 
     await _fadeOutController.forward();
-
     await _initVideo();
-
     await _slashController.forward();
-
-    _videoController?.addListener(() {
-      if (_videoController!.value.position >=
-          _videoController!.value.duration) {
-        _videoFadeOutController.forward().then((_) {
-          setState(() {
-            _showDialogContent = true;
-          });
-          _animations.playEntryAnimation();
-        });
-      }
-    });
   }
 
   Future<void> _playBankaiAudioWithTyping() async {
@@ -160,27 +146,39 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     final String? videoPath = widget.skin?['video_especial'];
     if (videoPath == null || videoPath.isEmpty) return;
 
-    _videoController = VideoPlayerController.asset(videoPath);
-    await _videoController!.initialize();
-
-    _chewieController = ChewieController(
-      videoPlayerController: _videoController!,
+    final result = await VideoService.initAssetVideo(
+      assetPath: videoPath,
+      onVideoEnd: () {
+        _videoFadeOutController.forward().then((_) {
+          setState(() {
+            _showDialogContent = true;
+          });
+          _animations.playEntryAnimation();
+        });
+      },
       autoPlay: true,
       looping: false,
       showControls: false,
       allowFullScreen: false,
     );
 
-    setState(() {
-      _isVideoReady = true;
-    });
+    if (result != null) {
+      _videoController = result.videoController;
+      _chewieController = result.chewieController;
+
+      setState(() {
+        _isVideoReady = true;
+      });
+    }
   }
 
   @override
   void dispose() {
     _audioPlayer.dispose();
-    _videoController?.dispose();
-    _chewieController?.dispose();
+    VideoService.disposeControllers(
+      videoController: _videoController,
+      chewieController: _chewieController,
+    );
     _writeController.dispose();
     _fadeOutController.dispose();
     _slashController.dispose();
@@ -269,22 +267,11 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
                                 },
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(16),
-                                  child: AnimatedBuilder(
-                                    animation: _slashController,
-                                    builder: (context, child) {
-                                      return ClipPath(
-                                        clipper: SlashClipper(
-                                            _slashController.value),
-                                        child: child,
-                                      );
-                                    },
-                                    child: FadeTransition(
-                                      opacity: Tween<double>(
-                                              begin: 1.0, end: 0.0)
-                                          .animate(_videoFadeOutController),
-                                      child: Chewie(
-                                          controller: _chewieController!),
-                                    ),
+                                  child: FadeTransition(
+                                    opacity: Tween<double>(begin: 1.0, end: 0.0)
+                                        .animate(_videoFadeOutController),
+                                    child:
+                                        Chewie(controller: _chewieController!),
                                   ),
                                 ),
                               ),
