@@ -2370,7 +2370,7 @@ exports.comprarSkin = async (req, res) => {
     }
 
     const userId = userRecord[0].id;
-    let currentFragments = userRecord[0].punts_emmagatzemats;
+    let currentFragments = userRecord[0].fragments_skins; // 🟢 Aquesta és la columna correcta!
 
     if (currentFragments < 100) {
       return res.status(200).send({
@@ -2441,3 +2441,4 @@ exports.comprarSkin = async (req, res) => {
     });
   }
 };
+
