@@ -20,6 +20,10 @@ class AudioService {
   bool _isFading = false; // bandera per controlar fades
   double _volume = 1.0; // Volum guardat manualment
 
+  final List<String> _prehomeMusicUrls = [
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
+  ];
+
   final List<String> _homeMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
@@ -146,6 +150,9 @@ class AudioService {
     List<String> urls;
 
     switch (screen) {
+      case 'prehome': // 👈 afegit
+        urls = _prehomeMusicUrls;
+        break;
       case 'home':
         urls = _homeMusicUrls;
         break;
@@ -155,7 +162,7 @@ class AudioService {
       case 'perfil':
         urls = _perfilMusicUrls;
         break;
-        case 'biblioteca':
+      case 'biblioteca':
         urls = _bibliotecaMusicUrls;
         break;
       default:
