@@ -38,6 +38,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
     perfilProvider.carregarTitolUsuari(userId);
   }
 
+  @override
+  void dispose() {
+    AudioService.instance.fadeOut();
+    super.dispose();
+  }
+
   Future<void> _loadUserLevel(int userId, PerfilProvider perfilProvider) async {
     try {
       final expData = await perfilProvider.getexpuser(userId);
