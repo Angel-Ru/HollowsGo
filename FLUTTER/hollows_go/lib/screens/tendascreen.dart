@@ -47,14 +47,12 @@ class _TendaScreenState extends State<TendaScreen> {
     'lib/images/fondo_tendascreen/Yoruichi.jpg',
   ];
   int _currentImageIndex = 0;
-
   @override
   void initState() {
     super.initState();
     _startBackgroundRotation();
 
-    // No cal crear un AudioPlayer aquí si AudioService ho gestiona
-    AudioService.instance.playTendaMusic();
+    AudioService.instance.playScreenMusic('tenda');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
@@ -77,6 +75,7 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   void dispose() {
     _pageController.dispose();
+    AudioService.instance.fadeOut(); // O stop si vols tallar de cop
     super.dispose();
   }
 

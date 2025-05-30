@@ -12,7 +12,6 @@ class AudioService {
   Duration _currentPosition = Duration.zero;
   bool _isPlaying = false;
 
-  // Llistes de cançons per cada pantalla
   final List<String> _homeMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
@@ -30,7 +29,6 @@ class AudioService {
 
   final Random _random = Random();
 
-  /// Reprodueix una nova cançó o continua la mateixa si ja estava en ús
   Future<void> play(String url) async {
     if (_currentUrl != url) {
       await _player.stop();
@@ -42,7 +40,6 @@ class AudioService {
     _isPlaying = true;
   }
 
-  /// Pausa l'àudio (fa stop per garantir que s'atura)
   Future<void> pause() async {
     if (_isPlaying) {
       _currentPosition = await _player.getCurrentPosition() ?? Duration.zero;
@@ -51,7 +48,6 @@ class AudioService {
     }
   }
 
-  /// Reprèn la reproducció des de la darrera posició
   Future<void> resume() async {
     if (_currentUrl != null && !_isPlaying) {
       await _player.play(UrlSource(_currentUrl!), position: _currentPosition);
@@ -59,19 +55,16 @@ class AudioService {
     }
   }
 
-  /// Atura completament l'àudio i reinicia la posició
   Future<void> stop() async {
     await _player.stop();
     _currentPosition = Duration.zero;
     _isPlaying = false;
   }
 
-  /// Allibera els recursos de l'àudio
   Future<void> dispose() async {
     await _player.dispose();
   }
 
-  /// Realitza un fade out de l'àudio abans d'aturar-lo
   Future<void> fadeOut({Duration duration = const Duration(seconds: 1)}) async {
     if (!_isPlaying) return;
 
@@ -86,22 +79,30 @@ class AudioService {
     }
 
     await _player.stop();
-    _player.setVolume(1.0); // Reset al volum per futures cançons
+    _player.setVolume(1.0);
     _isPlaying = false;
     _currentPosition = Duration.zero;
   }
 
-  // --- Funcions noves per reproduir música segons pantalla ---
+  /// Reprodueix música segons la pantalla especificada
+  Future<void> playScreenMusic(String screen) async {
+    List<String> urls;
 
-  /// Reprodueix una cançó aleatòria de la llista de la home
-  Future<void> playHomeMusic() async {
-    final url = _homeMusicUrls[_random.nextInt(_homeMusicUrls.length)];
-    await play(url);
-  }
+    switch (screen) {
+      case 'home':
+        urls = _homeMusicUrls;
+        break;
+      case 'tenda':
+        urls = _tendaMusicUrls;
+        break;
+      default:
+        return;
+    }
 
-  /// Reprodueix una cançó aleatòria de la llista de la tenda
-  Future<void> playTendaMusic() async {
-    final url = _tendaMusicUrls[_random.nextInt(_tendaMusicUrls.length)];
-    await play(url);
+    final url = urls[_random.nextInt(urls.length)];
+    if (_currentUrl != url) {
+      await fadeOut();
+      await play(url);
+    }
   }
 }

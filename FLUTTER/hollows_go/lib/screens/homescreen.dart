@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen>
     _expandAnimation =
         CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
 
-    AudioService.instance.playHomeMusic();
+    AudioService.instance.playScreenMusic('home');
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -65,6 +65,8 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _timer?.cancel();
+    AudioService.instance.fadeOut(); // o stop()
+
     _expandController.dispose();
     super.dispose();
   }
