@@ -29,6 +29,8 @@ class AudioService {
 
   final List<String> _prehomeMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
+
   ];
 
   final List<String> _homeMusicUrls = [
