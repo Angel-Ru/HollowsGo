@@ -155,6 +155,9 @@ class AudioService {
       case 'perfil':
         urls = _perfilMusicUrls;
         break;
+        case 'biblioteca':
+        urls = _bibliotecaMusicUrls;
+        break;
       default:
         debugPrint('⚠️ playScreenMusic: pantalla desconeguda $screen');
         return;

@@ -22,11 +22,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     AudioService.instance.playScreenMusic('biblioteca');
   }
 
-  @override
-  void dispose() {
-    AudioService.instance.fadeOut();
-    super.dispose();
-  }
+
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();

@@ -40,7 +40,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   @override
   void dispose() {
-    AudioService.instance.fadeOut();
+    
     super.dispose();
   }
 

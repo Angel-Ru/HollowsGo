@@ -47,17 +47,30 @@ class _TendaScreenState extends State<TendaScreen> {
     'lib/images/fondo_tendascreen/Yoruichi.jpg',
   ];
   int _currentImageIndex = 0;
+  bool _mostrarSkin = false; // 🔹 Iniciem tancat
+
   @override
   void initState() {
     super.initState();
+
     _startBackgroundRotation();
 
     AudioService.instance.playScreenMusic('tenda');
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
       dialogueProvider.loadDialogueFromJson('urahara');
+
+      final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+      bool success = await gachaProvider.getSkinDelDia(context);
+
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No s\'ha pogut carregar la Skin del Dia.')),
+        );
+      }
+      setState(() {}); // refresquem la UI per mostrar la skin carregada
     });
   }
 
@@ -65,8 +78,7 @@ class _TendaScreenState extends State<TendaScreen> {
     Future.delayed(Duration(seconds: 8), () {
       if (!mounted) return;
       setState(() {
-        _currentImageIndex =
-            (_currentImageIndex + 1) % _backgroundImages.length;
+        _currentImageIndex = (_currentImageIndex + 1) % _backgroundImages.length;
       });
       _startBackgroundRotation();
     });
@@ -75,84 +87,8 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   void dispose() {
     _pageController.dispose();
-    AudioService.instance.fadeOut(); // O stop si vols tallar de cop
+   
     super.dispose();
-  }
-
-  // Diàleg modal per mostrar la Skin del Dia
-  void _showSkinDelDiaDialog(BuildContext context, Map<String, dynamic>? skin) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.black.withOpacity(0.7),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: Container(
-            padding: EdgeInsets.all(16),
-            constraints: BoxConstraints(maxWidth: 350),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Skin del Dia",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.greenAccent,
-                    shadows: [
-                      Shadow(
-                        offset: Offset(1, 1),
-                        blurRadius: 3,
-                        color: Colors.black45,
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 16),
-                if (skin != null && skin['imatge'] != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      skin['imatge'],
-                      height: 180,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(Icons.broken_image,
-                          size: 100, color: Colors.grey),
-                    ),
-                  )
-                else
-                  Container(
-                    height: 180,
-                    alignment: Alignment.center,
-                    child: Text(
-                      "No hi ha cap skin disponible avui.",
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                  ),
-                SizedBox(height: 16),
-                if (skin != null && skin['description'] != null)
-                  Text(
-                    skin['description'],
-                    style: TextStyle(color: Colors.white70),
-                    textAlign: TextAlign.center,
-                  ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[700],
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Tancar"),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -226,6 +162,8 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   Widget _buildGachaContent(GachaProvider gachaProvider) {
+    final skin = gachaProvider.latestSkin;
+
     return Column(
       children: [
         SizedBox(height: 150),
@@ -236,65 +174,121 @@ class _TendaScreenState extends State<TendaScreen> {
           child: Column(
             children: [
               GachaBannerWidget(),
-              SizedBox(height: 20),
-
-              // Carta Skin del Dia
-              Card(
-                color: Colors.black.withOpacity(0.5),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                elevation: 8,
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Skin del Dia',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.greenAccent,
-                        ),
-                      ),
-                      SizedBox(height: 12),
-                      ElevatedButton.icon(
-                        icon: Icon(Icons.visibility),
-                        label: Text("Veure Skin"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green[700],
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
-                        ),
-                        onPressed: () async {
-                          final gachaProvider = Provider.of<GachaProvider>(
-                              context,
-                              listen: false);
-
-                          bool success =
-                              await gachaProvider.getSkinDelDia(context);
-
-                          if (success) {
-                            _showSkinDelDiaDialog(
-                                context, gachaProvider.latestSkin);
-                          } else {
-                            // Opcional: mostra un error o missatge alternatiu
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(
-                                      'No s\'ha pogut carregar la Skin del Dia.')),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 10),
+              SizedBox(height: 5),
             ],
           ),
         ),
+
+        // 🔹 La targeta "Skin del Dia" amb desplegament
+        Align(
+          alignment: Alignment.centerRight,
+          child: Container(
+            width: MediaQuery.of(context).size.width * 0.55,
+            margin: const EdgeInsets.only(right: 16),
+            child: Card(
+              color: Colors.black.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Color(0xFF1B5E20), width: 1.5), // Borde verd fosc i fi
+              ),
+              elevation: 8,
+              child: Column(
+                children: [
+                  // 🔹 Títol i botó de desplegament
+                  ListTile(
+                    title: Text(
+                      'Skin del Dia',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(
+                        _mostrarSkin
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _mostrarSkin = !_mostrarSkin;
+                        });
+                      },
+                    ),
+                  ),
+
+                  // 🔹 Contingut desplegable
+                  AnimatedCrossFade(
+                    firstChild: SizedBox.shrink(),
+                    secondChild: Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Column(
+                        children: [
+                          if (skin != null && skin['imatge'] != null)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                skin['imatge'],
+                                height: 115,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(
+                                  Icons.broken_image,
+                                  size: 100,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            )
+                          else
+                            Container(
+                              height: 140,
+                              alignment: Alignment.center,
+                              child: Text(
+                                "No hi ha cap skin disponible avui.",
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                          SizedBox(height: 8),
+                          if (skin != null && skin['description'] != null)
+                            Text(
+                              skin['description'],
+                              style:
+                                  TextStyle(color: Colors.white70, fontSize: 12),
+                              textAlign: TextAlign.center,
+                            ),
+                          SizedBox(height: 12),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content:
+                                      Text("Has fet clic a Comprar la skin!"),
+                                ),
+                              );
+                            },
+                            child: Text('Comprar'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    crossFadeState: _mostrarSkin
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: Duration(milliseconds: 300),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 10),
       ],
     );
   }
