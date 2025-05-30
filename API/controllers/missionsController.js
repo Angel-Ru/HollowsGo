@@ -20,7 +20,7 @@ exports.assignarMissionsDiaries = async (req, res) => {
       // 1. Assignar missions fixes
       // 1. Assignar missions fixes de tipus 0
 const [fixes] = await connection.execute(`
-  SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus = 0
+  SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus_missio = 0
 `);
 
       for (const missio of fixes) {
