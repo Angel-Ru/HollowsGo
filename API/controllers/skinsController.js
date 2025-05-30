@@ -2343,3 +2343,101 @@ exports.skinDelDia = async (req, res) => {
         res.status(500).send('Error en obtenir la skin del dia.');
     }
 };
+exports.comprarSkin = async (req, res) => {
+  try {
+    const { email, skinId, personatgeId } = req.body;
+
+    if (!email || !skinId || !personatgeId) {
+      return res.status(200).send({
+        success: false,
+        message: 'Falten paràmetres: email, skinId o personatgeId.'
+      });
+    }
+
+    const connection = await connectDB();
+
+    // Obtenir usuari i fragments
+    const [userRecord] = await connection.execute(
+      'SELECT id, punts_emmagatzemats FROM USUARIS WHERE email = ?',
+      [email]
+    );
+
+    if (userRecord.length === 0) {
+      return res.status(200).send({
+        success: false,
+        message: 'No es troba cap usuari amb aquest correu electrònic.'
+      });
+    }
+
+    const userId = userRecord[0].id;
+    let currentFragments = userRecord[0].punts_emmagatzemats;
+
+    if (currentFragments < 100) {
+      return res.status(200).send({
+        success: false,
+        message: 'No tens prou fragments per comprar la skin.',
+        fragmentsRestants: currentFragments
+      });
+    }
+
+    // Obtenir biblioteca d'aquest personatge de l'usuari
+    const [libraryRecords] = await connection.execute(
+      'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
+      [userId, personatgeId]
+    );
+
+    let skinIds = [];
+    if (libraryRecords.length > 0 && libraryRecords[0].skin_ids) {
+      skinIds = libraryRecords[0].skin_ids.split(',').map(id => id.trim());
+    }
+
+    // Comprovar si ja té la skin
+    if (skinIds.includes(String(skinId))) {
+      return res.status(200).send({
+        success: false,
+        message: 'Ja tens aquesta skin.',
+        skinId,
+        personatgeId
+      });
+    }
+
+    // Afegir la nova skin
+    skinIds.push(String(skinId));
+    const updatedSkinIds = skinIds.join(',');
+
+    if (libraryRecords.length === 0) {
+      // Inserir registre nou
+      await connection.execute(
+        'INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids) VALUES (?, ?, NOW(), ?)',
+        [userId, personatgeId, updatedSkinIds]
+      );
+    } else {
+      // Actualitzar registre existent
+      await connection.execute(
+        'UPDATE BIBLIOTECA SET skin_ids = ? WHERE user_id = ? AND personatge_id = ?',
+        [updatedSkinIds, userId, personatgeId]
+      );
+    }
+
+    // Restar 100 fragments
+    currentFragments -= 100;
+    await connection.execute(
+      'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+      [currentFragments, userId]
+    );
+
+    res.status(200).send({
+      success: true,
+      message: 'Skin comprada amb èxit!',
+      skinId,
+      personatgeId,
+      fragmentsRestants: currentFragments
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({
+      success: false,
+      message: 'Error en comprar la skin.'
+    });
+  }
+};

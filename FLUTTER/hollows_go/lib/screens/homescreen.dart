@@ -20,9 +20,10 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void initState() {
-        AudioService.instance.playScreenMusic('home');
 
     super.initState();
+            AudioService.instance.playScreenMusic('home');
+
     _controller = HomeScreenController(context);
 
     _expandController = AnimationController(

@@ -11,6 +11,8 @@ router.get('/biblioteca/:id', verificacioUsuari.verifyToken,skinsController.getP
 
 router.post('/skindia', verificacioUsuari.verifyToken, skinsController.skinDelDia)
 
+router.post('/skindia/comprar', verificacioUsuari.verifyToken, skinsController.comprarSkin)
+
 // Ruta per obtenir tots els quincys amb les seves skins de l'usuari
 router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariQuincy);
 

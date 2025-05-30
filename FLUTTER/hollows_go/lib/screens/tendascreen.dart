@@ -258,23 +258,32 @@ class _TendaScreenState extends State<TendaScreen> {
                             ),
                           SizedBox(height: 12),
                           ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content:
-                                      Text("Has fet clic a Comprar la skin!"),
-                                ),
-                              );
-                            },
-                            child: Text('Comprar'),
-                          ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.green,
+    foregroundColor: Colors.white,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+  onPressed: () async {
+    final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+    if (skin == null) return;
+
+    bool success = await gachaProvider.comprarSkinDelDia(
+      context,
+      skin['id'],          // Assumint que skin té un camp 'id'
+      skin['personatgeId'] ?? 0,  // També agafem el personatgeId (o posa 0 si no existeix)
+    );
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Has comprat la Skin del Dia!")),
+      );
+    }
+  },
+  child: Text('Comprar'),
+),
+
                         ],
                       ),
                     ),
