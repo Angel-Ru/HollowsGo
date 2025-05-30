@@ -1,4 +1,9 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:hollows_go/screens/dialegnoticies.dart';
+import 'package:hollows_go/widgets/novetatscontainerstate.dart';
+import 'package:provider/provider.dart';
+
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/service/audioservice.dart';
 import '../widgets/missions/mission_drawer.dart';
@@ -55,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen>
           AudioService.instance.playScreenMusic('perfil');
           break;
         default:
-          AudioService.instance.stop(); // o playScreenMusic('default')
+          AudioService.instance.stop();
       }
     };
 
@@ -147,6 +152,17 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
+  void _showDialegNoticies() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: DialegNoticies(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final uiProvider = Provider.of<UIProvider>(context);
@@ -184,9 +200,10 @@ class _HomeScreenState extends State<HomeScreen>
                 curve: Curves.easeInOut,
                 child: Padding(
                   padding: EdgeInsets.only(
-                      top: _mostrarDetallsSkin ? 0 : topMargin,
-                      left: 16,
-                      right: 16),
+                    top: _mostrarDetallsSkin ? 0 : topMargin,
+                    left: 16,
+                    right: 16,
+                  ),
                   child: ScaleTransition(
                     scale: _expandAnimation,
                     child: _buildExpandedCard(skin),
@@ -211,6 +228,15 @@ class _HomeScreenState extends State<HomeScreen>
               );
             },
           ),
+          if (!_mostrarDetallsSkin)
+            Positioned(
+              top: topMargin + 200, // Ajusta la posició segons necessiti
+              left: 0,
+              right: 0,
+              child: NovetatsContainer(
+                onTap: _showDialegNoticies,
+              ),
+            ),
           if (uiProvider.selectedMenuOpt == 0) DialogueSection(),
           AnimatedSwitcher(
             duration: Duration(milliseconds: 600),
@@ -266,9 +292,10 @@ class _HomeScreenState extends State<HomeScreen>
             child: Text(
               skin.nom,
               style: TextStyle(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
             ),
           ),
           AnimatedBuilder(
