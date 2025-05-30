@@ -513,10 +513,15 @@ exports.gachaTirada = async (req, res) => {
             }
         }
 
-        // Si ja la té, no restem monedes
+        // Si ja la té, afegir 10 fragments_skins en lloc de restar monedes
         if (userSkinIds.includes(String(randomSkin.id))) {
+            await connection.execute(
+                'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                [userId]
+            );
+
             return res.status(200).send({
-                message: "Ja tens aquesta skin.",
+                message: "Ja tens aquesta skin. Has rebut 10 fragments de skin!",
                 skin: randomSkin,
                 remainingCoins: currentBalance,
             });
@@ -563,6 +568,7 @@ exports.gachaTirada = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 exports.gachaSimulacio = async (req, res) => {
