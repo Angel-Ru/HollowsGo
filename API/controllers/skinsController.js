@@ -2358,7 +2358,7 @@ exports.comprarSkin = async (req, res) => {
 
     // Obtenir usuari i fragments
     const [userRecord] = await connection.execute(
-      'SELECT id, punts_emmagatzemats FROM USUARIS WHERE email = ?',
+      'SELECT id, fragments_skins FROM USUARIS WHERE email = ?',
       [email]
     );
 
@@ -2422,7 +2422,7 @@ exports.comprarSkin = async (req, res) => {
     // Restar 100 fragments
     currentFragments -= 100;
     await connection.execute(
-      'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+      'UPDATE USUARIS SET fragments_skins = ? WHERE id = ?',
       [currentFragments, userId]
     );
 

@@ -272,7 +272,7 @@ class _TendaScreenState extends State<TendaScreen> {
     bool success = await gachaProvider.comprarSkinDelDia(
       context,
       skin['id'],          // Assumint que skin té un camp 'id'
-      skin['personatgeId'] ?? 0,  // També agafem el personatgeId (o posa 0 si no existeix)
+      skin['personatge'] ?? 0,  // També agafem el personatgeId (o posa 0 si no existeix)
     );
 
     if (success) {
