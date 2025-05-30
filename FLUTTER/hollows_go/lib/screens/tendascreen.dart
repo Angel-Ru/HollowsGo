@@ -111,11 +111,11 @@ class _TendaScreenState extends State<TendaScreen> {
                   ),
                 ),
                 SizedBox(height: 16),
-                if (skin != null && skin['imageUrl'] != null)
+                if (skin != null && skin['imatge'] != null)
                   ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.network(
-                      skin['imageUrl'],
+                      skin['imatge'],
                       height: 180,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Icon(Icons.broken_image,
@@ -266,9 +266,25 @@ class _TendaScreenState extends State<TendaScreen> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
-                        onPressed: () {
-                          _showSkinDelDiaDialog(
-                              context, gachaProvider.latestSkin);
+                        onPressed: () async {
+                          final gachaProvider = Provider.of<GachaProvider>(
+                              context,
+                              listen: false);
+
+                          bool success =
+                              await gachaProvider.getSkinDelDia(context);
+
+                          if (success) {
+                            _showSkinDelDiaDialog(
+                                context, gachaProvider.latestSkin);
+                          } else {
+                            // Opcional: mostra un error o missatge alternatiu
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'No s\'ha pogut carregar la Skin del Dia.')),
+                            );
+                          }
                         },
                       ),
                     ],
