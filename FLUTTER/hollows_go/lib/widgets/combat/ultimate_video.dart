@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import '../../service/videoservice.dart';
 
 class UltimateVideo extends StatefulWidget {
   final String videoAsset;
-  final VideoPlayerController? controller;
   final VoidCallback onVideoEnd;
 
   const UltimateVideo({
     required this.videoAsset,
     required this.onVideoEnd,
-    this.controller,
     Key? key,
   }) : super(key: key);
 
@@ -18,45 +17,45 @@ class UltimateVideo extends StatefulWidget {
 }
 
 class _UltimateVideoState extends State<UltimateVideo> {
-  late VideoPlayerController _videoController;
+  VideoPlayerController? _videoController;
   bool _videoEnded = false;
+  bool _isInitialized = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeVideo();
+  }
 
-    _videoController =
-        widget.controller ?? VideoPlayerController.asset(widget.videoAsset);
+  Future<void> _initializeVideo() async {
+    final result = await VideoService.initAssetVideo(
+      assetPath: widget.videoAsset,
+      onVideoEnd: _handleVideoEnd,
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: false,
+      showControls: false,
+    );
 
-    if (widget.controller == null) {
-      _videoController.initialize().then((_) {
-        setState(() {});
-        _videoController.play();
-        _startListeners();
+    if (result != null) {
+      setState(() {
+        _videoController = result.videoController;
+        _isInitialized = _videoController!.value.isInitialized;
       });
-    } else {
-      _videoController.play();
-      _startListeners();
     }
   }
 
-  void _startListeners() {
-    _videoController.addListener(() {
-      if (!_videoEnded &&
-          _videoController.value.position >= _videoController.value.duration &&
-          !_videoController.value.isPlaying) {
-        _videoEnded = true;
-        widget.onVideoEnd();
-        Navigator.of(context).pop();
-      }
-    });
+  void _handleVideoEnd() {
+    if (!_videoEnded) {
+      _videoEnded = true;
+      widget.onVideoEnd();
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   void dispose() {
-    if (widget.controller == null) {
-      _videoController.dispose();
-    }
+    VideoService.disposeControllers(videoController: _videoController);
     super.dispose();
   }
 
@@ -65,21 +64,18 @@ class _UltimateVideoState extends State<UltimateVideo> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: _videoController.value.isInitialized
+        child: _isInitialized
             ? Container(
                 margin: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.orangeAccent,
-                    width: 4,
-                  ),
+                  border: Border.all(color: Colors.orangeAccent, width: 4),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: AspectRatio(
-                    aspectRatio: _videoController.value.aspectRatio,
-                    child: VideoPlayer(_videoController),
+                    aspectRatio: _videoController!.value.aspectRatio,
+                    child: VideoPlayer(_videoController!),
                   ),
                 ),
               )
