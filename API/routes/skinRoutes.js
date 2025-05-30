@@ -9,7 +9,7 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifi
 //Ruta per obtenir tots els personatges amb les seves skins de l'usuari
 router.get('/biblioteca/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuari);
 
-router.get('/skindia', skinsController.skinDelDia)
+router.post('/skindia', verificacioUsuari.verifyToken, skinsController.skinDelDia)
 
 // Ruta per obtenir tots els quincys amb les seves skins de l'usuari
 router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariQuincy);
