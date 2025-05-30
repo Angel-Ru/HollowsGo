@@ -1,5 +1,6 @@
 import 'package:hollows_go/screens/amistatsscreen.dart';
 import '../imports.dart';
+import 'package:hollows_go/service/audioservice.dart';
 
 class PerfilScreen extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
   void initState() {
     super.initState();
     _initializeData();
+    AudioService.instance.playScreenMusic('perfil');
   }
 
   Future<void> _initializeData() async {
@@ -128,7 +130,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   PerfilHeader(
                     username: userProvider.username,
                     userId: userProvider.userId,
-                    
                   ),
 
                   const SizedBox(height: 30),

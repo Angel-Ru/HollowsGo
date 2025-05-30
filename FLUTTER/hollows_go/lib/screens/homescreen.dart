@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/service/audioservice.dart';
-import '../models/missionDiaria.dart';
 import '../widgets/missions/mission_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -31,9 +29,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
     _expandAnimation =
         CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
+    AudioService.instance.playScreenMusic('home');
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await AudioService.instance.playScreenMusic('home');
       try {
         final avatarUrl = await _controller.loadProfileImage();
         setState(() => _imagePath = avatarUrl);

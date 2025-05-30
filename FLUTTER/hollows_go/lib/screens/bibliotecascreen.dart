@@ -1,6 +1,8 @@
 import 'dart:ui';
 
 // Aquí importes els teus models i providers
+import 'package:hollows_go/service/audioservice.dart';
+
 import '../imports.dart';
 
 class BibliotecaScreen extends StatefulWidget {
@@ -17,6 +19,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     super.initState();
     _loadUserData();
     _loadInitialDialogue();
+    AudioService.instance.playScreenMusic('biblioteca');
   }
 
   Future<void> _loadUserData() async {
