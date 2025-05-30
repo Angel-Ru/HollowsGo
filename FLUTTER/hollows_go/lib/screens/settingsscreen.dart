@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:http/http.dart' as http;
 import '../imports.dart'; // Inclou aquí el teu import general
 
 class SettingsScreen extends StatefulWidget {
@@ -92,6 +92,103 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  Future<void> _deleteAccount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('user_id');
+    final token = prefs.getString('token');
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7), BlendMode.darken),
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.orangeAccent,
+                  width: 3,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Eliminar compte',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade300,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Estàs segur que vols eliminar el teu compte?\nPerdràs totes les dades.',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('No',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orangeAccent,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Sí'),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (confirm == true && userId != null && token != null) {
+      final response = await http.delete(
+        Uri.parse('https://${Config.ip}/usuaris/$userId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        await prefs.clear();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => PreHomeScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al eliminar el compte')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,7 +205,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Stack(
         children: [
-          // Fons d'imatge
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -118,16 +214,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ),
-
-          // Filtre glaçat (blur)
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Container(
               color: Colors.black.withOpacity(0.2),
             ),
           ),
-
-          // Contingut
           Column(
             children: [
               const SizedBox(height: 10),
@@ -199,8 +291,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Icon(Icons.volume_up, color: Colors.white),
                           ],
                         ),
-
-                        // 🔈 Botó Mutar / Desmutar
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -211,8 +301,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         SizedBox(height: 20),
-
-                        // 🆕 Botó Tutorial
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -229,6 +317,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     builder: (_) => TutorialScreen()),
                               );
                             },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+
+                        // ✅ Botó d'eliminar compte
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.delete_forever),
+                            label: Text('Eliminar Compte'),
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Colors.deepOrangeAccent,
+                            ),
+                            onPressed: _deleteAccount,
                           ),
                         ),
                         SizedBox(height: 20),
@@ -252,8 +355,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
-
-              // 💬 Diàleg del personatge
               Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 child: DialogueWidget(

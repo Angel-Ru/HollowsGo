@@ -28,7 +28,7 @@ class CustomBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(context, Icons.map, 'Mapa', 1),
-          _buildNavItem(context, Icons.storefront, 'Tienda', 2),
+          _buildNavItem(context, Icons.storefront, 'Tenda', 2),
           _buildHomeButton(context),
           _buildNavItem(context, Icons.apps, 'Biblioteca', 3),
           _buildNavItem(context, Icons.person, 'Perfil', 4),
