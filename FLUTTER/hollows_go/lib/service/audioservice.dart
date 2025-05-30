@@ -1,6 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
 
+import 'package:hollows_go/imports.dart';
+
 class AudioService {
   // Singleton
   static final AudioService instance = AudioService._internal();
@@ -100,6 +102,7 @@ class AudioService {
     }
 
     final url = urls[_random.nextInt(urls.length)];
+    debugPrint('🔊 playScreenMusic($screen) -> $url');
     if (_currentUrl != url) {
       await fadeOut();
       await play(url);
