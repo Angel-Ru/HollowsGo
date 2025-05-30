@@ -442,6 +442,75 @@ Future<bool> getSkinDelDia(BuildContext context) async {
   }
 }
 
+Future<bool> comprarSkinDelDia(BuildContext context, int skinId, int personatgeId) async {
+  _setLoading(true);
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('userEmail');
+    final token = prefs.getString('token');
+
+    if (email == null || token == null) {
+      _showError(context, "No s'ha pogut obtenir el correu o el token.");
+      _setLoading(false);
+      return false;
+    }
+
+    final url = Uri.parse('https://${Config.ip}/skins/skindia/comprar');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({
+        'email': email,
+        'skinId': skinId,
+        'personatgeId': personatgeId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['error'] != null) {
+        // Si l'API retorna un error específic
+        _showError(context, data['error']);
+        return false;
+      }
+
+      if (data['message'] != null) {
+        _showError(context, data['message']);
+      }
+
+      if (data['success'] == true) {
+        _latestSkin = data['skin'] ?? {};
+        _isDuplicateSkin = false;
+        notifyListeners();
+        return true;
+      } else if (data['alreadyHasSkin'] == true) {
+        _isDuplicateSkin = true;
+        _showError(context, "Ja tens aquesta skin.");
+        return false;
+      } else if (data['notEnoughFragments'] == true) {
+        _showError(context, "No tens fragments suficients per comprar aquesta skin.");
+        return false;
+      }
+
+      return false;
+    } else {
+      _showError(context, 'Error: ${response.body}');
+      return false;
+    }
+  } catch (e) {
+    _showError(context, 'Error en comprar la skin: $e');
+    return false;
+  } finally {
+    _setLoading(false);
+  }
+}
+
 
 
 
