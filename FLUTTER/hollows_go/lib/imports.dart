@@ -62,6 +62,8 @@ export '/widgets/home/home_screen_controller.dart';
 export '/widgets/avatar/avatar_grid.dart';
 export '/widgets/avatar/current_avatar_display.dart';
 
+export '/service/videoservice.dart';
+
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:flutter/material.dart';
 export 'package:file_picker/file_picker.dart';

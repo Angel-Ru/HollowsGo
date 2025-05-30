@@ -1,5 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/service/videoservice.dart';
 import 'package:video_player/video_player.dart';
 
 class DialogVideoPlayer {
@@ -15,30 +16,30 @@ class DialogVideoPlayer {
       return _VideoInitResult(showContent: true, isReady: false);
     }
 
-    _videoController = VideoPlayerController.asset(videoPath);
-    try {
-      await _videoController!.initialize();
-      _chewieController = ChewieController(
-        videoPlayerController: _videoController!,
-        autoPlay: true,
-        looping: false,
-        showControls: false,
-        allowFullScreen: false,
-      );
+    final result = await VideoService.initAssetVideo(
+      assetPath: videoPath,
+      onVideoEnd: onVideoEnd,
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: false,
+      showControls: false,
+    );
 
-      _videoController!.addListener(() {
-        if (_videoController!.value.position >= _videoController!.value.duration) {
-          onVideoEnd();
-        }
-      });
-
-      return _VideoInitResult(showContent: false, isReady: true);
-    } catch (_) {
+    if (result == null) {
       return _VideoInitResult(showContent: true, isReady: false);
     }
+
+    _videoController = result.videoController;
+    _chewieController = result.chewieController;
+
+    return _VideoInitResult(showContent: false, isReady: true);
   }
 
   static Widget build() {
+    if (_videoController == null || !_videoController!.value.isInitialized) {
+      return const SizedBox.shrink(); // Per evitar errors si no està preparat
+    }
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -56,9 +57,12 @@ class DialogVideoPlayer {
   }
 
   static void dispose() {
-    _videoController?.removeListener(() {});
-    _videoController?.dispose();
-    _chewieController?.dispose();
+    VideoService.disposeControllers(
+      videoController: _videoController,
+      chewieController: _chewieController,
+    );
+    _videoController = null;
+    _chewieController = null;
   }
 }
 
