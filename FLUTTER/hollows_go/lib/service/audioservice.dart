@@ -17,6 +17,7 @@ class AudioService {
   String? _currentUrl;
   Duration _currentPosition = Duration.zero;
   bool _isPlaying = false;
+  bool _isFading = false; // bandera per controlar fades
   double _volume = 1.0; // Volum guardat manualment
 
   final List<String> _homeMusicUrls = [
@@ -52,8 +53,13 @@ class AudioService {
   bool get isPlaying => _isPlaying;
 
   Future<void> play(String url) async {
+    if (_isFading) {
+      debugPrint('⚠️ Ignorant play() mentre es fa fadeOut');
+      return;
+    }
     try {
       if (_currentUrl != url || !_isPlaying) {
+        debugPrint('▶️ Reproduint URL: $url');
         await _player.stop();
         _currentUrl = url;
         _currentPosition = Duration.zero;
@@ -110,8 +116,9 @@ class AudioService {
   }
 
   Future<void> fadeOut({Duration duration = const Duration(seconds: 1)}) async {
-    if (!_isPlaying) return;
+    if (!_isPlaying || _isFading) return;
 
+    _isFading = true;
     const int steps = 10;
     final double stepVolume = _volume / steps;
     final int stepDuration = duration.inMilliseconds ~/ steps;
@@ -130,12 +137,13 @@ class AudioService {
       _currentPosition = Duration.zero;
     } catch (e) {
       debugPrint('❌ Error a fadeOut(): $e');
+    } finally {
+      _isFading = false;
     }
   }
 
-  /// Reprodueix música segons la pantalla especificada
   Future<void> playScreenMusic(String screen) async {
-    List<String>? urls;
+    List<String> urls;
 
     switch (screen) {
       case 'home':
@@ -144,24 +152,25 @@ class AudioService {
       case 'tenda':
         urls = _tendaMusicUrls;
         break;
-      case 'biblioteca':
-        urls = _bibliotecaMusicUrls;
-        break;
       case 'perfil':
         urls = _perfilMusicUrls;
         break;
-      case 'mapa':
-        urls = _mapaMusicUrls;
-        break;
       default:
+        debugPrint('⚠️ playScreenMusic: pantalla desconeguda $screen');
         return;
     }
 
     final url = urls[_random.nextInt(urls.length)];
     debugPrint('🔊 playScreenMusic($screen) -> $url');
-    if (_currentUrl != url || !_isPlaying) {
-      await fadeOut();
-      await play(url);
+
+    if (_currentUrl == url && _isPlaying) {
+      debugPrint('🔊 Ja s’està reproduint aquesta música');
+      return;
     }
+
+    if (_isPlaying) {
+      await fadeOut();
+    }
+    await play(url);
   }
 }
