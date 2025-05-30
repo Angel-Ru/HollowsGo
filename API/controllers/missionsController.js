@@ -32,7 +32,7 @@ const [fixes] = await connection.execute(`
 
       // 2. Assignar una variable del dia (rotativa)
       const [variables] = await connection.execute(`
-  SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus = 0 ORDER BY id
+  SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus_missio = 0 ORDER BY id
 `);
 
       const dia = new Date();
