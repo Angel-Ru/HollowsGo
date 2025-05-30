@@ -611,7 +611,7 @@ exports.gachaSimulacio = async (req, res) => {
             return 'kenpachi';
         }
 
-        // 🔄 Simular que sempre toca la skin amb ID 237
+        // 🔄 Simular que sempre toca la skin amb ID 41
         const [simulatedSkinResult] = await connection.execute(
             'SELECT * FROM SKINS WHERE id = ?',
             [41]
@@ -669,9 +669,14 @@ exports.gachaSimulacio = async (req, res) => {
             : [];
 
         if (userSkinIds.includes(String(randomSkin.id))) {
-            // Ja té aquesta skin: NO restem monedes
+            // Ja té aquesta skin: NO restem monedes i sumem 10 fragments_skins
+            await connection.execute(
+                'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                [userId]
+            );
+
             return res.status(200).send({
-                message: "Ja tens aquesta skin.",
+                message: "Ja tens aquesta skin. Has rebut 10 fragments de skin!",
                 skin: randomSkin,
                 remainingCoins: currentBalance,
             });
@@ -713,6 +718,7 @@ exports.gachaSimulacio = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 
@@ -2268,5 +2274,72 @@ exports.llevarSkinSeleccionada = async (req, res) => {
     } catch (error) {
         console.error('Error actualitzant la skin seleccionada:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
+
+exports.skinDelDia = async (req, res) => {
+    try {
+        const email = req.body.email;
+
+        if (!email) {
+            return res.status(400).send('Email no proporcionat.');
+        }
+
+        const connection = await connectDB();
+
+        // Obtenir l'usuari
+        const [userRecord] = await connection.execute(
+            'SELECT id FROM USUARIS WHERE email = ?',
+            [email]
+        );
+
+        if (userRecord.length === 0) {
+            return res.status(400).send('No es troba cap usuari amb aquest correu electrònic.');
+        }
+
+        const userId = userRecord[0].id;
+
+        // Obtenir totes les skins de l'usuari
+        const [userSkins] = await connection.execute(
+            'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ?',
+            [userId]
+        );
+
+        let userSkinIds = userSkins
+            .map(row => row.skin_ids)
+            .filter(Boolean)
+            .flatMap(ids => ids.split(',').map(id => parseInt(id)));
+
+        // Obtenir les skins que NO té l'usuari
+        let [notOwnedSkins] = await connection.execute(`
+            SELECT s.*
+            FROM SKINS s
+            WHERE s.id NOT IN (${userSkinIds.length > 0 ? userSkinIds.join(',') : '0'})
+        `);
+
+        if (notOwnedSkins.length === 0) {
+            return res.status(200).send({
+                message: "Ja tens totes les skins!",
+                skin: null
+            });
+        }
+
+        // Seleccionar una skin diferent cada dia, per exemple:
+        // - Obtenim el número de dies des de '1970-01-01'
+        // - Fem servir aquest número com a índex en el conjunt de skins disponibles
+        const today = new Date();
+        const dayIndex = Math.floor(today.getTime() / (1000 * 60 * 60 * 24));
+
+        const skinIndex = dayIndex % notOwnedSkins.length;
+        const skinDelDia = notOwnedSkins[skinIndex];
+
+        res.status(200).send({
+            message: "Skin del dia seleccionada!",
+            skin: skinDelDia
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error en obtenir la skin del dia.');
     }
 };

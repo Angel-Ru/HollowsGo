@@ -391,6 +391,59 @@ Future<void> fetchSkinsCategoria4Hollows(BuildContext context) async {
   }
 }
 
+Future<bool> getSkinDelDia(BuildContext context) async {
+  _setLoading(true);
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final email = prefs.getString('userEmail');
+    final token = prefs.getString('token');
+
+    if (email == null || token == null) {
+      _showError(context, "No s'ha pogut obtenir el correu o el token.");
+      _setLoading(false);
+      return false;
+    }
+
+    final url = Uri.parse('https://${Config.ip}/skins/skindia');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode({'email': email}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['skin'] == null) {
+        _latestSkin = {};
+        _isDuplicateSkin = false;
+        _showError(context, data['message'] ?? 'No s\'ha trobat cap skin del dia.');
+      } else {
+        _latestSkin = data['skin'];
+        _isDuplicateSkin = false;
+      }
+
+      notifyListeners();
+      return true;
+    } else {
+      _showError(context, 'Error: ${response.body}');
+      return false;
+    }
+  } catch (e) {
+    _showError(context, 'Error en obtenir la skin del dia: $e');
+    return false;
+  } finally {
+    _setLoading(false);
+  }
+}
+
+
+
 
 
 
