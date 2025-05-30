@@ -22,8 +22,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     AudioService.instance.playScreenMusic('biblioteca');
   }
 
-
-
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('userId');

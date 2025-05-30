@@ -55,7 +55,8 @@ class _TendaScreenState extends State<TendaScreen> {
 
     _startBackgroundRotation();
 
-    AudioService.instance.playScreenMusic('tenda');
+    AudioService.instance.playScreenMusic(
+        'tenda'); //perque ja la guardi carregada quan es construeix la pantalla i carregui mes aviat
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final dialogueProvider =
@@ -78,7 +79,8 @@ class _TendaScreenState extends State<TendaScreen> {
     Future.delayed(Duration(seconds: 8), () {
       if (!mounted) return;
       setState(() {
-        _currentImageIndex = (_currentImageIndex + 1) % _backgroundImages.length;
+        _currentImageIndex =
+            (_currentImageIndex + 1) % _backgroundImages.length;
       });
       _startBackgroundRotation();
     });
@@ -87,7 +89,7 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   void dispose() {
     _pageController.dispose();
-   
+
     super.dispose();
   }
 
@@ -189,7 +191,9 @@ class _TendaScreenState extends State<TendaScreen> {
               color: Colors.black.withOpacity(0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Color(0xFF1B5E20), width: 1.5), // Borde verd fosc i fi
+                side: BorderSide(
+                    color: Color(0xFF1B5E20),
+                    width: 1.5), // Borde verd fosc i fi
               ),
               elevation: 8,
               child: Column(
@@ -252,38 +256,43 @@ class _TendaScreenState extends State<TendaScreen> {
                           if (skin != null && skin['description'] != null)
                             Text(
                               skin['description'],
-                              style:
-                                  TextStyle(color: Colors.white70, fontSize: 12),
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 12),
                               textAlign: TextAlign.center,
                             ),
                           SizedBox(height: 12),
                           ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.green,
-    foregroundColor: Colors.white,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-  ),
-  onPressed: () async {
-    final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
-    if (skin == null) return;
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () async {
+                              final gachaProvider = Provider.of<GachaProvider>(
+                                  context,
+                                  listen: false);
+                              if (skin == null) return;
 
-    bool success = await gachaProvider.comprarSkinDelDia(
-      context,
-      skin['id'],          // Assumint que skin té un camp 'id'
-      skin['personatgeId'] ?? 0,  // També agafem el personatgeId (o posa 0 si no existeix)
-    );
+                              bool success =
+                                  await gachaProvider.comprarSkinDelDia(
+                                context,
+                                skin['id'], // Assumint que skin té un camp 'id'
+                                skin['personatgeId'] ??
+                                    0, // També agafem el personatgeId (o posa 0 si no existeix)
+                              );
 
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Has comprat la Skin del Dia!")),
-      );
-    }
-  },
-  child: Text('Comprar'),
-),
-
+                              if (success) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text("Has comprat la Skin del Dia!")),
+                                );
+                              }
+                            },
+                            child: Text('Comprar'),
+                          ),
                         ],
                       ),
                     ),

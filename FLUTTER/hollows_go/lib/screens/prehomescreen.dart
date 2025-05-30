@@ -55,10 +55,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     _startAutoScroll(_scrollControllerTop);
     _startAutoScroll(_scrollControllerBottom);
 
-    /// 🔊 Nova crida unificada de música
     AudioService.instance.playScreenMusic('prehome');
 
-    /// Carrega de diàleg inicial
     Provider.of<DialogueProvider>(context, listen: false)
         .loadDialogueFromJson("ichigo");
   }
@@ -69,8 +67,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     _controller.dispose();
     _scrollControllerTop.dispose();
     _scrollControllerBottom.dispose();
-
-    AudioService.instance.stop(); // En cas que es tanqui abans
 
     super.dispose();
   }
@@ -198,7 +194,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     );
 
     if (result == true) {
-      await AudioService.instance.stop();
+      await AudioService.instance.fadeOut();
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => HomeScreen()),

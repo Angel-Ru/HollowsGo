@@ -18,11 +18,12 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
 
+  late final UIProvider _uiProvider;
+  late VoidCallback _uiListener;
+
   @override
   void initState() {
-
     super.initState();
-            AudioService.instance.playScreenMusic('home');
 
     _controller = HomeScreenController(context);
 
@@ -32,6 +33,36 @@ class _HomeScreenState extends State<HomeScreen>
     );
     _expandAnimation =
         CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
+
+    // Inicialitza el UIProvider i el listener per detectar canvis de menú
+    _uiProvider = Provider.of<UIProvider>(context, listen: false);
+
+    _uiListener = () {
+      switch (_uiProvider.selectedMenuOpt) {
+        case 0:
+          AudioService.instance.playScreenMusic('home');
+          break;
+        case 1:
+          AudioService.instance.playScreenMusic('mapa');
+          break;
+        case 2:
+          AudioService.instance.playScreenMusic('tenda');
+          break;
+        case 3:
+          AudioService.instance.playScreenMusic('biblioteca');
+          break;
+        case 4:
+          AudioService.instance.playScreenMusic('perfil');
+          break;
+        default:
+          AudioService.instance.stop(); // o playScreenMusic('default')
+      }
+    };
+
+    _uiProvider.addListener(_uiListener);
+
+    // Reproduir la música inicial segons el menú per si no és home
+    _uiListener();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -64,9 +95,11 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _timer?.cancel();
-    
 
     _expandController.dispose();
+
+    _uiProvider.removeListener(_uiListener);
+
     super.dispose();
   }
 

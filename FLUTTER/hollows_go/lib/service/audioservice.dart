@@ -1,3 +1,5 @@
+import 'dart:math' as developer;
+
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
 import 'package:hollows_go/imports.dart';
@@ -7,9 +9,14 @@ class AudioService {
   static final AudioService instance = AudioService._internal();
   factory AudioService() => instance;
   AudioService._internal() {
-    _player.onPlayerComplete.listen((event) {
-      _isPlaying = false;
-      _currentPosition = Duration.zero;
+    _player.onPlayerComplete.listen((event) async {
+      if (_currentUrl != null) {
+        // Fer un fadeOut suau
+        await fadeOut(duration: Duration(milliseconds: 700));
+        // Tornar a reproduir la mateixa cançó i fer fadeIn suau
+        await play(_currentUrl!);
+        await fadeIn(duration: Duration(milliseconds: 700));
+      }
     });
   }
 
@@ -43,8 +50,7 @@ class AudioService {
   ];
 
   final List<String> _perfilMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/PROFILE_MUSICA/dw9kzikmlmjr7lnin8cm',
   ];
 
   final List<String> _mapaMusicUrls = [
@@ -102,7 +108,8 @@ class AudioService {
 
   Future<void> stop() async {
     try {
-      debugPrint("🔇 AudioService: STOP");
+      debugPrint('🔇 AudioService: STOP cridat');
+      debugPrint(StackTrace.current.toString());
       await _player.stop();
       _currentPosition = Duration.zero;
       _isPlaying = false;
@@ -146,6 +153,30 @@ class AudioService {
     }
   }
 
+  Future<void> fadeIn({Duration duration = const Duration(seconds: 1)}) async {
+    if (_isPlaying || _isFading) return;
+
+    _isFading = true;
+    const int steps = 10;
+    final int stepDuration = duration.inMilliseconds ~/ steps;
+    _volume = 0.0;
+    await _player.setVolume(_volume);
+    _isPlaying = true;
+
+    try {
+      for (int i = 0; i < steps; i++) {
+        _volume = ((_volume + 1 / steps)).clamp(0.0, 1.0);
+        await _player.setVolume(_volume);
+        await Future.delayed(Duration(milliseconds: stepDuration));
+      }
+    } catch (e) {
+      debugPrint('❌ Error a fadeIn(): $e');
+    } finally {
+      _volume = 1.0;
+      _isFading = false;
+    }
+  }
+
   Future<void> playScreenMusic(String screen) async {
     List<String> urls;
 
@@ -164,6 +195,9 @@ class AudioService {
         break;
       case 'biblioteca':
         urls = _bibliotecaMusicUrls;
+        break;
+      case 'mapa':
+        urls = _mapaMusicUrls;
         break;
       default:
         debugPrint('⚠️ playScreenMusic: pantalla desconeguda $screen');

@@ -40,7 +40,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
   @override
   void dispose() {
-    
     super.dispose();
   }
 
