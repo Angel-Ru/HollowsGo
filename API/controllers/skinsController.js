@@ -611,7 +611,7 @@ exports.gachaSimulacio = async (req, res) => {
             return 'kenpachi';
         }
 
-        // 🔄 Simular que sempre toca la skin amb ID 237
+        // 🔄 Simular que sempre toca la skin amb ID 41
         const [simulatedSkinResult] = await connection.execute(
             'SELECT * FROM SKINS WHERE id = ?',
             [41]
@@ -669,9 +669,14 @@ exports.gachaSimulacio = async (req, res) => {
             : [];
 
         if (userSkinIds.includes(String(randomSkin.id))) {
-            // Ja té aquesta skin: NO restem monedes
+            // Ja té aquesta skin: NO restem monedes i sumem 10 fragments_skins
+            await connection.execute(
+                'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                [userId]
+            );
+
             return res.status(200).send({
-                message: "Ja tens aquesta skin.",
+                message: "Ja tens aquesta skin. Has rebut 10 fragments de skin!",
                 skin: randomSkin,
                 remainingCoins: currentBalance,
             });
@@ -713,6 +718,7 @@ exports.gachaSimulacio = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 
