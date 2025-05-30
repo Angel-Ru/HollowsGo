@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:hollows_go/imports.dart';
 import '../models/missionDiaria.dart';
 import '../widgets/missions/mission_drawer.dart';
@@ -17,6 +19,8 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _expandController;
   late Animation<double> _expandAnimation;
 
+  late AudioPlayer _audioPlayer;
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +32,9 @@ class _HomeScreenState extends State<HomeScreen>
     );
     _expandAnimation =
         CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
+
+    _audioPlayer = AudioPlayer();
+    _playBackgroundMusic();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
@@ -57,10 +64,23 @@ class _HomeScreenState extends State<HomeScreen>
     });
   }
 
+  void _playBackgroundMusic() async {
+    final List<String> musicUrls = [
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
+      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
+    ];
+
+    final randomUrl = (musicUrls..shuffle()).first;
+
+    await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    await _audioPlayer.play(UrlSource(randomUrl));
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
     _expandController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -159,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen>
             },
           ),
 
-          // Targeta petita (visible només si no està expandida)
+          // Targeta petita
           Consumer<SkinsEnemicsPersonatgesProvider>(
             builder: (context, provider, _) {
               final skin = _getSkinSeleccionada(provider);
@@ -257,123 +277,119 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildExpandedCard(Skin skin) {
-  return Container(
-    decoration: BoxDecoration(
-      color: Colors.black.withOpacity(0.3),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: Colors.black, width: 2),
-    ),
-    padding: EdgeInsets.all(20),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                skin.imatge ?? '',
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    Icon(Icons.broken_image, color: Colors.white),
-              ),
-            ),
-            // Franja negra translúcida a sota amb el nom
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
-                ),
-                child: Text(
-                  skin.nom,
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 28,
-                    shadows: [
-                      Shadow(
-                        offset: Offset(1, 1),
-                        color: Colors.black,
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.black, width: 2),
+      ),
+      padding: EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  skin.imatge ?? '',
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      Icon(Icons.broken_image, color: Colors.white),
                 ),
               ),
-            ),
-            // Botó per plegar
-            Positioned(
-              top: 8,
-              right: 8,
-              child: IconButton(
-                icon: Icon(Icons.keyboard_arrow_up,
-                    color: Colors.grey, size: 32),
-                onPressed: _toggleExpand,
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    ),
+                  ),
+                  child: Text(
+                    skin.nom,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(1, 1),
+                          color: Colors.black,
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ),
-            ),
-          ],
-        ),
-        SizedBox(height: 20),
-        _DetallsSkinCard(skin),
-      ],
-    ),
-  );
-}
-
-
-/// 🔽 Detalls de la skin
-Widget _DetallsSkinCard(Skin skin) {
-  String getNomRaca(int? raca) {
-    switch (raca) {
-      case 0:
-        return 'Quincy';
-      case 1:
-        return 'Shinigami';
-      case 2:
-        return 'Hollow / Enemic';
-      default:
-        return 'Desconegut';
-    }
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: Icon(Icons.keyboard_arrow_up,
+                      color: Colors.grey, size: 32),
+                  onPressed: _toggleExpand,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 20),
+          _DetallsSkinCard(skin),
+        ],
+      ),
+    );
   }
 
-  return Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: Colors.black.withOpacity(0.3),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (skin.vidaMaxima != null && skin.currentHealth != null)
-          Text(
-            'Vida: ${skin.currentHealth} / ${skin.vidaMaxima}',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
-          ),
-        if (skin.raca != null)
-          Text(
-            'Raça: ${getNomRaca(skin.raca)}',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
-          ),
-        if (skin.malTotal != null)
-          Text(
-            'Mal: ${skin.malTotal}',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
-          ),
-      ],
-    ),
-  );
-}
+  Widget _DetallsSkinCard(Skin skin) {
+    String getNomRaca(int? raca) {
+      switch (raca) {
+        case 0:
+          return 'Quincy';
+        case 1:
+          return 'Shinigami';
+        case 2:
+          return 'Hollow / Enemic';
+        default:
+          return 'Desconegut';
+      }
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (skin.vidaMaxima != null && skin.currentHealth != null)
+            Text(
+              'Vida: ${skin.currentHealth} / ${skin.vidaMaxima}',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          if (skin.raca != null)
+            Text(
+              'Raça: ${getNomRaca(skin.raca)}',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          if (skin.malTotal != null)
+            Text(
+              'Mal: ${skin.malTotal}',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+        ],
+      ),
+    );
+  }
 }
