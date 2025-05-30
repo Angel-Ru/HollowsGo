@@ -415,7 +415,6 @@ class UltimateService {
       barrierDismissible: false,
       builder: (_) => UltimateVideo(
         videoAsset: videoAsset,
-        controller: videoController,
         onVideoEnd: () {},
       ),
     );

@@ -67,13 +67,21 @@ class _HomeScreenState extends State<HomeScreen>
   void _playBackgroundMusic() async {
     final List<String> musicUrls = [
       'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
+      // Afegeix més URL vàlides si en tens més
     ];
 
-    final randomUrl = (musicUrls..shuffle()).first;
+    // Filtra URL buides
+    final filteredUrls =
+        musicUrls.where((url) => url.trim().isNotEmpty).toList();
 
-    await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    await _audioPlayer.play(UrlSource(randomUrl));
+    if (filteredUrls.isNotEmpty) {
+      final randomUrl = (filteredUrls..shuffle()).first;
+
+      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+      await _audioPlayer.play(UrlSource(randomUrl));
+    } else {
+      print("Cap URL de música vàlida disponible.");
+    }
   }
 
   @override
@@ -152,8 +160,6 @@ class _HomeScreenState extends State<HomeScreen>
       body: Stack(
         children: [
           HomeBackground(),
-
-          // Targeta de skin animada
           Consumer<SkinsEnemicsPersonatgesProvider>(
             builder: (context, provider, _) {
               final skin = _getSkinSeleccionada(provider);
@@ -178,8 +184,6 @@ class _HomeScreenState extends State<HomeScreen>
               );
             },
           ),
-
-          // Targeta petita
           Consumer<SkinsEnemicsPersonatgesProvider>(
             builder: (context, provider, _) {
               final skin = _getSkinSeleccionada(provider);
@@ -196,9 +200,7 @@ class _HomeScreenState extends State<HomeScreen>
               );
             },
           ),
-
           if (uiProvider.selectedMenuOpt == 0) DialogueSection(),
-
           AnimatedSwitcher(
             duration: Duration(milliseconds: 600),
             switchInCurve: Curves.easeInOut,
