@@ -461,16 +461,22 @@ exports.crearUsuariNormalToken = async (req, res) => {
 
         const token = jwt.sign({ id: newUserId, tipo: 0 }, process.env.JWT_SECRET);
 
-        res.status(201).json({
+        const responsePayload = {
             user: {
                 id: newUserId,
-                nom,
-                email,
+                nom: nom,
+                email: email,
                 punts_emmagatzemats: 100,
                 tipo: 0
             },
             token
-        });
+        };
+
+        // 🔴🔴🔴 Aquí fem el console.log per veure la resposta final
+        console.log("Resposta JSON enviada al client:", JSON.stringify(responsePayload, null, 2));
+
+        res.status(201).json(responsePayload);
+
     } catch (err) {
         console.error(err);
         res.status(500).send("Error al crear l'usuari");

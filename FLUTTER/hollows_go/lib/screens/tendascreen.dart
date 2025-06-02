@@ -47,7 +47,7 @@ class _TendaScreenState extends State<TendaScreen> {
     'lib/images/fondo_tendascreen/Yoruichi.jpg',
   ];
   int _currentImageIndex = 0;
-  bool _mostrarSkin = false; // 🔹 Iniciem tancat
+  bool _mostrarSkin = false;
 
   @override
   void initState() {
@@ -55,8 +55,7 @@ class _TendaScreenState extends State<TendaScreen> {
 
     _startBackgroundRotation();
 
-    AudioService.instance.playScreenMusic(
-        'tenda'); //perque ja la guardi carregada quan es construeix la pantalla i carregui mes aviat
+    AudioService.instance.playScreenMusic('tenda');
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final dialogueProvider =
@@ -64,6 +63,10 @@ class _TendaScreenState extends State<TendaScreen> {
       dialogueProvider.loadDialogueFromJson('urahara');
 
       final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+
+      // Aquí fem el fetch un cop
+      await gachaProvider.fetchFragmentsSkinsUsuari(context);
+
       bool success = await gachaProvider.getSkinDelDia(context);
 
       if (!success) {
@@ -71,7 +74,7 @@ class _TendaScreenState extends State<TendaScreen> {
           SnackBar(content: Text('No s\'ha pogut carregar la Skin del Dia.')),
         );
       }
-      setState(() {}); // refresquem la UI per mostrar la skin carregada
+      setState(() {});
     });
   }
 
@@ -113,7 +116,6 @@ class _TendaScreenState extends State<TendaScreen> {
       ),
       body: Stack(
         children: [
-          // 🔹 Fons rotatiu
           Positioned.fill(
             child: AnimatedSwitcher(
               duration: Duration(seconds: 2),
@@ -128,8 +130,6 @@ class _TendaScreenState extends State<TendaScreen> {
               ),
             ),
           ),
-
-          // 🔹 Contingut deslliçable
           Positioned.fill(
             child: PageView(
               controller: _pageController,
@@ -139,8 +139,6 @@ class _TendaScreenState extends State<TendaScreen> {
               ],
             ),
           ),
-
-          // 🔹 Diàleg i loader a la part inferior
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
             child: Column(
@@ -199,7 +197,7 @@ class _TendaScreenState extends State<TendaScreen> {
                 children: [
                   ListTile(
                     title: Text(
-                      'Skin del Dia',
+                      'Fragments: ${gachaProvider.latestFragmentsSkins?['fragments_skins']}',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -219,8 +217,6 @@ class _TendaScreenState extends State<TendaScreen> {
                       },
                     ),
                   ),
-
-                  // Contingut desplegable
                   AnimatedCrossFade(
                     firstChild: SizedBox.shrink(),
                     secondChild: Padding(
@@ -255,7 +251,9 @@ class _TendaScreenState extends State<TendaScreen> {
                             Text(
                               skin['description'],
                               style: TextStyle(
-                                  color: Colors.white70, fontSize: 12),
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
                               textAlign: TextAlign.center,
                             ),
                           SizedBox(height: 12),
@@ -268,23 +266,23 @@ class _TendaScreenState extends State<TendaScreen> {
                               ),
                             ),
                             onPressed: () async {
-                              final gachaProvider =
-                                  Provider.of<GachaProvider>(context, listen: false);
                               if (skin == null) return;
-
-                              bool success = await gachaProvider.comprarSkinDelDia(
+                              bool success =
+                                  await gachaProvider.comprarSkinDelDia(
                                 context,
                                 skin['id'],
                                 skin['personatgeId'] ?? 0,
                               );
-
                               if (success) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("Has comprat la Skin del Dia!")),
+                                  SnackBar(
+                                    content:
+                                        Text("Has comprat la Skin del Dia!"),
+                                  ),
                                 );
                               }
                             },
-                            child: Text('x100'),
+                            child: Text('x100 Frags'),
                           ),
                         ],
                       ),

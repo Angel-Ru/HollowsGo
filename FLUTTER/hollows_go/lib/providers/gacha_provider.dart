@@ -490,6 +490,7 @@ Future<bool> comprarSkinDelDia(BuildContext context, int skinId, int personatgeI
       if (data['success'] == true) {
         _latestSkin = data['skin'] ?? {};
         _isDuplicateSkin = false;
+        fetchFragmentsSkinsUsuari(context);
         notifyListeners();
         return true;
       } else if (data['alreadyHasSkin'] == true) {
