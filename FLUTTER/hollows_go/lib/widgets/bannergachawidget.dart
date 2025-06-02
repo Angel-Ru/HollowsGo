@@ -1,12 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:hollows_go/widgets/multiskinrewarddialog.dart';
 import '../imports.dart';
-import '../providers/gacha_provider.dart';
-import '../widgets/multiskinrewarddialog.dart';
-import '../config.dart';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'tenda/skinsdestacats.dart';
 
 class GachaBannerWidget extends StatefulWidget {
   const GachaBannerWidget({super.key});
@@ -38,20 +32,11 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   bool _isGachaLoading = false;
   double _scaleSingle = 1.0;
   double _scaleMulti = 1.0;
-  Map<String, dynamic>? _userFragments;
 
   @override
   void initState() {
     super.initState();
     _startBannerRotation();
-    _loadUserFragments();
-  }
-
-  Future<void> _loadUserFragments() async {
-    final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
-    final fragments = await gachaProvider.fetchFragmentsSkinsUsuari(context);
-    if (!mounted) return;
-    setState(() => _userFragments = fragments);
   }
 
   @override
@@ -137,7 +122,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
           },
         ),
       );
-      await _loadUserFragments();
     }
 
     setState(() => _isGachaLoading = false);
@@ -193,7 +177,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
       );
 
       await Future.wait([videoDialog, Future.wait(futures)]);
-      await _loadUserFragments();
     }
 
     setState(() => _isGachaLoading = false);
@@ -213,7 +196,10 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   }
 
   BorderSide getButtonBorder(int index) {
-    return const BorderSide(color: Colors.black, width: 2);
+    switch (index) {
+      default:
+        return const BorderSide(color: Colors.black, width: 2);
+    }
   }
 
   TextStyle getTextStyle(int index) {
@@ -265,6 +251,14 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                   height: 30,
                   width: 30,
                   fit: BoxFit.contain,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const SizedBox(
+                      height: 30,
+                      width: 30,
+                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    );
+                  },
                 ),
                 const SizedBox(width: 2),
                 _isGachaLoading
@@ -284,30 +278,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  // Nou contenidor per als fragments
-  Widget _buildFragmentContainer() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        color: getButtonColor(_currentSetIndex).withOpacity(0.9),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.fromBorderSide(getButtonBorder(_currentSetIndex)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(width: 4),
-          Text(
-            'Frags: ${_userFragments!['fragments'] ?? '0'}',
-            style: getTextStyle(_currentSetIndex),
-          ),
-        ],
       ),
     );
   }
@@ -360,6 +330,106 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                         _allBannerSets[_currentSetIndex][_currentBannerIndex],
                         width: MediaQuery.of(context).size.width * 0.8,
                         fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // Els punts que mostren quina sèrie de banner estem
+              Positioned(
+                bottom: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(_allBannerSets.length, (index) {
+                    return Container(
+                      width: 8,
+                      height: 8,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentSetIndex == index
+                            ? Colors.white.withOpacity(0.9)
+                            : Colors.white.withOpacity(0.4),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              // La icona circular a la cantonada inferior dreta
+              Positioned(
+                bottom: -12,
+                right: -12,
+                child: GestureDetector(
+                  onTap: () async {
+                    final gachaProvider =
+                        Provider.of<GachaProvider>(context, listen: false);
+
+                    if (_currentSetIndex == 1) {
+                      await gachaProvider.fetchSkinsCategoria4Quincy(context);
+                    } else if (_currentSetIndex == 2) {
+                      await gachaProvider.fetchSkinsCategoria4Hollows(context);
+                    } else {
+                      await gachaProvider
+                          .fetchSkinsCategoria4Shinigamis(context);
+                    }
+
+                    if (!mounted) return;
+
+                    showDialog(
+                      context: context,
+                      builder: (_) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: const EdgeInsets.all(20),
+                        child: SkinSwiperPopup(
+                          skins: gachaProvider.publicSkins,
+                          currentIndex: _currentSetIndex,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(seconds: 2),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOut,
+                          ),
+                          child: child,
+                        ),
+                        child: Image.network(
+                          key: ValueKey(
+                              _currentSetIndex), // canvia imatge segons índex
+                          _currentSetIndex == 1
+                              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
+                              : _currentSetIndex == 2
+                                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
+                                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -369,30 +439,25 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
           ),
         ),
         const SizedBox(height: 40),
-        Padding(
-          padding: EdgeInsets.zero, 
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              if (_userFragments != null) _buildFragmentContainer(),
-              const SizedBox(width: 5),
-              animatedButtonWithImage(
-                label: 'x100',
-                imageUrl: buttonImageUrl,
-                onPressed: () => _handleGachaPull(context),
-                scale: _scaleSingle,
-                setScale: (val) => _scaleSingle = val,
-              ),
-              const SizedBox(width: 5),
-              animatedButtonWithImage(
-                label: 'x500',
-                imageUrl: buttonImageUrl,
-                onPressed: () => _handleGachaPullMultiple(context),
-                scale: _scaleMulti,
-                setScale: (val) => _scaleMulti = val,
-              ),
-            ],
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            animatedButtonWithImage(
+              label: 'x100',
+              imageUrl: buttonImageUrl,
+              onPressed: () => _handleGachaPull(context),
+              scale: _scaleSingle,
+              setScale: (val) => _scaleSingle = val,
+            ),
+            const SizedBox(width: 15),
+            animatedButtonWithImage(
+              label: 'x500',
+              imageUrl: buttonImageUrl,
+              onPressed: () => _handleGachaPullMultiple(context),
+              scale: _scaleMulti,
+              setScale: (val) => _scaleMulti = val,
+            ),
+          ],
         ),
       ],
     );

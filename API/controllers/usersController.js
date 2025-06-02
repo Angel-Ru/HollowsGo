@@ -464,8 +464,8 @@ exports.crearUsuariNormalToken = async (req, res) => {
         res.status(201).json({
             user: {
                 id: newUserId,
-                nom,
-                email,
+                nom: nom,
+                email: email,
                 punts_emmagatzemats: 100,
                 tipo: 0
             },
