@@ -370,7 +370,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
         ),
         const SizedBox(height: 40),
         Padding(
-          padding: EdgeInsets.zero,  // <-- Aquí eliminem padding
+          padding: EdgeInsets.zero, 
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
