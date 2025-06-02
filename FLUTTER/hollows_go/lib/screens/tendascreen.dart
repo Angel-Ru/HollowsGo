@@ -242,21 +242,11 @@ class _TendaScreenState extends State<TendaScreen> {
                               height: 140,
                               alignment: Alignment.center,
                               child: Text(
-                                "No hi ha cap skin disponible avui.",
+                                "El proxim pic que tornis haurà una nova skin.",
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
-                          SizedBox(height: 8),
-                          if (skin != null && skin['description'] != null)
-                            Text(
-                              skin['description'],
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          SizedBox(height: 12),
+                          SizedBox(height: 4),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
@@ -271,7 +261,7 @@ class _TendaScreenState extends State<TendaScreen> {
                                   await gachaProvider.comprarSkinDelDia(
                                 context,
                                 skin['id'],
-                                skin['personatgeId'] ?? 0,
+                                skin['personatge'],
                               );
                               if (success) {
                                 ScaffoldMessenger.of(context).showSnackBar(

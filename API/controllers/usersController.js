@@ -472,9 +472,6 @@ exports.crearUsuariNormalToken = async (req, res) => {
             token
         };
 
-        // 🔴🔴🔴 Aquí fem el console.log per veure la resposta final
-        console.log("Resposta JSON enviada al client:", JSON.stringify(responsePayload, null, 2));
-
         res.status(201).json(responsePayload);
 
     } catch (err) {
