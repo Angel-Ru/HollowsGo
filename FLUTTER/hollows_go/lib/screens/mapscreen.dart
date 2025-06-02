@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:hollows_go/providers/map_provider.dart';
+import 'package:hollows_go/service/audioservice.dart';
 import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
@@ -97,6 +98,7 @@ class _MapaScreenState extends State<Mapscreen> {
   @override
   void initState() {
     super.initState();
+    AudioService.instance.playScreenMusic('mapa');
     WidgetsBinding.instance.addPostFrameCallback((_) => _checkSkinSelection());
     _initialize();
   }

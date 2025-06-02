@@ -45,17 +45,18 @@ class AudioService {
   ];
 
   final List<String> _bibliotecaMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
+    // falta 2
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/mgka7srvn6yvqkf0ook3',
   ];
 
   final List<String> _perfilMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/PROFILE_MUSICA/dw9kzikmlmjr7lnin8cm',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/rvfjnxz13ep6axa8wucr',
   ];
 
   final List<String> _mapaMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/q3nndud9xavtsimfry7v',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/yqruspp5kdqyhvpxehmm',
   ];
 
   final List<String> _settingsMusicUrls = [
@@ -65,6 +66,7 @@ class AudioService {
 
   final List<String> _amistatsMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/AMISTATS_MUSICA/tudeyopnovxc4khvlkoz',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/TUTORIAL/w8ypnhjubsiytbjkdwmu',
   ];
 
   final List<String> _tutorialMusicUrls = [
