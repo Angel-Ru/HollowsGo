@@ -85,27 +85,34 @@ class MissionsProvider with ChangeNotifier {
   }
 
   Future<void> fetchMissioTitol(int usuariId) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token') ?? '';
 
-    final url = Uri.parse('https://${Config.ip}/missions/titol/$usuariId');
+  final url = Uri.parse('https://${Config.ip}/missions/titol/$usuariId');
 
-    final response = await http.get(
-      url,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'Content-Type': 'application/json',
-      },
-    );
+  final response = await http.get(
+    url,
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+  );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      _missioTitol = MissionTitol.fromJson(data);
-      notifyListeners();
-    } else {
-      throw Exception('Error carregant missió de títol');
-    }
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    // Assignar la missió de títol
+    _missioTitol = MissionTitol.fromJson(data);
+  } else if (response.statusCode == 404) {
+    // No hi ha missió ni títol, posar la missió de títol a null
+    _missioTitol = null;
+  } else {
+    throw Exception('Error carregant missió de títol');
   }
+
+  notifyListeners();
+}
+
   Future<void> incrementarProgresMissioTitol(int missioId) async {
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';

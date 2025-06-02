@@ -1,8 +1,3 @@
-import '../imports.dart';
-import '../providers/missions_provider.dart';
-import 'missionArma.dart';
-import 'missionTitol.dart';
-
 class MissionDiary {
   final int id;
   final int usuari;
