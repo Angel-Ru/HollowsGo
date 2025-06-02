@@ -52,8 +52,10 @@ class _GachaVideoPopupState extends State<GachaVideoPopup> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
+Widget build(BuildContext context) {
+  return WillPopScope(
+    onWillPop: () async => false,
+    child: Stack(
       children: [
         ModalBarrier(
           color: Colors.black.withOpacity(0.7),
@@ -87,6 +89,8 @@ class _GachaVideoPopupState extends State<GachaVideoPopup> {
           ),
         ),
       ],
-    );
-  }
+    ),
+  );
+}
+
 }

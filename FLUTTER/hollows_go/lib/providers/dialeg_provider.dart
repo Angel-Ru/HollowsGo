@@ -3,12 +3,20 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
+import 'dart:convert';
+import 'dart:math';
+import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+
 class DialogueProvider extends ChangeNotifier {
   int _dialogIndex = 0;
   List<String> _dialogues = [];
   List<String> _characterImages = [];
   String _currentImage = '';
   String _currentCharacter = '';
+
+  // Identificador per controlar càrregues asíncrones
+  int _loadingId = 0;
 
   // Getter públic per accedir a la llista de diàlegs
   List<String> get dialogues => _dialogues;
@@ -27,23 +35,39 @@ class DialogueProvider extends ChangeNotifier {
   Future<void> loadDialogueFromJson(String characterKey) async {
     if (_currentCharacter == characterKey) return;
 
-    final String response =
-        await rootBundle.loadString('assets/dialogues.json');
-    final data = json.decode(response);
+    _loadingId++; // Incrementem l'ID de càrrega
+    final int currentLoadId = _loadingId;
 
-    if (!data.containsKey(characterKey)) return;
+    try {
+      final String response =
+          await rootBundle.loadString('assets/dialogues.json');
 
-    final List<String> dialogues =
-        List<String>.from(data[characterKey]["dialogues"]);
-    final List<String> images = List<String>.from(data[characterKey]["images"]);
+      // Si ha començat una altra càrrega després, ignorem aquesta
+      if (currentLoadId != _loadingId) return;
 
-    _dialogues = dialogues;
-    _characterImages = images;
-    _dialogIndex = 0;
-    _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
-    _currentCharacter = characterKey;
+      final data = json.decode(response);
 
-    notifyListeners();
+      if (!data.containsKey(characterKey)) return;
+
+      final List<String> dialogues =
+          List<String>.from(data[characterKey]["dialogues"]);
+      final List<String> images = List<String>.from(data[characterKey]["images"]);
+
+      // Comprovem novament abans d'actualitzar
+      if (currentLoadId == _loadingId) {
+        _dialogues = dialogues;
+        _characterImages = images;
+        _dialogIndex = 0;
+        _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
+        _currentCharacter = characterKey;
+        notifyListeners();
+      }
+    } catch (e) {
+      // Opcional: gestió d'errors
+      if (currentLoadId == _loadingId) {
+        print("Error carregant diàleg: $e");
+      }
+    }
   }
 
   void nextDialogue() {
