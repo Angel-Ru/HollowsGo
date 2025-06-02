@@ -33,14 +33,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
     perfilProvider.fetchPerfilData(userId);
     _loadAvatar(userId, perfilProvider);
     _loadUserLevel(userId, perfilProvider);
-
-    // Carreguem i guardem el títol dins PerfilProvider (fa notifyListeners)
     perfilProvider.carregarTitolUsuari(userId);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   Future<void> _loadUserLevel(int userId, PerfilProvider perfilProvider) async {
@@ -72,10 +65,11 @@ class _PerfilScreenState extends State<PerfilScreen> {
   }
 
   Future<void> _pickImage(BuildContext context) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ImageSelectionPage(
+    await Navigator.of(context)
+        .push<String>(
+      PageRouteBuilder(
+        transitionDuration: Duration(milliseconds: 500),
+        pageBuilder: (_, animation, __) => ImageSelectionPage(
           onImageSelected: (String imagePath) {
             setState(() {
               _imagePath = imagePath;
@@ -83,8 +77,23 @@ class _PerfilScreenState extends State<PerfilScreen> {
             Navigator.of(context).pop(imagePath);
           },
         ),
+        transitionsBuilder: (_, animation, __, child) {
+          final slide = Tween<Offset>(
+            begin: Offset(0.05, 0),
+            end: Offset.zero,
+          ).animate(animation);
+
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: slide,
+              child: child,
+            ),
+          );
+        },
       ),
-    ).then((imagePath) async {
+    )
+        .then((imagePath) async {
       if (imagePath != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('profileImagePath', _imagePath);
@@ -92,10 +101,26 @@ class _PerfilScreenState extends State<PerfilScreen> {
     });
   }
 
-  void _navigateToSettings(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SettingsScreen()),
+  void _navigateWithFade(BuildContext context, Widget page) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        transitionDuration: Duration(milliseconds: 500),
+        pageBuilder: (_, animation, __) => page,
+        transitionsBuilder: (_, animation, __, child) {
+          final slide = Tween<Offset>(
+            begin: Offset(0.05, 0),
+            end: Offset.zero,
+          ).animate(animation);
+
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: slide,
+              child: child,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -116,7 +141,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
         children: [
           _buildBackground(),
           Container(color: Colors.black.withOpacity(0.3)),
-
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(top: 80),
@@ -130,13 +154,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     expMaxima: _expMaxima,
                   ),
                   const SizedBox(height: 20),
-
-                  // Ara passem directament el títol guardat dins PerfilProvider
                   PerfilHeader(
                     username: userProvider.username,
                     userId: userProvider.userId,
                   ),
-
                   const SizedBox(height: 30),
                   PerfilStats(
                     partidesJugades: perfilProvider.partidesJugades,
@@ -150,14 +171,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
               ),
             ),
           ),
-
-          // Botons posats igual que abans (Settings, Edit Image, Amistats)
           Positioned(
             top: 115,
             right: 16,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () => _navigateToSettings(context),
+              onTap: () => _navigateWithFade(context, SettingsScreen()),
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
@@ -179,7 +198,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
               ),
             ),
           ),
-
           Positioned(
             top: 160,
             right: 16,
@@ -207,16 +225,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
               ),
             ),
           ),
-
           Positioned(
             top: 205,
             right: 16,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AmistatsScreen()),
-              ),
+              onTap: () => _navigateWithFade(context, AmistatsScreen()),
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(

@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
+import 'package:hollows_go/service/audioservice.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     _initBrightness();
     _initVolume();
+    AudioService.instance.playScreenMusic('settings');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
@@ -210,16 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text('Configuració'),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
+      appBar: null, // Aquí ja no hi ha appBar natiu
       body: Stack(
         children: [
           Container(
@@ -237,146 +230,188 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: Colors.black.withOpacity(0.2),
             ),
           ),
-          Column(
-            children: [
-              const SizedBox(height: 10),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 80, 20, 0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Lluminositat de la pantalla',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+
+          // Capçalera translúcida amb blur i disseny personalitzat
+          Padding(
+            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: Colors.white.withOpacity(0.3), width: 1),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () {
+                          AudioService.instance.playScreenMusic('perfil');
+                          Navigator.pop(context);
+                        },
+                      ),
+                      Text(
+                        'Configuració',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Icon(Icons.brightness_low, color: Colors.white),
-                            Expanded(
-                              child: Slider(
-                                value: _currentBrightness,
-                                min: 0.0,
-                                max: 1.0,
-                                divisions: 10,
-                                onChanged: _setBrightness,
-                                activeColor: Colors.yellow,
-                                inactiveColor: Colors.grey[300],
-                              ),
-                            ),
-                            Icon(Icons.brightness_high, color: Colors.white),
-                          ],
-                        ),
-                        Center(
-                          child: Text(
-                            '${(_currentBrightness * 100).round()}%',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 40),
-                        Text(
-                          'Volum del dispositiu',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.volume_down, color: Colors.white),
-                            Expanded(
-                              child: Slider(
-                                value: _volume,
-                                min: 0.0,
-                                max: 1.0,
-                                divisions: 100,
-                                onChanged: _setVolume,
-                                activeColor: Colors.yellow,
-                                inactiveColor: Colors.grey[300],
-                              ),
-                            ),
-                            Icon(Icons.volume_up, color: Colors.white),
-                          ],
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(
-                                _isMuted ? Icons.volume_off : Icons.volume_up),
-                            label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
-                            onPressed: _toggleMute,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(Icons.school),
-                            label: Text('Tutorial'),
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor: Colors.blueAccent,
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => TutorialScreen()),
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(Icons.delete_forever),
-                            label: Text('Eliminar Compte'),
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor: Colors.deepOrangeAccent,
-                            ),
-                            onPressed: _deleteAccount,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(Icons.logout),
-                            label: Text('Tancar Sessió'),
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor: Colors.red,
-                            ),
-                            onPressed: _logout,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                      ],
-                    ),
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(width: 48), // per mantenir l'espai
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                child: DialogueWidget(
-                  characterName: 'Shinji Hirako',
-                  nameColor: const Color.fromARGB(255, 231, 213, 50),
-                  bubbleColor: Color.fromARGB(212, 238, 238, 238),
-                ),
+            ),
+          ),
+
+          // Contingut principal amb padding per evitar superposició amb la capçalera
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 100, 20, 0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Lluminositat de la pantalla',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Icon(Icons.brightness_low, color: Colors.white),
+                      Expanded(
+                        child: Slider(
+                          value: _currentBrightness,
+                          min: 0.0,
+                          max: 1.0,
+                          divisions: 10,
+                          onChanged: _setBrightness,
+                          activeColor: Colors.yellow,
+                          inactiveColor: Colors.grey[300],
+                        ),
+                      ),
+                      Icon(Icons.brightness_high, color: Colors.white),
+                    ],
+                  ),
+                  Center(
+                    child: Text(
+                      '${(_currentBrightness * 100).round()}%',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 40),
+                  Text(
+                    'Volum del dispositiu',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.volume_down, color: Colors.white),
+                      Expanded(
+                        child: Slider(
+                          value: _volume,
+                          min: 0.0,
+                          max: 1.0,
+                          divisions: 100,
+                          onChanged: _setVolume,
+                          activeColor: Colors.yellow,
+                          inactiveColor: Colors.grey[300],
+                        ),
+                      ),
+                      Icon(Icons.volume_up, color: Colors.white),
+                    ],
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
+                      label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
+                      onPressed: _toggleMute,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.school),
+                      label: Text('Tutorial'),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.blueAccent,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => TutorialScreen()),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.delete_forever),
+                      label: Text('Eliminar Compte'),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.deepOrangeAccent,
+                      ),
+                      onPressed: _deleteAccount,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.logout),
+                      label: Text('Tancar Sessió'),
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: _logout,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                ],
               ),
-            ],
+            ),
+          ),
+
+          // DialogueWidget a sota
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 16,
+            child: DialogueWidget(
+              characterName: 'Shinji Hirako',
+              nameColor: const Color.fromARGB(255, 231, 213, 50),
+              bubbleColor: Color.fromARGB(212, 238, 238, 238),
+            ),
           ),
         ],
       ),

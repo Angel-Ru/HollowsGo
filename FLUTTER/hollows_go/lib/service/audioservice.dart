@@ -30,7 +30,6 @@ class AudioService {
   final List<String> _prehomeMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
-
   ];
 
   final List<String> _homeMusicUrls = [
@@ -58,6 +57,14 @@ class AudioService {
   final List<String> _mapaMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
+  ];
+
+  final List<String> _settingsMusicUrls = [
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/SETTINGS_MUSICA/u8ao6m5yyrxkpybgsdnh',
+  ];
+
+  final List<String> _amistatsMusicUrls = [
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/AMISTATS_MUSICA/tudeyopnovxc4khvlkoz',
   ];
 
   final Random _random = Random();
@@ -183,7 +190,7 @@ class AudioService {
     List<String> urls;
 
     switch (screen) {
-      case 'prehome': // 👈 afegit
+      case 'prehome':
         urls = _prehomeMusicUrls;
         break;
       case 'home':
@@ -200,6 +207,12 @@ class AudioService {
         break;
       case 'mapa':
         urls = _mapaMusicUrls;
+        break;
+      case 'settings':
+        urls = _settingsMusicUrls;
+        break;
+      case 'amistat':
+        urls = _amistatsMusicUrls;
         break;
       default:
         debugPrint('⚠️ playScreenMusic: pantalla desconeguda $screen');

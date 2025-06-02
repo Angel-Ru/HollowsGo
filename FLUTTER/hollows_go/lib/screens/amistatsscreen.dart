@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:hollows_go/service/audioservice.dart';
 import 'package:hollows_go/widgets/amistats/dialog_amic.dart';
 import '../imports.dart';
 
@@ -17,6 +18,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
   void initState() {
     super.initState();
     _refreshAmistats();
+    AudioService.instance.playScreenMusic('amistat');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
@@ -60,8 +62,9 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
             decoration: BoxDecoration(
               image: DecorationImage(
                 image:
-                    AssetImage('lib/images/amistatsscreen/amistats_fondo.png'),
+                    AssetImage('lib/images/tutorial_screen/fons_tutorial.jpg'),
                 fit: BoxFit.cover,
+                alignment: Alignment(-0.5, -0.5),
               ),
             ),
           ),
@@ -74,7 +77,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
             children: [
               // Capçalera translúcida
               Padding(
-                padding: const EdgeInsets.only(top: 60, left: 16, right: 16),
+                padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: BackdropFilter(
@@ -92,7 +95,10 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                         children: [
                           IconButton(
                             icon: Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: () {
+                              AudioService.instance.playScreenMusic('perfil');
+                              Navigator.of(context).pop();
+                            },
                           ),
                           Text(
                             'Les meves amistats',

@@ -162,7 +162,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                     decoration: const BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage(
-                            'lib/images/tutorial_screen/fons_tutorial.jpg'),
+                            'lib/images/amistatsscreen/amistats_fondo.png'),
                         fit: BoxFit.cover,
                       ),
                     ),
