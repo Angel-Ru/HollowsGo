@@ -1,43 +1,40 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  standalone: true,  // si uses standalone components
-  imports: [NgStyle],
+  standalone: true,
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  backgrounds = [
-    'url(https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/tjytgu9aljl2bdzjc0d4)',
-    'url(https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/cre3pjxh5xt44firil1k)',
-    'url(https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1470&q=80)'
-  ];
+  private audio!: HTMLAudioElement;
+  isMuted: boolean = false;
 
-  currentBackgroundIndex = 0;
-  intervalId?: any;
+  constructor(private cd: ChangeDetectorRef) {}
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  ngOnInit(): void {
+    // Crear l'objecte de l'àudio amb autoplay i loop
+    this.audio = new Audio('https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/MUSICA/ysqv9ww78jmpwijmb7qg');
+    this.audio.loop = true;
+    this.audio.autoplay = true;
+    this.audio.volume = 0.5; // Pots ajustar el volum inicial
+    this.audio.muted = false; // Assegura't que el so estigui activat des del principi
 
-  get backgroundImage(): string {
-    return this.backgrounds[this.currentBackgroundIndex];
+    // Algunes plataformes poden requerir una interacció de l'usuari per iniciar l'àudio.
+    // Però aquí forcem el play automàticament.
+    this.audio.play().catch(err => console.warn('L\'àudio necessita interacció de l\'usuari a alguns navegadors:', err));
   }
 
-  ngOnInit() {
-    this.intervalId = setInterval(() => {
-      this.changeBackground();
-      this.cdr.detectChanges();  // força Angular a detectar el canvi
-    }, 20000); // cada 20 segons
+  toggleMute(): void {
+    this.isMuted = !this.isMuted;
+    this.audio.muted = this.isMuted;
+    this.cd.detectChanges();
   }
 
-  ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
+  ngOnDestroy(): void {
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.src = '';
     }
-  }
-
-  changeBackground() {
-    this.currentBackgroundIndex = (this.currentBackgroundIndex + 1) % this.backgrounds.length;
   }
 }
