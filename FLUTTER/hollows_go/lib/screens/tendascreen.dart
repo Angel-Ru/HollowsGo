@@ -89,7 +89,6 @@ class _TendaScreenState extends State<TendaScreen> {
   @override
   void dispose() {
     _pageController.dispose();
-
     super.dispose();
   }
 
@@ -165,13 +164,14 @@ class _TendaScreenState extends State<TendaScreen> {
 
   Widget _buildGachaContent(GachaProvider gachaProvider) {
     final skin = gachaProvider.latestSkin;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
       children: [
         SizedBox(height: 150),
         Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.15,
+            horizontal: screenWidth * 0.15,
           ),
           child: Column(
             children: [
@@ -183,15 +183,16 @@ class _TendaScreenState extends State<TendaScreen> {
         Align(
           alignment: Alignment.centerRight,
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.55,
+            width: screenWidth * 0.65 > 600 ? 600 : screenWidth * 0.65,
             margin: const EdgeInsets.only(right: 16),
             child: Card(
               color: Colors.black.withOpacity(0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
-                    color: Color(0xFF1B5E20),
-                    width: 1.5),
+                  color: Color(0xFF1B5E20),
+                  width: 1.5,
+                ),
               ),
               elevation: 8,
               child: Column(
@@ -219,7 +220,7 @@ class _TendaScreenState extends State<TendaScreen> {
                     ),
                   ),
 
-                  // 🔹 Contingut desplegable
+                  // Contingut desplegable
                   AnimatedCrossFade(
                     firstChild: SizedBox.shrink(),
                     secondChild: Padding(
@@ -267,24 +268,19 @@ class _TendaScreenState extends State<TendaScreen> {
                               ),
                             ),
                             onPressed: () async {
-                              final gachaProvider = Provider.of<GachaProvider>(
-                                  context,
-                                  listen: false);
+                              final gachaProvider =
+                                  Provider.of<GachaProvider>(context, listen: false);
                               if (skin == null) return;
 
-                              bool success =
-                                  await gachaProvider.comprarSkinDelDia(
+                              bool success = await gachaProvider.comprarSkinDelDia(
                                 context,
-                                skin['id'], // Assumint que skin té un camp 'id'
-                                skin['personatgeId'] ??
-                                    0, // També agafem el personatgeId (o posa 0 si no existeix)
+                                skin['id'],
+                                skin['personatgeId'] ?? 0,
                               );
 
                               if (success) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text("Has comprat la Skin del Dia!")),
+                                  SnackBar(content: Text("Has comprat la Skin del Dia!")),
                                 );
                               }
                             },

@@ -20,6 +20,9 @@ class GachaProvider extends ChangeNotifier {
   Map<String, dynamic>? _latestSkin;
   Map<String, dynamic>? get latestSkin => _latestSkin;
 
+  Map<String, dynamic>? _latestFragmentsSkins;
+  Map<String, dynamic>? get latestFragmentsSkins => _latestFragmentsSkins;
+  
   Future<bool> gachaPull(BuildContext context) async {
     _setLoading(true);
 
@@ -511,6 +514,51 @@ Future<bool> comprarSkinDelDia(BuildContext context, int skinId, int personatgeI
   }
 }
 
+Future<Map<String, dynamic>?> fetchFragmentsSkinsUsuari(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final nom = prefs.getString('userName');
+
+      if (token == null || nom == null) {
+        _showError(context, "No s'ha pogut obtenir el token o el nom d'usuari.");
+        return null;
+      }
+
+      final url = Uri.parse('https://${Config.ip}/skins/fragments/$nom');
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        if (data.isNotEmpty) {
+          _latestFragmentsSkins = data.first as Map<String, dynamic>;
+          notifyListeners();
+          return _latestFragmentsSkins;
+        } else {
+          _showError(context, "No s'ha trobat cap fragment per a aquest usuari.");
+          return null;
+        }
+      } else {
+        _showError(context, 'Error: ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      _showError(context, 'Error en obtenir els fragments: $e');
+      return null;
+    } finally {
+      _setLoading(false);
+    }
+  }
 
 
 
