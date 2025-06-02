@@ -39,7 +39,7 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
-        height: 250,
+        height: 280,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -81,7 +81,7 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
                 color: Colors.black.withOpacity(0.5),
               ),
               Align(
-                alignment: const Alignment(0, -0.3),
+                alignment: const Alignment(0, -0.1),
                 child: Text(
                   'NOVETATS',
                   style: TextStyle(
