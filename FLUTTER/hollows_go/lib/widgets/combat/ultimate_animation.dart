@@ -77,23 +77,26 @@ class _UltimateAnimationState extends State<UltimateAnimation>
 
     final scaledHeight = (originalHeight / originalWidth) * maxWidth;
 
-    return Material(
-      color: Colors.black.withOpacity(0.3),
-      child: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: OverflowBox(
-            maxWidth: maxWidth * 1.5,
-            child: Transform.scale(
-              scaleX: 1.4,
-              scaleY: 1.0,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  widget.imageAsset,
-                  width: maxWidth,
-                  height: scaledHeight,
-                  fit: BoxFit.fill,
+    return WillPopScope(
+      onWillPop: () async => false, // ❌ Desactiva el botó enrere
+      child: Material(
+        color: Colors.black.withOpacity(0.3),
+        child: Center(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: OverflowBox(
+              maxWidth: maxWidth * 1.5,
+              child: Transform.scale(
+                scaleX: 1.4,
+                scaleY: 1.0,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    widget.imageAsset,
+                    width: maxWidth,
+                    height: scaledHeight,
+                    fit: BoxFit.fill,
+                  ),
                 ),
               ),
             ),

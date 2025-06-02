@@ -198,6 +198,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  // ... (imports y declaración de clase permanecen iguales hasta el build)
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -210,6 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         appBar: null,
         body: Stack(
           children: [
+            // Fondo con blur (se mantiene igual)
             Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
@@ -225,6 +228,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: Colors.black.withOpacity(0.2),
               ),
             ),
+
+            // Barra superior (se mantiene igual)
             Padding(
               padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
               child: ClipRRect(
@@ -264,12 +269,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
+
+            // Contenido principal
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 100, 20, 0),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Control de brillo (se mantiene igual)
                     Text(
                       'Lluminositat de la pantalla',
                       style: TextStyle(
@@ -306,6 +314,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     SizedBox(height: 40),
+
+                    // Control de volumen (se mantiene igual)
                     Text(
                       'Volum del dispositiu',
                       style: TextStyle(
@@ -331,55 +341,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Icon(Icons.volume_up, color: Colors.white),
                       ],
                     ),
+
+                    // Botón de mute (mejorado)
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
-                        icon:
-                            Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
-                        label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
+                        icon: Icon(
+                          _isMuted ? Icons.volume_off : Icons.volume_up,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          _isMuted ? 'Desmutar' : 'Mutar',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         onPressed: _toggleMute,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isMuted
+                              ? Colors.redAccent.withOpacity(0.8)
+                              : Colors.greenAccent.withOpacity(0.8),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1,
+                            ),
+                          ),
+                          elevation: 5,
+                          shadowColor: Colors.black.withOpacity(0.5),
+                        ),
                       ),
                     ),
                     SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      icon: Icon(Icons.school),
-                      label: Text('Tutorial'),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.blueAccent,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => TutorialScreen()),
-                        );
-                      },
+
+                    // Fila con dos botones (Tutorial y Eliminar cuenta)
+                    Row(
+                      children: [
+                        // Botón de Tutorial
+                        Expanded(
+                          child: _buildGradientButton(
+                            icon: Icons.school,
+                            label: 'Tutorial',
+                            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => TutorialScreen()),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        // Botón de Eliminar cuenta
+                        Expanded(
+                          child: _buildGradientButton(
+                            icon: Icons.delete_forever,
+                            label: 'Eliminar Compte',
+                            colors: [Colors.deepOrange, Colors.redAccent],
+                            onPressed: _deleteAccount,
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      icon: Icon(Icons.delete_forever),
-                      label: Text('Eliminar Compte'),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.deepOrangeAccent,
+
+                    // Botón de Cerrar sesión (centrado)
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        child: _buildGradientButton(
+                          icon: Icons.logout,
+                          label: 'Tancar Sessió',
+                          colors: [Colors.red, Colors.deepOrangeAccent],
+                          onPressed: _logout,
+                        ),
                       ),
-                      onPressed: _deleteAccount,
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      icon: Icon(Icons.logout),
-                      label: Text('Tancar Sessió'),
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.red,
-                      ),
-                      onPressed: _logout,
                     ),
                     SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
+
+            // Diálogo del personaje (se mantiene igual)
             Positioned(
               left: 16,
               right: 16,
@@ -391,6 +436,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+// Método auxiliar para crear botones con gradiente (se mantiene igual)
+  Widget _buildGradientButton({
+    required IconData icon,
+    required String label,
+    required List<Color> colors,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          ),
+        ],
+        gradient: LinearGradient(
+          colors: colors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: ElevatedButton.icon(
+        icon: Icon(icon, color: Colors.white),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
         ),
       ),
     );

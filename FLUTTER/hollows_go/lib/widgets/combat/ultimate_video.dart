@@ -61,25 +61,28 @@ class _UltimateVideoState extends State<UltimateVideo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: _isInitialized
-            ? Container(
-                margin: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.orangeAccent, width: 4),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: AspectRatio(
-                    aspectRatio: _videoController!.value.aspectRatio,
-                    child: VideoPlayer(_videoController!),
+    return WillPopScope(
+      onWillPop: () async => false, // ❌ Desactiva el botó enrere
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: _isInitialized
+              ? Container(
+                  margin: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.orangeAccent, width: 4),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                ),
-              )
-            : const CircularProgressIndicator(),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: AspectRatio(
+                      aspectRatio: _videoController!.value.aspectRatio,
+                      child: VideoPlayer(_videoController!),
+                    ),
+                  ),
+                )
+              : const CircularProgressIndicator(),
+        ),
       ),
     );
   }
