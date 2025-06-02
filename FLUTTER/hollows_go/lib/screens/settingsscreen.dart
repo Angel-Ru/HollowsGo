@@ -101,11 +101,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _deleteAccount() async {
-    print('Iniciant eliminació compte');
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getInt('userId');
     final token = prefs.getString('token');
-    print('UserID: $userId, Token: $token');
 
     final confirm = await showDialog<bool>(
       context: context,
@@ -180,182 +178,170 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
 
-    print('Confirmació diàleg: $confirm');
-
     if (confirm == true && userId != null && token != null) {
-      print('Executant petició DELETE...');
       final response = await http.delete(
         Uri.parse('https://${Config.ip}/usuaris/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
-      print('Resposta servidor: ${response.statusCode} - ${response.body}');
 
       if (response.statusCode == 200) {
-        print('Compte eliminat correctament, netejant preferències');
         await prefs.clear();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => PreHomeScreen()),
           (Route<dynamic> route) => false,
         );
       } else {
-        print('Error a l\'eliminar compte: ${response.statusCode}');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Error al eliminar el compte')),
         );
       }
-    } else {
-      print('Eliminació cancel·lada o dades insuficients (userId/token)');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: null, // Aquí ja no hi ha appBar natiu
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image:
-                    AssetImage('lib/images/settings_screen/fons_settings.jpg'),
-                fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: () async {
+        AudioService.instance.playScreenMusic('perfil');
+        return true;
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: null,
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'lib/images/settings_screen/fons_settings.jpg'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Container(
-              color: Colors.black.withOpacity(0.2),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                color: Colors.black.withOpacity(0.2),
+              ),
             ),
-          ),
-
-          // Capçalera translúcida amb blur i disseny personalitzat
-          Padding(
-            padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                        color: Colors.white.withOpacity(0.3), width: 1),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () {
-                          AudioService.instance.playScreenMusic('perfil');
-                          Navigator.pop(context);
-                        },
-                      ),
-                      Text(
-                        'Configuració',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: Colors.white.withOpacity(0.3), width: 1),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () {
+                            AudioService.instance.playScreenMusic('perfil');
+                            Navigator.pop(context);
+                          },
                         ),
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(width: 48), // per mantenir l'espai
-                        ],
-                      ),
-                    ],
+                        Text(
+                          'Configuració',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(width: 48),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-
-          // Contingut principal amb padding per evitar superposició amb la capçalera
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 100, 20, 0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Lluminositat de la pantalla',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Icon(Icons.brightness_low, color: Colors.white),
-                      Expanded(
-                        child: Slider(
-                          value: _currentBrightness,
-                          min: 0.0,
-                          max: 1.0,
-                          divisions: 10,
-                          onChanged: _setBrightness,
-                          activeColor: Colors.yellow,
-                          inactiveColor: Colors.grey[300],
-                        ),
-                      ),
-                      Icon(Icons.brightness_high, color: Colors.white),
-                    ],
-                  ),
-                  Center(
-                    child: Text(
-                      '${(_currentBrightness * 100).round()}%',
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 100, 20, 0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Lluminositat de la pantalla',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 40),
-                  Text(
-                    'Volum del dispositiu',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Icon(Icons.brightness_low, color: Colors.white),
+                        Expanded(
+                          child: Slider(
+                            value: _currentBrightness,
+                            min: 0.0,
+                            max: 1.0,
+                            divisions: 10,
+                            onChanged: _setBrightness,
+                            activeColor: Colors.yellow,
+                            inactiveColor: Colors.grey[300],
+                          ),
+                        ),
+                        Icon(Icons.brightness_high, color: Colors.white),
+                      ],
                     ),
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.volume_down, color: Colors.white),
-                      Expanded(
-                        child: Slider(
-                          value: _volume,
-                          min: 0.0,
-                          max: 1.0,
-                          divisions: 100,
-                          onChanged: _setVolume,
-                          activeColor: Colors.yellow,
-                          inactiveColor: Colors.grey[300],
+                    Center(
+                      child: Text(
+                        '${(_currentBrightness * 100).round()}%',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
                         ),
                       ),
-                      Icon(Icons.volume_up, color: Colors.white),
-                    ],
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
-                      label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
-                      onPressed: _toggleMute,
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
+                    SizedBox(height: 40),
+                    Text(
+                      'Volum del dispositiu',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.volume_down, color: Colors.white),
+                        Expanded(
+                          child: Slider(
+                            value: _volume,
+                            min: 0.0,
+                            max: 1.0,
+                            divisions: 100,
+                            onChanged: _setVolume,
+                            activeColor: Colors.yellow,
+                            inactiveColor: Colors.grey[300],
+                          ),
+                        ),
+                        Icon(Icons.volume_up, color: Colors.white),
+                      ],
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon:
+                            Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
+                        label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
+                        onPressed: _toggleMute,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton.icon(
                       icon: Icon(Icons.school),
                       label: Text('Tutorial'),
                       style: ElevatedButton.styleFrom(
@@ -369,11 +355,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         );
                       },
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
+                    SizedBox(height: 20),
+                    ElevatedButton.icon(
                       icon: Icon(Icons.delete_forever),
                       label: Text('Eliminar Compte'),
                       style: ElevatedButton.styleFrom(
@@ -382,11 +365,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       onPressed: _deleteAccount,
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
+                    SizedBox(height: 20),
+                    ElevatedButton.icon(
                       icon: Icon(Icons.logout),
                       label: Text('Tancar Sessió'),
                       style: ElevatedButton.styleFrom(
@@ -395,25 +375,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       onPressed: _logout,
                     ),
-                  ),
-                  SizedBox(height: 20),
-                ],
+                    SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
-          ),
-
-          // DialogueWidget a sota
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 16,
-            child: DialogueWidget(
-              characterName: 'Shinji Hirako',
-              nameColor: const Color.fromARGB(255, 231, 213, 50),
-              bubbleColor: Color.fromARGB(212, 238, 238, 238),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: DialogueWidget(
+                characterName: 'Shinji Hirako',
+                nameColor: const Color.fromARGB(255, 231, 213, 50),
+                bubbleColor: Color.fromARGB(212, 238, 238, 238),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
