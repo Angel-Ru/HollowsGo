@@ -205,7 +205,6 @@ exports.crearUsuariNormal = async (req, res) => {
  *       500:
  *         description: Error en eliminar l'usuari
  */
-router.delete('/:id', verificacioUsuari.verifyToken, userController.borrarUsuari);
 
 // Al controlador
 exports.borrarUsuari = async (req, res) => {
