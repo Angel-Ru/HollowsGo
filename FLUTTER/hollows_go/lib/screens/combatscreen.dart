@@ -1,10 +1,4 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import '../imports.dart';
-import '../providers/habilitat_provider.dart';
-import '../providers/missions_provider.dart';
 import '../service/missionsservice.dart';
 import '../widgets/combat/midscreen_turn_indicator.dart';
 
@@ -42,14 +36,12 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       final skinsProvider =
           Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-      await skinsProvider.selectRandomSkin();
-
+      
       final aliat = skinsProvider.selectedSkinAliat ??
           skinsProvider.selectedSkinQuincy ??
           skinsProvider.selectedSkinEnemic;
       final enemic = skinsProvider.selectedSkin;
 
-      // ✅ Només assignem nom i vida si tenim un enemic vàlid
       if (enemic != null) {
         final enemySkinName = enemic.personatgeNom;
         final enemySkinHealth = (enemic.vida ?? 1000).toDouble();
