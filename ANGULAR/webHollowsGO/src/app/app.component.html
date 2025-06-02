@@ -1,4 +1,8 @@
-<div class="background" [ngStyle]="{'background-image': backgroundImage}">
+<div
+  class="background"
+  [ngStyle]="{'background-image': backgroundImage}"
+  (click)="changeBackground()"
+>
   <div class="container">
     <img
       src="https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/zenpjlbr1fzmacdwgm4o"
@@ -15,10 +19,5 @@
     <footer>
       &copy; 2025 HollowsGo Remastered - Inspirado en Bleach
     </footer>
-
-    <!-- Botó per canviar fons -->
-    <button (click)="changeBackground()" class="btn-download" style="margin-top:20px;">
-      Canviar fons
-    </button>
   </div>
 </div>

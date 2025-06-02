@@ -9,6 +9,10 @@
   align-items: center;
   padding: 20px;
   box-sizing: border-box;
+
+  /* Añadimos transición suave en el fondo */
+  transition: background-image 4s ease-in-out, background-color 2s ease, filter 3s ease-in-out;
+
 }
 
 .container {
