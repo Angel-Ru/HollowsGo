@@ -93,9 +93,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _deleteAccount() async {
+    print('Iniciant eliminació compte');
     final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getInt('user_id');
+    final userId = prefs.getInt('userId');
     final token = prefs.getString('token');
+    print('UserID: $userId, Token: $token');
 
     final confirm = await showDialog<bool>(
       context: context,
@@ -170,22 +172,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
 
+    print('Confirmació diàleg: $confirm');
+
     if (confirm == true && userId != null && token != null) {
+      print('Executant petició DELETE...');
       final response = await http.delete(
         Uri.parse('https://${Config.ip}/usuaris/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
+      print('Resposta servidor: ${response.statusCode} - ${response.body}');
 
       if (response.statusCode == 200) {
+        print('Compte eliminat correctament, netejant preferències');
         await prefs.clear();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => PreHomeScreen()),
         );
       } else {
+        print('Error a l\'eliminar compte: ${response.statusCode}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar el compte')),
+          const SnackBar(content: Text('Error al eliminar el compte')),
         );
       }
+    } else {
+      print('Eliminació cancel·lada o dades insuficients (userId/token)');
     }
   }
 
