@@ -2442,3 +2442,20 @@ exports.comprarSkin = async (req, res) => {
   }
 };
 
+exports.getFragmentsSkinsUsuari = async (req, res) => {
+    try {
+        const connection = await connectDB();
+        const [rows] = await connection.execute(
+            'SELECT fragments_skins, nom FROM USUARIS WHERE nom = ?',
+            [req.params.nom]
+        );
+        if (rows.length === 0) {
+            return res.status(404).send("No s'ha trobat cap usuari amb aquest nom.");
+        }
+        
+        res.send(rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error amb la consulta');
+    }
+};

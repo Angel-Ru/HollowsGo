@@ -180,8 +180,6 @@ class _TendaScreenState extends State<TendaScreen> {
             ],
           ),
         ),
-
-        // 🔹 La targeta "Skin del Dia" amb desplegament
         Align(
           alignment: Alignment.centerRight,
           child: Container(
@@ -193,12 +191,11 @@ class _TendaScreenState extends State<TendaScreen> {
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(
                     color: Color(0xFF1B5E20),
-                    width: 1.5), // Borde verd fosc i fi
+                    width: 1.5),
               ),
               elevation: 8,
               child: Column(
                 children: [
-                  // 🔹 Títol i botó de desplegament
                   ListTile(
                     title: Text(
                       'Skin del Dia',
@@ -291,7 +288,7 @@ class _TendaScreenState extends State<TendaScreen> {
                                 );
                               }
                             },
-                            child: Text('Comprar'),
+                            child: Text('x100'),
                           ),
                         ],
                       ),
