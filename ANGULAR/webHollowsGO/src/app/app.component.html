@@ -1,0 +1,24 @@
+<div class="background" [ngStyle]="{'background-image': backgroundImage}">
+  <div class="container">
+    <img
+      src="https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/zenpjlbr1fzmacdwgm4o"
+      alt="HollowsGo Remastered Logo"
+      class="logo"
+    />
+    <h2>La experiencia definitiva de Bleach en Flutter</h2>
+    <p>
+      Sumérgete en el mundo de Bleach con HollowsGo Remastered, la aplicación
+      creada para los fans que quieren revivir las batallas épicas y explorar
+      los secretos del universo Hollow, todo desde tu dispositivo móvil.
+    </p>
+    <a routerLink="/download" class="btn-download">Descargar Ahora</a>
+    <footer>
+      &copy; 2025 HollowsGo Remastered - Inspirado en Bleach
+    </footer>
+
+    <!-- Botó per canviar fons -->
+    <button (click)="changeBackground()" class="btn-download" style="margin-top:20px;">
+      Canviar fons
+    </button>
+  </div>
+</div>
