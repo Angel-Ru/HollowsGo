@@ -1195,10 +1195,15 @@ exports.gachaTiradaQuincy = async (req, res) => {
 
         const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-        // Si ja té la skin → no descomptar i tornar resposta
+        // Si ja té la skin → donar fragments i no descomptar monedes
         if (userSkinIds.includes(String(randomSkin.id))) {
+            await connection.execute(
+                'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                [user.id]
+            );
+
             return res.status(200).send({
-                message: "Ja tens aquesta skin.",
+                message: "Ja tens aquesta skin. Has rebut 10 fragments de skin!",
                 skin: randomSkin,
                 remainingCoins: user.punts_emmagatzemats,
             });
@@ -1246,6 +1251,7 @@ exports.gachaTiradaQuincy = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 exports.getPersonatgesAmbSkinsPerUsuariQuincy = async (req, res) => {
@@ -1453,9 +1459,14 @@ exports.gachaTiradaEnemics = async (req, res) => {
         const alreadyOwned = existingSkinIds.includes(String(randomSkin.id));
 
         if (alreadyOwned) {
-            // Retornar les monedes
+            // Donar 10 fragments
+            await connection.execute(
+                'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                [user.id]
+            );
+
             return res.status(200).send({
-                message: 'Ja tens aquesta skin.',
+                message: 'Ja tens aquesta skin. Has rebut 10 fragments de skin!',
                 skin: randomSkin,
                 remainingCoins: user.punts_emmagatzemats,
             });
@@ -1474,8 +1485,8 @@ exports.gachaTiradaEnemics = async (req, res) => {
 
         if (userSkinRows.length === 0) {
             await connection.execute(
-                'INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids) VALUES (?, ?, ?, ?)',
-                [user.id, randomSkin.personatge, new Date(), updatedSkinIds]
+                'INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids) VALUES (?, ?, NOW(), ?)',
+                [user.id, randomSkin.personatge, updatedSkinIds]
             );
         } else {
             await connection.execute(
@@ -1495,6 +1506,7 @@ exports.gachaTiradaEnemics = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 
@@ -1744,6 +1756,11 @@ exports.gachaMultiSH = async (req, res) => {
                 ownedSkinIds.add(String(randomSkin.id)); // afegim com a adquirida
             } else {
                 repetides++;
+                // Donar 10 fragments
+                await connection.execute(
+                    'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                    [userId]
+                );
             }
 
             tirades.push({
@@ -1768,6 +1785,7 @@ exports.gachaMultiSH = async (req, res) => {
         res.status(500).send('Error en la tirada múltiple de gacha');
     }
 };
+
 
 
 // Endpoint per poder realitzar una tirada gacha de 5 Quincys
@@ -1922,6 +1940,11 @@ exports.gachaMultiQU = async (req, res) => {
                 }
             } else {
                 repetides++;
+                // Donar 10 fragments de skin per la skin repetida
+                await connection.execute(
+                    'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                    [userId]
+                );
             }
 
             tirades.push({
@@ -1946,6 +1969,7 @@ exports.gachaMultiQU = async (req, res) => {
         res.status(500).send('Error en la tirada múltiple de gacha');
     }
 };
+
 
 // Endpoint per poder realitzar una tirada gacha de 5 Hollows
 exports.gachaMultiHO = async (req, res) => {
@@ -2092,6 +2116,11 @@ exports.gachaMultiHO = async (req, res) => {
                 }
             } else {
                 repetides++;
+                // Donar 10 fragments de skin per la skin repetida
+                await connection.execute(
+                    'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+                    [userId]
+                );
             }
 
             tirades.push({
@@ -2116,6 +2145,7 @@ exports.gachaMultiHO = async (req, res) => {
         res.status(500).send('Error en la tirada múltiple de gacha');
     }
 };
+
 
 // Obtenir la skin seleccionada per un usuari
 exports.getSkinSeleccionada = async (req, res) => {
