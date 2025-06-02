@@ -188,11 +188,13 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
   }
 
   @override
-  Widget build(BuildContext context) {
-    final double dialogWidth = 440;
-    final double dialogHeight = dialogWidth * 9 / 16;
+Widget build(BuildContext context) {
+  final double dialogWidth = 440;
+  final double dialogHeight = dialogWidth * 9 / 16;
 
-    return Dialog(
+  return WillPopScope(
+    onWillPop: () async => false, // Això bloqueja el botó enrere
+    child: Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(20),
       child: SizedBox(
@@ -281,6 +283,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
                     : const SizedBox.shrink(),
               ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
