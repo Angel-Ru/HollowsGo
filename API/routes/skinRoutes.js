@@ -19,6 +19,7 @@ router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsControl
 //Ruta per obtenir tots els enemics amb les seves skins de l'usuari
 router.get('/biblioteca/enemics/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariEnemics);
 
+router.get('/fragments/:nom', verificacioUsuari.verifyToken, skinsController.getFragmentsSkinsUsuari);
 
 //Ruta per obtenir una skin d'un enemic amb el seu mal de forma aleatoria
 router.get('/enemic/', verificacioUsuari.verifyToken,skinsController.seleccionarSkinAleatoria);
