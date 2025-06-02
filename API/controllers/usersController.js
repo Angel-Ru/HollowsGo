@@ -205,21 +205,16 @@ exports.crearUsuariNormal = async (req, res) => {
  *       500:
  *         description: Error en eliminar l'usuari
  */
-router.delete('/:id', verificacioUsuari.verifyToken, userController.borrarUsuari);
-
-// Al controlador
 exports.borrarUsuari = async (req, res) => {
     try {
-        const userIdFromToken = req.userId; // Obtingut via verifyToken
-        const idToDelete = parseInt(req.params.id);
-
-        // Permetre eliminar-se a si mateix o si és admin
-        if (userIdFromToken !== idToDelete && !req.isAdmin) {
-            return res.status(403).send("No tens permisos per eliminar aquest usuari");
-        }
-
         const connection = await connectDB();
-        await connection.execute('DELETE FROM USUARIS WHERE id = ?', [idToDelete]);
+        const usuariId = req.params.id;  // <-- Aquí el paràmetre és 'id'
+        const [result] = await connection.execute('DELETE FROM USUARIS WHERE id = ?', [usuariId]);
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Usuari no trobat');
+        }
+        
         res.send('Usuari eliminat correctament');
     } catch (err) {
         console.error(err);

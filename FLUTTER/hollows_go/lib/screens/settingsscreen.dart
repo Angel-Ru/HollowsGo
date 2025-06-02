@@ -1,4 +1,9 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:screen_brightness/screen_brightness.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../imports.dart'; // Inclou aquí el teu import general
 
@@ -87,15 +92,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => PreHomeScreen()),
+      (Route<dynamic> route) => false,
     );
   }
 
   Future<void> _deleteAccount() async {
+    print('Iniciant eliminació compte');
     final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getInt('user_id');
+    final userId = prefs.getInt('userId');
     final token = prefs.getString('token');
+    print('UserID: $userId, Token: $token');
 
     final confirm = await showDialog<bool>(
       context: context,
@@ -170,22 +178,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
 
+    print('Confirmació diàleg: $confirm');
+
     if (confirm == true && userId != null && token != null) {
+      print('Executant petició DELETE...');
       final response = await http.delete(
         Uri.parse('https://${Config.ip}/usuaris/$userId'),
         headers: {'Authorization': 'Bearer $token'},
       );
+      print('Resposta servidor: ${response.statusCode} - ${response.body}');
 
       if (response.statusCode == 200) {
+        print('Compte eliminat correctament, netejant preferències');
         await prefs.clear();
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => PreHomeScreen()),
+          (Route<dynamic> route) => false,
         );
       } else {
+        print('Error a l\'eliminar compte: ${response.statusCode}');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar el compte')),
+          const SnackBar(content: Text('Error al eliminar el compte')),
         );
       }
+    } else {
+      print('Eliminació cancel·lada o dades insuficients (userId/token)');
     }
   }
 
@@ -320,8 +337,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         SizedBox(height: 20),
-
-                        // ✅ Botó d'eliminar compte
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -335,8 +350,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         SizedBox(height: 20),
-
-                        // 🚪 Botó Logout
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
