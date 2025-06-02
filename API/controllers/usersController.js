@@ -447,8 +447,8 @@ exports.crearUsuariNormalToken = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(contrassenya, 10);
         const [result] = await connection.execute(
-            `INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo)
-             VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo, imatgeperfil)
+             VALUES (?, ?, ?, ?, ?, 25)`,
             [nom, email, hashedPassword, 100, 0]
         );
 
@@ -779,11 +779,11 @@ exports.mostrarDadesPerfil = async (req, res) => {
     }
 };
 
-// Obtenir la llista d'avatares
+// Obtenir la llista d'avatares excepte el que té id 25
 exports.llistarAvatars = async (req, res) => {
     try {
         const connection = await connectDB();
-        const [rows] = await connection.execute('SELECT * FROM AVATARS');
+        const [rows] = await connection.execute('SELECT * FROM AVATARS WHERE id != 25');
         res.json(rows);
     } catch (error) {
         console.error('Error al obtenir els avatars:', error);

@@ -3,7 +3,7 @@ import '../imports.dart';
 class ImageSelectionPage extends StatefulWidget {
   final Function(String) onImageSelected;
 
-  ImageSelectionPage({super.key, required this.onImageSelected});
+  const ImageSelectionPage({super.key, required this.onImageSelected});
 
   @override
   _ImageSelectionPageState createState() => _ImageSelectionPageState();
@@ -11,7 +11,7 @@ class ImageSelectionPage extends StatefulWidget {
 
 class _ImageSelectionPageState extends State<ImageSelectionPage> {
   late Future<List<Avatar>> _avatarFuture;
-  late Future<String> _avatarActualUrlFuture;
+  Future<String>? _avatarActualUrlFuture; // 👈 fem nullable
   final PerfilProvider _perfilProvider = PerfilProvider();
 
   @override
@@ -50,7 +50,11 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
               children: [
                 const SizedBox(height: 20),
                 _buildBackButton(),
-                CurrentAvatarDisplay(avatarFuture: _avatarActualUrlFuture),
+
+                // 👇 Només mostra el CurrentAvatarDisplay si _avatarActualUrlFuture no és null
+                if (_avatarActualUrlFuture != null)
+                  CurrentAvatarDisplay(avatarFuture: _avatarActualUrlFuture!),
+
                 Expanded(
                   child: FutureBuilder<List<Avatar>>(
                     future: _avatarFuture,

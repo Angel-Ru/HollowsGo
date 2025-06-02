@@ -63,67 +63,69 @@ void dispose() {
   }
 
   Future<void> _register() async {
-    final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
+  final username = _usernameController.text.trim();
+  final email = _emailController.text.trim();
+  final password = _passwordController.text.trim();
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
-      _showToast("Tots els camps són obligatoris");
-      return;
-    }
-
-    if (!_isEmailValid(email)) {
-      _showToast("El correu electrònic no és vàlid");
-      return;
-    }
-
-    if (!_isPasswordValid(password)) {
-      _showToast("La contrasenya ha de tenir almenys 6 caràcters");
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    final url = Uri.parse('https://${Config.ip}/usuaris/');
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({
-      "nom": username,
-      "email": email,
-      "contrassenya": password,
-    });
-
-    try {
-      final response = await http.post(url, headers: headers, body: body);
-      final responseData = jsonDecode(response.body);
-
-      if (response.statusCode == 201) {
-        final user = responseData['user'];
-        final token = responseData['token'];
-
-        await _clearPreferences();
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('userEmail', user['email']);
-        await prefs.setString('userName', user['nom']);
-        await prefs.setInt('userPunts', user['punts_emmagatzemats']);
-        await prefs.setInt('userTipo', user['tipo']);
-        await prefs.setString('token', token);
-
-        _showToast("T'has registrat correctament");
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomeScreen()),
-        );
-      } else {
-        final errorMsg = responseData['message'] ?? "Error desconegut";
-        _showToast("Error: $errorMsg");
-      }
-    } catch (e) {
-      _showToast("Error de connexió: $e");
-    } finally {
-      setState(() => _isLoading = false);
-    }
+  if (username.isEmpty || email.isEmpty || password.isEmpty) {
+    _showToast("Tots els camps són obligatoris");
+    return;
   }
+
+  if (!_isEmailValid(email)) {
+    _showToast("El correu electrònic no és vàlid");
+    return;
+  }
+
+  if (!_isPasswordValid(password)) {
+    _showToast("La contrasenya ha de tenir almenys 6 caràcters");
+    return;
+  }
+
+  setState(() => _isLoading = true);
+
+  final url = Uri.parse('https://${Config.ip}/usuaris/');
+  final headers = {'Content-Type': 'application/json'};
+  final body = jsonEncode({
+    "nom": username,
+    "email": email,
+    "contrassenya": password,
+  });
+
+  try {
+    final response = await http.post(url, headers: headers, body: body);
+    final responseData = jsonDecode(response.body);
+
+    if (response.statusCode == 201) {
+      final user = responseData['user'];
+      final token = responseData['token'];
+
+      await _clearPreferences();
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setInt('userId', user['id']);
+      await prefs.setString('userEmail', user['email']);
+      await prefs.setString('userName', user['nom']);
+      await prefs.setInt('userPunts', user['punts_emmagatzemats']);
+      await prefs.setInt('userTipo', user['tipo']);
+      await prefs.setString('token', token);
+
+      _showToast("T'has registrat correctament");
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+      );
+    } else {
+      final errorMsg = responseData['message'] ?? "Error desconegut";
+      _showToast("Error: $errorMsg");
+    }
+  } catch (e) {
+    _showToast("Error de connexió: $e");
+  } finally {
+    setState(() => _isLoading = false);
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
