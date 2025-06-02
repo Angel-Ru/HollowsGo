@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hollows_go/providers/ui_provider.dart';
 import 'package:hollows_go/screens/homescreen.dart';
+import 'package:hollows_go/service/audioservice.dart';
 import 'package:provider/provider.dart';
 import '../providers/dialeg_provider.dart';
 import '../widgets/dialogue_widget.dart';
@@ -18,6 +19,8 @@ class _TutorialScreenState extends State<TutorialScreen> {
   @override
   void initState() {
     super.initState();
+    AudioService.instance.playScreenMusic('tutorial');
+
     _pageController = PageController(viewportFraction: 0.85);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<DialogueProvider>(context, listen: false)

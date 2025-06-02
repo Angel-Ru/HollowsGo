@@ -29,7 +29,6 @@ class AudioService {
 
   final List<String> _prehomeMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
   ];
 
   final List<String> _homeMusicUrls = [
@@ -66,6 +65,10 @@ class AudioService {
 
   final List<String> _amistatsMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/AMISTATS_MUSICA/tudeyopnovxc4khvlkoz',
+  ];
+
+  final List<String> _tutorialMusicUrls = [
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/TUTORIAL/gpubxi1cz98orj8muezc',
   ];
 
   final Random _random = Random();
@@ -214,6 +217,9 @@ class AudioService {
         break;
       case 'amistat':
         urls = _amistatsMusicUrls;
+        break;
+      case 'tutorial':
+        urls = _tutorialMusicUrls;
         break;
       default:
         debugPrint('⚠️ playScreenMusic: pantalla desconeguda $screen');
