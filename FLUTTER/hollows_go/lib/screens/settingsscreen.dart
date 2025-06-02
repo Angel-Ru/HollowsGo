@@ -1,4 +1,9 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:screen_brightness/screen_brightness.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../imports.dart'; // Inclou aquí el teu import general
 
@@ -87,8 +92,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => PreHomeScreen()),
+      (Route<dynamic> route) => false,
     );
   }
 
@@ -185,8 +191,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (response.statusCode == 200) {
         print('Compte eliminat correctament, netejant preferències');
         await prefs.clear();
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => PreHomeScreen()),
+          (Route<dynamic> route) => false,
         );
       } else {
         print('Error a l\'eliminar compte: ${response.statusCode}');
@@ -330,8 +337,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         SizedBox(height: 20),
-
-                        // ✅ Botó d'eliminar compte
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -345,8 +350,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         SizedBox(height: 20),
-
-                        // 🚪 Botó Logout
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
