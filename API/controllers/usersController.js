@@ -208,13 +208,20 @@ exports.crearUsuariNormal = async (req, res) => {
 exports.borrarUsuari = async (req, res) => {
     try {
         const connection = await connectDB();
-        await connection.execute('DELETE FROM USUARIS WHERE id = ?', [req.params.id]);
+        const usuariId = req.params.id;  // <-- Aquí el paràmetre és 'id'
+        const [result] = await connection.execute('DELETE FROM USUARIS WHERE id = ?', [usuariId]);
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Usuari no trobat');
+        }
+        
         res.send('Usuari eliminat correctament');
     } catch (err) {
         console.error(err);
         res.status(500).send("Error alhora d'eliminar l'usuari");
     }
 };
+
 /**
  * @swagger
  * /usuaris/admin/:

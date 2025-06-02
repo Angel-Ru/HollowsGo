@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:http/http.dart' as http;
-import '../imports.dart';
+import '../imports.dart'; // Inclou aquí el teu import general
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -97,30 +97,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final userId = prefs.getInt('user_id');
     final token = prefs.getString('token');
 
-    final confirm = await showGeneralDialog<bool>(
+    final confirm = await showDialog<bool>(
       context: context,
-      barrierDismissible: false,
-      barrierLabel: "Confirm",
-      barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (context, anim1, anim2) {
-        return Center(
-          child: Material(
-            type: MaterialType.transparency,
-            child: Container(
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Container(
               padding: const EdgeInsets.all(24),
-              margin: const EdgeInsets.symmetric(horizontal: 24),
               decoration: BoxDecoration(
-                color: Colors.black,
-                image: const DecorationImage(
+                image: DecorationImage(
                   image: NetworkImage(
                       'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
                   fit: BoxFit.cover,
-                  colorFilter:
-                      ColorFilter.mode(Colors.black54, BlendMode.darken),
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7), BlendMode.darken),
                 ),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.orangeAccent, width: 3),
+                border: Border.all(
+                  color: Colors.orangeAccent,
+                  width: 3,
+                ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -136,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Text(
+                  Text(
                     'Estàs segur que vols eliminar el teu compte?\nPerdràs totes les dades.',
                     style: TextStyle(fontSize: 16, color: Colors.white),
                     textAlign: TextAlign.center,
@@ -164,13 +161,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: const Text('Sí'),
                       ),
                     ],
-                  ),
+                  )
                 ],
               ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
 
     if (confirm == true && userId != null && token != null) {
@@ -186,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al eliminar el compte')),
+          SnackBar(content: Text('Error al eliminar el compte')),
         );
       }
     }
@@ -197,12 +194,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Configuració'),
+        title: Text('Configuració'),
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -233,133 +230,142 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildSectionTitle('Lluminositat de la pantalla'),
-                        const SizedBox(height: 20),
-                        _buildBrightnessSlider(),
-                        _buildPercentage(_currentBrightness),
-                        const SizedBox(height: 40),
-                        _buildSectionTitle('Volum del dispositiu'),
-                        _buildVolumeSlider(),
-                        const SizedBox(height: 10),
-                        _buildMuteButton(),
-                        const SizedBox(height: 20),
-                        _buildButton(
-                            'Tutorial', Icons.school, Colors.blueAccent, () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => TutorialScreen()),
-                          );
-                        }),
-                        const SizedBox(height: 20),
-                        _buildButton('Eliminar Compte', Icons.delete_forever,
-                            Colors.deepOrangeAccent, _deleteAccount),
-                        const SizedBox(height: 20),
-                        _buildButton(
-                            'Tancar Sessió', Icons.logout, Colors.red, _logout),
-                        const SizedBox(height: 20),
+                        Text(
+                          'Lluminositat de la pantalla',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Icon(Icons.brightness_low, color: Colors.white),
+                            Expanded(
+                              child: Slider(
+                                value: _currentBrightness,
+                                min: 0.0,
+                                max: 1.0,
+                                divisions: 10,
+                                onChanged: _setBrightness,
+                                activeColor: Colors.yellow,
+                                inactiveColor: Colors.grey[300],
+                              ),
+                            ),
+                            Icon(Icons.brightness_high, color: Colors.white),
+                          ],
+                        ),
+                        Center(
+                          child: Text(
+                            '${(_currentBrightness * 100).round()}%',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 40),
+                        Text(
+                          'Volum del dispositiu',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.volume_down, color: Colors.white),
+                            Expanded(
+                              child: Slider(
+                                value: _volume,
+                                min: 0.0,
+                                max: 1.0,
+                                divisions: 100,
+                                onChanged: _setVolume,
+                                activeColor: Colors.yellow,
+                                inactiveColor: Colors.grey[300],
+                              ),
+                            ),
+                            Icon(Icons.volume_up, color: Colors.white),
+                          ],
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(
+                                _isMuted ? Icons.volume_off : Icons.volume_up),
+                            label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
+                            onPressed: _toggleMute,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.school),
+                            label: Text('Tutorial'),
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Colors.blueAccent,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => TutorialScreen()),
+                              );
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 20),
+
+                        // ✅ Botó d'eliminar compte
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.delete_forever),
+                            label: Text('Eliminar Compte'),
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Colors.deepOrangeAccent,
+                            ),
+                            onPressed: _deleteAccount,
+                          ),
+                        ),
+                        SizedBox(height: 20),
+
+                        // 🚪 Botó Logout
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            icon: Icon(Icons.logout),
+                            label: Text('Tancar Sessió'),
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              backgroundColor: Colors.red,
+                            ),
+                            onPressed: _logout,
+                          ),
+                        ),
+                        SizedBox(height: 20),
                       ],
                     ),
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
                 child: DialogueWidget(
                   characterName: 'Shinji Hirako',
-                  nameColor: Color.fromARGB(255, 231, 213, 50),
+                  nameColor: const Color.fromARGB(255, 231, 213, 50),
                   bubbleColor: Color.fromARGB(212, 238, 238, 238),
                 ),
               ),
             ],
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    );
-  }
-
-  Widget _buildBrightnessSlider() {
-    return Row(
-      children: [
-        const Icon(Icons.brightness_low, color: Colors.white),
-        Expanded(
-          child: Slider(
-            value: _currentBrightness,
-            min: 0.0,
-            max: 1.0,
-            divisions: 10,
-            onChanged: _setBrightness,
-            activeColor: Colors.yellow,
-            inactiveColor: Colors.grey[300],
-          ),
-        ),
-        const Icon(Icons.brightness_high, color: Colors.white),
-      ],
-    );
-  }
-
-  Widget _buildVolumeSlider() {
-    return Row(
-      children: [
-        const Icon(Icons.volume_down, color: Colors.white),
-        Expanded(
-          child: Slider(
-            value: _volume,
-            min: 0.0,
-            max: 1.0,
-            divisions: 100,
-            onChanged: _setVolume,
-            activeColor: Colors.yellow,
-            inactiveColor: Colors.grey[300],
-          ),
-        ),
-        const Icon(Icons.volume_up, color: Colors.white),
-      ],
-    );
-  }
-
-  Widget _buildMuteButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        icon: Icon(_isMuted ? Icons.volume_off : Icons.volume_up),
-        label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
-        onPressed: _toggleMute,
-      ),
-    );
-  }
-
-  Widget _buildButton(
-      String text, IconData icon, Color color, VoidCallback onPressed) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        icon: Icon(icon),
-        label: Text(text),
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          backgroundColor: color,
-        ),
-        onPressed: onPressed,
-      ),
-    );
-  }
-
-  Widget _buildPercentage(double value) {
-    return Center(
-      child: Text(
-        '${(value * 100).round()}%',
-        style: const TextStyle(fontSize: 16, color: Colors.white),
       ),
     );
   }
