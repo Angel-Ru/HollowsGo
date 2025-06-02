@@ -124,20 +124,23 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: (_isVideoReady &&
-                _videoController != null &&
-                _videoController!.value.isInitialized)
-            ? FadeTransition(
-                opacity: _animationManager.fadeAnimation,
-                child: AspectRatio(
-                  aspectRatio: _videoController!.value.aspectRatio,
-                  child: VideoPlayer(_videoController!),
-                ),
-              )
-            : const SizedBox.shrink(),
+    return WillPopScope(
+      onWillPop: () async => false, // ❌ Evita que l'usuari pugui tornar enrere
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: (_isVideoReady &&
+                  _videoController != null &&
+                  _videoController!.value.isInitialized)
+              ? FadeTransition(
+                  opacity: _animationManager.fadeAnimation,
+                  child: AspectRatio(
+                    aspectRatio: _videoController!.value.aspectRatio,
+                    child: VideoPlayer(_videoController!),
+                  ),
+                )
+              : const SizedBox.shrink(),
+        ),
       ),
     );
   }

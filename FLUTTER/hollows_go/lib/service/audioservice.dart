@@ -61,6 +61,7 @@ class AudioService {
 
   final List<String> _settingsMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/SETTINGS_MUSICA/u8ao6m5yyrxkpybgsdnh',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/SETTINGS_MUSICA/zf5tmvaczuto07gjup4t',
   ];
 
   final List<String> _amistatsMusicUrls = [
