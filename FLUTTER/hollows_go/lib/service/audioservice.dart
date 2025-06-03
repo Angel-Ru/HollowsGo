@@ -46,8 +46,8 @@ class AudioService with WidgetsBindingObserver {
   ];
 
   final List<String> _bibliotecaMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/mgka7srvn6yvqkf0ook3',
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/kubs8yagdgzqrptb6qjv'
+        'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/wtj5tjwn4lziywibi7hs',
   ];
 
   final List<String> _perfilMusicUrls = [
@@ -72,6 +72,10 @@ class AudioService with WidgetsBindingObserver {
 
   final List<String> _tutorialMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/TUTORIAL/gpubxi1cz98orj8muezc',
+  ];
+
+  final List<String> _editMusicUrls = [
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/mgka7srvn6yvqkf0ook3',
   ];
 
   final Random _random = Random();
@@ -225,6 +229,8 @@ class AudioService with WidgetsBindingObserver {
       case 'tutorial':
         urls = _tutorialMusicUrls;
         break;
+      case 'edit':
+        urls = _editMusicUrls;
       default:
         debugPrint('⚠️ playScreenMusic: pantalla desconeguda $screen');
         return;
