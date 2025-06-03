@@ -289,7 +289,7 @@ exports.getTitolUsuari = async (req, res) => {
     res.status(500).json({ error: 'Error intern del servidor' });
   }
 };
-
+  
 exports.actualitzarTitolUsuari = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
   const { titolId } = req.body;

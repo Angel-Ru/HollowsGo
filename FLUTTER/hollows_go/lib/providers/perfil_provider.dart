@@ -12,9 +12,10 @@ class PerfilProvider with ChangeNotifier {
   int get partidesGuanyades => _partidesGuanyades;
   int get nombrePersonatges => _nombrePersonatges;
   int get nombreSkins => _nombreSkins;
+
   Titol? _titolUsuari;
   Titol? get titolUsuari => _titolUsuari;
-  
+
   Future<void> fetchPerfilData(int userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -157,19 +158,18 @@ class PerfilProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-    final url = Uri.parse(
-        'https://${Config.ip}/usuaris/avatar/$userId'); // Ruta per obtenir l'avatar de l'usuari
+    final url = Uri.parse('https://${Config.ip}/usuaris/avatar/$userId');
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token', // Afegir token d'autenticació
+        'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data['avatarUrl']; // Retorna l'URL de l'avatar
+      return data['avatarUrl'];
     } else {
       throw Exception('No s\'ha pogut carregar l\'avatar');
     }
@@ -224,49 +224,49 @@ class PerfilProvider with ChangeNotifier {
       throw e;
     }
   }
-  
+
   Future<List<Titol>> fetchTitolsComplets(int userId) async {
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
 
-    if (token == null) {
-      print("Token no disponible a SharedPreferences");
+      if (token == null) {
+        print("Token no disponible a SharedPreferences");
+        return [];
+      }
+
+      final response = await http.get(
+        Uri.parse('https://${Config.ip}/perfils/titols/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final titolsJson = data['titols'] as List<dynamic>?;
+
+        if (titolsJson == null) return [];
+
+        return titolsJson.map((e) => Titol.fromJson(e)).toList();
+      } else {
+        print('Error carregant títols completats: ${response.body}');
+        return [];
+      }
+    } catch (e) {
+      print('Error a fetchTitolsComplets: $e');
       return [];
     }
-
-    final response = await http.get(
-      Uri.parse('https://${Config.ip}/perfils/titols/$userId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final titolsJson = data['titols'] as List<dynamic>?;
-
-      if (titolsJson == null) return [];
-
-      return titolsJson.map((e) => Titol.fromJson(e)).toList();
-    } else {
-      print('Error carregant títols completats: ${response.body}');
-      return [];
-    }
-  } catch (e) {
-    print('Error a fetchTitolsComplets: $e');
-    return [];
   }
-}
-// Nou mètode per carregar el títol i notificar
+
   Future<void> carregarTitolUsuari(int userId) async {
     final titol = await fetchTitolUsuari(userId);
     _titolUsuari = titol;
     notifyListeners();
   }
 
-Future<Titol?> fetchTitolUsuari(int userId) async {
+  Future<Titol?> fetchTitolUsuari(int userId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -311,7 +311,8 @@ Future<Titol?> fetchTitolUsuari(int userId) async {
         return;
       }
 
-      final url = Uri.parse('https://${Config.ip}/perfils/actualitzar/titol/$userId');
+      final url =
+          Uri.parse('https://${Config.ip}/perfils/actualitzar/titol/$userId');
 
       final response = await http.patch(
         url,
@@ -326,7 +327,8 @@ Future<Titol?> fetchTitolUsuari(int userId) async {
 
       if (response.statusCode == 200) {
         print('Títol actualitzat correctament');
-        await carregarTitolUsuari(userId);  // Actualitza el títol localment i notifica
+        await carregarTitolUsuari(
+            userId); // <- aquí s'actualitza localment i notifica
       } else {
         print('Error actualitzant el títol: ${response.body}');
       }
@@ -334,6 +336,4 @@ Future<Titol?> fetchTitolUsuari(int userId) async {
       print('Error a patchTitolUsuari: $e');
     }
   }
-
-
 }

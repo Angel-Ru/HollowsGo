@@ -54,6 +54,8 @@ router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.
 // Ruta per obtenir totes les amistats d'un usuari
 router.get('/amics/:id', verificacioUsuari.verifyToken, userController.obtenirAmistats);
 
+router.get('/perfil/:idUsuari/amic/:idusuariamic', userController.obtenirEstadistiquesAmic);
+
 // Ruta per veure les sol·licituds pendents d'un usuari
 router.put('/amics/:id/pendents', verificacioUsuari.verifyToken, userController.obtenirpendents);
 

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:hollows_go/service/audioservice.dart';
 import 'package:hollows_go/widgets/amistats/dialog_amic.dart';
+import 'package:hollows_go/widgets/dialog_amic_estadistiques.dart';
 import '../imports.dart';
 
 class AmistatsScreen extends StatefulWidget {
@@ -80,7 +81,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
             // Contingut principal
             Column(
               children: [
-                // Capçalera translúcida
+                // Capçalera
                 Padding(
                   padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
                   child: ClipRRect(
@@ -203,6 +204,39 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                   style: TextStyle(color: Colors.white70),
                                 ),
                                 trailing: _estatBadge(estat),
+                                onTap: estat.toLowerCase() == 'acceptat'
+                                    ? () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              DialogAmicEstadistiques(
+                                            nom: nom,
+                                            avatarUrl:
+                                                amistat['imatge_perfil_amic'],
+                                            partidesJugades: int.tryParse(
+                                                    amistat['partides_jugades']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0,
+                                            partidesGuanyades: int.tryParse(
+                                                    amistat['partides_guanyades']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0,
+                                            nombrePersonatges: int.tryParse(
+                                                    amistat['nombre_personatges']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0,
+                                            nombreSkins: int.tryParse(
+                                                    amistat['nombre_skins']
+                                                            ?.toString() ??
+                                                        '0') ??
+                                                0,
+                                          ),
+                                        );
+                                      }
+                                    : null,
                               ),
                             );
                           },

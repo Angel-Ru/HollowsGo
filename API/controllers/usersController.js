@@ -873,6 +873,55 @@ exports.obtenirAmistats = async (req, res) => {
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };
+// Obtenir dades de perfil d'un amic si són amistats
+exports.obtenirEstadistiquesAmic = async (req, res) => {
+    try {
+        const { idusuari, idusuariamic } = req.params;
+
+        const connection = await connectDB();
+
+        // Comprovar si són amistats (estat = 'acceptat')
+        const [amistatRows] = await connection.execute(`
+            SELECT * FROM AMISTATS
+            WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
+            AND estat = 'acceptat'
+        `, [idusuari, idusuariamic, idusuariamic, idusuari]);
+
+        if (amistatRows.length === 0) {
+            return res.status(403).json({ missatge: 'No tens accés a les estadístiques d’aquest usuari.' });
+        }
+
+        // Obtenir estadístiques del perfil
+        const [rows] = await connection.execute(`
+            SELECT 
+                pu.partides_jugades, 
+                pu.partides_guanyades,
+                COUNT(DISTINCT b.personatge_id) AS nombre_personatges,
+                SUM(
+                    CASE 
+                        WHEN b.skin_ids IS NULL OR b.skin_ids = '' THEN 0
+                        ELSE CHAR_LENGTH(b.skin_ids) - CHAR_LENGTH(REPLACE(b.skin_ids, ',', '')) + 1
+                    END
+                ) AS nombre_skins
+            FROM PERFIL_USUARI pu
+            JOIN USUARIS u ON u.id = pu.usuari
+            JOIN BIBLIOTECA b ON b.user_id = u.id
+            WHERE u.id = ?
+            GROUP BY pu.partides_jugades, pu.partides_guanyades
+        `, [idAmic]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ missatge: 'Perfil no trobat' });
+        }
+
+        res.status(200).json(rows[0]);
+
+    } catch (error) {
+        console.error('Error obtenint estadístiques d’amic:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
+
 
 // Obtenir les sol·licituds d'amistat d'un usuari pendents
 exports.obtenirpendents = async (req, res) => {
