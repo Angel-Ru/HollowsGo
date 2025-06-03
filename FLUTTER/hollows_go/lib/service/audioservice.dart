@@ -47,6 +47,7 @@ class AudioService {
   final List<String> _bibliotecaMusicUrls = [
     // falta 2
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/mgka7srvn6yvqkf0ook3',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/kubs8yagdgzqrptb6qjv'
   ];
 
   final List<String> _perfilMusicUrls = [

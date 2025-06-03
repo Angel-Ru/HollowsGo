@@ -24,7 +24,6 @@ class CharacterDisplayWidget extends StatefulWidget {
 
   final bool showInkEffect;
 
-  // NOVES PROPIETATS per Senjumaru
   final bool showSenjumaruEffect;
   final int senjumaruAttackCount;
 
@@ -165,7 +164,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                 ),
               ),
               if (widget.isEnemy) ...[
-                // Efecte tinta Ichibe
                 AnimatedOpacity(
                   opacity: _opacity,
                   duration: const Duration(milliseconds: 500),
@@ -177,8 +175,6 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
                     height: containerSize,
                   ),
                 ),
-
-                // Efecte tela Senjumaru (amb les dues teles apilades i fadeIn)
                 if (widget.showSenjumaruEffect)
                   Stack(
                     children: [
@@ -220,101 +216,66 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 6,
+                runSpacing: 6,
                 children: [
-                  if (widget.isEnemy) ...[
-                    if (widget.debuffAmount > 0) ...[
-                      buildStatusIcon(),
-                      const SizedBox(width: 6),
-                    ],
-                    if (widget.isBleeding)
-                      Image.asset(
-                        'assets/special_attack/unohana/icone_sang.png',
-                        width: 18,
-                        height: 18,
-                      ),
-                    if (widget.isFrozen)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 6),
-                        child: Image.asset(
-                          'assets/special_attack/rukia/icone_gel.png',
-                          width: 18,
-                          height: 18,
-                        ),
-                      ),
-                  ],
-                  if (!widget.isEnemy) ...[
-                    if (widget.isBleeding)
-                      Image.asset(
-                        'assets/special_attack/unohana/icone_sang.png',
-                        width: 18,
-                        height: 18,
-                      ),
-                    if (widget.isFrozen)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 6),
-                        child: Image.asset(
-                          'assets/special_attack/rukia/icone_gel.png',
-                          width: 18,
-                          height: 18,
-                        ),
-                      ),
-                    if (widget.isImmune)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 6),
-                        child: Image.asset(
-                          'assets/special_attack/yhwach/icone_escut.png',
-                          width: 18,
-                          height: 18,
-                        ),
-                      ),
-                  ],
-                  Expanded(
-                    child: widget.isEnemy
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              HealthBarWidget(
-                                currentHealth: widget.health,
-                                maxHealth: widget.maxHealth,
-                                showText: false,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "${widget.health.toInt()}/${widget.maxHealth}",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              Text(
-                                "${widget.health.toInt()}/${widget.maxHealth}",
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              HealthBarWidget(
-                                currentHealth: widget.health,
-                                maxHealth: widget.maxHealth,
-                                showText: false,
-                              ),
-                            ],
-                          ),
-                  ),
-                  if (!widget.isEnemy && widget.buffAmount > 0) ...[
-                    const SizedBox(width: 6),
+                  if (widget.isEnemy && widget.debuffAmount > 0)
                     buildStatusIcon(),
-                  ],
+                  if (!widget.isEnemy && widget.buffAmount > 0)
+                    buildStatusIcon(),
+                  if (widget.isBleeding)
+                    Image.asset(
+                      'assets/special_attack/unohana/icone_sang.png',
+                      width: 18,
+                      height: 18,
+                    ),
+                  if (widget.isFrozen)
+                    Image.asset(
+                      'assets/special_attack/rukia/icone_gel.png',
+                      width: 18,
+                      height: 18,
+                    ),
+                  if (!widget.isEnemy && widget.isImmune)
+                    Image.asset(
+                      'assets/special_attack/yhwach/icone_escut.png',
+                      width: 18,
+                      height: 18,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  if (!widget.isEnemy)
+                    Text(
+                      "${widget.health.toInt()}/${widget.maxHealth}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  if (!widget.isEnemy) const SizedBox(width: 8),
+                  Expanded(
+                    child: HealthBarWidget(
+                      currentHealth: widget.health,
+                      maxHealth: widget.maxHealth,
+                      showText: false,
+                    ),
+                  ),
+                  if (widget.isEnemy) const SizedBox(width: 8),
+                  if (widget.isEnemy)
+                    Text(
+                      "${widget.health.toInt()}/${widget.maxHealth}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
                 ],
               ),
               const SizedBox(height: 6),
