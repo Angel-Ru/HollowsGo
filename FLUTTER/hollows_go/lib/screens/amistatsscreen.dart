@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hollows_go/service/audioservice.dart';
 import 'package:hollows_go/widgets/amistats/dialog_amic.dart';
 import 'package:hollows_go/widgets/dialog_amic_estadistiques.dart';
+import 'package:http/http.dart' as http;
 import '../imports.dart';
 
 class AmistatsScreen extends StatefulWidget {
@@ -43,13 +44,33 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
   }
 
   Future<Map<String, dynamic>?> fetchEstadistiquesAmic(
-      String idUsuari, String idUsuariAmic) async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
+      String idusuari, String idusuariamic) async {
     try {
-      return await userProvider.fetchEstadistiquesAmic(idUsuari, idUsuariAmic);
-    } catch (e) {
-      print(
-          'Error carregant estadístiques de l\'amic amb ID $idUsuariAmic: $e');
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      if (token == null) return null;
+
+      final url =
+          Uri.parse('https://${Config.ip}/perfil/$idusuariamic/amic/$idusuari');
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else if (response.statusCode == 404) {
+        // Retorna un mapa amb una clau especial per indicar l'error
+        return {'error': 'not_found'};
+      } else {
+        print('Error HTTP: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error a fetchEstadistiquesAmic: $error');
       return null;
     }
   }
@@ -211,8 +232,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                             amistat['id_usuari_amic']
                                                     ?.toString() ??
                                                 '';
-                                        print('idUsuari: $idUsuari');
-                                        print('idUsuariAmic: $idUsuariAmic');
+
                                         if (idUsuari.isEmpty ||
                                             idUsuariAmic.isEmpty) {
                                           ScaffoldMessenger.of(context)
@@ -232,7 +252,6 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                                   CircularProgressIndicator()),
                                         );
 
-                                        // ✅ CORRECTE: ordre dels paràmetres
                                         final dades = await userProvider
                                             .fetchEstadistiquesAmic(
                                           idUsuari,
@@ -251,6 +270,18 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                           return;
                                         }
 
+                                        if (dades.containsKey('error') &&
+                                            dades['error'] == 'not_found') {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'No tens accés a les estadístiques d’aquest amic.')),
+                                          );
+                                          return;
+                                        }
+
+                                        // Mostrem el diàleg amb les dades
                                         showDialog(
                                           context: context,
                                           builder: (context) =>
