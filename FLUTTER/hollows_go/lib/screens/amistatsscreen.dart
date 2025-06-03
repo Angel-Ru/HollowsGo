@@ -205,8 +205,8 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                         final userProvider =
                                             Provider.of<UserProvider>(context,
                                                 listen: false);
-                                        final idUsuari = userProvider.userId
-                                            .toString(); // ID del teu usuari
+                                        final idUsuari =
+                                            userProvider.userId.toString();
                                         final idUsuariAmic =
                                             amistat['id_usuari_amic']
                                                     ?.toString() ??
@@ -231,11 +231,11 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                                   CircularProgressIndicator()),
                                         );
 
-                                        // 👉 Intercanviem els valors aquí
+                                        // ✅ CORRECTE: ordre dels paràmetres
                                         final dades = await userProvider
                                             .fetchEstadistiquesAmic(
-                                          idUsuariAmic, // Primer: ID de l'amic
-                                          idUsuari, // Segon: El teu ID
+                                          idUsuari,
+                                          idUsuariAmic,
                                         );
 
                                         Navigator.of(context).pop();
