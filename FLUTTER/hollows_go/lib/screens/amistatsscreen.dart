@@ -222,8 +222,8 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
 
                                         final dades = await userProvider
                                             .fetchEstadistiquesAmic(
-                                          idUsuari,
                                           idUsuariAmic,
+                                          idUsuari,
                                         );
 
                                         Navigator.of(context).pop();
