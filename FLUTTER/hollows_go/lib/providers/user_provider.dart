@@ -307,6 +307,33 @@ class UserProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(String nomAmic) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      if (token == null) return null;
+
+      final url =
+          Uri.parse('https://${Config.ip}/usuaris/estadistiques/$nomAmic');
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        print('Error HTTP: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error a fetchEstadistiquesAmic: $error');
+      return null;
+    }
+  }
+
   Future<Map<String, dynamic>> crearAmistat(String emailAmic) async {
     try {
       final prefs = await SharedPreferences.getInstance();

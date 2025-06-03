@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:hollows_go/service/audioservice.dart';
 import 'package:hollows_go/widgets/amistats/dialog_amic.dart';
 import 'package:hollows_go/widgets/dialog_amic_estadistiques.dart';
@@ -42,6 +42,16 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
     );
   }
 
+  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(String nomUsuari) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    try {
+      return await userProvider.fetchEstadistiquesAmic(nomUsuari);
+    } catch (e) {
+      print('Error carregant estadístiques de $nomUsuari: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -63,8 +73,6 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
           children: [
             // Fons
             Container(
-              width: double.infinity,
-              height: double.infinity,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage(
@@ -74,11 +82,8 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                 ),
               ),
             ),
-
-            // Lluminositat suau
             Container(color: Colors.black.withOpacity(0.15)),
 
-            // Contingut principal
             Column(
               children: [
                 // Capçalera
@@ -141,19 +146,14 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
-                          child: Image.asset(
-                            'assets/loading/loading.gif',
-                            width: 60,
-                            height: 60,
-                          ),
+                          child: Image.asset('assets/loading/loading.gif',
+                              width: 60, height: 60),
                         );
                       }
                       if (snapshot.hasError) {
                         return Center(
-                          child: Text(
-                            'Error carregant les amistats.',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          child: Text('Error carregant les amistats.',
+                              style: TextStyle(color: Colors.white)),
                         );
                       }
 
@@ -161,10 +161,8 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
 
                       if (amistats.isEmpty) {
                         return Center(
-                          child: Text(
-                            'No hi ha amistats disponibles.',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          child: Text('No hi ha amistats disponibles.',
+                              style: TextStyle(color: Colors.white)),
                         );
                       }
 
@@ -195,44 +193,53 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                       ? Icon(Icons.person, color: Colors.white)
                                       : null,
                                 ),
-                                title: Text(
-                                  nom,
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                subtitle: Text(
-                                  'Estat: ${estat.toUpperCase()}',
-                                  style: TextStyle(color: Colors.white70),
-                                ),
+                                title: Text(nom,
+                                    style: TextStyle(color: Colors.white)),
+                                subtitle: Text('Estat: ${estat.toUpperCase()}',
+                                    style: TextStyle(color: Colors.white70)),
                                 trailing: _estatBadge(estat),
                                 onTap: estat.toLowerCase() == 'acceptat'
-                                    ? () {
+                                    ? () async {
+                                        showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (_) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                        );
+
+                                        final dades =
+                                            await fetchEstadistiquesAmic(nom);
+                                        Navigator.of(context)
+                                            .pop(); // tanca loading
+
+                                        if (dades == null) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  'No s\'han pogut carregar les estadístiques.'),
+                                            ),
+                                          );
+                                          return;
+                                        }
+
                                         showDialog(
                                           context: context,
                                           builder: (context) =>
                                               DialogAmicEstadistiques(
                                             nom: nom,
-                                            avatarUrl:
-                                                amistat['imatge_perfil_amic'],
-                                            partidesJugades: int.tryParse(
-                                                    amistat['partides_jugades']
-                                                            ?.toString() ??
-                                                        '0') ??
-                                                0,
-                                            partidesGuanyades: int.tryParse(
-                                                    amistat['partides_guanyades']
-                                                            ?.toString() ??
-                                                        '0') ??
-                                                0,
-                                            nombrePersonatges: int.tryParse(
-                                                    amistat['nombre_personatges']
-                                                            ?.toString() ??
-                                                        '0') ??
-                                                0,
-                                            nombreSkins: int.tryParse(
-                                                    amistat['nombre_skins']
-                                                            ?.toString() ??
-                                                        '0') ??
-                                                0,
+                                            avatarUrl: dades['imatge_perfil'],
+                                            partidesJugades:
+                                                dades['partides_jugades'] ?? 0,
+                                            partidesGuanyades:
+                                                dades['partides_guanyades'] ??
+                                                    0,
+                                            nombrePersonatges:
+                                                dades['nombre_personatges'] ??
+                                                    0,
+                                            nombreSkins:
+                                                dades['nombre_skins'] ?? 0,
                                           ),
                                         );
                                       }

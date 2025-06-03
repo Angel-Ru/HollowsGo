@@ -908,7 +908,7 @@ exports.obtenirEstadistiquesAmic = async (req, res) => {
             JOIN BIBLIOTECA b ON b.user_id = u.id
             WHERE u.id = ?
             GROUP BY pu.partides_jugades, pu.partides_guanyades
-        `, [idAmic]);
+        `, [idusuariamic]);
 
         if (rows.length === 0) {
             return res.status(404).json({ missatge: 'Perfil no trobat' });
