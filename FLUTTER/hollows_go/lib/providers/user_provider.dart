@@ -315,8 +315,9 @@ class UserProvider with ChangeNotifier {
 
       if (token == null) return null;
 
+      // Intercanviem els IDs aquí per agafar correctament l'id de l'amic primer
       final url =
-          Uri.parse('https://${Config.ip}/perfil/$idusuari/amic/$idusuariamic');
+          Uri.parse('https://${Config.ip}/perfil/$idusuariamic/amic/$idusuari');
       print('Cridant a: $url');
 
       final headers = {
