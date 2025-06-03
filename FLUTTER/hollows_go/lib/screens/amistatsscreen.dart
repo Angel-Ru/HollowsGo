@@ -43,8 +43,6 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
     );
   }
 
- 
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -251,7 +249,40 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                           return;
                                         }
 
-                                        // Mostrem el diàleg amb les dades
+                                        // Extreiem totes les dades noves amb seguretat
+                                        final partidesJugades = int.tryParse(
+                                                dades['partides_jugades']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+                                        final partidesGuanyades = int.tryParse(
+                                                dades['partides_guanyades']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+                                        final nombrePersonatges = int.tryParse(
+                                                dades['nombre_personatges']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+                                        final nombreSkins = int.tryParse(
+                                                dades['nombre_skins']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+
+                                        final personatgePreferit =
+                                            dades['nom_personatge_preferit'] ??
+                                                'Desconegut';
+                                        final imatgeSkinPreferida =
+                                            dades['imatge_skin_preferida'];
+                                        final nivell = dades['nivell'] != null
+                                            ? int.tryParse(
+                                                dades['nivell'].toString())
+                                            : null;
+                                        final nomTitol =
+                                            dades['nom_titol'] ?? 'Cap títol';
+
                                         showDialog(
                                           context: context,
                                           builder: (context) =>
@@ -259,16 +290,18 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                             nom: nom,
                                             avatarUrl:
                                                 amistat['imatge_perfil_amic'],
-                                            partidesJugades:
-                                                dades['partides_jugades'] ?? 0,
+                                            partidesJugades: partidesJugades,
                                             partidesGuanyades:
-                                                dades['partides_guanyades'] ??
-                                                    0,
+                                                partidesGuanyades,
                                             nombrePersonatges:
-                                                dades['nombre_personatges'] ??
-                                                    0,
-                                            nombreSkins:
-                                                dades['nombre_skins'] ?? 0,
+                                                nombrePersonatges,
+                                            nombreSkins: nombreSkins,
+                                            personatgePreferit:
+                                                personatgePreferit,
+                                            imatgeSkinPreferida:
+                                                imatgeSkinPreferida,
+                                            nivell: nivell,
+                                            nomTitol: nomTitol,
                                           ),
                                         );
                                       }

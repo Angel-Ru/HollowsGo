@@ -8,6 +8,12 @@ class DialogAmicEstadistiques extends StatelessWidget {
   final int nombrePersonatges;
   final int nombreSkins;
 
+  // Nous camps
+  final String personatgePreferit;
+  final String? imatgeSkinPreferida;
+  final int? nivell;
+  final String nomTitol;
+
   const DialogAmicEstadistiques({
     Key? key,
     required this.nom,
@@ -16,6 +22,10 @@ class DialogAmicEstadistiques extends StatelessWidget {
     required this.partidesGuanyades,
     required this.nombrePersonatges,
     required this.nombreSkins,
+    required this.personatgePreferit,
+    this.imatgeSkinPreferida,
+    this.nivell,
+    required this.nomTitol,
   }) : super(key: key);
 
   @override
@@ -41,16 +51,27 @@ class DialogAmicEstadistiques extends StatelessWidget {
           ),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('🎮 Partides Jugades: $partidesJugades'),
-          Text('🏆 Partides Guanyades: $partidesGuanyades'),
-          SizedBox(height: 8),
-          Text('🧙 Personatges Obtinguts: $nombrePersonatges'),
-          Text('🎨 Skins Obtingudes: $nombreSkins'),
-        ],
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('🎮 Partides Jugades: $partidesJugades'),
+            Text('🏆 Partides Guanyades: $partidesGuanyades'),
+            SizedBox(height: 8),
+            Text('🧙 Personatges Obtinguts: $nombrePersonatges'),
+            Text('🎨 Skins Obtingudes: $nombreSkins'),
+            SizedBox(height: 12),
+            Text('⭐ Personatge Preferit: $personatgePreferit'),
+            if (imatgeSkinPreferida != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Image.network(imatgeSkinPreferida!, height: 80),
+              ),
+            if (nivell != null) Text('📊 Nivell: $nivell'),
+            Text('🏅 Títol equipat: $nomTitol'),
+          ],
+        ),
       ),
       actions: [
         TextButton(

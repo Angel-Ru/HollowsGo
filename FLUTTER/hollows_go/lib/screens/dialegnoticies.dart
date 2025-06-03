@@ -66,7 +66,7 @@ class DialegNoticies extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    '🗞️ ·Combat·\n Els combats ara són més frenètics que mai!\n Afegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\n ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
+                    '🗞️ ·Combat·\n Els combats ara són més frenètics que mai!\n Afegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\n Canvi d\'enemics entre dPodràs equipar titols de personatges al teu perfil',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                   SizedBox(height: 12),
