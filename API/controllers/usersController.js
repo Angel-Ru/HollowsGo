@@ -842,7 +842,6 @@ exports.obtenirAvatar = async (req, res) => {
 };
 
 // Obtenir totes les amistats d'un usuari
-// API
 exports.obtenirAmistats = async (req, res) => {
     try {
         const userId = parseInt(req.params.id);
@@ -881,22 +880,22 @@ exports.obtenirAmistats = async (req, res) => {
 // Obtenir dades de perfil d'un amic si són amistats
 exports.obtenirEstadistiquesAmic = async (req, res) => {
     try {
-        const { idusuari, idusuariamic } = req.params;
+        const { id, idUsuariLoguejat } = req.params;
 
         const connection = await connectDB();
 
-        // Comprovar si són amistats (estat = 'acceptat')
+        // Comprovem si són amics
         const [amistatRows] = await connection.execute(`
             SELECT * FROM AMISTATS
             WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
             AND estat = 'acceptat'
-        `, [idusuari, idusuariamic, idusuariamic, idusuari]);
+        `, [id, idUsuariLoguejat, idUsuariLoguejat, id]);
 
         if (amistatRows.length === 0) {
-            return res.status(403).json({ missatge: 'No tens accés a les estadístiques d’aquest usuari.' });
+            return res.status(404).json({ missatge: 'No són amics o amistat no acceptada' });
         }
 
-        // Obtenir estadístiques del perfil
+        // Si són amics, obtenim estadístiques
         const [rows] = await connection.execute(`
             SELECT 
                 pu.partides_jugades, 
@@ -913,7 +912,7 @@ exports.obtenirEstadistiquesAmic = async (req, res) => {
             JOIN BIBLIOTECA b ON b.user_id = u.id
             WHERE u.id = ?
             GROUP BY pu.partides_jugades, pu.partides_guanyades
-        `, [idusuariamic]);
+        `, [idUsuariLoguejat]);
 
         if (rows.length === 0) {
             return res.status(404).json({ missatge: 'Perfil no trobat' });
@@ -922,7 +921,7 @@ exports.obtenirEstadistiquesAmic = async (req, res) => {
         res.status(200).json(rows[0]);
 
     } catch (error) {
-        console.error('Error obtenint estadístiques d’amic:', error);
+        console.error('Error obtenint estadístiques d’ amic:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };

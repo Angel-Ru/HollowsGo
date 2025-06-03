@@ -60,6 +60,26 @@ class DialegNoticies extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                   SizedBox(height: 12),
+                  Image.asset(
+                    'assets/images/consell.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    '🗞️ ·Combat·\n Els combats ara són més frenètics que mai!\n Afegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\n ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    '🗞️ ·Biblioteca·\n Duu la personalització a un altre nivell!\n S\'ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Image.asset(
+                    'assets/images/consell.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 12),
                   Text(
                     '🗞️ ·Perfil·\n Duu la personalització a un altre nivell!\n S\'ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
