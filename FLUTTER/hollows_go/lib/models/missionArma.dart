@@ -15,15 +15,16 @@ class MissionArma {
     required this.progres,
   });
 
-  factory MissionArma.fromJson(Map<String, dynamic> json) {
-    final missio = json['missio'] ?? {};
-    return MissionArma(
-      nomArma: json['arma'],
-      id: missio['id'],
-      nomMissio: missio['nom_missio'],
-      descripcio: missio['descripcio'],
-      objectiu: missio['objectiu'] ?? 1,
-      progres: missio['progres'] ?? 0,
-    );
-  }
+ factory MissionArma.fromJson(Map<String, dynamic> json) {
+  final missio = json['missio'] ?? {};
+  return MissionArma(
+    nomArma: json['arma'] ?? '',
+    id: missio['id'] ?? 0,
+    nomMissio: missio['nom_missio'] ?? '',
+    descripcio: missio['descripcio'] ?? '',
+    objectiu: missio['objectiu'] ?? 1,
+    progres: missio['progres'] ?? 0,
+  );
+}
+
 }

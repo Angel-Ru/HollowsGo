@@ -1,11 +1,17 @@
 import { Component } from '@angular/core';
+import {Router, RouterModule} from '@angular/router'; // ¡Importa Router, no RouterModule!
 
 @Component({
   selector: 'app-qui-som',
-  imports: [],
   templateUrl: './qui-som.html',
-  styleUrl: './qui-som.css'
+  styleUrls: ['./qui-som.css'],
+  standalone: true,
+  imports: [RouterModule]
 })
 export class QuiSomComponent {
+  constructor(private _router: Router) {} // ¡Necesitas inyectar Router!
 
+  goInici(): void {
+    this._router.navigate(['/qui-som']);
+  }
 }

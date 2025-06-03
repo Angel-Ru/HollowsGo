@@ -21,10 +21,12 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
   void initState() {
     super.initState();
     final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
+   
     _loadFutures = Future.wait([
+      
       missionsProvider.fetchMissions(widget.usuariId),
       missionsProvider.fetchMissioTitol(widget.usuariId),
-      missionsProvider.fetchMissioArma(widget.usuariId),
+      missionsProvider.fetchMissioArma(widget.usuariId)
     ]);
   }
 

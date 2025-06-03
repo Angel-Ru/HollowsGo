@@ -176,7 +176,7 @@ exports.assignarMissionsTitols = async (req, res) => {
     }
 
     res.status(200).json({ missatge: 'Missions de títol assignades correctament!' });
-
+    console.log
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error assignant missions de títol' });
@@ -484,7 +484,7 @@ exports.getMissionArma = async (req, res) => {
         tipus_missio: missioFinal.tipusMissio
       }
     });
-
+    console.log(res);
   } catch (err) {
     console.error('Error al recuperar la missió d\'arma:', err);
     res.status(500).json({ error: 'Error recuperant la missió d\'arma' });

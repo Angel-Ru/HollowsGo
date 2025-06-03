@@ -20,6 +20,7 @@ class MissionsProvider with ChangeNotifier {
   MissionArma? get missioArma => _missioArma;
 
   Future<void> fetchMissions(int usuariId) async {
+    
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
@@ -65,7 +66,10 @@ class MissionsProvider with ChangeNotifier {
     }
   }
 
+   
+
   Future<void> assignarMissionsTitols(int usuariId) async {
+    
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
@@ -83,8 +87,28 @@ class MissionsProvider with ChangeNotifier {
       throw Exception('Error assignant missions de títol');
     }
   }
+  Future<void> assignarMissionsArmes(int usuariId) async {
+    
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final url = Uri.parse('https://${Config.ip}/missions/armes/$usuariId');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Error assignant missions de armes');
+    }
+  }
 
   Future<void> fetchMissioTitol(int usuariId) async {
+  assignarMissionsTitols(usuariId);
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
 
@@ -136,36 +160,48 @@ class MissionsProvider with ChangeNotifier {
 }
 
 Future<void> fetchMissioArma(int usuariId) async {
+  assignarMissionsArmes(usuariId);
   final prefs = await SharedPreferences.getInstance();
   final token = prefs.getString('token') ?? '';
 
   final url = Uri.parse('https://${Config.ip}/missions/arma/$usuariId');
 
-  final response = await http.get(
-    url,
-    headers: {
-      'Authorization': 'Bearer $token',
-      'Content-Type': 'application/json',
-    },
-  );
+  try {
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
 
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
+    debugPrint('Resposta del servidor: ${response.body}');
 
-    if (data.containsKey('missio')) {
-      // Tenim la missió dins 'missio'
-      _missioArma = MissionArma.fromJson(data['missio']);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data.containsKey('missio') && data['missio'] != null) {
+       _missioArma = MissionArma.fromJson(data);
+
+      } else if (data.containsKey('missatge')) {
+        _missioArma = null;
+        debugPrint('Missatge: ${data['missatge']}');
+      } else {
+        _missioArma = null;
+        debugPrint('Resposta inesperada: $data');
+      }
+
+      notifyListeners();
     } else {
-      
-      _missioArma = null;
-      debugPrint('Missió arma no disponible: ${data['missatge']}');
+      debugPrint('Error carregant missió: ${response.body}');
+      throw Exception('Error carregant missió d\'arma: ${response.statusCode}');
     }
-
-    notifyListeners();
-  } else {
+  } catch (e) {
+    debugPrint('Error a la petició o parseig: $e');
     throw Exception('Error carregant missió d\'arma');
   }
 }
+
 
 Future<void> incrementarProgresMissioArma(int usuariId) async {
   final prefs = await SharedPreferences.getInstance();
