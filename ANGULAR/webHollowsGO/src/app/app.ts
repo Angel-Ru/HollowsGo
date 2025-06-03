@@ -30,4 +30,10 @@ export class AppComponent {
   goToQuiSom(): void {
     this._router.navigate(['/qui-som']);
   }
+  goToBleachInfo(): void {
+    this._router.navigate(['/bleach-info']);
+  }
+  goToInici(): void {
+    this._router.navigate(['..']);
+  }
 }

@@ -5,85 +5,94 @@
   left: 0;
   width: 100%;
   height: 60px;
-  background: linear-gradient(90deg, rgba(10, 10, 10, 0.6), rgba(30, 30, 30, 0.6));
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 1.2rem;
+  justify-content: space-between; /* Això manté l'espai entre logo i enllaços */
+  padding: 0 1.5rem;
   box-sizing: border-box;
   z-index: 20;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  border-bottom: 1px solid rgba(255, 166, 77, 0.3);
+  box-shadow: 0 2px 8px rgba(40, 40, 40, 0.35);
+  border-bottom: 1px solid rgba(232, 139, 57, 0.25); /* taronja suau */
 }
 
-/* Logo-text amb més estil */
+/* Contenidor pels enllaços de navegació */
+.nav-links {
+  display: flex;
+  gap: 20px; /* Espai entre els enllaços */
+}
+
+/* Logo-text amb estil minimalista càlid */
 .logo-text {
-  color: #ffb380;
+  color: #d17e2c; /* taronja càlid però sense brillar */
   font-weight: 700;
-  font-size: 1.3rem;
-  letter-spacing: 1px;
-  text-shadow: 0 0 3px rgba(255, 166, 77, 0.5);
+  font-size: 1.4rem;
+  letter-spacing: 1.2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 70%;
+  text-shadow: none; /* Eliminem el neó */
 }
 
-/* Enllaç Qui som? amb efecte vibrant */
+/* Enllaç Qui som? amb detall taronja minimalista */
 .app-bar-link {
-  color: #ffa64d;
+  color: #e18a36; /* taronja suau */
   text-decoration: none;
   font-weight: 600;
   font-size: 1rem;
   position: relative;
-  padding: 4px 8px;
-  transition: color 0.3s ease;
+  padding: 5px 10px;
+  transition: color 0.25s ease;
+  white-space: nowrap; /* Evita que el text es divideixi en línies */
 }
 
 .app-bar-link::after {
   content: '';
   position: absolute;
   left: 0;
-  bottom: -2px;
+  bottom: 0;
   width: 100%;
   height: 2px;
-  background: #ffa64d;
+  background: #e18a36;
   border-radius: 1px;
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
 .app-bar-link:hover {
-  color: #fff2e6;
+  color: #f0d8b3;
 }
 
 .app-bar-link:hover::after {
   transform: scaleX(1);
   transform-origin: left;
 }
-/* Botó de mute integrat amb l’app-bar */
+
+/* Botó de mute integrat amb l’app-bar amb estil subtil */
 .mute-button {
   position: fixed;
-  top: 70px; /* Baixem perquè no es tapi amb l’app-bar de 60px */
+  top: 70px; /* per no tapar l’app-bar */
   right: 20px;
-  z-index: 10;
-  background: rgba(0, 0, 0, 0.6);
-  border: 2px solid #ffa64d;
+  z-index: 15;
+  background: rgba(30, 30, 30, 0.7);
+  border: 1.8px solid #d17e2c; /* taronja suau */
   border-radius: 50%;
-  color: #ffa64d;
-  font-size: 1.2rem;
-  padding: 10px;
+  color: #d17e2c;
+  font-size: 1.3rem;
+  padding: 10px 12px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s;
+  transition: background 0.3s ease, transform 0.15s ease;
+  box-shadow: none;
+}
+.background {
+  padding-top: 60px;
 }
 
 .mute-button:hover {
-  background: rgba(0, 0, 0, 0.8);
-  transform: scale(1.1);
+  background: rgba(40, 40, 40, 0.85);
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(209, 126, 44, 0.2); /* ombra taronja molt suau */
 }
-
-
-

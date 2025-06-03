@@ -919,7 +919,7 @@ exports.obtenirEstadistiquesAmic = async (req, res) => {
         }
 
         res.status(200).json(rows[0]);
-
+        console.log(res);
     } catch (error) {
         console.error('Error obtenint estadístiques d’ amic:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });

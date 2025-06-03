@@ -1,0 +1,126 @@
+.scroll-container {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.section {
+  height: calc(100vh - 60px);
+  scroll-snap-align: start;
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+  overflow: hidden; /* Evita scroll interno en la sección */
+}
+
+
+
+.section-video {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000; /* fons negre */
+}
+
+.bleach-video {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  object-fit: contain;
+}
+
+/* Secció Bleach */
+.section-bleach {
+  background: rgba(20, 20, 20, 0.85);
+
+  color: #f3e4cd;
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 80%;
+  padding: 0 40px 0 40px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  text-align: justify;
+
+}
+
+.section-bleach .text-content {
+  flex: 1 1 400px;
+  max-width: 600px;
+}
+
+.section-bleach .image-content {
+  flex: 1 1 300px;
+  max-width: 300px;
+}
+
+.section-bleach .image-content img.styled-image {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(232, 139, 57, 0.3);
+  object-fit: contain;
+}
+
+/* Logo Bleach (titular) */
+.section-bleach .title-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-bleach .title-image img.bleach-logo {
+  max-width: 280px;
+  height: auto;
+}
+
+/* Secció d'imatges de Bleach */
+.section-images {
+  background: #000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.section-images img {
+  max-width: 45%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+/* Secció Tite Kubo */
+.section-tite-kubo {
+  background: rgba(20, 20, 20, 0.85);
+  color: #f3e4cd;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 40px;
+  border-radius: 12px;
+  height: 90vh;
+  box-sizing: border-box;
+  text-align: justify;
+}
+
+.section-tite-kubo .text-content {
+  flex: 1 1 300px;
+  max-width: 500px;
+}
+
+.section-tite-kubo .image-content img.styled-image {
+  max-width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(232, 139, 57, 0.3);
+  object-fit: contain;
+}
