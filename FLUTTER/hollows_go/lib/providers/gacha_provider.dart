@@ -10,7 +10,7 @@ class GachaProvider extends ChangeNotifier {
   bool _isDuplicateSkin = false;
   bool get isDuplicateSkin => _isDuplicateSkin;
 
-  // Aquí guardare les skins de categoria 4 que siguin shinigamis o aliades(Angel del futuro pensa en modificar el endpoint per afegir les que tenen habilitat llegendaria) 
+  // Aquí guardare les skins de categoria 4 que siguin shinigamis o aliades(Angel del futuro pensa en modificar el endpoint per afegir les que tenen habilitat llegendaria)
   List<Map<String, dynamic>> _publicSkins = [];
   List<Map<String, dynamic>> get publicSkins => _publicSkins;
 
@@ -22,7 +22,7 @@ class GachaProvider extends ChangeNotifier {
 
   Map<String, dynamic>? _latestFragmentsSkins;
   Map<String, dynamic>? get latestFragmentsSkins => _latestFragmentsSkins;
-  
+
   Future<bool> gachaPull(BuildContext context) async {
     _setLoading(true);
 
@@ -55,6 +55,8 @@ class GachaProvider extends ChangeNotifier {
           _latestSkin = data['skin'];
           _isDuplicateSkin = false;
         }
+        fetchFragmentsSkinsUsuari(context);
+
         notifyListeners();
         return true;
       } else {
@@ -101,6 +103,8 @@ class GachaProvider extends ChangeNotifier {
           _latestSkin = data['skin'];
           _isDuplicateSkin = false;
         }
+        fetchFragmentsSkinsUsuari(context);
+
         notifyListeners();
         return true;
       } else {
@@ -114,6 +118,7 @@ class GachaProvider extends ChangeNotifier {
       _setLoading(false);
     }
   }
+
   Future<bool> gachaPullEnemics(BuildContext context) async {
     _setLoading(true);
 
@@ -146,6 +151,8 @@ class GachaProvider extends ChangeNotifier {
           _latestSkin = data['skin'];
           _isDuplicateSkin = false;
         }
+        fetchFragmentsSkinsUsuari(context);
+
         notifyListeners();
         return true;
       } else {
@@ -161,361 +168,367 @@ class GachaProvider extends ChangeNotifier {
   }
 
   Future<bool> gachaPullMultiple(BuildContext context) async {
-  _setLoading(true);
+    _setLoading(true);
 
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail');
-    final token = prefs.getString('token');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('userEmail');
+      final token = prefs.getString('token');
 
-    if (email == null || token == null) {
-      _showError(context, "No s'ha pogut obtenir el correu o el token.");
-      _setLoading(false);
-      return false;
-    }
-
-    final response = await http.post(
-      Uri.parse('https://${Config.ip}/skins/gacha/multish'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({'email': email}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> tirades = data['skins'];
-
-      // Guardar les tirades amb info si són duplicades o no
-      _latestMultipleSkins = tirades.map<Map<String, dynamic>>((entry) {
-        return {
-          'skin': entry['skin'],
-          'jaTenia': entry['jaTenia'],
-        };
-      }).toList();
-
-      notifyListeners();
-      return true;
-    } else {
-      _showError(context, 'Error: ${response.body}');
-      return false;
-    }
-  } catch (e) {
-    _showError(context, 'Error amb la tirada múltiple: $e');
-    return false;
-  } finally {
-    _setLoading(false);
-  }
-}
-
-Future<bool> gachaPullMultipleQuincys(BuildContext context) async {
-  _setLoading(true);
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail');
-    final token = prefs.getString('token');
-
-    if (email == null || token == null) {
-      _showError(context, "No s'ha pogut obtenir el correu o el token.");
-      _setLoading(false);
-      return false;
-    }
-
-    final response = await http.post(
-      Uri.parse('https://${Config.ip}/skins/gacha/multiqu'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({'email': email}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> tirades = data['skins'];
-
-      // Guardar les tirades amb info si són duplicades o no
-      _latestMultipleSkins = tirades.map<Map<String, dynamic>>((entry) {
-        return {
-          'skin': entry['skin'],
-          'jaTenia': entry['jaTenia'],
-        };
-      }).toList();
-
-      notifyListeners();
-      return true;
-    } else {
-      _showError(context, 'Error: ${response.body}');
-      return false;
-    }
-  } catch (e) {
-    _showError(context, 'Error amb la tirada múltiple: $e');
-    return false;
-  } finally {
-    _setLoading(false);
-  }
-}
-Future<bool> gachaPullMultipleEnemics(BuildContext context) async {
-  _setLoading(true);
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail');
-    final token = prefs.getString('token');
-
-    if (email == null || token == null) {
-      _showError(context, "No s'ha pogut obtenir el correu o el token.");
-      _setLoading(false);
-      return false;
-    }
-
-    final response = await http.post(
-      Uri.parse('https://${Config.ip}/skins/gacha/multiho'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({'email': email}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final List<dynamic> tirades = data['skins'];
-
-      // Guardar les tirades amb info si són duplicades o no
-      _latestMultipleSkins = tirades.map<Map<String, dynamic>>((entry) {
-        return {
-          'skin': entry['skin'],
-          'jaTenia': entry['jaTenia'],
-        };
-      }).toList();
-
-      notifyListeners();
-      return true;
-    } else {
-      _showError(context, 'Error: ${response.body}');
-      return false;
-    }
-  } catch (e) {
-    _showError(context, 'Error amb la tirada múltiple: $e');
-    return false;
-  } finally {
-    _setLoading(false);
-  }
-}
-
-
-Future<void> fetchSkinsCategoria4Shinigamis(BuildContext context) async {
-  _setLoading(true);
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    final response = await http.get(
-      Uri.parse('https://${Config.ip}/destacats/shinigamis'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      _publicSkins = data.cast<Map<String, dynamic>>();
-      notifyListeners();
-    } else {
-      _showError(context, 'Error al obtenir les skins públiques');
-    }
-  } catch (e) {
-    _showError(context, 'Error en carregar les skins: $e');
-  } finally {
-    _setLoading(false);
-  }
-}
-
-Future<void> fetchSkinsCategoria4Quincy(BuildContext context) async {
-  _setLoading(true);
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    final response = await http.get(
-      Uri.parse('https://${Config.ip}/destacats/quincy'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      _publicSkins = data.cast<Map<String, dynamic>>();
-      notifyListeners();
-    } else {
-      _showError(context, 'Error al obtenir les skins públiques');
-    }
-  } catch (e) {
-    _showError(context, 'Error en carregar les skins: $e');
-  } finally {
-    _setLoading(false);
-  }
-}
-
-Future<void> fetchSkinsCategoria4Hollows(BuildContext context) async {
-  _setLoading(true);
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    final response = await http.get(
-      Uri.parse('https://${Config.ip}/destacats/hollows'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      _publicSkins = data.cast<Map<String, dynamic>>();
-      notifyListeners();
-    } else {
-      _showError(context, 'Error al obtenir les skins públiques');
-    }
-  } catch (e) {
-    _showError(context, 'Error en carregar les skins: $e');
-  } finally {
-    _setLoading(false);
-  }
-}
-
-Future<bool> getSkinDelDia(BuildContext context) async {
-  _setLoading(true);
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail');
-    final token = prefs.getString('token');
-
-    if (email == null || token == null) {
-      _showError(context, "No s'ha pogut obtenir el correu o el token.");
-      _setLoading(false);
-      return false;
-    }
-
-    final url = Uri.parse('https://${Config.ip}/skins/skindia');
-
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({'email': email}),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
-      if (data['skin'] == null) {
-        _latestSkin = {};
-        _isDuplicateSkin = false;
-        _showError(context, data['message'] ?? 'No s\'ha trobat cap skin del dia.');
-      } else {
-        _latestSkin = data['skin'];
-        _isDuplicateSkin = false;
-      }
-
-      notifyListeners();
-      return true;
-    } else {
-      _showError(context, 'Error: ${response.body}');
-      return false;
-    }
-  } catch (e) {
-    _showError(context, 'Error en obtenir la skin del dia: $e');
-    return false;
-  } finally {
-    _setLoading(false);
-  }
-}
-
-Future<bool> comprarSkinDelDia(BuildContext context, int skinId, int personatgeId) async {
-  _setLoading(true);
-
-  try {
-    final prefs = await SharedPreferences.getInstance();
-    final email = prefs.getString('userEmail');
-    final token = prefs.getString('token');
-
-    if (email == null || token == null) {
-      _showError(context, "No s'ha pogut obtenir el correu o el token.");
-      _setLoading(false);
-      return false;
-    }
-
-    final url = Uri.parse('https://${Config.ip}/skins/skindia/comprar');
-
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({
-        'email': email,
-        'skinId': skinId,
-        'personatgeId': personatgeId,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
-      if (data['error'] != null) {
-        // Si l'API retorna un error específic
-        _showError(context, data['error']);
+      if (email == null || token == null) {
+        _showError(context, "No s'ha pogut obtenir el correu o el token.");
+        _setLoading(false);
         return false;
       }
 
-      if (data['message'] != null) {
-        _showError(context, data['message']);
+      final response = await http.post(
+        Uri.parse('https://${Config.ip}/skins/gacha/multish'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> tirades = data['skins'];
+
+        // Guardar les tirades amb info si són duplicades o no
+        _latestMultipleSkins = tirades.map<Map<String, dynamic>>((entry) {
+          return {
+            'skin': entry['skin'],
+            'jaTenia': entry['jaTenia'],
+          };
+        }).toList();
+        fetchFragmentsSkinsUsuari(context);
+
+        notifyListeners();
+        return true;
+      } else {
+        _showError(context, 'Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      _showError(context, 'Error amb la tirada múltiple: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> gachaPullMultipleQuincys(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('userEmail');
+      final token = prefs.getString('token');
+
+      if (email == null || token == null) {
+        _showError(context, "No s'ha pogut obtenir el correu o el token.");
+        _setLoading(false);
+        return false;
       }
 
-      if (data['success'] == true) {
-        _latestSkin = data['skin'] ?? {};
-        _isDuplicateSkin = false;
+      final response = await http.post(
+        Uri.parse('https://${Config.ip}/skins/gacha/multiqu'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> tirades = data['skins'];
+
+        // Guardar les tirades amb info si són duplicades o no
+        _latestMultipleSkins = tirades.map<Map<String, dynamic>>((entry) {
+          return {
+            'skin': entry['skin'],
+            'jaTenia': entry['jaTenia'],
+          };
+        }).toList();
+        fetchFragmentsSkinsUsuari(context);
+
+        notifyListeners();
+        return true;
+      } else {
+        _showError(context, 'Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      _showError(context, 'Error amb la tirada múltiple: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> gachaPullMultipleEnemics(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('userEmail');
+      final token = prefs.getString('token');
+
+      if (email == null || token == null) {
+        _showError(context, "No s'ha pogut obtenir el correu o el token.");
+        _setLoading(false);
+        return false;
+      }
+
+      final response = await http.post(
+        Uri.parse('https://${Config.ip}/skins/gacha/multiho'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final List<dynamic> tirades = data['skins'];
+
+        // Guardar les tirades amb info si són duplicades o no
+        _latestMultipleSkins = tirades.map<Map<String, dynamic>>((entry) {
+          return {
+            'skin': entry['skin'],
+            'jaTenia': entry['jaTenia'],
+          };
+        }).toList();
         fetchFragmentsSkinsUsuari(context);
         notifyListeners();
         return true;
-      } else if (data['alreadyHasSkin'] == true) {
-        _isDuplicateSkin = true;
-        _showError(context, "Ja tens aquesta skin.");
+      } else {
+        _showError(context, 'Error: ${response.body}');
         return false;
-      } else if (data['notEnoughFragments'] == true) {
-        _showError(context, "No tens fragments suficients per comprar aquesta skin.");
+      }
+    } catch (e) {
+      _showError(context, 'Error amb la tirada múltiple: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> fetchSkinsCategoria4Shinigamis(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.get(
+        Uri.parse('https://${Config.ip}/destacats/shinigamis'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        _publicSkins = data.cast<Map<String, dynamic>>();
+        notifyListeners();
+      } else {
+        _showError(context, 'Error al obtenir les skins públiques');
+      }
+    } catch (e) {
+      _showError(context, 'Error en carregar les skins: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> fetchSkinsCategoria4Quincy(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.get(
+        Uri.parse('https://${Config.ip}/destacats/quincy'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        _publicSkins = data.cast<Map<String, dynamic>>();
+        notifyListeners();
+      } else {
+        _showError(context, 'Error al obtenir les skins públiques');
+      }
+    } catch (e) {
+      _showError(context, 'Error en carregar les skins: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> fetchSkinsCategoria4Hollows(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.get(
+        Uri.parse('https://${Config.ip}/destacats/hollows'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        _publicSkins = data.cast<Map<String, dynamic>>();
+        notifyListeners();
+      } else {
+        _showError(context, 'Error al obtenir les skins públiques');
+      }
+    } catch (e) {
+      _showError(context, 'Error en carregar les skins: $e');
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> getSkinDelDia(BuildContext context) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('userEmail');
+      final token = prefs.getString('token');
+
+      if (email == null || token == null) {
+        _showError(context, "No s'ha pogut obtenir el correu o el token.");
+        _setLoading(false);
         return false;
       }
 
-      return false;
-    } else {
-      _showError(context, 'Error: ${response.body}');
-      return false;
-    }
-  } catch (e) {
-    _showError(context, 'Error en comprar la skin: $e');
-    return false;
-  } finally {
-    _setLoading(false);
-  }
-}
+      final url = Uri.parse('https://${Config.ip}/skins/skindia');
 
-Future<Map<String, dynamic>?> fetchFragmentsSkinsUsuari(BuildContext context) async {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['skin'] == null) {
+          _latestSkin = {};
+          _isDuplicateSkin = false;
+          _showError(
+              context, data['message'] ?? 'No s\'ha trobat cap skin del dia.');
+        } else {
+          _latestSkin = data['skin'];
+          _isDuplicateSkin = false;
+        }
+
+        notifyListeners();
+        return true;
+      } else {
+        _showError(context, 'Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      _showError(context, 'Error en obtenir la skin del dia: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> comprarSkinDelDia(
+      BuildContext context, int skinId, int personatgeId) async {
+    _setLoading(true);
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final email = prefs.getString('userEmail');
+      final token = prefs.getString('token');
+
+      if (email == null || token == null) {
+        _showError(context, "No s'ha pogut obtenir el correu o el token.");
+        _setLoading(false);
+        return false;
+      }
+
+      final url = Uri.parse('https://${Config.ip}/skins/skindia/comprar');
+
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'email': email,
+          'skinId': skinId,
+          'personatgeId': personatgeId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data['error'] != null) {
+          // Si l'API retorna un error específic
+          _showError(context, data['error']);
+          return false;
+        }
+
+        if (data['message'] != null) {
+          _showError(context, data['message']);
+        }
+
+        if (data['success'] == true) {
+          _latestSkin = data['skin'] ?? {};
+          _isDuplicateSkin = false;
+          fetchFragmentsSkinsUsuari(context);
+          notifyListeners();
+          return true;
+        } else if (data['alreadyHasSkin'] == true) {
+          _isDuplicateSkin = true;
+          _showError(context, "Ja tens aquesta skin.");
+          return false;
+        } else if (data['notEnoughFragments'] == true) {
+          _showError(context,
+              "No tens fragments suficients per comprar aquesta skin.");
+          return false;
+        }
+
+        return false;
+      } else {
+        _showError(context, 'Error: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      _showError(context, 'Error en comprar la skin: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchFragmentsSkinsUsuari(
+      BuildContext context) async {
     _setLoading(true);
 
     try {
@@ -524,7 +537,8 @@ Future<Map<String, dynamic>?> fetchFragmentsSkinsUsuari(BuildContext context) as
       final nom = prefs.getString('userName');
 
       if (token == null || nom == null) {
-        _showError(context, "No s'ha pogut obtenir el token o el nom d'usuari.");
+        _showError(
+            context, "No s'ha pogut obtenir el token o el nom d'usuari.");
         return null;
       }
 
@@ -546,7 +560,8 @@ Future<Map<String, dynamic>?> fetchFragmentsSkinsUsuari(BuildContext context) as
           notifyListeners();
           return _latestFragmentsSkins;
         } else {
-          _showError(context, "No s'ha trobat cap fragment per a aquest usuari.");
+          _showError(
+              context, "No s'ha trobat cap fragment per a aquest usuari.");
           return null;
         }
       } else {
@@ -560,10 +575,6 @@ Future<Map<String, dynamic>?> fetchFragmentsSkinsUsuari(BuildContext context) as
       _setLoading(false);
     }
   }
-
-
-
-
 
   void _showError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(

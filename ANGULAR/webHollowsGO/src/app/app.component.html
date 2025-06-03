@@ -1,0 +1,42 @@
+<div class="app-bar">
+  <div class="logo-text">HollowsGo Remastered</div>
+  <a routerLink="/qui-som" class="app-bar-link">Qui som?</a>
+</div>
+<div class="background">
+  <!-- Aquí van les partícules -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <!-- Pots posar tantes com vulguis -->
+  </div>
+
+  <div class="container">
+    <img
+      src="https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/zenpjlbr1fzmacdwgm4o"
+      alt="HollowsGo Remastered Logo"
+      class="logo"
+    />
+    <h2>L'experiència definitiva de Bleach amb Flutter</h2>
+    <p>
+      Ficat al mon de Bleach amb HollowsGo Remastered, l'aplicació
+      creada per reviure els combats increíbles i explorar
+      el mon real juntament al Hueco Mundo, tot desde el teu dispositiu mòbil.
+    </p>
+    <a routerLink="/download" class="btn-download">Descarregar Ara</a>
+    <footer>
+     2025 HollowsGo Remastered - Inspirat amb Bleach
+    </footer>
+  </div>
+   <!-- Botó de mute -->
+  <button (click)="toggleMute()" class="mute-button">
+    {{ isMuted ? '🔈' : '🔇' }}
+  </button>
+</div>
