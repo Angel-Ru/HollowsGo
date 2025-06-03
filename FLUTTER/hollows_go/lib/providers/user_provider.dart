@@ -290,9 +290,7 @@ class UserProvider with ChangeNotifier {
             'nom_amic': amic['nom_amic'],
             'estat': amic['estat'],
             'imatge_perfil_amic': amic['imatge_perfil_amic'],
-            'partides_jugades': amic['partides_jugades'], // <-- afegir aquí
-            'partides_guanyades': amic['partides_guanyades'], // <-- afegir aquí
-            'nivell': amic['nivell'], // <-- afegir aquí
+            'id_usuari_amic': amic['id_usuari_amic'],
           };
         }).toList();
 

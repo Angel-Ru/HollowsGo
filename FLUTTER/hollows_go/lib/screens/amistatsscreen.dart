@@ -211,7 +211,8 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                             amistat['id_usuari_amic']
                                                     ?.toString() ??
                                                 '';
-
+                                        print('idUsuari: $idUsuari');
+                                        print('idUsuariAmic: $idUsuariAmic');
                                         if (idUsuari.isEmpty ||
                                             idUsuariAmic.isEmpty) {
                                           ScaffoldMessenger.of(context)
