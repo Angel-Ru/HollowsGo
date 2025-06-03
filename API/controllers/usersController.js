@@ -878,6 +878,7 @@ exports.obtenirAmistats = async (req, res) => {
 };
 
 // Obtenir dades de perfil d'un amic si són amistats
+/*
 exports.obtenirEstadistiquesAmic = async (req, res) => {
     try {
         const { id, idUsuariLoguejat } = req.params;
@@ -924,8 +925,65 @@ exports.obtenirEstadistiquesAmic = async (req, res) => {
         console.error('Error obtenint estadístiques d’ amic:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
-};
+};*/
+exports.obtenirEstadistiquesAmic = async (req, res) => {
+    try {
+        const { id, idUsuariLoguejat } = req.params;
 
+        const connection = await connectDB();
+
+        // Comprovem si són amics
+        const [amistatRows] = await connection.execute(`
+            SELECT * FROM AMISTATS
+            WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
+            AND estat = 'acceptat'
+        `, [id, idUsuariLoguejat, idUsuariLoguejat, id]);
+
+        if (amistatRows.length === 0) {
+            return res.status(404).json({ missatge: 'No són amics o amistat no acceptada' });
+        }
+
+        // Si són amics, obtenim estadístiques
+        const [rows] = await connection.execute(`
+           SELECT 
+    pu.partides_jugades, 
+    pu.partides_guanyades,
+    COUNT(DISTINCT b.personatge_id) AS nombre_personatges,
+    SUM(
+        CASE 
+            WHEN b.skin_ids IS NULL OR b.skin_ids = '' THEN 0
+            ELSE CHAR_LENGTH(b.skin_ids) - CHAR_LENGTH(REPLACE(b.skin_ids, ',', '')) + 1
+        END
+    ) AS nombre_skins,
+    pu.personatge_preferit,
+    per.nom AS nom_personatge_preferit,
+    pu.skin_preferida_id,
+    s.imatge AS imatge_skin_preferida,
+    u.nivell,
+    t.id AS titol_id,
+    t.nom_titol AS nom_titol
+FROM PERFIL_USUARI pu
+JOIN USUARIS u ON u.id = pu.usuari
+LEFT JOIN BIBLIOTECA b ON b.user_id = u.id
+LEFT JOIN PERSONATGES per ON per.id = pu.personatge_preferit
+LEFT JOIN SKINS s ON s.id = pu.skin_preferida_id
+LEFT JOIN TITOLS t ON t.id = pu.titol
+WHERE u.id = ?
+GROUP BY pu.partides_jugades, pu.partides_guanyades, pu.personatge_preferit, per.nom, pu.skin_preferida_id, s.imatge, u.nivell, t.id, t.nom_titol
+
+        `, [idUsuariLoguejat]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ missatge: 'Perfil no trobat' });
+        }
+
+        res.status(200).json(rows[0]);
+       console.log('Resposta enviada:', rows[0]);
+    } catch (error) {
+        console.error('Error obtenint estadístiques d’ amic:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
 
 // Obtenir les sol·licituds d'amistat d'un usuari pendents
 exports.obtenirpendents = async (req, res) => {

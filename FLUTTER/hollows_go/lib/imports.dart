@@ -54,7 +54,7 @@ export '/widgets/profile/perfil_header_widget.dart';
 export '/widgets/profile/perfil_stats_widget.dart';
 export '/widgets/dialegueequipament.dart';
 export '/widgets/detailsscreen_card_swiper.dart';
-export '/screens/prefilscreen.dart';
+export 'screens/perfilscreen.dart';
 export '/widgets/home/dialogue_section.dart';
 export '/widgets/home/home_app_bar.dart';
 export '/widgets/home/home_background.dart';
