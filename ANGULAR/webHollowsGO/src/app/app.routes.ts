@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
-import { QuiSomComponent } from './qui-som/qui-som';
-import { AppComponent } from './app';
+import { IniciComponent } from './inici/inici';
+import { QuiSomComponent } from './qui-som/qui-som'
+export const routes: Routes = [
+  { path: '', component: IniciComponent },
+  { path: 'qui-som', component: QuiSomComponent },
+  { path: '**', redirectTo: '' }
+];
 
-export const routes: Routes = [{ path: '', component: AppComponent },{ path: 'qui-som', component: QuiSomComponent },];
