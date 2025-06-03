@@ -46,8 +46,8 @@ class AudioService with WidgetsBindingObserver {
   ];
 
   final List<String> _bibliotecaMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/kubs8yagdgzqrptb6qjv'
-        'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/wtj5tjwn4lziywibi7hs',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/kubs8yagdgzqrptb6qjv',
+    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/wtj5tjwn4lziywibi7hs',
   ];
 
   final List<String> _perfilMusicUrls = [

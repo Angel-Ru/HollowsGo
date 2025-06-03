@@ -28,10 +28,10 @@ class DialegNoticies extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    '📢 Versió 1.0 de "HollowsGO:Remastered" ja disponible!\n Actualització ambientada en l\'arc més recent de l\'Anime\n El Thousand Year Blood War.',
+                    '📢 ·Versió 1.0 de "HollowsGO:Remastered"\n ja disponible!\n Actualització ambientada en l\'arc més recent de l\'Anime\n El Thousand Year Blood War.',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                   SizedBox(height: 12),
@@ -41,7 +41,7 @@ class DialegNoticies extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    '💡 Nous Personatge:\n Afegits un total de 33 personatges nous i un total de  la raça dels Quincies, d’afrontar enemics de nivell alt. Consulta la secció de “Tàctiques” per més informació.',
+                    '💡 ·Nous Personatges·\n Afegits un total de 33 personatges nous i un total de 74 skins noves, afegint-hi la raça dels Quincies i fent jugables als Hollows i a Quincies.',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                   SizedBox(height: 12),
@@ -51,7 +51,17 @@ class DialegNoticies extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    '🗞️ Properament...\nEstem preparant una nova zona de joc ambientada en el món dels Vizards. Estigues atent a les pròximes actualitzacions!',
+                    '🗞️ ·Tenda·\n El quiosc de l\'Urahara ha fet remodelatge!\n Ara es possible fer tirades de 5 en 5, a més\n de tenir nous Banners(Shinigamis, Quincies, Hollows).\n Ja pots repondre les teves monedes amb diners reals!\n Mecànica nova afegida, si et toquen molts personatges repetits obtindràs fragments que et serviràn per poder comprar un personatge diàriament que no hagis obtingut.',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Image.asset(
+                    'assets/images/consell.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    '🗞️ ·Perfil·\n Duu la personalització a un altre nivell!\n S\'ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],
