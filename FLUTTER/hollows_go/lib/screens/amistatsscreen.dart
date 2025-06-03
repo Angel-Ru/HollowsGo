@@ -43,37 +43,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
     );
   }
 
-  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(
-      String idusuari, String idusuariamic) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token');
-
-      if (token == null) return null;
-
-      final url =
-          Uri.parse('https://${Config.ip}/perfil/$idusuariamic/amic/$idusuari');
-
-      final headers = {
-        'Authorization': 'Bearer $token',
-      };
-
-      final response = await http.get(url, headers: headers);
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else if (response.statusCode == 404) {
-        // Retorna un mapa amb una clau especial per indicar l'error
-        return {'error': 'not_found'};
-      } else {
-        print('Error HTTP: ${response.statusCode}');
-        return null;
-      }
-    } catch (error) {
-      print('Error a fetchEstadistiquesAmic: $error');
-      return null;
-    }
-  }
+ 
 
   @override
   Widget build(BuildContext context) {

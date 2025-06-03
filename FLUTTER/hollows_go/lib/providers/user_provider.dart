@@ -315,7 +315,7 @@ class UserProvider with ChangeNotifier {
 
       // Intercanviem els IDs aquí per agafar correctament l'id de l'amic primer
       final url =
-          Uri.parse('https://${Config.ip}/perfil/$idusuariamic/amic/$idusuari');
+          Uri.parse('https://${Config.ip}/usuaris/perfil/$idusuariamic/amic/$idusuari');
       print('Cridant a: $url');
 
       final headers = {
