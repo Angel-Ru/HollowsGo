@@ -307,7 +307,8 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(String nomAmic) async {
+  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(
+      String idusuari, String idusuariamic) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');
@@ -315,7 +316,9 @@ class UserProvider with ChangeNotifier {
       if (token == null) return null;
 
       final url =
-          Uri.parse('https://${Config.ip}/usuaris/estadistiques/$nomAmic');
+          Uri.parse('https://${Config.ip}/perfil/$idusuari/amic/$idusuariamic');
+      print('Cridant a: $url');
+
       final headers = {
         'Authorization': 'Bearer $token',
       };

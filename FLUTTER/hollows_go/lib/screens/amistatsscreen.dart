@@ -42,12 +42,14 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
     );
   }
 
-  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(String nomUsuari) async {
+  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(
+      String idUsuari, String idUsuariAmic) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     try {
-      return await userProvider.fetchEstadistiquesAmic(nomUsuari);
+      return await userProvider.fetchEstadistiquesAmic(idUsuari, idUsuariAmic);
     } catch (e) {
-      print('Error carregant estadístiques de $nomUsuari: $e');
+      print(
+          'Error carregant estadístiques de l\'amic amb ID $idUsuariAmic: $e');
       return null;
     }
   }
@@ -200,6 +202,27 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                 trailing: _estatBadge(estat),
                                 onTap: estat.toLowerCase() == 'acceptat'
                                     ? () async {
+                                        final userProvider =
+                                            Provider.of<UserProvider>(context,
+                                                listen: false);
+                                        final idUsuari = userProvider.userId
+                                            .toString(); // <-- CORRECTE
+                                        final idUsuariAmic =
+                                            amistat['id_usuari_amic']
+                                                    ?.toString() ??
+                                                '';
+
+                                        if (idUsuari.isEmpty ||
+                                            idUsuariAmic.isEmpty) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'No es poden carregar les estadístiques.')),
+                                          );
+                                          return;
+                                        }
+
                                         showDialog(
                                           context: context,
                                           barrierDismissible: false,
@@ -209,17 +232,16 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                         );
 
                                         final dades =
-                                            await fetchEstadistiquesAmic(nom);
-                                        Navigator.of(context)
-                                            .pop(); // tanca loading
+                                            await fetchEstadistiquesAmic(
+                                                idUsuari, idUsuariAmic);
+                                        Navigator.of(context).pop();
 
                                         if (dades == null) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
                                             SnackBar(
-                                              content: Text(
-                                                  'No s\'han pogut carregar les estadístiques.'),
-                                            ),
+                                                content: Text(
+                                                    'No s\'han pogut carregar les estadístiques.')),
                                           );
                                           return;
                                         }
@@ -229,7 +251,8 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                           builder: (context) =>
                                               DialogAmicEstadistiques(
                                             nom: nom,
-                                            avatarUrl: dades['imatge_perfil'],
+                                            avatarUrl:
+                                                amistat['imatge_perfil_amic'],
                                             partidesJugades:
                                                 dades['partides_jugades'] ?? 0,
                                             partidesGuanyades:
