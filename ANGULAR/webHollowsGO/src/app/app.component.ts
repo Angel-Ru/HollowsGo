@@ -36,4 +36,7 @@ export class AppComponent {
   goToInici(): void {
     this._router.navigate(['..']);
   }
+  goToHollowsGoInfo(): void {
+    this._router.navigate(['/hollows-go-info']);
+  }
 }
