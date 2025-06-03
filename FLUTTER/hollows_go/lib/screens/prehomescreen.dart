@@ -7,7 +7,7 @@ class PreHomeScreen extends StatefulWidget {
 }
 
 class _PreHomeScreenState extends State<PreHomeScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   final List<String> imagePaths = [
     'lib/images/imatges_prehomescreen/0c7569c5931f07a4fbce4e1dd58f9684.jpg',
     'lib/images/imatges_prehomescreen/28bee056b92ef5af41ab8d7cc6f6949a.jpg',
@@ -30,7 +30,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
 
     final random = Random();
     randomBackground = imagePaths[random.nextInt(imagePaths.length)];
@@ -63,23 +62,10 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     _scrollControllerTop.dispose();
     _scrollControllerBottom.dispose();
-
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.paused) {
-      AudioService.instance.pause();
-    } else if (state == AppLifecycleState.resumed) {
-      AudioService.instance.resume();
-    }
   }
 
   void _startAutoScroll(ScrollController scrollController) {

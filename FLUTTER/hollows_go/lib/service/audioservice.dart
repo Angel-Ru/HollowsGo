@@ -1,19 +1,20 @@
-import 'dart:math' as developer;
-
-import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/widgets.dart';
 import 'package:hollows_go/imports.dart';
 
-class AudioService {
+class AudioService with WidgetsBindingObserver {
   // Singleton
   static final AudioService instance = AudioService._internal();
   factory AudioService() => instance;
+
   AudioService._internal() {
+    // Escoltar els canvis del cicle de vida de l'app
+    WidgetsBinding.instance.addObserver(this);
+
     _player.onPlayerComplete.listen((event) async {
       if (_currentUrl != null) {
-        // Fer un fadeOut suau
         await fadeOut(duration: Duration(milliseconds: 700));
-        // Tornar a reproduir la mateixa cançó i fer fadeIn suau
         await play(_currentUrl!);
         await fadeIn(duration: Duration(milliseconds: 700));
       }
@@ -24,8 +25,8 @@ class AudioService {
   String? _currentUrl;
   Duration _currentPosition = Duration.zero;
   bool _isPlaying = false;
-  bool _isFading = false; // bandera per controlar fades
-  double _volume = 1.0; // Volum guardat manualment
+  bool _isFading = false;
+  double _volume = 1.0;
 
   final List<String> _prehomeMusicUrls = [
     'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
@@ -45,7 +46,6 @@ class AudioService {
   ];
 
   final List<String> _bibliotecaMusicUrls = [
-    // falta 2
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/mgka7srvn6yvqkf0ook3',
     'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/kubs8yagdgzqrptb6qjv'
   ];
@@ -136,6 +136,7 @@ class AudioService {
 
   Future<void> dispose() async {
     try {
+      WidgetsBinding.instance.removeObserver(this);
       await _player.dispose();
     } catch (e) {
       debugPrint('❌ Error a dispose(): $e');
@@ -241,5 +242,15 @@ class AudioService {
       await fadeOut();
     }
     await play(url);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    debugPrint('📱 App Lifecycle State: $state');
+    if (state == AppLifecycleState.paused) {
+      pause();
+    } else if (state == AppLifecycleState.resumed) {
+      resume();
+    }
   }
 }

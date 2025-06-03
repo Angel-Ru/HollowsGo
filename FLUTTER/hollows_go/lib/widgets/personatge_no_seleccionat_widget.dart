@@ -1,3 +1,5 @@
+import 'package:hollows_go/service/audioservice.dart';
+
 import '../imports.dart';
 
 class PersonatgeNoSeleccionatDialog {
@@ -23,6 +25,8 @@ class PersonatgeNoSeleccionatDialog {
       desc: 'Has de seleccionar una skin (personatge) per poder jugar.',
       btnOkText: 'Anar a la biblioteca',
       btnOkOnPress: () {
+        AudioService.instance.playScreenMusic('biblioteca');
+
         Provider.of<UIProvider>(context, listen: false).selectedMenuOpt = 3;
       },
       btnOkColor: Colors.orange,

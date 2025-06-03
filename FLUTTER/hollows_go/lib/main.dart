@@ -1,4 +1,5 @@
 import 'package:hollows_go/providers/missions_provider.dart';
+import 'package:hollows_go/service/audioservice.dart';
 
 import 'imports.dart';
 import 'providers/habilitat_provider.dart';
@@ -8,6 +9,8 @@ Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l
 A més, s'afegeixen els providers que es faran servir a tota l'aplicació.
 */
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  AudioService.instance;
   runApp(const MyApp());
 }
 
