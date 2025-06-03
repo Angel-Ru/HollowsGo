@@ -366,8 +366,11 @@ class _HomeScreenState extends State<HomeScreen>
                 top: 8,
                 right: 8,
                 child: IconButton(
-                  icon: Icon(Icons.keyboard_arrow_up,
-                      color: Colors.grey, size: 32),
+                  icon: Icon(
+                    Icons.keyboard_arrow_up,
+                    color: Colors.yellow, // 🔶 Fletxa groga
+                    size: 32,
+                  ),
                   onPressed: _toggleExpand,
                 ),
               ),
@@ -404,20 +407,30 @@ class _HomeScreenState extends State<HomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (skin.vidaMaxima != null && skin.currentHealth != null)
-            Text(
-              'Vida: ${skin.currentHealth} / ${skin.vidaMaxima}',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          if (skin.raca != null)
-            Text(
-              'Raça: ${getNomRaca(skin.raca)}',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
+          // 🔹 Línia amb Vida i Raça
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              if (skin.vidaMaxima != null && skin.currentHealth != null)
+                Text(
+                  'Vida: ${skin.currentHealth} / ${skin.vidaMaxima}',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              if (skin.raca != null)
+                Text(
+                  'Raça: ${getNomRaca(skin.raca)}',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+            ],
+          ),
+          SizedBox(height: 8),
+          // 🔹 Centrat Mal
           if (skin.malTotal != null)
-            Text(
-              'Mal: ${skin.malTotal}',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
+            Center(
+              child: Text(
+                'Mal: ${skin.malTotal}',
+                style: TextStyle(color: Colors.grey, fontSize: 14),
+              ),
             ),
         ],
       ),

@@ -133,7 +133,7 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
                   },
                 ),
                 const Text(
-                  'Configuració',
+                  'Edita Perfil',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
