@@ -66,12 +66,31 @@ class DialegNoticies extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    '🗞️ ·Combat·\n Els combats ara són més frenètics que mai!\n Afegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\n Canvi d\'enemics entre dPodràs equipar titols de personatges al teu perfil',
+                    '🗞️ ·Combat·\n Els combats ara són més frenètics que mai!\n Afegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\n Canvi d\'enemics entre dia i nit, \n Hi ha conseqüències a l\'hora de fer un combat en acabar-se el mateix es queda guardada la vida del teu personatge. Planteja bé les teves estratègies. \n Els personatges es poden curar amb els nous vials que es regeneren cada 5 hores del darrer ús d\'un vial.',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                   SizedBox(height: 12),
                   Text(
                     '🗞️ ·Biblioteca·\n Duu la personalització a un altre nivell!\n S\'ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Image.asset(
+                    'assets/images/consell.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  Text(
+                    '🗞️ ·Missions·\n Anima\'t a aconseguir noves recompenses!\n Nova rotació de misions diàries amb recompenses, a més ara els personatges tenen misions asignades cada un per aconseguir les seves armes i el titol de personatge del mateix.',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Image.asset(
+                    'assets/images/consell.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    '🗞️ ·Biblioteca·\n  A la biblioteca ara podràs assignar-te un personatge preferit i una skin preferida, també és on podràs curar al teus personatges i veure la vida dels mateixos.\n Mantenint polsat a sobre la skin li podràs equipar les armes que sumaràn "Mal" a les seves estadístiques.\n A més, ara hi ha noves entrades d\'informació per cada personatge amb història dels mateixos.',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                   SizedBox(height: 12),
