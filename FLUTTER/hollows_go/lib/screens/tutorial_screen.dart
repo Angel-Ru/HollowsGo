@@ -278,7 +278,7 @@ class _TutorialScreenState extends State<TutorialScreen> {
                           ),
                         const SizedBox(height: 12),
                         DialogueWidget(
-                          characterName: 'KON',
+                          characterName: 'Kon',
                           nameColor: const Color.fromARGB(255, 233, 179, 3),
                           bubbleColor:
                               Colors.blueGrey.shade700.withOpacity(0.85),
