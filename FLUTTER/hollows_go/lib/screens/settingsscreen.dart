@@ -94,6 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
+    AudioService.instance.playScreenMusic('prehome');
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => PreHomeScreen()),
       (Route<dynamic> route) => false,
@@ -414,7 +415,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           icon: Icons.logout,
                           label: 'Tancar Sessió',
                           colors: [Colors.red, Colors.deepOrangeAccent],
-                          onPressed: _logout,
+                          onPressed: _logout, 
                         ),
                       ),
                     ),

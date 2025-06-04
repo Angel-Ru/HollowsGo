@@ -208,6 +208,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                             });
                           }
                         },
+                        toggleSkinFavorite: () => _toggleFavoriteSkin(userProvider, skin),
                       ),
                     ),
                     const SizedBox(width: 4),

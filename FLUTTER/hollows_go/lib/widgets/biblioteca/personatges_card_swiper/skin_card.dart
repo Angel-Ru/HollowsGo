@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../models/skin.dart'; 
+import '../../../models/skin.dart';
 
 class SkinCard extends StatelessWidget {
   final Skin skin;
@@ -12,6 +12,7 @@ class SkinCard extends StatelessWidget {
   final VoidCallback? onDoubleTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onVialPressed;
+  final VoidCallback? toggleSkinFavorite;
   final Color activeColor;
   final Color borderColor;
 
@@ -25,6 +26,7 @@ class SkinCard extends StatelessWidget {
     this.onDoubleTap,
     this.onLongPress,
     this.onVialPressed,
+    this.toggleSkinFavorite,
     this.activeColor = Colors.orangeAccent,
     this.borderColor = const Color.fromRGBO(255, 165, 0, 0.6),
   }) : super(key: key);
@@ -85,15 +87,19 @@ class SkinCard extends StatelessWidget {
                   Positioned(
                     top: 8,
                     left: 8,
-                    child: Icon(
-                      isFavorite ? Icons.star : Icons.star_border,
-                      color: isFavorite ? Colors.yellow : Colors.grey,
-                      size: 28,
-                      shadows: const [
-                        Shadow(blurRadius: 4, color: Colors.black),
-                      ],
+                    child: GestureDetector(
+                      onTap: toggleSkinFavorite,
+                      child: Icon(
+                        isFavorite ? Icons.star : Icons.star_border,
+                        color: isFavorite ? Colors.yellow : Colors.grey,
+                        size: 28,
+                        shadows: const [
+                          Shadow(blurRadius: 4, color: Colors.black),
+                        ],
+                      ),
                     ),
                   ),
+
                   // Check seleccionat
                   if (isSelected)
                     Positioned(
