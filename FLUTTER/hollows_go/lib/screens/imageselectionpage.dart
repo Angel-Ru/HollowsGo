@@ -20,6 +20,7 @@ class _ImageSelectionPageState extends State<ImageSelectionPage> {
   @override
   void initState() {
     super.initState();
+    AudioService.instance.playScreenMusic('edit');
     _avatarFuture = _perfilProvider.getAvatars();
 
     SharedPreferences.getInstance().then((prefs) {

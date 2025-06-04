@@ -164,6 +164,18 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 ],
               ),
             ),
+            // Afegeix aquest widget per mostrar la versió
+            Positioned(
+              right: 10,
+              bottom: 10,
+              child: Text(
+                "v1.0",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
           ],
         ),
       ),
