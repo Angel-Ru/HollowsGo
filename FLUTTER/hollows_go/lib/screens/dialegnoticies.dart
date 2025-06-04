@@ -66,18 +66,8 @@ class DialegNoticies extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    '🗞️ ·Combat·\n Els combats ara són més frenètics que mai!\n Afegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\n Canvi d\'enemics entre dia i nit, \n Hi ha conseqüències a l\'hora de fer un combat en acabar-se el mateix es queda guardada la vida del teu personatge. Planteja bé les teves estratègies. \n Els personatges es poden curar amb els nous vials que es regeneren cada 5 hores del darrer ús d\'un vial.',
+                    '🗞️ ·Combat·\n Els combats ara són més frenètics que mai!\n Afegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\n Canvi d\'enemics entre dia i nit, \n Hi ha conseqüències a l\'hora de fer un combat, en acabar-se el mateix es queda guardada la vida del teu personatge. Planteja bé les teves estratègies. \n Els personatges es poden curar amb els nous vials que es regeneren cada 5 hores del darrer ús.',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    '🗞️ ·Biblioteca·\n Duu la personalització a un altre nivell!\n S\'ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                  SizedBox(height: 12),
-                  Image.asset(
-                    'assets/images/consell.jpg',
-                    fit: BoxFit.cover,
                   ),
                   Text(
                     '🗞️ ·Missions·\n Anima\'t a aconseguir noves recompenses!\n Nova rotació de misions diàries amb recompenses, a més ara els personatges tenen misions asignades cada un per aconseguir les seves armes i el titol de personatge del mateix.',
@@ -100,7 +90,27 @@ class DialegNoticies extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(
-                    '🗞️ ·Perfil·\n Duu la personalització a un altre nivell!\n S\'ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil',
+                    '🗞️ ·Perfil·\n Duu la personalització a un altre nivell!\n S\'ha afegit un nou seguiment per nivells amb sistema d\'experiència.\n Podràs equipar titols de personatges al teu perfil, i veure les teves estadístiques al teu perfil.',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Image.asset(
+                    'assets/images/consell.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    '🗞️ ·Amistats·\n Comparteix el teu compte amb els teus amics!\n Nou sistema d\'amistats inclòs al joc, ara pots afegir als teus amics a "HollowsGo" poguent compartir els vostres perfils.\n Et picaràs amb les teves amistats per a veure qui aconsegueix tots els personatges primer?',
+                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                  ),
+                  SizedBox(height: 12),
+                  Image.asset(
+                    'assets/images/consell.jpg',
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    '🗞️ ·Configuració·\n Nova pantalla de configuració on, podràs modificar el volum del teu dispositiu, l\'abrillantament, a més de poder veure el nou tutorial, fet per nous integrats ls teus amics a "HollowsGo" poguent compartir els vostres perfils.\n Et picaràs amb les teves amistats per a veure qui aconsegueix tots els personatges primer?',
                     style: TextStyle(color: Colors.white70, fontSize: 16),
                   ),
                 ],

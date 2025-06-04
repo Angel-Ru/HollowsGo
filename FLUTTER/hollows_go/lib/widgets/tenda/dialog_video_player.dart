@@ -6,6 +6,9 @@ import 'package:video_player/video_player.dart';
 class DialogVideoPlayer {
   static VideoPlayerController? _videoController;
   static ChewieController? _chewieController;
+  static bool _isLoading = false;
+
+  static bool get isLoading => _isLoading;
 
   static Future<_VideoInitResult> initVideo({
     required Map<String, dynamic>? skin,
@@ -13,8 +16,11 @@ class DialogVideoPlayer {
   }) async {
     final videoPath = skin?['video_especial'];
     if (videoPath == null || videoPath.isEmpty) {
+      _isLoading = false;
       return _VideoInitResult(showContent: true, isReady: false);
     }
+
+    _isLoading = true;
 
     final result = await VideoService.initAssetVideo(
       assetPath: videoPath,
@@ -24,6 +30,8 @@ class DialogVideoPlayer {
       allowFullScreen: false,
       showControls: false,
     );
+
+    _isLoading = false;
 
     if (result == null) {
       return _VideoInitResult(showContent: true, isReady: false);
@@ -36,6 +44,13 @@ class DialogVideoPlayer {
   }
 
   static Widget build() {
+    if (_isLoading) {
+      // Mostrem el loader mentre es carrega
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
     if (_videoController == null || !_videoController!.value.isInitialized) {
       return const SizedBox.shrink(); // Per evitar errors si no està preparat
     }
@@ -63,6 +78,7 @@ class DialogVideoPlayer {
     );
     _videoController = null;
     _chewieController = null;
+    _isLoading = false;
   }
 }
 

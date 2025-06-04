@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import 'package:video_player/video_player.dart';
 import '../../service/videoservice.dart';
 
@@ -81,7 +82,7 @@ class _UltimateVideoState extends State<UltimateVideo> {
                     ),
                   ),
                 )
-              : const CircularProgressIndicator(),
+              : const CustomLoadingIndicator(),
         ),
       ),
     );

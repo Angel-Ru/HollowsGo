@@ -188,103 +188,119 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
   }
 
   @override
-Widget build(BuildContext context) {
-  final double dialogWidth = 440;
-  final double dialogHeight = dialogWidth * 9 / 16;
+  Widget build(BuildContext context) {
+    final double dialogWidth = 440;
+    final double dialogHeight = dialogWidth * 9 / 16;
 
-  return WillPopScope(
-    onWillPop: () async => false, // Això bloqueja el botó enrere
-    child: Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(20),
-      child: SizedBox(
-        width: dialogWidth,
-        height: _showDialogContent ? null : dialogHeight,
-        child: _showDialogContent
-            ? FadeTransition(
-                opacity: _animations.fadeAnimation,
-                child: ScaleTransition(
-                  scale: _animations.scaleAnimation,
-                  child: DialogContent(
-                    skin: widget.skin,
-                    isDuplicate: widget.isDuplicate,
-                    animations: _animations,
+    return WillPopScope(
+      onWillPop: () async => false, // Això bloqueja el botó enrere
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: SizedBox(
+          width: dialogWidth,
+          height: _showDialogContent ? null : dialogHeight,
+          child: _showDialogContent
+              ? FadeTransition(
+                  opacity: _animations.fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _animations.scaleAnimation,
+                    child: DialogContent(
+                      skin: widget.skin,
+                      isDuplicate: widget.isDuplicate,
+                      animations: _animations,
+                    ),
                   ),
-                ),
-              )
-            : AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: _showBankaiScreen
-                    ? SizedBox(
-                        key: const ValueKey('bankai'),
-                        width: dialogWidth,
-                        height: dialogHeight,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            FadeTransition(
-                              opacity: Tween<double>(begin: 1, end: 0)
-                                  .animate(_fadeOutController),
-                              child: Center(
-                                child: AnimatedBuilder(
-                                  animation: _writeController,
-                                  builder: (context, child) {
-                                    return SizedBox(
-                                      width: dialogWidth,
-                                      height: dialogHeight,
-                                      child: CustomPaint(
-                                        painter: InkWritePainter(
-                                          text: _fullBankaiText,
-                                          progress: _writeController.value,
-                                          isShinji: _isShinji,
-                                          textStyle: const TextStyle(
-                                            fontSize: 64,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            letterSpacing: 8,
-                                            fontFamily: 'Harukaze',
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                )
+              : AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: _showBankaiScreen
+                      ? SizedBox(
+                          key: const ValueKey('bankai'),
+                          width: dialogWidth,
+                          height: dialogHeight,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                            ),
-                            if (_isVideoReady)
-                              AnimatedBuilder(
-                                animation: _slashController,
-                                builder: (context, child) {
-                                  return ClipPath(
-                                    clipper:
-                                        SlashClipper(_slashController.value),
-                                    child: child,
-                                  );
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: FadeTransition(
-                                    opacity: Tween<double>(begin: 1.0, end: 0.0)
-                                        .animate(_videoFadeOutController),
-                                    child:
-                                        Chewie(controller: _chewieController!),
+
+                              // Si el vídeo no està preparat, mostrar el GIF de càrrega
+                              if (!_isVideoReady)
+                                Center(
+                                  child: Image.asset(
+                                    'assets/loading.gif', // aquí posa la ruta del gif
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.contain,
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
-      ),
-    ),
-  );
-}
 
+                              // Text Bankai només si vídeo no carregat i GIF no visible
+                              if (!_isVideoReady)
+                                FadeTransition(
+                                  opacity: Tween<double>(begin: 1, end: 0)
+                                      .animate(_fadeOutController),
+                                  child: Center(
+                                    child: AnimatedBuilder(
+                                      animation: _writeController,
+                                      builder: (context, child) {
+                                        return SizedBox(
+                                          width: dialogWidth,
+                                          height: dialogHeight,
+                                          child: CustomPaint(
+                                            painter: InkWritePainter(
+                                              text: _fullBankaiText,
+                                              progress: _writeController.value,
+                                              isShinji: _isShinji,
+                                              textStyle: const TextStyle(
+                                                fontSize: 64,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                letterSpacing: 8,
+                                                fontFamily: 'Harukaze',
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+
+                              // Mostrar el vídeo si ja està carregat
+                              if (_isVideoReady)
+                                AnimatedBuilder(
+                                  animation: _slashController,
+                                  builder: (context, child) {
+                                    return ClipPath(
+                                      clipper:
+                                          SlashClipper(_slashController.value),
+                                      child: child,
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: FadeTransition(
+                                      opacity:
+                                          Tween<double>(begin: 1.0, end: 0.0)
+                                              .animate(_videoFadeOutController),
+                                      child: Chewie(
+                                          controller: _chewieController!),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+        ),
+      ),
+    );
+  }
 }

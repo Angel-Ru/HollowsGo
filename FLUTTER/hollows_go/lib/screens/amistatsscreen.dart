@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hollows_go/service/audioservice.dart';
 import 'package:hollows_go/widgets/amistats/dialog_amic.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import 'package:hollows_go/widgets/dialog_amic_estadistiques.dart';
 import 'package:http/http.dart' as http;
 import '../imports.dart';
@@ -136,10 +137,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                     future: _amistatsFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: Image.asset('assets/loading/loading.gif',
-                              width: 60, height: 60),
-                        );
+                        return const CustomLoadingIndicator();
                       }
                       if (snapshot.hasError) {
                         return Center(
@@ -215,9 +213,8 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
                                         showDialog(
                                           context: context,
                                           barrierDismissible: false,
-                                          builder: (_) => Center(
-                                              child:
-                                                  CircularProgressIndicator()),
+                                          builder: (_) =>
+                                              const CustomLoadingIndicator(),
                                         );
 
                                         final dades = await userProvider
