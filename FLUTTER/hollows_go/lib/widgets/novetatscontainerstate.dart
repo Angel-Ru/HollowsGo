@@ -86,7 +86,7 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
                   'NOVETATS',
                   style: TextStyle(
                     color: const Color(0xFFFFD700),
-                    fontSize: 28,
+                    fontSize: 40,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Harukaze',
                     shadows: const [
@@ -96,7 +96,7 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
                         blurRadius: 5,
                       ),
                     ],
-                    letterSpacing: 8,
+                    letterSpacing: 9,
                   ),
                 ),
               ),

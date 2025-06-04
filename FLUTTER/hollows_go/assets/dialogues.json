@@ -1,7 +1,7 @@
 {
     "ichigo": {
         "dialogues": [
-            "Benvingut a HollowsGo!",
+            "Benvingut a HollowsGo: Remastered!",
             "Getsuga... Tenshō!!",
             "Sóc un shinigami substitut, com que no saps què és?",
             "Si tens algun dubte, recorda que pots veure el tutorial a la configuració"
@@ -74,7 +74,7 @@
             "Sóc un dels últims Quincys.",
             "Els Quincys són enemics naturals dels Shinigamis.",
             "No sóc un guerrer. Sóc metge. Només salvo vides.",
-            "Faré de tu un vertader Quincy. Però amb una condició..."
+            "Faré de tu un vertader Quincy."
         ],
         "images": [
             "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/RYUKEN/dhotwsdtahljom1ua5bw",
@@ -123,12 +123,12 @@
     "Orihime": {
         "dialogues": [
             "Hola! Què tal? Vols ser el meu amic?",
+            "Recorda que pots veure el perfil dels teus amics, clicant a sobre ells.",
             "Jo crec que tothom mereix una segona oportunitat... i una tercera!",
             "És bonic tenir amics que et facin somriure.",
             "T’imagines una amistat tan forta com el pa amb mantega? Mmmm!",
             "No importa d’on vens, si el teu cor és amable, jo t’accepto!",
             "Una vegada vaig fer galetes d’amistat... no van sortir molt bé, però era amb amor!",
-            "Si et sents sol, sempre pots comptar amb mi.",
             "L’amistat pot curar ferides que ni la meva Shun Shun Rikka pot!"
         ],
         "images": [
