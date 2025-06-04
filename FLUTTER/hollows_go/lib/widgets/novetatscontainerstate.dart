@@ -36,16 +36,9 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
 
   @override
   Widget build(BuildContext context) {
-    final double imageAspectRatio = 400 / 280; // ample / alt de la imatge
-    final double deviceWidth = MediaQuery.of(context).size.width;
-    final double containerWidth = deviceWidth - 32; // marge horitzontal 16+16
-    final double containerHeight = containerWidth / imageAspectRatio;
-
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
-        width: containerWidth,
-        height: containerHeight,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -59,54 +52,57 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              AnimatedSwitcher(
-                duration: const Duration(seconds: 2),
-                switchInCurve: Curves.easeInOut,
-                switchOutCurve: Curves.easeInOut,
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: child,
-                  );
-                },
-                child: Image.network(
-                  key: ValueKey(_novetatsImages[_currentImageIndex]),
-                  _novetatsImages[_currentImageIndex],
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
+          child: AspectRatio(
+            aspectRatio: 400 / 280, // manté la proporció de la imatge
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                AnimatedSwitcher(
+                  duration: const Duration(seconds: 2),
+                  switchInCurve: Curves.easeInOut,
+                  switchOutCurve: Curves.easeInOut,
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
                   },
-                ),
-              ),
-              // Fons negre opacat per destacar el text
-              Container(
-                color: Colors.black.withOpacity(0.5),
-              ),
-              Align(
-                alignment: const Alignment(0, -0.1),
-                child: Text(
-                  'NOVETATS',
-                  style: TextStyle(
-                    color: const Color(0xFFFFD700),
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Harukaze',
-                    shadows: const [
-                      Shadow(
-                        color: Colors.black87,
-                        offset: Offset(2, 2),
-                        blurRadius: 5,
-                      ),
-                    ],
-                    letterSpacing: 9,
+                  child: Image.network(
+                    key: ValueKey(_novetatsImages[_currentImageIndex]),
+                    _novetatsImages[_currentImageIndex],
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
                   ),
                 ),
-              ),
-            ],
+                Container(
+                  color: Colors.black.withOpacity(0.5),
+                ),
+                Align(
+                  alignment: const Alignment(0, -0.1),
+                  child: Text(
+                    'NOVETATS',
+                    style: TextStyle(
+                      color: const Color(0xFFFFD700),
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Harukaze',
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black87,
+                          offset: Offset(2, 2),
+                          blurRadius: 5,
+                        ),
+                      ],
+                      letterSpacing: 9,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
