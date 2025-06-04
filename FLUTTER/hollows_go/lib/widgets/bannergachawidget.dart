@@ -197,10 +197,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   }
 
   BorderSide getButtonBorder(int index) {
-    switch (index) {
-      default:
-        return const BorderSide(color: Colors.black, width: 2);
-    }
+    return const BorderSide(color: Colors.black, width: 2);
   }
 
   TextStyle getTextStyle(int index) {
@@ -257,8 +254,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                     return const SizedBox(
                       height: 30,
                       width: 30,
-                      child: Center(
-                          child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(child: CustomLoadingIndicator()),
                     );
                   },
                 ),
@@ -267,11 +263,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
+                        child: CustomLoadingIndicator(),
                       )
                     : Text(
                         label,
@@ -335,25 +327,13 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return const Center(
-                              child: CircularProgressIndicator());
+                          return const Center(child: CustomLoadingIndicator());
                         },
                       ),
                     ),
                   ),
                 ),
               ),
-
-              // Aquí superposem el widget de carrega quan calgui
-              if (_isGachaLoading)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black54,
-                    child: const CustomLoadingIndicator(size: 80),
-                  ),
-                ),
-
-              // Els punts que mostren quina sèrie de banner estem
               Positioned(
                 bottom: 10,
                 child: Row(
@@ -373,8 +353,6 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                   }),
                 ),
               ),
-
-              // La icona circular a la cantonada inferior dreta (resta sense canvis)
               Positioned(
                 bottom: -12,
                 right: -12,
@@ -440,7 +418,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return const Center(
-                                child: CircularProgressIndicator());
+                                child: CustomLoadingIndicator());
                           },
                         ),
                       ),

@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+
 import '../../imports.dart';
 
 class SkinSwiperPopup extends StatefulWidget {
   final List<Map<String, dynamic>> skins;
-  final int currentIndex;  // nou camp
+  final int currentIndex; // nou camp
 
   const SkinSwiperPopup({
     required this.skins,
@@ -15,7 +17,8 @@ class SkinSwiperPopup extends StatefulWidget {
   State<SkinSwiperPopup> createState() => _SkinSwiperPopupState();
 }
 
-class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderStateMixin {
+class _SkinSwiperPopupState extends State<SkinSwiperPopup>
+    with TickerProviderStateMixin {
   late final PageController _pageController;
   late Timer _timer;
   int _currentPage = 0;
@@ -45,7 +48,8 @@ class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderSt
     if (widget.currentIndex == 1) {
       return Colors.blueAccent;
     } else if (widget.currentIndex == 2) {
-      return Colors.purple[700]!;;
+      return Colors.purple[700]!;
+      ;
     } else {
       return Colors.orange;
     }
@@ -159,7 +163,9 @@ class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderSt
                     builder: (context, child) {
                       double value = 1.0;
                       if (_pageController.position.haveDimensions) {
-                        value = (_pageController.page! - index).abs().clamp(0.0, 1.0);
+                        value = (_pageController.page! - index)
+                            .abs()
+                            .clamp(0.0, 1.0);
                         value = 1 - (value * 0.1);
                       }
                       return Transform.scale(scale: value, child: child);
@@ -181,10 +187,13 @@ class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderSt
                                   imageUrl,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => const Center(
-                                      child: Icon(Icons.error, color: Colors.redAccent)),
-                                  loadingBuilder: (context, child, loadingProgress) {
+                                      child: Icon(Icons.error,
+                                          color: Colors.redAccent)),
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
-                                    return const Center(child: CircularProgressIndicator());
+                                    return const Center(
+                                        child: CustomLoadingIndicator());
                                   },
                                 ),
                               ),
@@ -193,7 +202,8 @@ class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderSt
                                 left: 0,
                                 right: 0,
                                 child: Container(
-                                  padding: const EdgeInsets.only(top: 8, bottom: 12),
+                                  padding:
+                                      const EdgeInsets.only(top: 8, bottom: 12),
                                   color: Colors.black.withOpacity(0.7),
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -231,7 +241,8 @@ class _SkinSwiperPopupState extends State<SkinSwiperPopup> with TickerProviderSt
                 style: TextStyle(color: _activeColor),
               ),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
             ),
           ],
