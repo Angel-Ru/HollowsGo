@@ -36,10 +36,16 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
 
   @override
   Widget build(BuildContext context) {
+    final double imageAspectRatio = 400 / 280; // ample / alt de la imatge
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    final double containerWidth = deviceWidth - 32; // marge horitzontal 16+16
+    final double containerHeight = containerWidth / imageAspectRatio;
+
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
-        height: 280,
+        width: containerWidth,
+        height: containerHeight,
         margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
