@@ -1,4 +1,3 @@
-<!-- bleach-info.component.html -->
 <div class="scroll-container" xmlns:images="http://www.w3.org/1999/xhtml">
 
   <!-- Primera “página”: Bleach amb logo i Ichigo -->
@@ -35,14 +34,12 @@
     </div>
   </div>
 
-
-
   <div class="section section-video carousel-section">
     <!-- Columna esquerra: Text justificat i centrat verticalment -->
     <div class="carousel-text">
       <h2>Descobreix HollowsGo</h2>
       <p>
-        Descobreix els secrets ocults de HollowsGo: Remastered. Deixa’t captivar per aquest enigmàtic carrusel que revela les misterioses pantalles d’inici que et donen la benvinguda quan obres l’aplicació. Escolta com la música de fons, tan aviat entres o surts, se silencia com un murmuro, com si una presència amagada vetllés pel teu confort.
+        Descobreix els secrets ocults de HollowsGo: Remastered. Deixa’t captivar per aquest enigmàtic carrusel que revela les misterioses pantalles d’inici que et donen la benvinguda quan obres l’aplicació. Escolta com la música de fons, tan aviat entres o surts, se silencia com un murmura, com si una presència amagada vetllés pel teu confort.
       </p>
     </div>
 
@@ -59,24 +56,24 @@
       </div>
     </div>
 
-    <!-- Columna dreta: Vídeo amb controls personalitzats dins -->
+    <!-- Columna dreta: Vídeo amb controls personalitzats -->
     <div class="video-wrapper">
       <div class="video-container">
         <video #videoPlayer
                src="https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/WEB/Fotos_HollowsGo/av19ph39hu2ve9hl51kp"
-               muted loop (timeupdate)="updateProgress(videoPlayer)">
+               muted loop (timeupdate)="updateProgress(0)">
         </video>
 
-        <button class="video-btn play-pause" (click)="togglePlay(videoPlayer)">
-          {{ isPlaying ? '⏸️' : '▶️' }}
+        <button class="video-btn play-pause" (click)="togglePlay(0)">
+          {{ videoStates[0]?.isPlaying ? '⏸️' : '▶️' }}
         </button>
 
-        <button class="video-btn mute" (click)="toggleMute(videoPlayer)">
-          {{ isMuted ? '🔇' : '🔊' }}
+        <button class="video-btn mute" (click)="toggleMute(0)">
+          {{ videoStates[0]?.isMuted ? '🔇' : '🔊' }}
         </button>
 
-        <div class="progress-bar-container" (click)="seekVideo($event, videoPlayer)">
-          <div class="progress-bar" [style.width.%]="progress"></div>
+        <div class="progress-bar-container" (click)="seekVideo($event, 0)">
+          <div class="progress-bar" [style.width.%]="videoStates[0]?.progress"></div>
         </div>
       </div>
     </div>
@@ -95,20 +92,20 @@
       <img src="https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/dl1ca2y0az0xupuquhja" alt="Tite Kubo" class="styled-image" />
     </div>
   </div>
+
   <div class="section section-video carousel-section">
     <!-- Columna esquerra: Text justificat i centrat verticalment -->
     <div class="carousel-text">
       <h2>Tenda</h2>
       <p>
         Ei, escolta… aquí pots trobar de tot: Shinigamis, Quincy i fins i tot Hollows. I no parlo de qualsevol cosa, sinó dels més rars, els que tenen aquell toc especial que només es veu una vegada a la vida. Mira bé els personatges que surten destacats a cada banner, perquè aquests són els que valen de debò.
-        </p>
+      </p>
       <p>
-      Ah, i quan tires un gacha, para atenció… alguns personatges tindran una animació diferent, una mica més especial. Una mena de signe que t’estan esperant, com si volguessin deixar clar que no són qualsevol cosa.
+        Ah, i quan tires un gacha, para atenció… alguns personatges tindran una animació diferent, una mica més especial. Una mena de signe que t’estan esperant, com si volguessin deixar clar que no són qualsevol cosa.
       </p>
       <p>
         I si el destí et juga una mala passada i et toca un personatge repetit? No et preocupis, no és un fracàs. A canvi, obtindràs fragments de skins, com petites peces d’un trencaclosques que pots usar per comprar skins noves — només et costarà 100 monedes, res fora de l’habitual.
       </p>
-
     </div>
 
     <!-- Columna central: Carrusel -->
@@ -124,24 +121,24 @@
       </div>
     </div>
 
-    <!-- Columna dreta: Vídeo amb controls personalitzats dins -->
+    <!-- Columna dreta: Vídeo amb controls personalitzats -->
     <div class="video-wrapper">
       <div class="video-container">
         <video #videoPlayer
-               src="https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/WEB/Fotos_HollowsGo/av19ph39hu2ve9hl51kp"
-               muted loop (timeupdate)="updateProgress(videoPlayer)">
+               src="https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/WEB/Fotos_HollowsGo/mppb2hxqmhi9a854crwd"
+               muted loop (timeupdate)="updateProgress(1)">
         </video>
 
-        <button class="video-btn play-pause" (click)="togglePlay(videoPlayer)">
-          {{ isPlaying ? '⏸️' : '▶️' }}
+        <button class="video-btn play-pause" (click)="togglePlay(1)">
+          {{ videoStates[1]?.isPlaying ? '⏸️' : '▶️' }}
         </button>
 
-        <button class="video-btn mute" (click)="toggleMute(videoPlayer)">
-          {{ isMuted ? '🔇' : '🔊' }}
+        <button class="video-btn mute" (click)="toggleMute(1)">
+          {{ videoStates[1]?.isMuted ? '🔇' : '🔊' }}
         </button>
 
-        <div class="progress-bar-container" (click)="seekVideo($event, videoPlayer)">
-          <div class="progress-bar" [style.width.%]="progress"></div>
+        <div class="progress-bar-container" (click)="seekVideo($event, 1)">
+          <div class="progress-bar" [style.width.%]="videoStates[1]?.progress"></div>
         </div>
       </div>
     </div>
