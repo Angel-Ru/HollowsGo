@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:hollows_go/service/videoservice.dart';
 import 'package:video_player/video_player.dart';
 
+// Importa el CustomLoadingIndicator
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+
 class DialogVideoPlayer {
   static VideoPlayerController? _videoController;
   static ChewieController? _chewieController;
@@ -47,7 +50,7 @@ class DialogVideoPlayer {
     if (_isLoading) {
       // Mostrem el loader mentre es carrega
       return const Center(
-        child: CircularProgressIndicator(),
+        child: CustomLoadingIndicator(),
       );
     }
 

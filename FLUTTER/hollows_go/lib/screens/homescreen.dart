@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/models/habilitat_llegendaria.dart';
 import 'package:hollows_go/screens/dialegnoticies.dart';
 import 'package:hollows_go/widgets/novetatscontainerstate.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen>
   late final UIProvider _uiProvider;
   late VoidCallback _uiListener;
 
+  int? _lastLoadedSkinId; // <-- CONTROLAR ÚLTIMA SKIN PER CÀRREGA HABILITAT
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen>
     _expandAnimation =
         CurvedAnimation(parent: _expandController, curve: Curves.easeInOut);
 
-    // Inicialitza el UIProvider i el listener per detectar canvis de menú
     _uiProvider = Provider.of<UIProvider>(context, listen: false);
 
     _uiListener = () {
@@ -66,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen>
 
     _uiProvider.addListener(_uiListener);
 
-    // Reproduir la música inicial segons el menú per si no és home
     _uiListener();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -100,11 +101,8 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _timer?.cancel();
-
     _expandController.dispose();
-
     _uiProvider.removeListener(_uiListener);
-
     super.dispose();
   }
 
@@ -167,9 +165,19 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final uiProvider = Provider.of<UIProvider>(context);
     final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final habilitatProvider = Provider.of<HabilitatProvider>(context);
+    final skinsProvider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
 
     final double topMargin =
         MediaQuery.of(context).padding.top + kToolbarHeight;
+
+    final skin = _getSkinSeleccionada(skinsProvider);
+
+    // Càrrega habilitat llegendària quan la skin canvia
+    if (skin != null && skin.id != _lastLoadedSkinId) {
+      _lastLoadedSkinId = skin.id;
+      habilitatProvider.loadHabilitatPerSkinId(skin.id);
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -187,31 +195,24 @@ class _HomeScreenState extends State<HomeScreen>
       body: Stack(
         children: [
           HomeBackground(),
-          Consumer<SkinsEnemicsPersonatgesProvider>(
-            builder: (context, provider, _) {
-              final skin = _getSkinSeleccionada(provider);
-              if (skin == null) return SizedBox();
-
-              return AnimatedAlign(
-                alignment: _mostrarDetallsSkin
-                    ? Alignment.center
-                    : Alignment.topCenter,
-                duration: Duration(milliseconds: 500),
-                curve: Curves.easeInOut,
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: _mostrarDetallsSkin ? 0 : topMargin,
-                    left: 16,
-                    right: 16,
-                  ),
-                  child: ScaleTransition(
-                    scale: _expandAnimation,
-                    child: _buildExpandedCard(skin),
-                  ),
+          if (skin != null)
+            AnimatedAlign(
+              alignment:
+                  _mostrarDetallsSkin ? Alignment.center : Alignment.topCenter,
+              duration: Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: _mostrarDetallsSkin ? 0 : topMargin,
+                  left: 16,
+                  right: 16,
                 ),
-              );
-            },
-          ),
+                child: ScaleTransition(
+                  scale: _expandAnimation,
+                  child: _buildExpandedCard(skin, habilitatProvider.habilitat),
+                ),
+              ),
+            ),
           Consumer<SkinsEnemicsPersonatgesProvider>(
             builder: (context, provider, _) {
               final skin = _getSkinSeleccionada(provider);
@@ -230,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen>
           ),
           if (!_mostrarDetallsSkin)
             Positioned(
-              top: topMargin + 200, // Ajusta la posició segons necessiti
+              top: topMargin + 200,
               left: 0,
               right: 0,
               child: NovetatsContainer(
@@ -307,7 +308,20 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildExpandedCard(Skin skin) {
+  Widget _buildExpandedCard(Skin skin, HabilitatLlegendaria? habilitat) {
+    String getNomRaca(int? raca) {
+      switch (raca) {
+        case 0:
+          return 'Quincy';
+        case 1:
+          return 'Shinigami';
+        case 2:
+          return 'Hollow / Enemic';
+        default:
+          return 'Desconegut';
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.3),
@@ -318,17 +332,19 @@ class _HomeScreenState extends State<HomeScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // (Imatge i títol sense canvis)
           Stack(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  skin.imatge ?? '',
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) =>
-                      Icon(Icons.broken_image, color: Colors.white),
+              AspectRatio(
+                aspectRatio: 16 / 9,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.network(
+                    skin.imatge ?? '',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.broken_image, color: Colors.white),
+                  ),
                 ),
               ),
               Positioned(
@@ -368,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen>
                 child: IconButton(
                   icon: Icon(
                     Icons.keyboard_arrow_up,
-                    color: Colors.yellow, // 🔶 Fletxa groga
+                    color: Colors.yellow,
                     size: 32,
                   ),
                   onPressed: _toggleExpand,
@@ -377,61 +393,90 @@ class _HomeScreenState extends State<HomeScreen>
             ],
           ),
           SizedBox(height: 20),
-          _DetallsSkinCard(skin),
-        ],
-      ),
-    );
-  }
-
-  Widget _DetallsSkinCard(Skin skin) {
-    String getNomRaca(int? raca) {
-      switch (raca) {
-        case 0:
-          return 'Quincy';
-        case 1:
-          return 'Shinigami';
-        case 2:
-          return 'Hollow / Enemic';
-        default:
-          return 'Desconegut';
-      }
-    }
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 🔹 Línia amb Vida i Raça
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if (skin.vidaMaxima != null && skin.currentHealth != null)
-                Text(
-                  'Vida: ${skin.currentHealth} / ${skin.vidaMaxima}',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-              if (skin.raca != null)
-                Text(
-                  'Raça: ${getNomRaca(skin.raca)}',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-            ],
-          ),
-          SizedBox(height: 8),
-          // 🔹 Centrat Mal
-          if (skin.malTotal != null)
-            Center(
-              child: Text(
-                'Mal: ${skin.malTotal}',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // **Fila amb Vida, Mal i Raça alineats a l'espai**
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    if (skin.vidaMaxima != null && skin.currentHealth != null)
+                      Text(
+                        'Vida: ${skin.currentHealth} / ${skin.vidaMaxima}',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    if (skin.malTotal != null)
+                      Text(
+                        'Mal: ${skin.malTotal}',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                    if (skin.raca != null)
+                      Text(
+                        'Raça: ${getNomRaca(skin.raca)}',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                      ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                if (habilitat != null) ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Habilitat Llegendària: ',
+                            style: TextStyle(
+                              color: Colors.amberAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Flexible(
+                            child: Text(
+                              habilitat.nom,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              habilitat.efecte ?? '',
+                              style: TextStyle(
+                                color: Colors.grey[300],
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );
