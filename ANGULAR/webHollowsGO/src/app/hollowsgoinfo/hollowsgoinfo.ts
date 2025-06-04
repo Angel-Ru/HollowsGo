@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, QueryList, ViewChildren, ElementRef } from '@angular/core';
 import { NgForOf } from '@angular/common';
 
 @Component({
@@ -6,7 +6,7 @@ import { NgForOf } from '@angular/common';
   standalone: true,
   imports: [NgForOf],
   templateUrl: './hollowsgoinfo.html',
-  styleUrl: './hollowsgoinfo.css'
+  styleUrls: ['./hollowsgoinfo.css']
 })
 export class Hollowsgoinfo implements OnInit, OnDestroy {
   images: string[] = [
@@ -19,16 +19,24 @@ export class Hollowsgoinfo implements OnInit, OnDestroy {
     'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/Fotos_HollowsGo/gz60njhmwp3ultysdic5',
     'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/Fotos_HollowsGo/s2cuqbfigljiu45ajpl5',
     'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/Fotos_HollowsGo/vtpb8pbzq9twlhu7t0t9'
-  ]
+  ];
+
   index: number = 0;
 
-  isPlaying: boolean = false;
-  isMuted: boolean = false;
-  progress: number = 0;
+  // Referències a tots els vídeos amb #videoPlayer
+  @ViewChildren('videoPlayer') videoPlayers!: QueryList<ElementRef<HTMLVideoElement>>;
+
+  // Estat per cada vídeo: si està reproduint, mut, progress
+  videoStates: { isPlaying: boolean; isMuted: boolean; progress: number }[] = [];
 
   ngOnInit(): void {
     this.updateBackground();
     window.addEventListener('resize', this.updateBackground.bind(this));
+    // Inicialitzem 2 vídeos (canvia segons el nombre que tinguis)
+    this.videoStates = [
+      { isPlaying: false, isMuted: true, progress: 0 },
+      { isPlaying: false, isMuted: true, progress: 0 }
+    ];
   }
 
   ngOnDestroy(): void {
@@ -49,37 +57,38 @@ export class Hollowsgoinfo implements OnInit, OnDestroy {
     return `translateX(-${this.index * 100}%)`;
   }
 
-  togglePlay(video: HTMLVideoElement): void {
+  togglePlay(index: number): void {
+    const video = this.videoPlayers.toArray()[index].nativeElement;
     if (video.paused) {
       video.play();
-      this.isPlaying = true;
+      this.videoStates[index].isPlaying = true;
     } else {
       video.pause();
-      this.isPlaying = false;
+      this.videoStates[index].isPlaying = false;
     }
   }
 
-  toggleMute(video: HTMLVideoElement): void {
+  toggleMute(index: number): void {
+    const video = this.videoPlayers.toArray()[index].nativeElement;
     video.muted = !video.muted;
-    this.isMuted = video.muted;
+    this.videoStates[index].isMuted = video.muted;
   }
 
-  updateProgress(video: HTMLVideoElement): void {
+  updateProgress(index: number): void {
+    const video = this.videoPlayers.toArray()[index].nativeElement;
     if (video.duration) {
-      this.progress = (video.currentTime / video.duration) * 100;
+      this.videoStates[index].progress = (video.currentTime / video.duration) * 100;
     } else {
-      this.progress = 0;
+      this.videoStates[index].progress = 0;
     }
   }
 
-  // Nou: permet fer "seek" clicant a la barra
-  seekVideo(event: MouseEvent, video: HTMLVideoElement): void {
+  seekVideo(event: MouseEvent, index: number): void {
+    const video = this.videoPlayers.toArray()[index].nativeElement;
     const target = event.currentTarget;
-
     if (!(target instanceof HTMLElement)) {
-      return; // Si no és HTMLElement, sortim (seguretat)
+      return;
     }
-
     const rect = target.getBoundingClientRect();
     const clickX = event.clientX - rect.left;
     const width = rect.width;
@@ -89,8 +98,6 @@ export class Hollowsgoinfo implements OnInit, OnDestroy {
       video.currentTime = video.duration * clickRatio;
     }
   }
-
-
 
   private updateBackground(): void {
     const isLandscape = window.matchMedia('(orientation: landscape)').matches;
