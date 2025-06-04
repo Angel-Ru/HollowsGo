@@ -231,8 +231,6 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
                               ),
 
                               // Si el vídeo no està preparat, mostrar el GIF de càrrega
-                              if (!_isVideoReady)
-                                Center(child: CustomLoadingIndicator()),
 
                               // Text Bankai només si vídeo no carregat i GIF no visible
                               if (!_isVideoReady)
