@@ -115,8 +115,18 @@ class DialogAmicEstadistiques extends StatelessWidget {
                 _buildStatItem(
                     label: 'Per. Obtinguts:',
                     value: nombrePersonatges.toString()),
+              ],
+            ),
+            SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
                 _buildStatItem(
                     label: 'Skins Obtingudes:', value: nombreSkins.toString()),
+                _buildStatItem(
+                    label: 'Per. Preferit:',
+                    value: personatgePreferit.toString()),
               ],
             ),
 
@@ -126,28 +136,6 @@ class DialogAmicEstadistiques extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Personatge preferit
-                Column(
-                  children: [
-                    Text(
-                      'Per. Preferit:',
-                      style: TextStyle(
-                        color: Colors.orangeAccent.withOpacity(0.9),
-                        fontSize: 12,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      personatgePreferit,
-                      style: TextStyle(
-                        color: Colors.orangeAccent.withOpacity(0.9),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-
                 // Skin preferida
                 Column(
                   children: [
