@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:hollows_go/service/audioservice.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:hollows_go/widgets/tenda/paypal_payment_widget.dart';
 
@@ -151,7 +152,7 @@ class _TendaScreenState extends State<TendaScreen> {
                   bubbleColor: Color.fromARGB(212, 238, 238, 238),
                 ),
                 if (gachaProvider.isLoading)
-                  Center(child: CircularProgressIndicator()),
+                  Center(child: CustomLoadingIndicator()),
               ],
             ),
           ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import 'package:video_player/video_player.dart';
 
 import 'dialog_content.dart';
@@ -231,14 +232,7 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
 
                               // Si el vídeo no està preparat, mostrar el GIF de càrrega
                               if (!_isVideoReady)
-                                Center(
-                                  child: Image.asset(
-                                    'assets/loading.gif', // aquí posa la ruta del gif
-                                    width: 100,
-                                    height: 100,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
+                                Center(child: CustomLoadingIndicator()),
 
                               // Text Bankai només si vídeo no carregat i GIF no visible
                               if (!_isVideoReady)

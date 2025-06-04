@@ -1,3 +1,4 @@
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import 'package:hollows_go/widgets/multiskinrewarddialog.dart';
 import '../imports.dart';
 import 'tenda/skinsdestacats.dart';
@@ -289,115 +290,188 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
     const buttonImageUrl =
         'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/OTHERS/yslqndyf4eri3f7mpl6i';
 
-    return Stack(
+    return Column(
       children: [
-        Column(
-          children: [
-            GestureDetector(
-              onHorizontalDragEnd: _handleSwipe,
-              child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Transform.scale(
-                    scale: 1.3,
-                    child: Container(
-                      height: 160,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        border: Border.all(
-                          color: Colors.grey[700]!.withOpacity(0.8),
-                          width: 3,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 6,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+        GestureDetector(
+          onHorizontalDragEnd: _handleSwipe,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              Transform.scale(
+                scale: 1.3,
+                child: Container(
+                  height: 160,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: Colors.grey[700]!.withOpacity(0.8),
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        blurRadius: 6,
+                        offset: const Offset(0, 4),
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(seconds: 2),
-                          transitionBuilder: (child, animation) =>
-                              FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          ),
-                          child: Image.network(
-                            _allBannerSets[_currentSetIndex]
-                                [_currentBannerIndex],
-                            key: ValueKey<String>(
-                              _allBannerSets[_currentSetIndex]
-                                  [_currentBannerIndex],
-                            ),
-                            fit: BoxFit.cover,
-                          ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(seconds: 2),
+                      transitionBuilder: (child, animation) => FadeTransition(
+                        opacity: CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeInOut,
                         ),
+                        child: child,
+                      ),
+                      child: Image.network(
+                        key: ValueKey(_allBannerSets[_currentSetIndex]
+                            [_currentBannerIndex]),
+                        _allBannerSets[_currentSetIndex][_currentBannerIndex],
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        },
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: -26,
-                    child: Container(
-                      width: 320,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.grey[700]!.withOpacity(0.8),
-                          width: 3,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
-                            blurRadius: 6,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            animatedButtonWithImage(
-                              label: 'Pull single',
-                              imageUrl: buttonImageUrl,
-                              onPressed: () => _handleGachaPull(context),
-                              scale: _scaleSingle,
-                              setScale: (val) => _scaleSingle = val,
-                            ),
-                            animatedButtonWithImage(
-                              label: 'Pull x10',
-                              imageUrl: buttonImageUrl,
-                              onPressed: () =>
-                                  _handleGachaPullMultiple(context),
-                              scale: _scaleMulti,
-                              setScale: (val) => _scaleMulti = val,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
+
+              // Aquí superposem el widget de carrega quan calgui
+              if (_isGachaLoading)
+                Positioned.fill(
+                  child: Container(
+                    color: Colors.black54,
+                    child: const CustomLoadingIndicator(size: 80),
+                  ),
+                ),
+
+              // Els punts que mostren quina sèrie de banner estem
+              Positioned(
+                bottom: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(_allBannerSets.length, (index) {
+                    return Container(
+                      width: 8,
+                      height: 8,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentSetIndex == index
+                            ? Colors.white.withOpacity(0.9)
+                            : Colors.white.withOpacity(0.4),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+
+              // La icona circular a la cantonada inferior dreta (resta sense canvis)
+              Positioned(
+                bottom: -12,
+                right: -12,
+                child: GestureDetector(
+                  onTap: () async {
+                    final gachaProvider =
+                        Provider.of<GachaProvider>(context, listen: false);
+
+                    if (_currentSetIndex == 1) {
+                      await gachaProvider.fetchSkinsCategoria4Quincy(context);
+                    } else if (_currentSetIndex == 2) {
+                      await gachaProvider.fetchSkinsCategoria4Hollows(context);
+                    } else {
+                      await gachaProvider
+                          .fetchSkinsCategoria4Shinigamis(context);
+                    }
+
+                    if (!mounted) return;
+
+                    showDialog(
+                      context: context,
+                      builder: (_) => Dialog(
+                        backgroundColor: Colors.transparent,
+                        insetPadding: const EdgeInsets.all(20),
+                        child: SkinSwiperPopup(
+                          skins: gachaProvider.publicSkins,
+                          currentIndex: _currentSetIndex,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(seconds: 2),
+                        transitionBuilder: (child, animation) => FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: animation,
+                            curve: Curves.easeInOut,
+                          ),
+                          child: child,
+                        ),
+                        child: Image.network(
+                          key: ValueKey(_currentSetIndex),
+                          _currentSetIndex == 1
+                              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
+                              : _currentSetIndex == 2
+                                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
+                                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 40),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            animatedButtonWithImage(
+              label: 'x100',
+              imageUrl: buttonImageUrl,
+              onPressed: () => _handleGachaPull(context),
+              scale: _scaleSingle,
+              setScale: (val) => _scaleSingle = val,
             ),
-            const SizedBox(height: 36),
+            const SizedBox(width: 15),
+            animatedButtonWithImage(
+              label: 'x500',
+              imageUrl: buttonImageUrl,
+              onPressed: () => _handleGachaPullMultiple(context),
+              scale: _scaleMulti,
+              setScale: (val) => _scaleMulti = val,
+            ),
           ],
         ),
-        if (_isGachaLoading)
-          Container(
-            color: Colors.black54,
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 4,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-          ),
       ],
     );
   }
