@@ -6,7 +6,6 @@ import 'skin_vida_controller.dart';
 
 class PersonatgesCardSwiper extends StatefulWidget {
   final Personatge personatge;
-  final bool isEnemyMode;
   final Function(Skin) onSkinSelected;
   final Function()? onSkinDeselected;
   final Skin? selectedSkin;
@@ -14,7 +13,6 @@ class PersonatgesCardSwiper extends StatefulWidget {
   const PersonatgesCardSwiper({
     Key? key,
     required this.personatge,
-    required this.isEnemyMode,
     required this.onSkinSelected,
     this.onSkinDeselected,
     this.selectedSkin,
@@ -40,7 +38,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
 
     _skinController = SkinInteractionController(
       context: context,
-      isEnemyMode: widget.isEnemyMode,
       usuariId: Provider.of<UserProvider>(context, listen: false).userId,
     );
 
@@ -179,7 +176,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                         skin: skin,
                         isSelected: isSkinSelected,
                         isFavorite: isSkinFavorite,
-                        isEnemyMode: widget.isEnemyMode,
                         onTap: () {
                           widget.onSkinSelected(skin);
                         },
