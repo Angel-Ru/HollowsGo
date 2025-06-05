@@ -22,11 +22,11 @@ class _MapaScreenState extends State<Mapscreen> {
   StreamSubscription<Position>? _positionStream;
 
   final List<String> imagePaths = [
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rf9vbqlqbpza3inl5syo.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/au1f1y75qc1aguz4nzze.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_miqna6lpshzrlfeewy1v.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_rf9vbqlqbpza3inl5syo.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_au1f1y75qc1aguz4nzze.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_rr49g97fcsrzg6n7r2un.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_omchti7wzjbcdlf98fcl.png?raw=true',
   ];
 
   static const String _darkMapStyle = '''
