@@ -314,8 +314,8 @@ class UserProvider with ChangeNotifier {
       if (token == null) return null;
 
       // Intercanviem els IDs aquí per agafar correctament l'id de l'amic primer
-      final url =
-          Uri.parse('https://${Config.ip}/usuaris/perfil/$idusuariamic/amic/$idusuari');
+      final url = Uri.parse(
+          'https://${Config.ip}/usuaris/perfil/$idusuariamic/amic/$idusuari');
       print('Cridant a: $url');
 
       final headers = {
@@ -400,6 +400,39 @@ class UserProvider with ChangeNotifier {
         'message': 'Error de conexión',
         'error': error.toString()
       };
+    }
+  }
+
+  Future<bool> marcarTutorialCompletat() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final int? userId = prefs.getInt('userId');
+      final String? token = prefs.getString('token');
+
+      if (userId == null || token == null) {
+        print("Token o usuari no disponible");
+        return false;
+      }
+
+      final url = Uri.parse('https://${Config.ip}/usuaris/$userId/tutorial');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.patch(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        print('Tutorial marcat com completat correctament');
+        return true;
+      } else {
+        print(
+            'Error al marcar tutorial com completat: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Excepció a marcarTutorialCompletat: $e');
+      return false;
     }
   }
 }

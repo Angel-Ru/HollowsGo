@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/imports.dart';
 import 'package:hollows_go/providers/ui_provider.dart';
 import 'package:hollows_go/screens/homescreen.dart';
 import 'package:hollows_go/service/audioservice.dart';
@@ -37,6 +38,9 @@ class _TutorialScreenState extends State<TutorialScreen> {
   void _navigateToHome() async {
     if (_navigating) return;
     _navigating = true;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenTutorial', true); // 👈 Afegim aquesta línia
 
     // Carregar el diàleg d'Ichigo abans de navegar
     await Provider.of<DialogueProvider>(context, listen: false)

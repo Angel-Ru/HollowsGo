@@ -62,4 +62,8 @@ router.put('/amics/:id/pendents', verificacioUsuari.verifyToken, userController.
 // Ruta per afegir un amic
 router.post('/amics/nova/:id', verificacioUsuari.verifyToken, userController.crearamistat);
 
+//Ruta per canviar a tutorial complet
+router.patch('/:id/tutorial', verificacioUsuari.verifyToken, userController.marcarTutorialCompletat);
+
+
 module.exports = router;
