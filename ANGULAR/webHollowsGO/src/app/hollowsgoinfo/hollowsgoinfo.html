@@ -65,15 +65,15 @@
         </video>
 
         <button class="video-btn play-pause" (click)="togglePlay(0)">
-          {{ videoStates[0]?.isPlaying ? '⏸️' : '▶️' }}
+          {{ videoStates[0].isPlaying ? '⏸️' : '▶️' }}
         </button>
 
         <button class="video-btn mute" (click)="toggleMute(0)">
-          {{ videoStates[0]?.isMuted ? '🔇' : '🔊' }}
+          {{ videoStates[0].isMuted ? '🔇' : '🔊' }}
         </button>
 
         <div class="progress-bar-container" (click)="seekVideo($event, 0)">
-          <div class="progress-bar" [style.width.%]="videoStates[0]?.progress"></div>
+          <div class="progress-bar" [style.width.%]="videoStates[0].progress"></div>
         </div>
       </div>
     </div>
@@ -130,15 +130,15 @@
         </video>
 
         <button class="video-btn play-pause" (click)="togglePlay(1)">
-          {{ videoStates[1]?.isPlaying ? '⏸️' : '▶️' }}
+          {{ videoStates[1].isPlaying ? '⏸️' : '▶️' }}
         </button>
 
         <button class="video-btn mute" (click)="toggleMute(1)">
-          {{ videoStates[1]?.isMuted ? '🔇' : '🔊' }}
+          {{ videoStates[1].isMuted ? '🔇' : '🔊' }}
         </button>
 
         <div class="progress-bar-container" (click)="seekVideo($event, 1)">
-          <div class="progress-bar" [style.width.%]="videoStates[1]?.progress"></div>
+          <div class="progress-bar" [style.width.%]="videoStates[1].progress"></div>
         </div>
       </div>
     </div>

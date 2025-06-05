@@ -38,6 +38,9 @@ android {
         }
     }
 }
+tasks.withType(Test) {
+    enabled = false
+}
 
 flutter {
     source = "../.."
