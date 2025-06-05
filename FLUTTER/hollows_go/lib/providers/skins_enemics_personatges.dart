@@ -577,6 +577,11 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         print('Skin seleccionada llevada correctament.');
 
         await getSkinSeleccionada(userId);
+
+        //Aixo es lo nou que he afegit per desseleccionar, els metodes ja estaven pero no se cridaven per tant a nivell local no es deselectaven
+        unselectSkinAliat();
+        unselectSkinQuincy();
+        unselectSkinEnemic();
       } else if (response.statusCode == 404) {
         print('No s’ha trobat la skin per a aquest usuari.');
       } else {

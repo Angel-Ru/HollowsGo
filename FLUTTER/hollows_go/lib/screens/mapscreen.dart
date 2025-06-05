@@ -99,17 +99,17 @@ class _MapaScreenState extends State<Mapscreen> {
   void initState() {
     super.initState();
     AudioService.instance.playScreenMusic('mapa');
-    // WidgetsBinding.instance.addPostFrameCallback((_) => _checkSkinSelection());
+     WidgetsBinding.instance.addPostFrameCallback((_) => _checkSkinSelection());
     _initialize();
   }
 
-  /*void _checkSkinSelection() {
+  void _checkSkinSelection() {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    if (provider.selectedSkinAliat == null) {
+    if (provider.selectedSkinAliat == null && provider.selectedSkinEnemic == null && provider.selectedSkinQuincy == null) {
       PersonatgeNoSeleccionatDialog.mostrar(context);
     }
-  }*/
+  }
 
   void _initialize() async {
     final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
