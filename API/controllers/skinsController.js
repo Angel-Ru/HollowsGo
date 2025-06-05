@@ -1744,7 +1744,7 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
 
 
 
-//Endpoint per poder realitzar una tirada gacha de 5 Shinigami
+//Endpoint per poder realitzar una tirada gacha de 5 Shinigamis
 exports.gachaMultiSH = async (req, res) => {
     try {
         const email = req.body.email;
