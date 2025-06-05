@@ -3,11 +3,6 @@ import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
-import 'dart:convert';
-import 'dart:math';
-import 'package:flutter/services.dart';
-import 'package:flutter/material.dart';
-
 class DialogueProvider extends ChangeNotifier {
   int _dialogIndex = 0;
   List<String> _dialogues = [];
@@ -31,44 +26,46 @@ class DialogueProvider extends ChangeNotifier {
   /// Getter públic per accedir a l'índex del diàleg actual
   int get currentIndex => _dialogIndex;
 
+  bool _dialogueLoaded = false;
+  bool get dialogueLoaded => _dialogueLoaded;
+
   // Carrega diàlegs i imatges d’un personatge des de JSON
   Future<void> loadDialogueFromJson(String characterKey) async {
-    if (_currentCharacter == characterKey) return;
+  if (_currentCharacter == characterKey) return;
 
-    _loadingId++; // Incrementem l'ID de càrrega
-    final int currentLoadId = _loadingId;
+  _loadingId++;
+  final int currentLoadId = _loadingId;
 
-    try {
-      final String response =
-          await rootBundle.loadString('assets/dialogues.json');
+  try {
+    final String response =
+        await rootBundle.loadString('assets/dialogues.json');
 
-      // Si ha començat una altra càrrega després, ignorem aquesta
-      if (currentLoadId != _loadingId) return;
+    if (currentLoadId != _loadingId) return;
 
-      final data = json.decode(response);
+    final data = json.decode(response);
 
-      if (!data.containsKey(characterKey)) return;
+    if (!data.containsKey(characterKey)) return;
 
-      final List<String> dialogues =
-          List<String>.from(data[characterKey]["dialogues"]);
-      final List<String> images = List<String>.from(data[characterKey]["images"]);
+    final List<String> dialogues =
+        List<String>.from(data[characterKey]["dialogues"]);
+    final List<String> images = List<String>.from(data[characterKey]["images"]);
 
-      // Comprovem novament abans d'actualitzar
-      if (currentLoadId == _loadingId) {
-        _dialogues = dialogues;
-        _characterImages = images;
-        _dialogIndex = 0;
-        _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
-        _currentCharacter = characterKey;
-        notifyListeners();
-      }
-    } catch (e) {
-      // Opcional: gestió d'errors
-      if (currentLoadId == _loadingId) {
-        print("Error carregant diàleg: $e");
-      }
+    if (currentLoadId == _loadingId) {
+      _dialogues = dialogues;
+      _characterImages = images;
+      _dialogIndex = 0;
+      _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
+      _currentCharacter = characterKey;
+      _dialogueLoaded = true; // <- Marquem com a carregat
+      notifyListeners();
+    }
+  } catch (e) {
+    if (currentLoadId == _loadingId) {
+      print("Error carregant diàleg: $e");
     }
   }
+}
+
 
   void nextDialogue() {
     if (_dialogues.isEmpty || _characterImages.isEmpty) return;
