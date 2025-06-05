@@ -178,26 +178,6 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     }
   }
 
-  void setMaxEnemyHealth(int maxHealth) {
-    _maxEnemyHealth = maxHealth;
-    notifyListeners();
-  }
-
-  void setMaxAllyHealth(int maxHealth) {
-    _maxAllyHealth = maxHealth;
-    notifyListeners();
-  }
-
-  void resetHealth() {
-    if (_selectedSkin != null && _maxEnemyHealth != null) {
-      _selectedSkin!.currentHealth = _maxEnemyHealth!;
-    }
-    if (_selectedSkinAliat != null && _maxAllyHealth != null) {
-      _selectedSkinAliat!.currentHealth = _maxAllyHealth!;
-    }
-    notifyListeners();
-  }
-
   Future<void> fetchEnemyPoints() async {
     try {
       final prefs = await SharedPreferences.getInstance();

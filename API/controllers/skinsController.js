@@ -108,15 +108,16 @@ exports.getSkinUsuariPerId = async (req, res) => {
         `, [req.params.id, req.params.skin_id]);
 
         if (rows.length > 0) {
-            res.send(rows);
+            res.json(rows);
         } else {
-            res.send("No s'ha trobat la skin per a aquest usuari");
+            res.status(404).json({ error: "No s'ha trobat la skin per a aquest usuari" });
         }
     } catch (err) {
         console.error(err);
-        res.status(500).send('Error en la consulta');
+        res.status(500).json({ error: 'Error en la consulta' });
     }
 };
+
 
 
 /**
