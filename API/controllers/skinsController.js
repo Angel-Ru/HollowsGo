@@ -857,7 +857,7 @@ exports.seleccionarSkinAleatoria = async (req, res) => {
  *       500:
  *         description: Error en la consulta.
  */
-    exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
+exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
   try {
     const connection = await connectDB();
     const userId = req.params.id;
