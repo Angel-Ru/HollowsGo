@@ -294,63 +294,161 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   Widget _buildMonedesPage() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 150, left: 24, right: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  return Padding(
+    padding: const EdgeInsets.only(top: 150, left: 24, right: 24),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.75),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.green.withOpacity(0.7),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.green.withOpacity(0.15),
+                offset: Offset(0, 2),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.local_mall, color: Colors.green, size: 28),
+              SizedBox(width: 8),
+              Stack(
+                children: [
+                  // Contorn verd per donar un toc "misteriós"
+                  Text(
+                    'Compra de monedes',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 2
+                        ..color = Color(0xFF1B5E20),
+                    ),
+                  ),
+                  // Text blanc per dins
+                  Text(
+                    'Compra de monedes',
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.green.withOpacity(0.4),
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 10),
+        _monedaOption("100 monedes", "0,99 €"),
+        _monedaOption("500 monedes", "4,49 €"),
+        _monedaOption("1000 monedes", "7,99 €"),
+        _monedaOption("1500 monedes", "12,99 €"),
+      ],
+    ),
+  );
+}
+
+Widget _monedaOption(String title, String priceDisplay) {
+  final priceValue =
+      priceDisplay.replaceAll('€', '').replaceAll(',', '.').trim();
+
+  final puntsComprats = int.tryParse(title.split(' ').first) ?? 0;
+
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaypalPaymentScreen(
+            totalAmount: priceValue,
+            itemName: title,
+            puntsComprats: puntsComprats,
+          ),
+        ),
+      );
+    },
+    child: Container(
+      margin: EdgeInsets.only(bottom: 14),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.black.withOpacity(0.7),
+            Colors.black.withOpacity(0.4),
+            Colors.green.withOpacity(0.5), // només un petit toc de verd
+          ],
+          stops: [0.0, 0.9, 1.0], // 90% negre, 10% verd
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.green.withOpacity(0.6),
+          width: 1.3,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            offset: Offset(0, 2),
+            blurRadius: 6,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          Row(
+            children: [
+              Icon(Icons.monetization_on, color: Colors.green, size: 20),
+              SizedBox(width: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.white.withOpacity(0.95),
+                ),
+              ),
+            ],
+          ),
           Text(
-            'Compra de monedes',
+            priceDisplay,
             style: TextStyle(
-              fontSize: 28,
-              color: Colors.white,
+              color: Colors.green,
               fontWeight: FontWeight.bold,
+              fontSize: 16,
               shadows: [
                 Shadow(
-                  offset: Offset(2, 2),
-                  blurRadius: 4.0,
-                  color: Colors.black.withOpacity(0.7),
+                  blurRadius: 4,
+                  color: Colors.green.withOpacity(0.5),
+                  offset: Offset(0, 1),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 30),
-          _monedaOption("100 monedes", "0,99 €"),
-          _monedaOption("500 monedes", "4,49 €"),
-          _monedaOption("1000 monedes", "7,99 €"),
-          _monedaOption("1500 monedes", "14,99 €"),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _monedaOption(String title, String priceDisplay) {
-    final priceValue =
-        priceDisplay.replaceAll('€', '').replaceAll(',', '.').trim();
 
-    final puntsComprats = int.tryParse(title.split(' ').first) ?? 0;
-
-    return Card(
-      color: Colors.white.withOpacity(0.85),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        trailing: Text(priceDisplay,
-            style: TextStyle(color: Colors.green, fontSize: 16)),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PaypalPaymentScreen(
-                totalAmount: priceValue,
-                itemName: title,
-                puntsComprats: puntsComprats,
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
 }
