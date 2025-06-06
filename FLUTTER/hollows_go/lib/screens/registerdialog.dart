@@ -98,7 +98,7 @@ class _RegisterDialogState extends State<RegisterDialog> {
         final user = responseData['user'];
         final token = responseData['token'];
 
-       
+        await _clearPreferences();
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
@@ -110,14 +110,8 @@ class _RegisterDialogState extends State<RegisterDialog> {
         await prefs.setString('token', token);
 
         _showToast("T'has registrat correctament");
-
-        final userProvider = Provider.of<UserProvider>(context, listen: false);
-        final skinsprovider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-        userProvider.loadUserData();
-        skinsprovider.getSkinSeleccionada(userProvider.userId);
-        print(userProvider.userId);
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomeScreen()),
+          MaterialPageRoute(builder: (_) => TutorialScreen()),
         );
       } else {
         final errorMsg = responseData['message'] ?? "Error desconegut";

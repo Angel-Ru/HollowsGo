@@ -15,10 +15,8 @@ class DefeatDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      // 👈 Esto asegura el centrado vertical y horizontal
       child: Dialog(
-        insetPadding: const EdgeInsets.symmetric(
-            horizontal: 40), // 👈 Opcional: controla el tamaño
+        insetPadding: const EdgeInsets.symmetric(horizontal: 40),
         backgroundColor: Colors.black.withOpacity(0.5),
         child: Container(
           padding: const EdgeInsets.all(24),
@@ -40,7 +38,7 @@ class DefeatDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "💀 Has perdut...",
+                "Has perdut en combat, cura't les ferides",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -50,11 +48,12 @@ class DefeatDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),
-              const CircleAvatar(
-                backgroundColor: Colors.transparent,
-                radius: 50,
-                backgroundImage: NetworkImage(
-                  'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254233/COMBATSCREEN/yhh1xy0qy4lumw9v7jtd.png',
+              SizedBox(
+                width: 200,
+                height: 200,
+                child: Image.asset(
+                  'lib/images/Kon.gif',
+                  fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 30),
