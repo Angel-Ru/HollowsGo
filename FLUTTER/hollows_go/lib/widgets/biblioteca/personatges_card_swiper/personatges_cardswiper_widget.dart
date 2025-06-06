@@ -66,6 +66,22 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   }
 
   @override
+void didUpdateWidget(covariant PersonatgesCardSwiper oldWidget) {
+  super.didUpdateWidget(oldWidget);
+
+  if (oldWidget.personatge.id != widget.personatge.id) {
+    // Reinicializa todo lo que haces en initState relacionado con el personaje
+    _currentPage = 0;
+    _skinHealthController.carregarVidaPerSkinsAroundPage(
+      widget.personatge.skins,
+      _currentPage,
+    );
+    // Si necesitas reinicializar otras cosas, hazlo aquí
+  }
+}
+
+
+  @override
   void dispose() {
     _pageController.removeListener(_onPageChanged);
     _pageController.dispose();
@@ -230,6 +246,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   }
 
   Widget _buildBarraVida(int skinId) {
+    print( skinId);
     final vida = _skinHealthController.getVida(skinId);
     final Skin? skin = widget.personatge.skins.firstWhere(
       (s) => s.id == skinId,
