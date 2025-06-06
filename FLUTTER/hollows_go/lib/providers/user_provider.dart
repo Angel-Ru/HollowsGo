@@ -28,13 +28,13 @@ class UserProvider with ChangeNotifier {
   String? get skinPreferidaimatge => _skinPreferidaimatge;
 
   UserProvider() {
-    _loadUserData();
+    loadUserData();
   }
 
   get skinPreferidaNom => null;
 
   // LOAD ALL USER DATA
-  Future<void> _loadUserData() async {
+  Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _coinCount = prefs.getInt('userPunts') ?? 0;
     _username = prefs.getString('userName') ?? 'Usuari';
@@ -118,48 +118,61 @@ class UserProvider with ChangeNotifier {
   }
 
   Future<void> fetchFavoritePersonatgeSkin() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      int? userId = prefs.getInt('userId');
-      String? token = prefs.getString('token');
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('userId');
+    String? token = prefs.getString('token');
 
-      if (userId == null || token == null) return;
+    if (userId == null || token == null) return;
 
-      final url = Uri.parse('https://${Config.ip}/perfils/preferit/$userId');
-      final headers = {
-        'Authorization': 'Bearer $token',
-      };
+    final url = Uri.parse('https://${Config.ip}/perfils/preferit/$userId');
+    final headers = {
+      'Authorization': 'Bearer $token',
+    };
 
-      final response = await http.get(url, headers: headers);
+    final response = await http.get(url, headers: headers);
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
 
-        // Actualizar ambos valores (personaje y skin preferidos)
-        _personatgePreferitId = data['personatge_preferit'] ?? 0;
-        _skinPreferidaId = data['skin_preferida_id'] ?? 0;
-        _personatgepreferitnom = data['nom'];
-        _skinPreferidaimatge = data['imatge'];
+      _personatgePreferitId = data['personatge_preferit'] ?? 0;
+      _skinPreferidaId = data['skin_preferida_id'] ?? 0;
+      _personatgepreferitnom = data['nom'] ?? '';
+      _skinPreferidaimatge = data['imatge'] ?? '';
 
-        print('Personaje favorito actualizado: $_personatgePreferitId');
-        print('Skin favorita actualizada: $_skinPreferidaId');
+      print('Personatge favorit actualitzat: $_personatgePreferitId');
+      print('Skin favorita actualitzada: $_skinPreferidaId');
 
-        notifyListeners();
-      } else {
-        print('Error en fetchFavoritePersonatge: ${response.statusCode}');
-        // Opcional: resetear valores si hay error
-        _personatgePreferitId = 0;
-        _skinPreferidaId = 0;
-        notifyListeners();
-      }
-    } catch (error) {
-      print('Error en fetchFavoritePersonatge: $error');
-      // Opcional: resetear valores si hay excepción
+      notifyListeners();
+    } else if (response.statusCode == 404) {
+      // Si 404, assigna valors "buits" o null
+      _personatgePreferitId = null;
+      _skinPreferidaId = null;
+      _personatgepreferitnom = "";
+      _skinPreferidaimatge = "";
+
+      print('No s\'ha trobat cap personatge o skin preferida (404). Assignats valors nuls.');
+
+      notifyListeners();
+    } else {
+      print('Error en fetchFavoritePersonatge: ${response.statusCode}');
+      // Opcional: resetear valores si hay error
       _personatgePreferitId = 0;
       _skinPreferidaId = 0;
+      _personatgepreferitnom = "";
+      _skinPreferidaimatge = "";
       notifyListeners();
     }
+  } catch (error) {
+    print('Error en fetchFavoritePersonatge: $error');
+    _personatgePreferitId = 0;
+    _skinPreferidaId = 0;
+    _personatgepreferitnom = "";
+    _skinPreferidaimatge = "";
+    notifyListeners();
   }
+}
+
 
   Future<bool> updatePersonatgePreferit(int personatgeId) async {
     try {

@@ -183,6 +183,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   }
 
   Future<void> _showLoginDialog(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -194,6 +195,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     if (result == true) {
       await AudioService.instance.fadeOut();
       if (mounted) {
+        userProvider.loadUserData();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => HomeScreen()),
         );

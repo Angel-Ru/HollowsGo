@@ -88,8 +88,12 @@ class _HomeScreenState extends State<HomeScreen>
       Provider.of<VialsProvider>(context, listen: false)
           .fetchVials(userProvider.userId);
 
-      Provider.of<DialogueProvider>(context, listen: false)
-          .loadDialogueFromJson("ichigo");
+      final dialogueProvider =
+          Provider.of<DialogueProvider>(context, listen: false);
+
+      if (!dialogueProvider.dialogueLoaded) {
+        dialogueProvider.loadDialogueFromJson("ichigo");
+      }
 
       await _controller.loadUserData();
       final selectedProvider =

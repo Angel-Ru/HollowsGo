@@ -54,6 +54,7 @@ dependencies:
   card_swiper: ^3.0.1
   flutter_paypal: ^0.2.1
   webview_flutter: ^4.4.2
+  collection: ^1.17.2
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"

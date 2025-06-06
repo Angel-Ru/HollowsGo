@@ -7,7 +7,6 @@ class SkinCard extends StatelessWidget {
   final Skin skin;
   final bool isSelected;
   final bool isFavorite;
-  final bool isEnemyMode;
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
   final VoidCallback? onLongPress;
@@ -21,7 +20,6 @@ class SkinCard extends StatelessWidget {
     required this.skin,
     required this.isSelected,
     required this.isFavorite,
-    required this.isEnemyMode,
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
@@ -38,9 +36,9 @@ class SkinCard extends StatelessWidget {
     return FractionallySizedBox(
       widthFactor: 0.9,
       child: GestureDetector(
-        onTap: isEnemyMode ? null : onTap,
-        onDoubleTap: isEnemyMode ? null : onDoubleTap,
-        onLongPress: isEnemyMode ? null : onLongPress,
+        onTap: onTap,
+        onDoubleTap: onDoubleTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Container(
@@ -109,19 +107,19 @@ class SkinCard extends StatelessWidget {
                           color: activeColor, size: 28),
                     ),
                   // Botó vial
-                  if (!isEnemyMode)
-                    Positioned(
-                      bottom: 60,
-                      left: 8,
-                      child: GestureDetector(
-                        onTap: onVialPressed,
-                        child: const CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.green,
-                          child: Icon(Icons.healing, color: Colors.white),
-                        ),
+
+                  Positioned(
+                    bottom: 60,
+                    left: 8,
+                    child: GestureDetector(
+                      onTap: onVialPressed,
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.green,
+                        child: Icon(Icons.healing, color: Colors.white),
                       ),
                     ),
+                  ),
                   // Nom i estrelles
                   Positioned(
                     bottom: 0,
