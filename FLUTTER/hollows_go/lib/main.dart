@@ -2,7 +2,7 @@ import 'package:hollows_go/providers/missions_provider.dart';
 import 'package:hollows_go/service/audioservice.dart';
 
 import 'imports.dart';
-import 'providers/habilitat_provider.dart';
+
 
 /*
 Aquesta és la classe Main. En aquesta classe es creen les rutes anomenades de l'aplicació i es defineix el tema.
