@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CombatProvider()),
         ChangeNotifierProvider(create: (_) => VialsProvider()),
         ChangeNotifierProvider(create: (_) => HabilitatProvider()),
-        ChangeNotifierProvider(create: (_) => MissionsProvider())
+        ChangeNotifierProvider(create: (_) => MissionsProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -14,10 +14,10 @@ router.post('/skindia', verificacioUsuari.verifyToken, skinsController.skinDelDi
 router.post('/skindia/comprar', verificacioUsuari.verifyToken, skinsController.comprarSkin)
 
 // Ruta per obtenir tots els quincys amb les seves skins de l'usuari
-router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariQuincy);
+router.get('/biblioteca/quincys/:id',skinsController.getPersonatgesAmbSkinsPerUsuariQuincy);
 
 //Ruta per obtenir tots els enemics amb les seves skins de l'usuari
-router.get('/biblioteca/enemics/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariEnemics);
+router.get('/biblioteca/enemics/:id',skinsController.getPersonatgesAmbSkinsPerUsuariEnemics);
 
 router.get('/fragments/:nom', verificacioUsuari.verifyToken, skinsController.getFragmentsSkinsUsuari);
 
