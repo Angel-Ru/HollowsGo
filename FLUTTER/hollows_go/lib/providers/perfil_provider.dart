@@ -35,13 +35,27 @@ class PerfilProvider with ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        _partidesJugades =
-            int.tryParse(data['partides_jugades'].toString()) ?? 0;
-        _partidesGuanyades =
-            int.tryParse(data['partides_guanyades'].toString()) ?? 0;
-        _nombrePersonatges = data['nombre_personatges'] ?? 0;
-        _nombreSkins = int.tryParse(data['nombre_skins'].toString()) ?? 0;
+        final body = response.body;
+        print("Resposta del servidor: $body");
+
+        if (body.isEmpty) {
+          print("El body està buit. Assignant valors per defecte.");
+          _partidesJugades = 0;
+          _partidesGuanyades = 0;
+          _nombrePersonatges = 0;
+          _nombreSkins = 0;
+        } else {
+          final data = json.decode(body);
+
+          _partidesJugades =
+              int.tryParse(data['partides_jugades']?.toString() ?? '0') ?? 0;
+          _partidesGuanyades =
+              int.tryParse(data['partides_guanyades']?.toString() ?? '0') ?? 0;
+          _nombrePersonatges =
+              int.tryParse(data['nombre_personatges']?.toString() ?? '0') ?? 0;
+          _nombreSkins =
+              int.tryParse(data['nombre_skins']?.toString() ?? '0') ?? 0;
+        }
 
         notifyListeners();
       } else {

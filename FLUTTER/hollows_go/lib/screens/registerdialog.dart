@@ -18,24 +18,22 @@ class _RegisterDialogState extends State<RegisterDialog> {
   bool _isLoading = false;
 
   @override
-void initState() {
-  super.initState();
-  AudioService.instance.pause(); // 👈 Pausar música en obrir el registre
-}
-
+  void initState() {
+    super.initState();
+    AudioService.instance.pause(); // 👈 Pausar música en obrir el registre
+  }
 
   @override
-void dispose() {
-  _usernameController.dispose();
-  _emailController.dispose();
-  _passwordController.dispose();
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
 
-  // Només reprendre si seguim a la PreHomeScreen
-  AudioService.instance.resume(); // 👈 Reprendre música si tanca el registre
+    // Només reprendre si seguim a la PreHomeScreen
+    AudioService.instance.resume(); // 👈 Reprendre música si tanca el registre
 
-  super.dispose();
-}
-
+    super.dispose();
+  }
 
   Future<void> _clearPreferences() async {
     final prefs = await SharedPreferences.getInstance();
@@ -63,69 +61,74 @@ void dispose() {
   }
 
   Future<void> _register() async {
-  final username = _usernameController.text.trim();
-  final email = _emailController.text.trim();
-  final password = _passwordController.text.trim();
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
 
-  if (username.isEmpty || email.isEmpty || password.isEmpty) {
-    _showToast("Tots els camps són obligatoris");
-    return;
-  }
-
-  if (!_isEmailValid(email)) {
-    _showToast("El correu electrònic no és vàlid");
-    return;
-  }
-
-  if (!_isPasswordValid(password)) {
-    _showToast("La contrasenya ha de tenir almenys 6 caràcters");
-    return;
-  }
-
-  setState(() => _isLoading = true);
-
-  final url = Uri.parse('https://${Config.ip}/usuaris/');
-  final headers = {'Content-Type': 'application/json'};
-  final body = jsonEncode({
-    "nom": username,
-    "email": email,
-    "contrassenya": password,
-  });
-
-  try {
-    final response = await http.post(url, headers: headers, body: body);
-    final responseData = jsonDecode(response.body);
-
-    if (response.statusCode == 201) {
-      final user = responseData['user'];
-      final token = responseData['token'];
-
-      await _clearPreferences();
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      await prefs.setInt('userId', user['id']);
-      await prefs.setString('userEmail', user['email']);
-      await prefs.setString('userName', user['nom']);
-      await prefs.setInt('userPunts', user['punts_emmagatzemats']);
-      await prefs.setInt('userTipo', user['tipo']);
-      await prefs.setString('token', token);
-
-      _showToast("T'has registrat correctament");
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-      );
-    } else {
-      final errorMsg = responseData['message'] ?? "Error desconegut";
-      _showToast("Error: $errorMsg");
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      _showToast("Tots els camps són obligatoris");
+      return;
     }
-  } catch (e) {
-    _showToast("Error de connexió: $e");
-  } finally {
-    setState(() => _isLoading = false);
-  }
-}
 
+    if (!_isEmailValid(email)) {
+      _showToast("El correu electrònic no és vàlid");
+      return;
+    }
+
+    if (!_isPasswordValid(password)) {
+      _showToast("La contrasenya ha de tenir almenys 6 caràcters");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final url = Uri.parse('https://${Config.ip}/usuaris/');
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({
+      "nom": username,
+      "email": email,
+      "contrassenya": password,
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        final user = responseData['user'];
+        final token = responseData['token'];
+
+       
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setInt('userId', user['id']);
+        await prefs.setString('userEmail', user['email']);
+        await prefs.setString('userName', user['nom']);
+        await prefs.setInt('userPunts', user['punts_emmagatzemats']);
+        await prefs.setInt('userTipo', user['tipo']);
+        await prefs.setString('token', token);
+
+        _showToast("T'has registrat correctament");
+
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        final skinsprovider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
+        userProvider.loadUserData();
+        skinsprovider.getSkinSeleccionada(userProvider.userId);
+        print(userProvider.userId);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => HomeScreen()),
+        );
+      } else {
+        final errorMsg = responseData['message'] ?? "Error desconegut";
+        _showToast("Error: $errorMsg");
+      }
+    } catch (e) {
+      _showToast("Error de connexió: $e");
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,11 +189,14 @@ void dispose() {
                     obscureText: !_isPasswordVisible,
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: Color.fromARGB(233, 255, 255, 255),
                       ),
                       onPressed: () {
-                        setState(() => _isPasswordVisible = !_isPasswordVisible);
+                        setState(
+                            () => _isPasswordVisible = !_isPasswordVisible);
                       },
                     ),
                   ),
@@ -204,7 +210,8 @@ void dispose() {
                         onPressed: () => Navigator.of(context).pop(),
                         child: const Text(
                           'Cancel·la',
-                          style: TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
+                          style: TextStyle(
+                              color: Color.fromARGB(233, 255, 255, 255)),
                         ),
                       ),
                       ElevatedButton(
@@ -212,7 +219,8 @@ void dispose() {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orangeAccent.shade200,
                           foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
