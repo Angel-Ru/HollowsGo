@@ -84,7 +84,7 @@ class MarkerHelper {
       return Marker(
         markerId: MarkerId('enemy_$index'),
         position: randomPoint,
-        infoWindow: InfoWindow(title: 'Punt Aleatori $index'),
+        infoWindow: InfoWindow(title: 'Hollow nº $index'),
         icon: BitmapDescriptor.fromBytes(iconBytes),
         onTap: () {
           Navigator.push(
