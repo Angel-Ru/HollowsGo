@@ -1,5 +1,3 @@
-import 'package:hollows_go/widgets/custom_loading_indicator.dart';
-
 import '../../imports.dart';
 
 class PerfilAvatar extends StatelessWidget {
@@ -27,10 +25,29 @@ class PerfilAvatar extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           // Barra de progreso circular (fondo)
-          SizedBox(width: 130, height: 130, child: CustomLoadingIndicator()),
+          SizedBox(
+            width: 130,
+            height: 130,
+            child: CircularProgressIndicator(
+              value: 1.0,
+              strokeWidth: 6,
+              backgroundColor: Colors.grey.withOpacity(0.3),
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(Colors.grey.withOpacity(0.1)),
+            ),
+          ),
 
           // Barra de progreso circular (relleno)
-          SizedBox(width: 130, height: 130, child: CustomLoadingIndicator()),
+          SizedBox(
+            width: 130,
+            height: 130,
+            child: CircularProgressIndicator(
+              value: progress,
+              strokeWidth: 6,
+              backgroundColor: Colors.transparent,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+            ),
+          ),
 
           // Avatar
           Container(
