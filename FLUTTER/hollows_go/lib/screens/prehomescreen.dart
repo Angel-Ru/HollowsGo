@@ -7,7 +7,7 @@ class PreHomeScreen extends StatefulWidget {
 }
 
 class _PreHomeScreenState extends State<PreHomeScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final List<String> imagePaths = [
     'lib/images/imatges_prehomescreen/0c7569c5931f07a4fbce4e1dd58f9684.jpg',
     'lib/images/imatges_prehomescreen/28bee056b92ef5af41ab8d7cc6f6949a.jpg',
@@ -30,6 +30,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
 
     final random = Random();
     randomBackground = imagePaths[random.nextInt(imagePaths.length)];
@@ -54,6 +56,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     _startAutoScroll(_scrollControllerTop);
     _startAutoScroll(_scrollControllerBottom);
 
+    // Inicia la música
     AudioService.instance.playScreenMusic('prehome');
 
     Provider.of<DialogueProvider>(context, listen: false)
@@ -62,10 +65,21 @@ class _PreHomeScreenState extends State<PreHomeScreen>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _controller.dispose();
     _scrollControllerTop.dispose();
     _scrollControllerBottom.dispose();
     super.dispose();
+  }
+
+  // Control del cicle de vida de l'app per pausar o reproduir música
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      AudioService.instance.playScreenMusic('prehome');
+    } else if (state == AppLifecycleState.paused) {
+      AudioService.instance.pause();
+    }
   }
 
   void _startAutoScroll(ScrollController scrollController) {
@@ -112,7 +126,8 @@ class _PreHomeScreenState extends State<PreHomeScreen>
           bool wentToHome = await _checkLogin();
           if (!wentToHome) {
             await _showLoginDialog(context);
-            await AudioService.instance.resume();
+            // No cridem resume aquí per evitar que soni si el diàleg està obert
+            // La música es reprèn només quan la pantalla torni a estar activa (resume)
           }
         },
         child: Stack(
@@ -164,7 +179,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 ],
               ),
             ),
-            // Afegeix aquest widget per mostrar la versió
             Positioned(
               right: 10,
               bottom: 10,
@@ -200,8 +214,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
           MaterialPageRoute(builder: (_) => HomeScreen()),
         );
       }
-    } else {
-      await AudioService.instance.resume();
     }
+    
   }
 }
