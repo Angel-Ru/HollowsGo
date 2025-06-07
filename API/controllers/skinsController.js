@@ -1337,46 +1337,36 @@ exports.getPersonatgesAmbSkinsPerUsuariQuincy = async (req, res) => {
       WHERE b.user_id = ? AND s.raça = 0
     `, [userId, userId]);
 
-    // Recollir els IDs de les skins
     const skinIds = skinsResult.map(skin => skin.skin_id);
 
     if (skinIds.length > 0) {
-      // Crear placeholders dinàmics per la consulta IN
       const placeholders = skinIds.map(() => '?').join(',');
       const params = [userId, ...skinIds];
 
-      // Consultar quins registres d'usuari_skin_armes ja existeixen
+      // Consultar quins registres ja existeixen
       const [usuarisSkinsRecords] = await connection.execute(`
         SELECT skin, usuari, vida_actual FROM USUARI_SKIN_ARMES WHERE usuari = ? AND skin IN (${placeholders})
       `, params);
 
       const usuariSkinMap = new Map();
       usuarisSkinsRecords.forEach(rec => {
-        usuariSkinMap.set(rec.skin, rec.vida_actual);
+        usuariSkinMap.set(Number(rec.skin), rec.vida_actual);
       });
 
-      // Per cada skin, insertar o actualitzar si cal
       for (const skin of skinsResult) {
         const vidaMaxima = (personatgesResult.find(p => p.personatge_id === skin.personatge_id)?.vida_base) || 100;
 
-        if (!usuariSkinMap.has(skin.skin_id)) {
-          // No hi ha registre: insert
-          await connection.execute(`
-            INSERT INTO USUARI_SKIN_ARMES (usuari, skin, vida_actual) VALUES (?, ?, ?)
-          `, [userId, skin.skin_id, vidaMaxima]);
+        const vidaActual = (usuariSkinMap.has(Number(skin.skin_id)) && usuariSkinMap.get(Number(skin.skin_id)) !== null)
+          ? usuariSkinMap.get(Number(skin.skin_id))
+          : vidaMaxima;
 
-          skin.vida_actual = vidaMaxima;
-        } else if (usuariSkinMap.get(skin.skin_id) === null) {
-          // Registre existent però vida_actual null: update
-          await connection.execute(`
-            UPDATE USUARI_SKIN_ARMES SET vida_actual = ? WHERE usuari = ? AND skin = ?
-          `, [vidaMaxima, userId, skin.skin_id]);
+        await connection.execute(`
+          INSERT INTO USUARI_SKIN_ARMES (usuari, skin, vida_actual)
+          VALUES (?, ?, ?)
+          ON DUPLICATE KEY UPDATE vida_actual = VALUES(vida_actual)
+        `, [userId, skin.skin_id, vidaActual]);
 
-          skin.vida_actual = vidaMaxima;
-        } else {
-          // Si ja existeix i no és null, assignar el valor existent
-          skin.vida_actual = usuariSkinMap.get(skin.skin_id);
-        }
+        skin.vida_actual = vidaActual;
       }
     }
 
@@ -1652,41 +1642,35 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
       WHERE b.user_id = ? AND s.raça = 2 AND s.nom NOT LIKE '%bo%'
     `, [userId, userId]);
 
-    // Recollir els IDs de les skins
     const skinIds = skinsResult.map(skin => skin.skin_id);
 
     if (skinIds.length > 0) {
-      // Crear placeholders dinàmics per la consulta IN
       const placeholders = skinIds.map(() => '?').join(',');
       const params = [userId, ...skinIds];
 
-      // Consultar quins registres d'usuari_skin_armes ja existeixen
       const [usuarisSkinsRecords] = await connection.execute(`
         SELECT skin, usuari, vida_actual FROM USUARI_SKIN_ARMES WHERE usuari = ? AND skin IN (${placeholders})
       `, params);
 
       const usuariSkinMap = new Map();
       usuarisSkinsRecords.forEach(rec => {
-        usuariSkinMap.set(rec.skin, rec.vida_actual);
+        usuariSkinMap.set(Number(rec.skin), rec.vida_actual);
       });
 
-      // Actualitzar o inserir segons correspongui
       for (const skin of skinsResult) {
         const vidaMaxima = (personatgesResult.find(p => p.personatge_id === skin.personatge_id)?.vida_base) || 100;
 
-        if (!usuariSkinMap.has(skin.skin_id)) {
-          await connection.execute(`
-            INSERT INTO USUARI_SKIN_ARMES (usuari, skin, vida_actual) VALUES (?, ?, ?)
-          `, [userId, skin.skin_id, vidaMaxima]);
-          skin.vida_actual = vidaMaxima;
-        } else if (usuariSkinMap.get(skin.skin_id) === null) {
-          await connection.execute(`
-            UPDATE USUARI_SKIN_ARMES SET vida_actual = ? WHERE usuari = ? AND skin = ?
-          `, [vidaMaxima, userId, skin.skin_id]);
-          skin.vida_actual = vidaMaxima;
-        } else {
-          skin.vida_actual = usuariSkinMap.get(skin.skin_id);
-        }
+        const vidaActual = (usuariSkinMap.has(Number(skin.skin_id)) && usuariSkinMap.get(Number(skin.skin_id)) !== null)
+          ? usuariSkinMap.get(Number(skin.skin_id))
+          : vidaMaxima;
+
+        await connection.execute(`
+          INSERT INTO USUARI_SKIN_ARMES (usuari, skin, vida_actual)
+          VALUES (?, ?, ?)
+          ON DUPLICATE KEY UPDATE vida_actual = VALUES(vida_actual)
+        `, [userId, skin.skin_id, vidaActual]);
+
+        skin.vida_actual = vidaActual;
       }
     }
 
@@ -1736,6 +1720,7 @@ exports.getPersonatgesAmbSkinsPerUsuariEnemics = async (req, res) => {
     res.status(500).send('Error en la consulta');
   }
 };
+
 
 
 
@@ -1970,7 +1955,7 @@ exports.gachaMultiQU = async (req, res) => {
         const [availableSkins] = await connection.execute(`
             SELECT *
             FROM SKINS
-            WHERE raça = 3
+            WHERE raça = 0
         `);
 
         if (availableSkins.length === 0) {
