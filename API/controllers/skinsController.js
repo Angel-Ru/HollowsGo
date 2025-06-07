@@ -915,29 +915,25 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
 
       const usuariSkinMap = new Map();
       usuarisSkinsRecords.forEach(rec => {
-        usuariSkinMap.set(rec.skin, rec.vida_actual);
+        usuariSkinMap.set(Number(rec.skin), rec.vida_actual);
       });
 
-      // Insertar o actualitzar segons calgui
+      // Insertar o actualitzar segons calgui amb ON DUPLICATE KEY UPDATE
       for (const skin of skinsResult) {
         const vidaMaxima = (personatgesResult.find(p => p.personatge_id === skin.personatge_id)?.vida_base) || 100;
 
-        if (!usuariSkinMap.has(skin.skin_id)) {
-          // No hi ha registre: inserta
-          await connection.execute(`
-            INSERT INTO USUARI_SKIN_ARMES (usuari, skin, vida_actual) VALUES (?, ?, ?)
-          `, [userId, skin.skin_id, vidaMaxima]);
-          skin.vida_actual = vidaMaxima;
-        } else if (usuariSkinMap.get(skin.skin_id) === null) {
-          // Registre existent però vida_actual és null: actualitza
-          await connection.execute(`
-            UPDATE USUARI_SKIN_ARMES SET vida_actual = ? WHERE usuari = ? AND skin = ?
-          `, [vidaMaxima, userId, skin.skin_id]);
-          skin.vida_actual = vidaMaxima;
-        } else {
-          // Si ja existeix i no és null, assignar el valor existent
-          skin.vida_actual = usuariSkinMap.get(skin.skin_id);
-        }
+        // Si no hi ha valor o és null, posem la vida màxima, si no, mantenim la que hi ha
+        const vidaActual = (usuariSkinMap.has(Number(skin.skin_id)) && usuariSkinMap.get(Number(skin.skin_id)) !== null)
+          ? usuariSkinMap.get(Number(skin.skin_id))
+          : vidaMaxima;
+
+        await connection.execute(`
+          INSERT INTO USUARI_SKIN_ARMES (usuari, skin, vida_actual)
+          VALUES (?, ?, ?)
+          ON DUPLICATE KEY UPDATE vida_actual = VALUES(vida_actual)
+        `, [userId, skin.skin_id, vidaActual]);
+
+        skin.vida_actual = vidaActual;
       }
     }
 
@@ -987,6 +983,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
     res.status(500).send('Error en la consulta');
   }
 };
+
 
 
 
