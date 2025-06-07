@@ -1,21 +1,21 @@
 {
     "ichigo": {
         "dialogues": [
-            "Benvingut a HollowsGo!",
+            "Benvingut a HollowsGo: Remastered!",
             "Getsuga... Tenshō!!",
             "Sóc un shinigami substitut, com que no saps què és?",
-            "Si tens alguna pregunta, no dubtis en preguntar-me!"
+            "Si tens algun dubte, recorda que pots veure el tutorial a la configuració"
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/hazqi2qemvdeah1c9woi",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/eehrsuvitrbva44tzwju",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/qgihe9glzzho4w3gazpa",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/vttk41sr4jcazfmfbv10",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/ubdjpwv1pewa5qmak9gq",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/diqo26cusvrfw4kcpxiu",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/auuaatxjcpdat0se7u49",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/jawbmaxck3r4dx1e6feu",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ICHIGO/b0bqzj9o66ssgk9bp6yp"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_hazqi2qemvdeah1c9woi.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_eehrsuvitrbva44tzwju.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_qgihe9glzzho4w3gazpa.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_vttk41sr4jcazfmfbv10.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_ubdjpwv1pewa5qmak9gq.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_diqo26cusvrfw4kcpxiu.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_auuaatxjcpdat0se7u49.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_jawbmaxck3r4dx1e6feu.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ICHIGO_b0bqzj9o66ssgk9bp6yp.png?raw=true"
         ]
     },
     "urahara": {
@@ -27,10 +27,10 @@
             "No et preocupis per mi, sóc un venedor qualsevol."
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/URAHARA/vu4khphxooqtreujozuo",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/URAHARA/m1rszlzyunksrfor7zii",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/URAHARA/kv9v0d74fpv9ur64ke1f",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/URAHARA/rlqq6fhcymv7pchikmnc"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_URAHARA_vu4khphxooqtreujozuo.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_URAHARA_m1rszlzyunksrfor7zii.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_URAHARA_kv9v0d74fpv9ur64ke1f.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_URAHARA_rlqq6fhcymv7pchikmnc.png?raw=true"
         ]
     },
     "Mayuri": {
@@ -45,11 +45,11 @@
             "Mmm... potser aquesta és una oportunitat per fer un experiment amb tu..."
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/MAYURI/cqvcctr4govzknihn6ck",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/MAYURI/hpwcngz9uzgdjzyl5nws",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/MAYURI/vbttkwauqhvnr9r9qmox",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/MAYURI/hr9yxjpoxrobqraxl63z",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/MAYURI/krljmmyt3gbvl6cvciur"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_MAYURI_cqvcctr4govzknihn6ck.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_MAYURI_hpwcngz9uzgdjzyl5nws.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_MAYURI_vbttkwauqhvnr9r9qmox.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_MAYURI_hr9yxjpoxrobqraxl63z.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_MAYURI_krljmmyt3gbvl6cvciur.png?raw=true"
         ]
     },
     "Nel": {
@@ -63,9 +63,9 @@
             "Ichigo, vine a buscar la Nel, si us plau..."
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/NEL/umnss5uhgyskig1kkhp6",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/NEL/uidljorqcbxybbzclsg4",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/NEL/y9dk0ni8deex8ief3tlu"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_NEL_umnss5uhgyskig1kkhp6.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_NEL_uidljorqcbxybbzclsg4.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_NEL_y9dk0ni8deex8ief3tlu.png?raw=true"
         ]
     },
     "Ryuken": {
@@ -74,12 +74,12 @@
             "Sóc un dels últims Quincys.",
             "Els Quincys són enemics naturals dels Shinigamis.",
             "No sóc un guerrer. Sóc metge. Només salvo vides.",
-            "Faré de tu un vertader Quincy. Però amb una condició..."
+            "Faré de tu un vertader Quincy."
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/RYUKEN/dhotwsdtahljom1ua5bw",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/RYUKEN/uescl6o1rv50bqzjw5lv",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/RYUKEN/o6jvcyvat6pvisoerbyi"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_RYUKEN_dhotwsdtahljom1ua5bw.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_RYUKEN_uescl6o1rv50bqzjw5lv.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_RYUKEN_o6jvcyvat6pvisoerbyi.png?raw=true"
         ]
     },
     "Shinji": {
@@ -91,54 +91,107 @@
             "Estàs segur que entens què fa aquest botó?"
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/ur0cikpzpyim61tkqd2i",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/dpemq71fkvndtyvjjcmv",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/bqr6giwyx7aa4a1slsgi",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/qcjpt9nf6ynru7zo48b3",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KYORAKU/gmx9v7pklo9aptkqugqg"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KYORAKU_ur0cikpzpyim61tkqd2i.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KYORAKU_dpemq71fkvndtyvjjcmv.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KYORAKU_bqr6giwyx7aa4a1slsgi.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KYORAKU_qcjpt9nf6ynru7zo48b3.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KYORAKU_gmx9v7pklo9aptkqugqg.png?raw=true"
         ]
     },
     "tutorial": {
         "dialogues": [
-            "Hola, benvingut a Hollows Go, aquí et podràs enfrontar a Hollows i Quincies per igual, anem a explicar-te un poc com funciona.",
-            "Això es la pantalla d'Inici, aqui podràs veure una vista general de l'aplicació",
-            "A la zona d'adalt hi tenim d'esquerre a dreta, les monedes(kans), llavors els vials, i finalment el perfil",
-            "A la part d'abaix podem observar els diferents llocs de l'aplicació, ara anirem a la Tenda",
-            "A la tenda hi tenim el gacha on podem fer tirades per aconseguir un personatge, una vegada aconseguit un personatge podem anar a la biblioteca",
-            "Aqui hi tenim la biblioteca, on podem equipar-nos els personatges que aconseguim per combatre, informar-mos dels mateixos, i a part podrem emprar els vials per curar-nos. Ara anem al mapa",
-            "Aqui agafarà la nostra ubicació actual i ens sortiràn Quincies o Hollows, depenent de si es de dia o de nit, en pressionarem un per entrar en combat",
-            "Aquesta es la pantalla de combat, on ens enfronatrem a enemics poderosos, tenim el botó de lluita, i un botó secret que només funciona per certs personatges, si guanyem ens donaràn monedes",
-            "Llavors tenim el Perfil, on podrem veure les nostres estadístiques com a jugadors, també ens podrem modificar la foto de perfil, a més també podem anar a la configuració per fer uns retocs",
-            "Aquesta es la pantalla de configuració, on podrem tancar la sessió si ho desitjam i fins hi tot borrar-ne el nostre compte si ho dessitjam",
-            "Espero que t'agradi l'aventura que estàs a punt de començar. Passa-ho bé!"
+            "Hola benvingut a \"Hollows Go: Remastered\", l'experiència de HollowsGo definitiva, on viuràs una gran aventura, anem a explicar-te un poc com funciona",
+            "Això es la pantalla d'Inici, on veuràs la vista general de l'aplicació, ara et mostraré tot, abaix...  ",
+            "La barra de navegació on podem diferenciar d'esquerre a dreta.",
+            "El Mapa",
+            "La Tenda",
+            "L'Inici, que es on esteim",
+            "La Biblioteca",
+            "I el Perfil",
+            "Llavors si miram adalt veurem",
+            "Els kan o monedes del joc",
+            "Els vials curatius (cada 5 hores es regeneren amb un limit de 3)",
+            "El nom de compte i la foto, heu vist que guapo surto?",
+            "I la visualització de missions.",
+            "També hi tenim un requadre on podem veure les novetats incloses a la versió de l'aplicació, ara anem a veure la Tenda",
+            "Com podem veure a la tenda tenim 3 tipus de gacha disponibles",
+            "Shinigamis",
+            "Quincies",
+            "I els Hollows",
+            "Si llisquem el dit de dreta a esquerre",
+            "Veurem que es poden comprar monedes amb diners reals, llavors li prendré la tarjeta de credit a l'Ichigo jejeje...",
+            "Tornant a la tenda...",
+            "`Podem veure un desplegable on sortirà sempre un personatge/skin que no tinguem, els fragments s'obtenen si toquen personatges/skins repetides.",
+            "Dit això, anem a fer una tirada als Shinigamis, a veure que hem toca...",
+            "M'ha tocat la Rukia",
+            "Per poder-ho equipar, anem a la Biblioteca",
+            "Aquesta es la biblioteca",
+            "Pitijam a sobre la Rukia",
+            "I s'ens equiparà.",
+            "La barra de vida del costat es la vida actual del personatge",
+            "I el botó verd es per curar-lo amb un vial de curació en cas de que es debiliti",
+            "Si mantenim polsat a sobre del personatge",
+            "Podrem equipar-li armes a la skin",
+            "No en tinc cap de nova... Es deuen aconseguir a les misions?",
+            "Ja que esteim afegiré com a preferit el personatge i la skin",
+            "A la icona d'interrogació podem veure més informació del personatge a veure...",
+            "Aqui podem veure molta informació, a veure el personatge fa x de mal base i te un total de x vida.",
+            "Tornant a l'Inici",
+            "Ara si llisquem el dit o polsam a la visualització de les missions",
+            "Podem veure les missions diaries, les misions de personatge",
+            "Ah! i aquí tenim com aconseguir l'arma",
+            "També podem veure adalt la skin equipada que tenim, i si pitjem",
+            "Veurem les estadístiques que fa amb l'arma equipada i el seu mal base, a més de la vida i el tipus de raça que te el personatge",
+            "Ara sense més dilació estem preparats per anar al mapa",
+            "Com podem veure al mapa estic rodejat d'enemics, que com que es de dia deuen ser Quincies hauré de picar a sobre un i...",
+            "Ara et veuràs amb el poder del magnífic KON",
+            "He guanyat",
+            "Després d'aquesta magnifica victoria, anem al perfil",
+            "Al perfil hi podem veure les nostres estadístiques, també hi tenim 3 botons disponibles",
+            "El de configuració",
+            "Edició d'Avatar",
+            "Amistats",
+            "No necessito canviar-me l'avatar perquè tinc la meva cara preciosa, pero anem a veure si hem puc afegir a la Rukia d'amiga",
+            "Aquesta es la pantalla d'Amistats",
+            "A veure crec que he de pitjar al \"+\" i llavors...",
+            "Crec que el correu de la Rukia era rukia@hollowsgo.com",
+            "Siiiii, ja la tinc afegida.",
+            "A veure el seu perfil...",
+            "I per el que veig te més personatges que jo, bé anem a una altre cosa. Tornem al perfil nostre.",
+            "Per acabar mostraré la pantalla de configuració.",
+            "Aquí com podem veure...",
+            "Podem canviar el volum i l'abrillantament de la pantalla.",
+            "També podem tancar la sessió o borrar el compte",
+            "I finalment el més important, si estàs desorientat o no t'enrecordes de res, pots tornar a veure el tutorial sempre quan vulguis",
+            "Bé fins aquí arribem, aneu a derrotar tants Quincies i Hollows com pogueu, molta bauxaaa!! Adeeu!!"
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KON/migx3bo5v5yzbrnqgmjj",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KON/ell9qe5okwu4ruz2zmsg",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KON/xnpxy9phomxnjjed83hu",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KON/gimfynsavysop3jivrw5",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/KON/ekmm70ddkq8muo4asihe"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KON_migx3bo5v5yzbrnqgmjj.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KON_ell9qe5okwu4ruz2zmsg.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KON_xnpxy9phomxnjjed83hu.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KON_gimfynsavysop3jivrw5.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_KON_ekmm70ddkq8muo4asihe.png?raw=true"
         ]
     },
     "Orihime": {
         "dialogues": [
             "Hola! Què tal? Vols ser el meu amic?",
+            "Recorda que pots veure el perfil dels teus amics, clicant a sobre ells.",
             "Jo crec que tothom mereix una segona oportunitat... i una tercera!",
             "És bonic tenir amics que et facin somriure.",
             "T’imagines una amistat tan forta com el pa amb mantega? Mmmm!",
             "No importa d’on vens, si el teu cor és amable, jo t’accepto!",
             "Una vegada vaig fer galetes d’amistat... no van sortir molt bé, però era amb amor!",
-            "Si et sents sol, sempre pots comptar amb mi.",
             "L’amistat pot curar ferides que ni la meva Shun Shun Rikka pot!"
         ],
         "images": [
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/Orihime_301_saoql9",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/Orihime_315_ulahhv",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/Orihime_314_ggyqk8",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/Orihime_312_ullwvj",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/rt5q15yruhtjo61pdocq",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/Orihime_310_q8jzre",
-            "https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/DIALOGS_CHARACTERS/ORIHIME/jd5pk75dpgizvwqmk8ca"
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/Orihime_301_saoql9.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/Orihime_315_ulahhv.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/Orihime_314_ggyqk8.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/Orihime_312_ullwvj.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ORIHIME_rt5q15yruhtjo61pdocq.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/Orihime_310_q8jzre.png?raw=true",
+            "https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/DIALOGUE_CHARACTER/DIALOGS_CHARACTERS_ORIHIME_jd5pk75dpgizvwqmk8ca.png?raw=true"
         ]
     }
 }

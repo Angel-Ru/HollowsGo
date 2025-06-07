@@ -1,6 +1,9 @@
 import 'dart:ui';
 
 // Aquí importes els teus models i providers
+import 'package:hollows_go/service/audioservice.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+
 import '../imports.dart';
 
 class BibliotecaScreen extends StatefulWidget {
@@ -11,12 +14,14 @@ class BibliotecaScreen extends StatefulWidget {
 class _BibliotecaScreenState extends State<BibliotecaScreen> {
   int _currentMode = 0; // 0: Aliats, 1: Quincy, 2: Enemics
   String _randomSkinName = '';
+  late Future<void> _initLoadFuture;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _initLoadFuture = _loadUserData();
     _loadInitialDialogue();
+    AudioService.instance.playScreenMusic('biblioteca');
   }
 
   Future<void> _loadUserData() async {
@@ -25,7 +30,7 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
     if (userId == null) {
       print("No s'ha trobat l'ID de l'usuari a SharedPreferences.");
-      return;
+      throw Exception('User ID no trobat');
     }
 
     final provider =
@@ -135,10 +140,37 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _initLoadFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            backgroundColor: Colors.black,
+            body: Center(child: CustomLoadingIndicator()),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: Colors.black,
+            body: Center(
+              child: Text(
+                'Error carregant les dades.',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          );
+        }
+
+        return _buildBibliotecaContent(context);
+      },
+    );
+  }
+
+  Widget _buildBibliotecaContent(BuildContext context) {
     final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context);
     final currentPersonatges = _getCurrentPersonatges();
 
-    // Assignar la skin seleccionada segons el mode actual
     Skin? selectedSkin;
     switch (_currentMode) {
       case 0:
@@ -234,7 +266,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                       padding: const EdgeInsets.only(bottom: 20),
                       child: PersonatgesCardSwiper(
                         personatge: personatge,
-                        isEnemyMode: _currentMode == 2, // Aquí corregit
                         onSkinSelected: (skin) async {
                           final provider =
                               Provider.of<SkinsEnemicsPersonatgesProvider>(
@@ -248,11 +279,9 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                             return;
                           }
 
-                          // Actualitza la skin seleccionada al backend
                           await provider.actualitzarSkinSeleccionada(
                               userId, skin.id);
 
-                          // Torna a fer els GET per refrescar les dades
                           await provider
                               .fetchPersonatgesAmbSkins(userId.toString());
                           await provider
@@ -260,15 +289,14 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           await provider.fetchPersonatgesAmbSkinsQuincys(
                               userId.toString());
 
-// Assigna la skin localment
                           setState(() {
                             if (_currentMode == 0) {
-                              provider.setSelectedSkinAliat(skin);
+                              provider.getSkinSeleccionada(userId);
                               _randomSkinName = skin.nom;
                             } else if (_currentMode == 1) {
-                              provider.setSelectedSkinQuincy(skin);
-                            } else {
-                              provider.setSelectedSkinEnemic(skin);
+                              provider.getSkinSeleccionada(userId);
+                            } else if (_currentMode == 2) {
+                              provider.getSkinSeleccionada(userId);
                             }
                           });
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -290,10 +318,8 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                             return;
                           }
 
-                          // Crida al mètode del provider per deseleccionar la skin al backend
                           await provider.llevarkinSeleccionada(userId);
 
-                          // Refresca les dades
                           await provider
                               .fetchPersonatgesAmbSkins(userId.toString());
                           await provider
@@ -301,15 +327,14 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                           await provider.fetchPersonatgesAmbSkinsQuincys(
                               userId.toString());
 
-                          // Actualitza la UI
                           setState(() {
                             if (_currentMode == 0) {
-                              provider.unselectSkinAliat();
+                              provider.llevarkinSeleccionada(userId);
                               _randomSkinName = '';
                             } else if (_currentMode == 1) {
-                              provider.unselectSkinQuincy();
-                            } else {
-                              provider.unselectSkinEnemic();
+                              provider.llevarkinSeleccionada(userId);
+                            } else if (_currentMode == 2) {
+                              provider.llevarkinSeleccionada(userId);
                             }
                           });
 
@@ -396,9 +421,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     _randomSkinName = '';
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.unselectSkinAliat();
-    provider.unselectSkinQuincy();
-    provider.unselectSkinEnemic();
 
     final dialogueProvider =
         Provider.of<DialogueProvider>(context, listen: false);

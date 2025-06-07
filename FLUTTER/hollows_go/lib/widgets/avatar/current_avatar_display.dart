@@ -41,9 +41,18 @@ class CurrentAvatarDisplay extends StatelessWidget {
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: NetworkImage(snapshot.data!),
+              Container(
+                padding: const EdgeInsets.all(0.5), // Grosor del borde
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: const Color.fromARGB(255, 92, 92, 92), width: 3),
+                ),
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundImage: NetworkImage(snapshot.data!),
+                  backgroundColor: Colors.transparent,
+                ),
               ),
             ],
           ),

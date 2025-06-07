@@ -1,3 +1,4 @@
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import 'package:hollows_go/widgets/multiskinrewarddialog.dart';
 import '../imports.dart';
 import 'tenda/skinsdestacats.dart';
@@ -12,16 +13,16 @@ class GachaBannerWidget extends StatefulWidget {
 class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   final List<List<String>> _allBannerSets = [
     [
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/dc8kvqgcrlrc0pglxy5h',
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/r1ak8j1is33rrshhvttw',
+      'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/TENDASCREEN_dc8kvqgcrlrc0pglxy5h.png?raw=true',
+      'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/TENDASCREEN_r1ak8j1is33rrshhvttw.png?raw=true',
     ],
     [
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/lllx814oz39coei2qjw2',
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/em78g2xplw170ms4opvj',
+      'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/TENDASCREEN_lllx814oz39coei2qjw2.png?raw=true',
+      'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/TENDASCREEN_em78g2xplw170ms4opvj.png?raw=true',
     ],
     [
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/esxiqu8zcrdka97pacvr',
-      'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/luibwaplkahoyqhqdeyp'
+      'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/TENDASCREEN_esxiqu8zcrdka97pacvr.png?raw=true',
+      'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/TENDASCREEN_luibwaplkahoyqhqdeyp.png?raw=true'
     ]
   ];
 
@@ -196,10 +197,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   }
 
   BorderSide getButtonBorder(int index) {
-    switch (index) {
-      default:
-        return const BorderSide(color: Colors.black, width: 2);
-    }
+    return const BorderSide(color: Colors.black, width: 2);
   }
 
   TextStyle getTextStyle(int index) {
@@ -256,7 +254,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                     return const SizedBox(
                       height: 30,
                       width: 30,
-                      child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: Center(child: CustomLoadingIndicator()),
                     );
                   },
                 ),
@@ -265,10 +263,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
+                        child: CustomLoadingIndicator(),
                       )
                     : Text(
                         label,
@@ -285,7 +280,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
   @override
   Widget build(BuildContext context) {
     const buttonImageUrl =
-        'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/OTHERS/yslqndyf4eri3f7mpl6i';
+        'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/HomeScreen/OTHERS_yslqndyf4eri3f7mpl6i.png?raw=true';
 
     return Column(
       children: [
@@ -332,8 +327,7 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
-                          return const Center(
-                              child: CircularProgressIndicator());
+                          return const Center(child: CustomLoadingIndicator());
                         },
                       ),
                     ),
@@ -414,18 +408,17 @@ class _GachaBannerWidgetState extends State<GachaBannerWidget> {
                           child: child,
                         ),
                         child: Image.network(
-                          key: ValueKey(
-                              _currentSetIndex), // clave para que cambie la imagen al cambiar índice
+                          key: ValueKey(_currentSetIndex),
                           _currentSetIndex == 1
-                              ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/wfobiwvsveiyqrb4suu6'
+                              ? 'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/Iconos_destacats/TENDASCREEN_wfobiwvsveiyqrb4suu6.png?raw=true'
                               : _currentSetIndex == 2
-                                  ? 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/uodrpjmettpywivmsnlt'
-                                  : 'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/TENDASCREEN/isxsnqgs1nox2keiluef',
+                                  ? 'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/Iconos_destacats/TENDASCREEN_uodrpjmettpywivmsnlt.png?raw=true'
+                                  : 'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Tenda/Iconos_destacats/TENDASCREEN_isxsnqgs1nox2keiluef.png?raw=true',
                           fit: BoxFit.cover,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return const Center(
-                                child: CircularProgressIndicator());
+                                child: CustomLoadingIndicator());
                           },
                         ),
                       ),

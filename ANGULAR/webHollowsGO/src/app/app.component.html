@@ -1,0 +1,19 @@
+<div class="background">
+  <div class="app-bar">
+    <div class="logo-text">HollowsGo Remastered</div>
+    <div class="nav-links">
+      <a (click)="goToInici()" class="app-bar-link">Inici</a>
+      <a (click)="goToHollowsGoInfo()" class="app-bar-link">HollowsGo</a>
+      <a (click)="goToBleachInfo()" class="app-bar-link">Bleach</a>
+      <a (click)="goToQuiSom()" class="app-bar-link">Qui som?</a>
+    </div>
+  </div>
+
+
+  <router-outlet></router-outlet>
+
+
+<button (click)="toggleMute()" class="mute-button">
+  {{ isMuted ? '🔈' : '🔇' }}
+</button>
+</div>

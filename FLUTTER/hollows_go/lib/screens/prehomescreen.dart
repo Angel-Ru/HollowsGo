@@ -7,7 +7,7 @@ class PreHomeScreen extends StatefulWidget {
 }
 
 class _PreHomeScreenState extends State<PreHomeScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   final List<String> imagePaths = [
     'lib/images/imatges_prehomescreen/0c7569c5931f07a4fbce4e1dd58f9684.jpg',
     'lib/images/imatges_prehomescreen/28bee056b92ef5af41ab8d7cc6f6949a.jpg',
@@ -30,8 +30,6 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addObserver(this);
 
     final random = Random();
     randomBackground = imagePaths[random.nextInt(imagePaths.length)];
@@ -56,37 +54,18 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     _startAutoScroll(_scrollControllerTop);
     _startAutoScroll(_scrollControllerBottom);
 
-    AudioService.instance.play(
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
-    );
+    AudioService.instance.playScreenMusic('prehome');
+
     Provider.of<DialogueProvider>(context, listen: false)
         .loadDialogueFromJson("ichigo");
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-
     _controller.dispose();
     _scrollControllerTop.dispose();
     _scrollControllerBottom.dispose();
-
-    AudioService.instance.stop(); // Per si de cas l'usuari surt abans
-
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.paused) {
-      // App va a background, pausa la música
-      AudioService.instance.pause();
-    } else if (state == AppLifecycleState.resumed) {
-      // App torna a foreground, reprèn la música
-      AudioService.instance.resume();
-    }
   }
 
   void _startAutoScroll(ScrollController scrollController) {
@@ -145,9 +124,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
               ),
             ),
             Positioned.fill(
-              child: Container(
-                color: Colors.black.withOpacity(0.4),
-              ),
+              child: Container(color: Colors.black.withOpacity(0.4)),
             ),
             Center(
               child: Column(
@@ -187,6 +164,18 @@ class _PreHomeScreenState extends State<PreHomeScreen>
                 ],
               ),
             ),
+            // Afegeix aquest widget per mostrar la versió
+            Positioned(
+              right: 10,
+              bottom: 10,
+              child: Text(
+                "v1.0",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -194,6 +183,7 @@ class _PreHomeScreenState extends State<PreHomeScreen>
   }
 
   Future<void> _showLoginDialog(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -203,8 +193,9 @@ class _PreHomeScreenState extends State<PreHomeScreen>
     );
 
     if (result == true) {
-      await AudioService.instance.stop();
+      await AudioService.instance.fadeOut();
       if (mounted) {
+        userProvider.loadUserData();
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => HomeScreen()),
         );

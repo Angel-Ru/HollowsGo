@@ -1,0 +1,73 @@
+/* Contenidor principal */
+.container {
+  max-width: 600px;
+  background: rgba(20, 20, 20, 0.75);
+  border: 2px solid #e18a36;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow:
+    0 0 15px rgba(225, 138, 54, 0.3),
+    0 0 25px rgba(225, 138, 54, 0.2);
+  text-align: center;
+  color: #f0f0f0;
+  justify-self: center;
+  z-index: 2;
+  margin-bottom: env(safe-area-inset-bottom, 0px); /* Respecta l'app bar */
+}
+
+.logo {
+  max-width: 480px;
+  width: 100%;
+  height: auto;
+  margin: 2.5rem auto 2rem auto;
+  display: block;
+  animation: zoom 8s ease-in-out infinite;
+}
+
+h2 {
+  font-weight: 400;
+  color: #d17e2c;
+  margin-bottom: 1em;
+}
+
+p {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 2em;
+  color: #f0d6b3;
+}
+
+.btn-download {
+  background: #e18a36;
+  color: #1a1a1a;
+  font-weight: 700;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: none;
+}
+
+.btn-download:hover {
+  background: #c77220;
+  color: #fff;
+  text-decoration: none;
+}
+
+footer {
+  margin-top: 30px;
+  font-size: 0.9rem;
+  color: #cc9955;
+}
+
+/* Ajust per dispositius mòbils */
+@media (max-height: 700px) {
+  .container {
+    padding: 15px 25px;
+    transform: scale(0.9);
+  }
+}

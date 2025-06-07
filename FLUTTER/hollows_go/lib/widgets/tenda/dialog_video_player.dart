@@ -1,10 +1,17 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/service/videoservice.dart';
 import 'package:video_player/video_player.dart';
+
+// Importa el CustomLoadingIndicator
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 
 class DialogVideoPlayer {
   static VideoPlayerController? _videoController;
   static ChewieController? _chewieController;
+  static bool _isLoading = false;
+
+  static bool get isLoading => _isLoading;
 
   static Future<_VideoInitResult> initVideo({
     required Map<String, dynamic>? skin,
@@ -12,33 +19,45 @@ class DialogVideoPlayer {
   }) async {
     final videoPath = skin?['video_especial'];
     if (videoPath == null || videoPath.isEmpty) {
+      _isLoading = false;
       return _VideoInitResult(showContent: true, isReady: false);
     }
 
-    _videoController = VideoPlayerController.asset(videoPath);
-    try {
-      await _videoController!.initialize();
-      _chewieController = ChewieController(
-        videoPlayerController: _videoController!,
-        autoPlay: true,
-        looping: false,
-        showControls: false,
-        allowFullScreen: false,
-      );
+    _isLoading = true;
 
-      _videoController!.addListener(() {
-        if (_videoController!.value.position >= _videoController!.value.duration) {
-          onVideoEnd();
-        }
-      });
+    final result = await VideoService.initAssetVideo(
+      assetPath: videoPath,
+      onVideoEnd: onVideoEnd,
+      autoPlay: true,
+      looping: false,
+      allowFullScreen: false,
+      showControls: false,
+    );
 
-      return _VideoInitResult(showContent: false, isReady: true);
-    } catch (_) {
+    _isLoading = false;
+
+    if (result == null) {
       return _VideoInitResult(showContent: true, isReady: false);
     }
+
+    _videoController = result.videoController;
+    _chewieController = result.chewieController;
+
+    return _VideoInitResult(showContent: false, isReady: true);
   }
 
   static Widget build() {
+    if (_isLoading) {
+      // Mostrem el loader mentre es carrega
+      return const Center(
+        child: CustomLoadingIndicator(),
+      );
+    }
+
+    if (_videoController == null || !_videoController!.value.isInitialized) {
+      return const SizedBox.shrink(); // Per evitar errors si no està preparat
+    }
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -56,9 +75,13 @@ class DialogVideoPlayer {
   }
 
   static void dispose() {
-    _videoController?.removeListener(() {});
-    _videoController?.dispose();
-    _chewieController?.dispose();
+    VideoService.disposeControllers(
+      videoController: _videoController,
+      chewieController: _chewieController,
+    );
+    _videoController = null;
+    _chewieController = null;
+    _isLoading = false;
   }
 }
 

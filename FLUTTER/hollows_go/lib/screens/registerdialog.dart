@@ -18,24 +18,22 @@ class _RegisterDialogState extends State<RegisterDialog> {
   bool _isLoading = false;
 
   @override
-void initState() {
-  super.initState();
-  AudioService.instance.pause(); // 👈 Pausar música en obrir el registre
-}
-
+  void initState() {
+    super.initState();
+    AudioService.instance.pause(); // 👈 Pausar música en obrir el registre
+  }
 
   @override
-void dispose() {
-  _usernameController.dispose();
-  _emailController.dispose();
-  _passwordController.dispose();
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
 
-  // Només reprendre si seguim a la PreHomeScreen
-  AudioService.instance.resume(); // 👈 Reprendre música si tanca el registre
+    // Només reprendre si seguim a la PreHomeScreen
+    AudioService.instance.resume(); // 👈 Reprendre música si tanca el registre
 
-  super.dispose();
-}
-
+    super.dispose();
+  }
 
   Future<void> _clearPreferences() async {
     final prefs = await SharedPreferences.getInstance();
@@ -104,6 +102,7 @@ void dispose() {
 
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
+        await prefs.setInt('userId', user['id']);
         await prefs.setString('userEmail', user['email']);
         await prefs.setString('userName', user['nom']);
         await prefs.setInt('userPunts', user['punts_emmagatzemats']);
@@ -112,7 +111,7 @@ void dispose() {
 
         _showToast("T'has registrat correctament");
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => HomeScreen()),
+          MaterialPageRoute(builder: (_) => TutorialScreen()),
         );
       } else {
         final errorMsg = responseData['message'] ?? "Error desconegut";
@@ -184,11 +183,14 @@ void dispose() {
                     obscureText: !_isPasswordVisible,
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: Color.fromARGB(233, 255, 255, 255),
                       ),
                       onPressed: () {
-                        setState(() => _isPasswordVisible = !_isPasswordVisible);
+                        setState(
+                            () => _isPasswordVisible = !_isPasswordVisible);
                       },
                     ),
                   ),
@@ -202,7 +204,8 @@ void dispose() {
                         onPressed: () => Navigator.of(context).pop(),
                         child: const Text(
                           'Cancel·la',
-                          style: TextStyle(color: Color.fromARGB(233, 255, 255, 255)),
+                          style: TextStyle(
+                              color: Color.fromARGB(233, 255, 255, 255)),
                         ),
                       ),
                       ElevatedButton(
@@ -210,7 +213,8 @@ void dispose() {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orangeAccent.shade200,
                           foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

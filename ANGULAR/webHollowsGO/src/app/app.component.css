@@ -1,0 +1,98 @@
+/* App bar amb un degradat subtil i un toc de vidre esmerilat */
+.app-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Això manté l'espai entre logo i enllaços */
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+  z-index: 20;
+  box-shadow: 0 2px 8px rgba(40, 40, 40, 0.35);
+  border-bottom: 1px solid rgba(232, 139, 57, 0.25); /* taronja suau */
+}
+
+/* Contenidor pels enllaços de navegació */
+.nav-links {
+  display: flex;
+  gap: 20px; /* Espai entre els enllaços */
+}
+
+/* Logo-text amb estil minimalista càlid */
+.logo-text {
+  color: #d17e2c; /* taronja càlid però sense brillar */
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 1.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70%;
+  text-shadow: none; /* Eliminem el neó */
+}
+
+/* Enllaç Qui som? amb detall taronja minimalista */
+.app-bar-link {
+  color: #e18a36; /* taronja suau */
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  padding: 5px 10px;
+  transition: color 0.25s ease;
+  white-space: nowrap; /* Evita que el text es divideixi en línies */
+}
+
+.app-bar-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: #e18a36;
+  border-radius: 1px;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s ease;
+}
+
+.app-bar-link:hover {
+  color: #f0d8b3;
+}
+
+.app-bar-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Botó de mute integrat amb l’app-bar amb estil subtil */
+.mute-button {
+  position: fixed;
+  top: 70px; /* per no tapar l’app-bar */
+  right: 20px;
+  z-index: 15;
+  background: rgba(30, 30, 30, 0.7);
+  border: 1.8px solid #d17e2c; /* taronja suau */
+  border-radius: 50%;
+  color: #d17e2c;
+  font-size: 1.3rem;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.15s ease;
+  box-shadow: none;
+}
+.background {
+  padding-top: 60px;
+}
+
+.mute-button:hover {
+  background: rgba(40, 40, 40, 0.85);
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(209, 126, 44, 0.2); /* ombra taronja molt suau */
+}

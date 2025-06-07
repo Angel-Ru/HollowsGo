@@ -1,5 +1,11 @@
 import 'dart:ui';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/material.dart';
+import 'package:hollows_go/service/audioservice.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+import 'package:provider/provider.dart';
+import 'package:hollows_go/widgets/tenda/paypal_payment_widget.dart';
+
 import '../imports.dart';
 
 class TendaScreen extends StatefulWidget {
@@ -42,36 +48,35 @@ class _TendaScreenState extends State<TendaScreen> {
     'lib/images/fondo_tendascreen/Yoruichi.jpg',
   ];
   int _currentImageIndex = 0;
-  late AudioPlayer _audioPlayer;
+  bool _mostrarSkin = false;
 
   @override
   void initState() {
     super.initState();
+
     _startBackgroundRotation();
 
-    _audioPlayer = AudioPlayer();
-    _playBackgroundMusic();
+    AudioService.instance.playScreenMusic('tenda');
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
       dialogueProvider.loadDialogueFromJson('urahara');
+
+      final gachaProvider = Provider.of<GachaProvider>(context, listen: false);
+
+      // Aquí fem el fetch un cop
+      await gachaProvider.fetchFragmentsSkinsUsuari(context);
+
+      bool success = await gachaProvider.getSkinDelDia(context);
+
+      if (!success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No s\'ha pogut carregar la Skin del Dia.')),
+        );
+      }
+      setState(() {});
     });
-  }
-
-  void _playBackgroundMusic() async {
-    final List<String> musicUrls = [
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dq2skhigp8ml5kjysdl8',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/n47sbuwwhjntfd5tplpl',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/wqjoawsw8v7igikmuym4',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/nzvkinzhqcoor7hdb72n',
-      'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dtofpubrwmruyye4kajd',
-    ];
-
-    final randomUrl = (musicUrls..shuffle()).first;
-
-    await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-    await _audioPlayer.play(UrlSource(randomUrl));
   }
 
   void _startBackgroundRotation() {
@@ -87,7 +92,6 @@ class _TendaScreenState extends State<TendaScreen> {
 
   @override
   void dispose() {
-    _audioPlayer.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -113,7 +117,6 @@ class _TendaScreenState extends State<TendaScreen> {
       ),
       body: Stack(
         children: [
-          // 🔹 Fons rotatiu
           Positioned.fill(
             child: AnimatedSwitcher(
               duration: Duration(seconds: 2),
@@ -128,8 +131,6 @@ class _TendaScreenState extends State<TendaScreen> {
               ),
             ),
           ),
-
-          // 🔹 Contingut deslliçable
           Positioned.fill(
             child: PageView(
               controller: _pageController,
@@ -139,8 +140,6 @@ class _TendaScreenState extends State<TendaScreen> {
               ],
             ),
           ),
-
-          // 🔹 Diàleg i loader a la part inferior
           Padding(
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 0),
             child: Column(
@@ -153,7 +152,7 @@ class _TendaScreenState extends State<TendaScreen> {
                   bubbleColor: Color.fromARGB(212, 238, 238, 238),
                 ),
                 if (gachaProvider.isLoading)
-                  Center(child: CircularProgressIndicator()),
+                  Center(child: CustomLoadingIndicator()),
               ],
             ),
           ),
@@ -163,63 +162,293 @@ class _TendaScreenState extends State<TendaScreen> {
   }
 
   Widget _buildGachaContent(GachaProvider gachaProvider) {
+    final skin = gachaProvider.latestSkin;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Column(
       children: [
         SizedBox(height: 150),
         Padding(
           padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.15,
+            horizontal: screenWidth * 0.15,
           ),
           child: Column(
             children: [
               GachaBannerWidget(),
-              SizedBox(height: 10),
+              SizedBox(height: 5),
             ],
           ),
         ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: Container(
+            width: screenWidth * 0.65 > 600 ? 600 : screenWidth * 0.65,
+            margin: const EdgeInsets.only(right: 16),
+            child: Card(
+              color: Colors.black.withOpacity(0.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: Color(0xFF1B5E20),
+                  width: 1.5,
+                ),
+              ),
+              elevation: 8,
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      'Fragments: ${gachaProvider.latestFragmentsSkins?['fragments_skins']}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    trailing: IconButton(
+                      icon: Icon(
+                        _mostrarSkin
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _mostrarSkin = !_mostrarSkin;
+                        });
+                      },
+                    ),
+                  ),
+                  AnimatedCrossFade(
+                    firstChild: SizedBox.shrink(),
+                    secondChild: Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Column(
+                        children: [
+                          if (skin != null && skin['imatge'] != null)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                skin['imatge'],
+                                height: 115,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Icon(
+                                  Icons.broken_image,
+                                  size: 100,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            )
+                          else
+                            Container(
+                              height: 140,
+                              alignment: Alignment.center,
+                              child: Text(
+                                "El proxim pic que tornis haurà una nova skin.",
+                                style: TextStyle(color: Colors.white70),
+                              ),
+                            ),
+                          SizedBox(height: 4),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () async {
+                              if (skin == null) return;
+                              bool success =
+                                  await gachaProvider.comprarSkinDelDia(
+                                context,
+                                skin['id'],
+                                skin['personatge'],
+                              );
+                              if (success) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text("Has comprat la Skin del Dia!"),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text('x100 Frags'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    crossFadeState: _mostrarSkin
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: Duration(milliseconds: 300),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 10),
       ],
     );
   }
 
   Widget _buildMonedesPage() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 150, left: 24, right: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Compra de monedes',
-            style: TextStyle(
-              fontSize: 28,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+  return Padding(
+    padding: const EdgeInsets.only(top: 150, left: 24, right: 24),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(bottom: 16),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.75),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: Colors.green.withOpacity(0.7),
+              width: 1.5,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.green.withOpacity(0.15),
+                offset: Offset(0, 2),
+                blurRadius: 6,
+              ),
+            ],
           ),
-          SizedBox(height: 30),
-          _monedaOption("100 monedes", "0,99 €"),
-          _monedaOption("550 monedes", "4,49 €"),
-          _monedaOption("1200 monedes", "9,99 €"),
-          _monedaOption("2500 monedes", "19,99 €"),
+          child: Row(
+            children: [
+              Icon(Icons.local_mall, color: Colors.green, size: 28),
+              SizedBox(width: 8),
+              Stack(
+                children: [
+                  // Contorn verd per donar un toc "misteriós"
+                  Text(
+                    'Compra de monedes',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      foreground: Paint()
+                        ..style = PaintingStyle.stroke
+                        ..strokeWidth = 2
+                        ..color = Color(0xFF1B5E20),
+                    ),
+                  ),
+                  // Text blanc per dins
+                  Text(
+                    'Compra de monedes',
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.green.withOpacity(0.4),
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 10),
+        _monedaOption("100 monedes", "0,99 €"),
+        _monedaOption("500 monedes", "4,49 €"),
+        _monedaOption("1000 monedes", "7,99 €"),
+        _monedaOption("1500 monedes", "12,99 €"),
+      ],
+    ),
+  );
+}
+
+Widget _monedaOption(String title, String priceDisplay) {
+  final priceValue =
+      priceDisplay.replaceAll('€', '').replaceAll(',', '.').trim();
+
+  final puntsComprats = int.tryParse(title.split(' ').first) ?? 0;
+
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PaypalPaymentScreen(
+            totalAmount: priceValue,
+            itemName: title,
+            puntsComprats: puntsComprats,
+          ),
+        ),
+      );
+    },
+    child: Container(
+      margin: EdgeInsets.only(bottom: 14),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.black.withOpacity(0.7),
+            Colors.black.withOpacity(0.4),
+            Colors.green.withOpacity(0.5), // només un petit toc de verd
+          ],
+          stops: [0.0, 0.9, 1.0], // 90% negre, 10% verd
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.green.withOpacity(0.6),
+          width: 1.3,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            offset: Offset(0, 2),
+            blurRadius: 6,
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _monedaOption(String title, String price) {
-    return Card(
-      color: Colors.white.withOpacity(0.85),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-        trailing:
-            Text(price, style: TextStyle(color: Colors.green, fontSize: 16)),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Funció de compra encara no implementada')),
-          );
-        },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.monetization_on, color: Colors.green, size: 20),
+              SizedBox(width: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                  color: Colors.white.withOpacity(0.95),
+                ),
+              ),
+            ],
+          ),
+          Text(
+            priceDisplay,
+            style: TextStyle(
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              shadows: [
+                Shadow(
+                  blurRadius: 4,
+                  color: Colors.green.withOpacity(0.5),
+                  offset: Offset(0, 1),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
+
 }

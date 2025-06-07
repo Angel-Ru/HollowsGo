@@ -1,6 +1,10 @@
 import 'dart:ui';
-
+import 'package:flutter/material.dart';
+import 'package:hollows_go/service/audioservice.dart';
 import 'package:hollows_go/widgets/amistats/dialog_amic.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+import 'package:hollows_go/widgets/dialog_amic_estadistiques.dart';
+import 'package:http/http.dart' as http;
 import '../imports.dart';
 
 class AmistatsScreen extends StatefulWidget {
@@ -17,6 +21,7 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
   void initState() {
     super.initState();
     _refreshAmistats();
+    AudioService.instance.playScreenMusic('amistat');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
           Provider.of<DialogueProvider>(context, listen: false);
@@ -41,182 +46,290 @@ class _AmistatsScreenState extends State<AmistatsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(0),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          // Fons
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image:
-                    AssetImage('lib/images/amistatsscreen/amistats_fondo.png'),
-                fit: BoxFit.cover,
-              ),
+    return WillPopScope(
+      onWillPop: () async {
+        AudioService.instance.playScreenMusic('perfil');
+        return true;
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(0),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
             ),
           ),
+        ),
+        body: Stack(
+          children: [
+            // Fons
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'lib/images/tutorial_screen/fons_tutorial.jpg'),
+                  fit: BoxFit.cover,
+                  alignment: Alignment(-0.5, -0.5),
+                ),
+              ),
+            ),
+            Container(color: Colors.black.withOpacity(0.15)),
 
-          // Lluminositat suau
-          Container(color: Colors.black.withOpacity(0.15)),
-
-          // Contingut principal
-          Column(
-            children: [
-              // Capçalera translúcida
-              Padding(
-                padding: const EdgeInsets.only(top: 60, left: 16, right: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Container(
-                      padding: EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color: Colors.white.withOpacity(0.3), width: 1),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.arrow_back, color: Colors.white),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                          Text(
-                            'Les meves amistats',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+            Column(
+              children: [
+                // Capçalera
+                Padding(
+                  padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                      child: Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: Colors.white.withOpacity(0.3), width: 1),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.arrow_back, color: Colors.white),
+                              onPressed: () {
+                                AudioService.instance.playScreenMusic('perfil');
+                                Navigator.of(context).pop();
+                              },
                             ),
-                          ),
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(Icons.refresh, color: Colors.white),
-                                onPressed: _refreshAmistats,
+                            Text(
+                              'Les meves amistats',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                              IconButton(
-                                icon: Icon(Icons.add, color: Colors.white),
-                                onPressed: _showAfegirAmicDialog,
-                              ),
-                            ],
-                          ),
-                        ],
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon:
+                                      Icon(Icons.refresh, color: Colors.white),
+                                  onPressed: _refreshAmistats,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.add, color: Colors.white),
+                                  onPressed: _showAfegirAmicDialog,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-              // Llista d'amistats
-              Expanded(
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: _amistatsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: Image.asset(
-                          'assets/loading/loading.gif',
-                          width: 60,
-                          height: 60,
-                        ),
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Error carregant les amistats.',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    }
+                // Llista d'amistats
+                Expanded(
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _amistatsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CustomLoadingIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text('Error carregant les amistats.',
+                              style: TextStyle(color: Colors.white)),
+                        );
+                      }
 
-                    final amistats = snapshot.data ?? [];
+                      final amistats = snapshot.data ?? [];
 
-                    if (amistats.isEmpty) {
-                      return Center(
-                        child: Text(
-                          'No hi ha amistats disponibles.',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    }
+                      if (amistats.isEmpty) {
+                        return Center(
+                          child: Text('No hi ha amistats disponibles.',
+                              style: TextStyle(color: Colors.white)),
+                        );
+                      }
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ListView.builder(
-                        itemCount: amistats.length,
-                        itemBuilder: (context, index) {
-                          final amistat = amistats[index];
-                          final nom = amistat['nom_amic'] ?? 'Desconegut';
-                          final estat = amistat['estat'] ?? 'desconegut';
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: ListView.builder(
+                          itemCount: amistats.length,
+                          itemBuilder: (context, index) {
+                            final amistat = amistats[index];
+                            final nom = amistat['nom_amic'] ?? 'Desconegut';
+                            final estat = amistat['estat'] ?? 'desconegut';
 
-                          return Card(
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            color: Colors.white.withOpacity(0.15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundImage:
-                                    amistat['imatge_perfil_amic'] != null
-                                        ? NetworkImage(
-                                            amistat['imatge_perfil_amic'])
-                                        : null,
-                                child: amistat['imatge_perfil_amic'] == null
-                                    ? Icon(Icons.person, color: Colors.white)
+                            return Card(
+                              margin: EdgeInsets.symmetric(vertical: 8),
+                              color: Colors.white.withOpacity(0.15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage:
+                                      amistat['imatge_perfil_amic'] != null
+                                          ? NetworkImage(
+                                              amistat['imatge_perfil_amic'])
+                                          : null,
+                                  child: amistat['imatge_perfil_amic'] == null
+                                      ? Icon(Icons.person, color: Colors.white)
+                                      : null,
+                                ),
+                                title: Text(nom,
+                                    style: TextStyle(color: Colors.white)),
+                                subtitle: Text('Estat: ${estat.toUpperCase()}',
+                                    style: TextStyle(color: Colors.white70)),
+                                trailing: _estatBadge(estat),
+                                onTap: estat.toLowerCase() == 'acceptat'
+                                    ? () async {
+                                        final userProvider =
+                                            Provider.of<UserProvider>(context,
+                                                listen: false);
+                                        final idUsuari =
+                                            userProvider.userId.toString();
+                                        final idUsuariAmic =
+                                            amistat['id_usuari_amic']
+                                                    ?.toString() ??
+                                                '';
+
+                                        if (idUsuari.isEmpty ||
+                                            idUsuariAmic.isEmpty) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'No es poden carregar les estadístiques.')),
+                                          );
+                                          return;
+                                        }
+
+                                        showDialog(
+                                          context: context,
+                                          barrierDismissible: false,
+                                          builder: (_) =>
+                                              const CustomLoadingIndicator(),
+                                        );
+
+                                        final dades = await userProvider
+                                            .fetchEstadistiquesAmic(
+                                          idUsuariAmic,
+                                          idUsuari,
+                                        );
+
+                                        Navigator.of(context).pop();
+
+                                        if (dades == null) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'No s\'han pogut carregar les estadístiques.')),
+                                          );
+                                          return;
+                                        }
+
+                                        if (dades.containsKey('error') &&
+                                            dades['error'] == 'not_found') {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'No tens accés a les estadístiques d’aquest amic.')),
+                                          );
+                                          return;
+                                        }
+
+                                        // Extreiem totes les dades noves amb seguretat
+                                        final partidesJugades = int.tryParse(
+                                                dades['partides_jugades']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+                                        final partidesGuanyades = int.tryParse(
+                                                dades['partides_guanyades']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+                                        final nombrePersonatges = int.tryParse(
+                                                dades['nombre_personatges']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+                                        final nombreSkins = int.tryParse(
+                                                dades['nombre_skins']
+                                                        ?.toString() ??
+                                                    '') ??
+                                            0;
+
+                                        final personatgePreferit =
+                                            dades['nom_personatge_preferit'] ??
+                                                'Desconegut';
+                                        final imatgeSkinPreferida =
+                                            dades['imatge_skin_preferida'];
+                                        final nivell = dades['nivell'] != null
+                                            ? int.tryParse(
+                                                dades['nivell'].toString())
+                                            : null;
+                                        final nomTitol =
+                                            dades['nom_titol'] ?? 'Cap títol';
+
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              DialogAmicEstadistiques(
+                                            nom: nom,
+                                            avatarUrl:
+                                                amistat['imatge_perfil_amic'],
+                                            partidesJugades: partidesJugades,
+                                            partidesGuanyades:
+                                                partidesGuanyades,
+                                            nombrePersonatges:
+                                                nombrePersonatges,
+                                            nombreSkins: nombreSkins,
+                                            personatgePreferit:
+                                                personatgePreferit,
+                                            imatgeSkinPreferida:
+                                                imatgeSkinPreferida,
+                                            nivell: nivell,
+                                            nomTitol: nomTitol,
+                                          ),
+                                        );
+                                      }
                                     : null,
                               ),
-                              title: Text(
-                                nom,
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              subtitle: Text(
-                                'Estat: ${estat.toUpperCase()}',
-                                style: TextStyle(color: Colors.white70),
-                              ),
-                              trailing: _estatBadge(estat),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+
+            // Diàleg Inoue Orihime
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: DialogueWidget(
+                  characterName: 'Inoue Orihime',
+                  nameColor: Colors.pink,
+                  bubbleColor: Color.fromARGB(212, 238, 238, 238),
                 ),
               ),
-            ],
-          ),
-
-          // Diàleg Inoue Orihime
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: DialogueWidget(
-                characterName: 'Inoue Orihime',
-                nameColor: Colors.pink,
-                bubbleColor: Color.fromARGB(212, 238, 238, 238),
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

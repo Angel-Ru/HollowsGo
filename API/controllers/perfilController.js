@@ -204,3 +204,134 @@ exports.getallExp = async (req, res) => {
         res.status(500).send('Error en la consulta');
     }
 }
+
+exports.getTitolsComplets = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) {
+    return res.status(400).json({ error: 'Usuari invàlid' });
+  }
+
+  try {
+    const connection = await connectDB();
+
+    // Obtenim tots els títols on l’usuari ha completat missions de tipus 1
+    const [titolsCompletats] = await connection.execute(`
+      SELECT DISTINCT
+        t.id AS titol_id,
+        t.nom_titol
+      FROM MISSIONS_TITOLS mt
+      JOIN MISSIONS m ON mt.missio = m.id
+      JOIN TITOLS t ON mt.titol = t.id
+      WHERE mt.usuari = ? 
+        AND m.tipus_missio = 1 
+        AND mt.progres >= m.objectiu
+    `, [usuariId]);
+
+    if (titolsCompletats.length === 0) {
+      return res.status(200).json({ missatge: 'No hi ha títols amb missions completades per aquest usuari.' });
+    }
+
+    res.status(200).json({
+      missatge: 'Títols amb missions completades recuperats correctament',
+      titols: titolsCompletats
+    });
+
+  } catch (err) {
+    console.error('Error recuperant títols amb missions completades:', err.message);
+    res.status(500).json({ error: 'Error intern del servidor' });
+  }
+};
+
+exports.getTitolUsuari = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  if (!usuariId) {
+    return res.status(400).json({ error: 'Usuari invàlid' });
+  }
+
+  try {
+    const connection = await connectDB();
+
+    // Obtenim el titol_id de PERFIL_USUARI
+    const [rows] = await connection.execute(`
+      SELECT titol
+      FROM PERFIL_USUARI
+      WHERE usuari = ?
+    `, [usuariId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Usuari no trobat' });
+    }
+
+    const titolId = rows[0].titol;
+
+    if (!titolId) {
+      return res.status(200).json({ missatge: 'L’usuari no té cap títol assignat' });
+    }
+
+    // Opcional: obtenir més info del títol, per exemple el nom
+    const [titolData] = await connection.execute(`
+      SELECT id as titol_id, nom_titol
+      FROM TITOLS
+      WHERE id = ?
+    `, [titolId]);
+
+    if (titolData.length === 0) {
+      return res.status(404).json({ error: 'Títol no trobat' });
+    }
+
+    res.status(200).json({
+      missatge: 'Títol de l’usuari recuperat correctament',
+      titol: titolData[0]
+    });
+
+  } catch (err) {
+    console.error('Error recuperant títol de l’usuari:', err.message);
+    res.status(500).json({ error: 'Error intern del servidor' });
+  }
+};
+  
+exports.actualitzarTitolUsuari = async (req, res) => {
+  const usuariId = parseInt(req.params.usuariId);
+  const { titolId } = req.body;
+
+  if (!usuariId || !titolId) {
+    return res.status(400).json({ error: 'Usuari o títol invàlid' });
+  }
+
+  try {
+    const connection = await connectDB();
+
+    // Comprovar que l'usuari existeix
+    const [usuariRows] = await connection.execute(`
+      SELECT * FROM PERFIL_USUARI WHERE usuari = ?
+    `, [usuariId]);
+
+    if (usuariRows.length === 0) {
+      return res.status(404).json({ error: 'Usuari no trobat' });
+    }
+
+    // Comprovar que el títol existeix
+    const [titolRows] = await connection.execute(`
+      SELECT * FROM TITOLS WHERE id = ?
+    `, [titolId]);
+
+    if (titolRows.length === 0) {
+      return res.status(404).json({ error: 'Títol no trobat' });
+    }
+
+    // Actualitzar només el títol
+    await connection.execute(`
+      UPDATE PERFIL_USUARI
+      SET titol = ?
+      WHERE usuari = ?
+    `, [titolId, usuariId]);
+
+    res.status(200).json({ missatge: 'Títol actualitzat correctament' });
+
+  } catch (err) {
+    console.error('Error al patch del títol:', err.message);
+    res.status(500).json({ error: 'Error intern del servidor' });
+  }
+};
+
+

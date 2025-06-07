@@ -1,0 +1,23 @@
+body {
+  background-image: url('https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/bskmatlis5iwjnqpshzi');
+  background-size: cover;      /* Que se adapte al viewport */
+  background-position: center; /* Centra la imagen en el viewport */
+  background-repeat: no-repeat;/* Que no se repita */
+  background-color: #1b0c04;   /* Color de fondo de respaldo */
+  margin: 0;                   /* Asegura que no haya márgenes */
+  min-height: 100vh;           /* Que ocupe todo el alto de la ventana */
+}
+
+/* Fondo para pantallas en orientación vertical (portrait) */
+@media (orientation: portrait) {
+  body {
+    background-image: url('https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/ujexiwili5xmdwkstmw9');
+  }
+}
+
+/* Fondo para pantallas en orientación horizontal (landscape) */
+@media (orientation: landscape) {
+  body {
+    background-image: url('https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/bskmatlis5iwjnqpshzi');
+  }
+}

@@ -28,13 +28,13 @@ class UserProvider with ChangeNotifier {
   String? get skinPreferidaimatge => _skinPreferidaimatge;
 
   UserProvider() {
-    _loadUserData();
+    loadUserData();
   }
 
   get skinPreferidaNom => null;
 
   // LOAD ALL USER DATA
-  Future<void> _loadUserData() async {
+  Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     _coinCount = prefs.getInt('userPunts') ?? 0;
     _username = prefs.getString('userName') ?? 'Usuari';
@@ -84,49 +84,95 @@ class UserProvider with ChangeNotifier {
     fetchUserPoints();
   }
 
-  Future<void> fetchFavoritePersonatgeSkin() async {
+  Future<void> sumarPuntsUsuari(int puntsASumar) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      int? userId = prefs.getInt('userId');
       String? token = prefs.getString('token');
+      int? userId =
+          prefs.getInt('userId'); // Assegura’t que guardes aquest ID en login
 
-      if (userId == null || token == null) return;
+      if (userId == null || token == null) {
+        print("Usuari o token no disponibles");
+        return;
+      }
 
-      final url = Uri.parse('https://${Config.ip}/perfils/preferit/$userId');
+      final url = Uri.parse(
+          'https://${Config.ip}/usuaris/punts/comprats/$userId/$puntsASumar');
       final headers = {
         'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
       };
 
-      final response = await http.get(url, headers: headers);
+      final response = await http.put(url, headers: headers);
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-
-        // Actualizar ambos valores (personaje y skin preferidos)
-        _personatgePreferitId = data['personatge_preferit'] ?? 0;
-        _skinPreferidaId = data['skin_preferida_id'] ?? 0;
-        _personatgepreferitnom = data['nom'];
-        _skinPreferidaimatge = data['imatge'];
-
-        print('Personaje favorito actualizado: $_personatgePreferitId');
-        print('Skin favorita actualizada: $_skinPreferidaId');
-
-        notifyListeners();
+        print("Punts afegits correctament");
+        refreshPoints(); // Opcional: refresca el recompte de punts
       } else {
-        print('Error en fetchFavoritePersonatge: ${response.statusCode}');
-        // Opcional: resetear valores si hay error
-        _personatgePreferitId = 0;
-        _skinPreferidaId = 0;
-        notifyListeners();
+        print(
+            "Error al sumar punts: ${response.statusCode} - ${response.body}");
       }
-    } catch (error) {
-      print('Error en fetchFavoritePersonatge: $error');
-      // Opcional: resetear valores si hay excepción
-      _personatgePreferitId = 0;
-      _skinPreferidaId = 0;
-      notifyListeners();
+    } catch (e) {
+      print("Error a sumarPuntsUsuari: $e");
     }
   }
+
+  Future<void> fetchFavoritePersonatgeSkin() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt('userId');
+    String? token = prefs.getString('token');
+
+    if (userId == null || token == null) return;
+
+    final url = Uri.parse('https://${Config.ip}/perfils/preferit/$userId');
+    final headers = {
+      'Authorization': 'Bearer $token',
+    };
+
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      _personatgePreferitId = data['personatge_preferit'] ?? 0;
+      _skinPreferidaId = data['skin_preferida_id'] ?? 0;
+      _personatgepreferitnom = data['nom'] ?? '';
+      _skinPreferidaimatge = data['imatge'] ?? '';
+
+      print('Personatge favorit actualitzat: $_personatgePreferitId');
+      print('Skin favorita actualitzada: $_skinPreferidaId');
+
+      notifyListeners();
+    } else if (response.statusCode == 404) {
+      // Si 404, assigna valors "buits" o null
+      _personatgePreferitId = null;
+      _skinPreferidaId = null;
+      _personatgepreferitnom = "";
+      _skinPreferidaimatge = "";
+
+      print('No s\'ha trobat cap personatge o skin preferida (404). Assignats valors nuls.');
+
+      notifyListeners();
+    } else {
+      print('Error en fetchFavoritePersonatge: ${response.statusCode}');
+      // Opcional: resetear valores si hay error
+      _personatgePreferitId = 0;
+      _skinPreferidaId = 0;
+      _personatgepreferitnom = "";
+      _skinPreferidaimatge = "";
+      notifyListeners();
+    }
+  } catch (error) {
+    print('Error en fetchFavoritePersonatge: $error');
+    _personatgePreferitId = 0;
+    _skinPreferidaId = 0;
+    _personatgepreferitnom = "";
+    _skinPreferidaimatge = "";
+    notifyListeners();
+  }
+}
+
 
   Future<bool> updatePersonatgePreferit(int personatgeId) async {
     try {
@@ -257,6 +303,7 @@ class UserProvider with ChangeNotifier {
             'nom_amic': amic['nom_amic'],
             'estat': amic['estat'],
             'imatge_perfil_amic': amic['imatge_perfil_amic'],
+            'id_usuari_amic': amic['id_usuari_amic'],
           };
         }).toList();
 
@@ -268,6 +315,37 @@ class UserProvider with ChangeNotifier {
     } catch (error) {
       print('Error a fetchAmistatsUsuari: $error');
       return [];
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchEstadistiquesAmic(
+      String idusuari, String idusuariamic) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      if (token == null) return null;
+
+      // Intercanviem els IDs aquí per agafar correctament l'id de l'amic primer
+      final url = Uri.parse(
+          'https://${Config.ip}/usuaris/perfil/$idusuariamic/amic/$idusuari');
+      print('Cridant a: $url');
+
+      final headers = {
+        'Authorization': 'Bearer $token',
+      };
+
+      final response = await http.get(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        print('Error HTTP: ${response.statusCode}');
+        return null;
+      }
+    } catch (error) {
+      print('Error a fetchEstadistiquesAmic: $error');
+      return null;
     }
   }
 
@@ -335,6 +413,39 @@ class UserProvider with ChangeNotifier {
         'message': 'Error de conexión',
         'error': error.toString()
       };
+    }
+  }
+
+  Future<bool> marcarTutorialCompletat() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final int? userId = prefs.getInt('userId');
+      final String? token = prefs.getString('token');
+
+      if (userId == null || token == null) {
+        print("Token o usuari no disponible");
+        return false;
+      }
+
+      final url = Uri.parse('https://${Config.ip}/usuaris/$userId/tutorial');
+      final headers = {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      };
+
+      final response = await http.patch(url, headers: headers);
+
+      if (response.statusCode == 200) {
+        print('Tutorial marcat com completat correctament');
+        return true;
+      } else {
+        print(
+            'Error al marcar tutorial com completat: ${response.statusCode} - ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Excepció a marcarTutorialCompletat: $e');
+      return false;
     }
   }
 }

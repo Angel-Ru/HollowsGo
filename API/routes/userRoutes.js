@@ -12,6 +12,9 @@ router.get('/perfil/:id', verificacioUsuari.verifyToken, userController.mostrarD
 // Ruta per obtenir els punts d'un usuari per nom (accessible per a tots, però requereix token)
 router.get('/punts/:nom', verificacioUsuari.verifyToken, userController.getPuntsUsuari);
 
+// Ruta per sumar els punts comprats per un usuari
+router.put('/punts/comprats/:id/:punts',verificacioUsuari.verifyToken, userController.sumarPuntsUsuari);
+
 // Ruta per obtenir els avatars
 router.get('/avatars', verificacioUsuari.verifyToken, userController.llistarAvatars);
 
@@ -31,8 +34,7 @@ router.post('/login', userController.login);
 router.post('/admin/', verificacioUsuari.verifyToken, verificacioUsuari.verifyAdminDB, userController.crearUsuariAdmin);
 
 // Ruta per eliminar un usuari per ID (només accessible per a administradors)
-router.delete('/:id', verificacioUsuari.verifyToken, verificacioUsuari.verifyAdminDB, userController.borrarUsuari);
-
+router.delete('/:id', verificacioUsuari.verifyToken, userController.borrarUsuari);
 
 //Ruta per modificar la imatge de perfil de l'usuari
 router.put('/actualitzaravatar', verificacioUsuari.verifyToken, userController.actualitzarAvatar);
@@ -51,6 +53,8 @@ router.put('/partida_jugada/:id', verificacioUsuari.verifyToken, userController.
 
 // Ruta per obtenir totes les amistats d'un usuari
 router.get('/amics/:id', verificacioUsuari.verifyToken, userController.obtenirAmistats);
+
+router.get('/perfil/:id/amic/:idUsuariLoguejat', userController.obtenirEstadistiquesAmic);
 
 // Ruta per veure les sol·licituds pendents d'un usuari
 router.put('/amics/:id/pendents', verificacioUsuari.verifyToken, userController.obtenirpendents);

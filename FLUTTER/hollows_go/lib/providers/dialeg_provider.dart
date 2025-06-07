@@ -10,6 +10,9 @@ class DialogueProvider extends ChangeNotifier {
   String _currentImage = '';
   String _currentCharacter = '';
 
+  // Identificador per controlar càrregues asíncrones
+  int _loadingId = 0;
+
   // Getter públic per accedir a la llista de diàlegs
   List<String> get dialogues => _dialogues;
 
@@ -23,12 +26,22 @@ class DialogueProvider extends ChangeNotifier {
   /// Getter públic per accedir a l'índex del diàleg actual
   int get currentIndex => _dialogIndex;
 
+  bool _dialogueLoaded = false;
+  bool get dialogueLoaded => _dialogueLoaded;
+
   // Carrega diàlegs i imatges d’un personatge des de JSON
   Future<void> loadDialogueFromJson(String characterKey) async {
-    if (_currentCharacter == characterKey) return;
+  if (_currentCharacter == characterKey) return;
 
+  _loadingId++;
+  final int currentLoadId = _loadingId;
+
+  try {
     final String response =
         await rootBundle.loadString('assets/dialogues.json');
+
+    if (currentLoadId != _loadingId) return;
+
     final data = json.decode(response);
 
     if (!data.containsKey(characterKey)) return;
@@ -37,14 +50,22 @@ class DialogueProvider extends ChangeNotifier {
         List<String>.from(data[characterKey]["dialogues"]);
     final List<String> images = List<String>.from(data[characterKey]["images"]);
 
-    _dialogues = dialogues;
-    _characterImages = images;
-    _dialogIndex = 0;
-    _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
-    _currentCharacter = characterKey;
-
-    notifyListeners();
+    if (currentLoadId == _loadingId) {
+      _dialogues = dialogues;
+      _characterImages = images;
+      _dialogIndex = 0;
+      _currentImage = _characterImages.isNotEmpty ? _characterImages[0] : '';
+      _currentCharacter = characterKey;
+      _dialogueLoaded = true; // <- Marquem com a carregat
+      notifyListeners();
+    }
+  } catch (e) {
+    if (currentLoadId == _loadingId) {
+      print("Error carregant diàleg: $e");
+    }
   }
+}
+
 
   void nextDialogue() {
     if (_dialogues.isEmpty || _characterImages.isEmpty) return;

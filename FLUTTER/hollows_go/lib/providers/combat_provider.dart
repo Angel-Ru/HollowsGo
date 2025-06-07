@@ -9,7 +9,6 @@ class CombatProvider with ChangeNotifier {
   double? _aliatHealth;
   double _enemicHealth = 1000.0;
   double _enemyMaxHealth = 1000.0;
-
   bool _isEnemyTurn = false;
   bool _isEnemyHit = false;
   bool _isAllyHit = false;
@@ -18,6 +17,9 @@ class CombatProvider with ChangeNotifier {
   bool _enemyFrozen = false;
   bool _enemyBleeding = false;
   bool _ichibeJustUsedUlti = false;
+  bool _playerImmune = false;
+  bool _senjumaruEffectActive = false;
+  int _senjumaruAttackCount = 0;
 
   int _bleedTick = 0;
   int _bonusAllyDamage = 0;
@@ -42,10 +44,13 @@ class CombatProvider with ChangeNotifier {
   String get enemyName => _enemyName;
   bool get ichibeJustUsedUlti => _ichibeJustUsedUlti;
   String? get overrideBackground => _overrideBackground;
+  bool get playerImmune => _playerImmune;
+  bool get senjumaruEffectActive => _senjumaruEffectActive;
+  int get senjumaruAttackCount => _senjumaruAttackCount;
 
   // SETTERS
   void setAllyHealth(double value) {
-    _aliatHealth = value;
+    _aliatHealth = value.clamp(0, double.infinity);
     notifyListeners();
   }
 
@@ -63,7 +68,6 @@ class CombatProvider with ChangeNotifier {
   }
 
   void setEnemyName(String value) {
-    print("🔁 setEnemyName cridat amb: $value");
     _enemyName = value;
     notifyListeners();
   }
@@ -88,11 +92,14 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setPlayerImmune(bool value) {
+    _playerImmune = value;
+    notifyListeners();
+  }
+
   void healPlayer(int amount, int maxHealth) {
     _aliatHealth = (_aliatHealth ?? 0) + amount;
-    if (_aliatHealth! > maxHealth) {
-      _aliatHealth = maxHealth.toDouble();
-    }
+    if (_aliatHealth! > maxHealth) _aliatHealth = maxHealth.toDouble();
     notifyListeners();
   }
 
@@ -113,6 +120,33 @@ class CombatProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void activateSenjumaruEffect() {
+    _senjumaruEffectActive = true;
+    _senjumaruAttackCount = 0;
+
+    // Aquí notifiquem el widget per mostrar la primera imatge (via listener o algun state)
+    notifyListeners();
+  }
+
+  void registerEnemyAttack({VoidCallback? onVictory}) {
+    if (_senjumaruEffectActive) {
+      _senjumaruAttackCount++;
+      notifyListeners();
+      if (_senjumaruAttackCount >= 2) {
+        _senjumaruEffectActive = false;
+        killEnemy(onVictory: onVictory);
+      }
+    }
+  }
+
+  void killEnemy({VoidCallback? onVictory}) {
+    _enemicHealth = 0;
+    notifyListeners();
+    if (onVictory != null) {
+      onVictory();
+    }
+  }
+
   Map<String, dynamic> ichibeUltimateEffect({
     required String enemyName,
     required double enemyMaxHealth,
@@ -130,7 +164,6 @@ class CombatProvider with ChangeNotifier {
     _enemyName = modifiedName;
 
     int attackDebuff = (enemyAttack / 2).floor();
-
     notifyListeners();
 
     return {
@@ -150,7 +183,7 @@ class CombatProvider with ChangeNotifier {
     });
   }
 
-  void processBleedTick() {
+  void processBleedTick({VoidCallback? onEnemyDefeated}) {
     if (!_enemyBleeding || _enemicHealth <= 0) return;
 
     double bleedDamage = 100 * (pow(1.2, _bleedTick) as double);
@@ -162,6 +195,17 @@ class CombatProvider with ChangeNotifier {
 
     if (_enemicHealth == 0) {
       _enemyBleeding = false;
+      _isAttackInProgress = false;
+      notifyListeners();
+      if (onEnemyDefeated != null) {
+        onEnemyDefeated();
+      }
+    }
+  }
+
+  void checkVictory(VoidCallback onVictory) {
+    if (_enemicHealth <= 0) {
+      onVictory();
     }
   }
 
@@ -170,9 +214,7 @@ class CombatProvider with ChangeNotifier {
     double maxEnemyHealth = 1000.0,
     bool keepAllyHealth = false,
   }) {
-    if (!keepAllyHealth) {
-      _aliatHealth = maxAllyHealth;
-    }
+    if (!keepAllyHealth) _aliatHealth = maxAllyHealth;
     _enemicHealth = maxEnemyHealth;
     _enemyMaxHealth = maxEnemyHealth;
     _isEnemyTurn = false;
@@ -209,27 +251,33 @@ class CombatProvider with ChangeNotifier {
       if (_enemicHealth < 0) _enemicHealth = 0;
 
       _isEnemyHit = false;
-      _isEnemyTurn = _enemicHealth > 0;
       notifyListeners();
 
-      if (_enemicHealth > 0) {
-        await _performEnemyAttack(enemyDamage, skinId, onDefeat);
-      } else {
+      if (_enemicHealth <= 0) {
+        _enemyBleeding = false;
         _isAttackInProgress = false;
         await updateSkinVidaActual(
             skinId: skinId, vidaActual: _aliatHealth ?? 0);
         onVictory();
+        return;
       }
+
+      _isEnemyTurn = true;
+      notifyListeners();
+
+      // Atac enemic
+      await _performEnemyAttack(enemyDamage, skinId, onDefeat,
+          onVictory: onVictory);
     }
   }
 
   Future<void> _performEnemyAttack(
     int enemyDamage,
     int skinId,
-    VoidCallback onDefeat,
-  ) async {
+    VoidCallback onDefeat, {
+    VoidCallback? onVictory,
+  }) async {
     if (_enemyFrozen) {
-      debugPrint('[DEBUG] Torn enemic congelat: no ataca.');
       _isEnemyTurn = false;
       _isAttackInProgress = false;
       notifyListeners();
@@ -240,14 +288,21 @@ class CombatProvider with ChangeNotifier {
     _isAllyHit = true;
     notifyListeners();
 
-    final effectiveDamage = max(0, enemyDamage - _enemyAttackDebuff);
-    _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
-    if (_aliatHealth! < 0) _aliatHealth = 0;
+    if (!_playerImmune) {
+      final effectiveDamage = max(0, enemyDamage - _enemyAttackDebuff);
+      _aliatHealth = (_aliatHealth ?? 0) - effectiveDamage;
+      if (_aliatHealth! < 0) _aliatHealth = 0;
 
-    await Future.delayed(const Duration(milliseconds: 500));
+      registerEnemyAttack(onVictory: onVictory);
+    }
+
+    await Future.delayed(const Duration(milliseconds: 600));
     _isAllyHit = false;
 
-    processBleedTick();
+    // Process bleed tick només si enemic viu
+    if (_enemyBleeding && _enemicHealth > 0) {
+      processBleedTick(onEnemyDefeated: onVictory);
+    }
 
     _isEnemyTurn = false;
     _isAttackInProgress = false;
@@ -268,10 +323,7 @@ class CombatProvider with ChangeNotifier {
       final token = prefs.getString('token');
       final usuariId = prefs.getInt('userId');
 
-      if (token == null || usuariId == null) {
-        print("Token o usuari_id no disponible");
-        return;
-      }
+      if (token == null || usuariId == null) return;
 
       final response = await http.put(
         Uri.parse('https://${Config.ip}/combats/vida/$skinId'),
@@ -285,11 +337,9 @@ class CombatProvider with ChangeNotifier {
         }),
       );
 
-      if (response.statusCode == 200) {
-        print("Vida actualitzada correctament.");
-      } else {
+      if (response.statusCode != 200) {
         print(
-            "Error al actualitzar vida: ${response.statusCode}, ${response.body}");
+            "Error actualitzant vida: ${response.statusCode}, ${response.body}");
       }
     } catch (e) {
       print("Error en updateSkinVidaActual: $e");
@@ -302,28 +352,21 @@ class CombatProvider with ChangeNotifier {
       final token = prefs.getString('token');
       final usuariId = prefs.getInt('userId');
 
-      if (token == null || usuariId == null) {
-        print("Token o usuari_id no disponible");
-        return null;
-      }
+      if (token == null || usuariId == null) return null;
 
       final response = await http.get(
         Uri.parse(
             'https://${Config.ip}/combats/vida/$skinId?usuari_id=$usuariId'),
-        headers: {
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final vida = (data['vida_actual'] as num).toDouble();
         setAllyHealth(vida);
-        print("Vida actual obtinguda: $vida");
         return vida;
       } else {
-        print(
-            "Error al obtenir vida: ${response.statusCode}, ${response.body}");
+        print("Error obtenint vida: ${response.statusCode}, ${response.body}");
         return null;
       }
     } catch (e) {

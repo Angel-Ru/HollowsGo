@@ -47,7 +47,7 @@ class _MultiSkinRewardDialogState extends State<MultiSkinRewardDialog> {
                   (index) => Container(
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     width: currentPage == index ? 14 : 8,
-                    height: 8,
+                    height: 10,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: currentPage == index

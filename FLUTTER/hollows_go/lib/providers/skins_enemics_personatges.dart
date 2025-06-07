@@ -86,7 +86,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedSkinAliat(Skin skin) {
+  void setSelectedSkinAliat(Skin? skin) {
     _selectedSkinAliat = skin;
     _selectedSkinEnemic = null;
     _selectedSkinQuincy = null;
@@ -98,7 +98,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedSkinQuincy(Skin skin) {
+  void setSelectedSkinQuincy(Skin? skin) {
     _selectedSkinQuincy = skin;
     _selectedSkinAliat = null;
     _selectedSkinEnemic = null;
@@ -110,7 +110,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSelectedSkinEnemic(Skin skin) {
+  void setSelectedSkinEnemic(Skin? skin) {
     _selectedSkinEnemic = skin;
     _selectedSkinAliat = null;
     _selectedSkinQuincy = null;
@@ -178,26 +178,6 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     }
   }
 
-  void setMaxEnemyHealth(int maxHealth) {
-    _maxEnemyHealth = maxHealth;
-    notifyListeners();
-  }
-
-  void setMaxAllyHealth(int maxHealth) {
-    _maxAllyHealth = maxHealth;
-    notifyListeners();
-  }
-
-  void resetHealth() {
-    if (_selectedSkin != null && _maxEnemyHealth != null) {
-      _selectedSkin!.currentHealth = _maxEnemyHealth!;
-    }
-    if (_selectedSkinAliat != null && _maxAllyHealth != null) {
-      _selectedSkinAliat!.currentHealth = _maxAllyHealth!;
-    }
-    notifyListeners();
-  }
-
   Future<void> fetchEnemyPoints() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -235,168 +215,188 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   }
 
   Future<void> fetchPersonatgesAmbSkins(String userId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token'); // Obtenir el token
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
-      if (token == null) {
-        print("No s'ha trobat cap token. L'usuari no està autenticat.");
-        return;
-      }
+    if (token == null) {
+      print("No s'ha trobat cap token. L'usuari no està autenticat.");
+      return;
+    }
 
-      final url = Uri.parse('$_baseUrl/skins/biblioteca/$userId');
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+    final url = Uri.parse('$_baseUrl/skins/biblioteca/$userId');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
 
-        _personatges.clear();
-        _skins.clear();
+      // Sempre netejar les llistes abans d’afegir
+      _personatges.clear();
+      _skins.clear();
 
-        for (var item in data) {
-          final personatge = Personatge.fromJson(item['personatge']);
+      for (var item in data) {
+        final personatge = Personatge.fromJson(item['personatge']);
 
-          bool isAlly =
-              false; // Variable para verificar si alguna skin es de tipo aliado (raça == 1)
+        bool isAlly = false;
 
-          if (item.containsKey('skins') && item['skins'] is List) {
-            for (var skinJson in item['skins']) {
-              final skin = Skin.fromJson(skinJson);
-              personatge.skins.add(skin);
+        if (item.containsKey('skins') && item['skins'] is List) {
+          for (var skinJson in item['skins']) {
+            final skin = Skin.fromJson(skinJson);
+            personatge.skins.add(skin);
 
-              // Comprobar si la skin es de tipo aliado (raça == 1)
-              if (skin.raca == 1) {
-                isAlly =
-                    true; // Si hay al menos una skin de aliado, marcarlo como aliado
-              }
+            if (skin.raca == 1) {
+              isAlly = true;
             }
-          }
-
-          // Si hay al menos una skin de aliado, añadir el personaje a la lista de personajes aliados
-          if (isAlly) {
-            _personatges.add(personatge);
           }
         }
 
-        notifyListeners();
-      } else {
-        print('Error en la resposta: ${response.statusCode}');
+        if (isAlly) {
+          _personatges.add(personatge);
+        }
       }
-    } catch (error) {
-      print('Error en fetchPersonatgesAmbSkins: $error');
+
+      notifyListeners();
+    } else if (response.statusCode == 404) {
+      print('No s\'han trobat personatges amb skins.');
+
+      // Buidar explícitament les llistes
+      _personatges.clear();
+      _skins.clear();
+
+      notifyListeners();
+    } else {
+      print('Error en la resposta: ${response.statusCode}');
     }
+  } catch (error) {
+    print('Error en fetchPersonatgesAmbSkins: $error');
   }
+}
+
 
   Future<void> fetchEnemicsAmbSkins(String userId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token'); // Obtenir el token
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
-      if (token == null) {
-        print("No s'ha trobat cap token. L'usuari no està autenticat.");
-        return;
-      }
+    if (token == null) {
+      print("No s'ha trobat cap token. L'usuari no està autenticat.");
+      return;
+    }
 
-      final url = Uri.parse('$_baseUrl/skins/biblioteca/enemics/$userId');
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+    final url = Uri.parse('$_baseUrl/skins/biblioteca/enemics/$userId');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
 
-        _characterEnemies.clear();
-        _skins.clear();
+      _characterEnemies.clear();
+      _skins.clear();
 
-        for (var item in data) {
-          final personatge = Personatge.fromJson(item['personatge']);
+      for (var item in data) {
+        final personatge = Personatge.fromJson(item['personatge']);
 
-          bool isEnemic =
-              false; // Variable para verificar si alguna skin es enemiga
+        bool isEnemic = false;
 
-          if (item.containsKey('skins') && item['skins'] is List) {
-            for (var skinJson in item['skins']) {
-              final skin = Skin.fromJson(skinJson);
-              personatge.skins.add(skin);
+        if (item.containsKey('skins') && item['skins'] is List) {
+          for (var skinJson in item['skins']) {
+            final skin = Skin.fromJson(skinJson);
+            personatge.skins.add(skin);
 
-              // Comprobar si la skin es enemiga (raça == 2)
-              if (skin.raca == 2) {
-                isEnemic =
-                    true; // Si hay al menos una skin enemiga, marcarlo como enemigo
-              }
+            if (skin.raca == 2) {
+              isEnemic = true;
             }
-          }
-
-          // Si hay al menos una skin enemiga, añadir el personaje a la lista de enemigos
-          if (isEnemic) {
-            _characterEnemies.add(personatge);
           }
         }
 
-        notifyListeners();
-      } else {
-        print('Error en la resposta: ${response.statusCode}');
+        if (isEnemic) {
+          _characterEnemies.add(personatge);
+        }
       }
-    } catch (error) {
-      print('Error en fetchPersonatgesAmbSkins: $error');
+
+      notifyListeners();
+    } else if (response.statusCode == 404) {
+      print('No s\'han trobat enemics amb skins.');
+
+      // Buidar explícitament la llista d’enemics
+      _characterEnemies.clear();
+      _skins.clear();
+
+      notifyListeners();
+    } else {
+      print('Error en la resposta: ${response.statusCode}');
     }
+  } catch (error) {
+    print('Error en fetchEnemicsAmbSkins: $error');
   }
+}
+
 
   Future<void> fetchPersonatgesAmbSkinsQuincys(String userId) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token'); // Obtenir el token
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token'); // Obtenir el token
 
-      if (token == null) {
-        print("No s'ha trobat cap token. L'usuari no està autenticat.");
-        return;
-      }
+    if (token == null) {
+      print("No s'ha trobat cap token. L'usuari no està autenticat.");
+      return;
+    }
 
-      final url = Uri.parse('$_baseUrl/skins/biblioteca/quincys/$userId');
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+    final url = Uri.parse('$_baseUrl/skins/biblioteca/quincys/$userId');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
 
-        _quincys.clear();
-        _skins.clear();
+      _quincys.clear();
+      _skins.clear();
 
-        for (var item in data) {
-          final personatge = Personatge.fromJson(item['personatge']);
+      for (var item in data) {
+        final personatge = Personatge.fromJson(item['personatge']);
 
-          if (item.containsKey('skins') && item['skins'] is List) {
-            for (var skinJson in item['skins']) {
-              personatge.skins.add(Skin.fromJson(skinJson));
-            }
+        if (item.containsKey('skins') && item['skins'] is List) {
+          for (var skinJson in item['skins']) {
+            personatge.skins.add(Skin.fromJson(skinJson));
           }
-
-          _quincys.add(personatge);
         }
 
-        notifyListeners();
-      } else {
-        print('Error en la resposta: ${response.statusCode}');
+        _quincys.add(personatge);
       }
-    } catch (error) {
-      print('Error en fetchPersonatgesAmbSkins: $error');
+
+      notifyListeners();
+    } else if (response.statusCode == 404) {
+      print('No s\'han trobat quincys amb skins.');
+
+      // Netejar les llistes
+      _quincys.clear();
+      _skins.clear();
+
+      notifyListeners();
+    } else {
+      print('Error en la resposta: ${response.statusCode}');
     }
+  } catch (error) {
+    print('Error en fetchPersonatgesAmbSkinsQuincys: $error');
   }
+}
+
 
   void refreshPoints() {
     fetchEnemyPoints();
@@ -489,55 +489,63 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   }
 
   Future<void> getSkinSeleccionada(int id) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('token');
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
-      if (token == null) {
-        print("No s'ha trobat cap token. L'usuari no està autenticat.");
-        return;
-      }
-
-      final url = Uri.parse('$_baseUrl/skins/seleccionada/$id');
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        if (data.containsKey('skin')) {
-          final skin = Skin.fromJson(data['skin']);
-
-          // Assignar-la segons la categoria
-          switch (skin.raca) {
-            case 0:
-              setSelectedSkinQuincy(skin);
-              break;
-            case 1:
-              setSelectedSkinAliat(skin);
-              break;
-            case 2:
-              setSelectedSkinEnemic(skin);
-              break;
-          }
-
-          notifyListeners(); // <- Important per actualitzar la UI
-        } else {
-          print('No s\'ha trobat cap skin seleccionada al JSON.');
-        }
-      } else if (response.statusCode == 404) {
-        print('No hi ha cap skin seleccionada.');
-      } else {
-        print('Error en la resposta: ${response.statusCode}');
-      }
-    } catch (error) {
-      print('Error a getSkinSeleccionada: $error');
+    if (token == null) {
+      print("No s'ha trobat cap token. L'usuari no està autenticat.");
+      return;
     }
+
+    final url = Uri.parse('$_baseUrl/skins/seleccionada/$id');
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+      if (data.containsKey('skin')) {
+        final skin = Skin.fromJson(data['skin']);
+
+        // Assignar-la segons la categoria
+        switch (skin.raca) {
+          case 0:
+            setSelectedSkinQuincy(skin);
+            break;
+          case 1:
+            setSelectedSkinAliat(skin);
+            break;
+          case 2:
+            setSelectedSkinEnemic(skin);
+            break;
+        }
+
+        notifyListeners(); // <- Important per actualitzar la UI
+      } else {
+        print('No s\'ha trobat cap skin seleccionada al JSON.');
+      }
+    } else if (response.statusCode == 404) {
+      print('No hi ha cap skin seleccionada.');
+
+      // Quan no hi ha skin seleccionada, posar-les totes a null
+      setSelectedSkinQuincy(null);
+      setSelectedSkinAliat(null);
+      setSelectedSkinEnemic(null);
+
+      notifyListeners(); // <- Important per actualitzar la UI
+    } else {
+      print('Error en la resposta: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error a getSkinSeleccionada: $error');
   }
+}
+
 
   Future<void> actualitzarSkinSeleccionada(int userId, int skinId) async {
     try {
@@ -597,6 +605,11 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
         print('Skin seleccionada llevada correctament.');
 
         await getSkinSeleccionada(userId);
+
+        //Aixo es lo nou que he afegit per desseleccionar, els metodes ja estaven pero no se cridaven per tant a nivell local no es deselectaven
+        unselectSkinAliat();
+        unselectSkinQuincy();
+        unselectSkinEnemic();
       } else if (response.statusCode == 404) {
         print('No s’ha trobat la skin per a aquest usuari.');
       } else {

@@ -1,10 +1,4 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import '../imports.dart';
-import '../providers/habilitat_provider.dart';
-import '../providers/missions_provider.dart';
 import '../service/missionsservice.dart';
 import '../widgets/combat/midscreen_turn_indicator.dart';
 
@@ -42,14 +36,12 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
       final skinsProvider =
           Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
 
-      await skinsProvider.selectRandomSkin();
-
+      
       final aliat = skinsProvider.selectedSkinAliat ??
           skinsProvider.selectedSkinQuincy ??
           skinsProvider.selectedSkinEnemic;
       final enemic = skinsProvider.selectedSkin;
 
-      // ✅ Només assignem nom i vida si tenim un enemic vàlid
       if (enemic != null) {
         final enemySkinName = enemic.personatgeNom;
         final enemySkinHealth = (enemic.vida ?? 1000).toDouble();
@@ -249,7 +241,7 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                       CharacterDisplayWidget(
                         imageUrl: skins.enemic?.imatge ??
                             'lib/images/combatscreen_images/aizen_combat.png',
-                        name: combatProvider.enemyName, // ✅ Ús del nom correcte
+                        name: combatProvider.enemyName,
                         health: combatProvider.enemicHealth,
                         maxHealth: combatProvider.enemyMaxHealth.toInt(),
                         isHit: combatProvider.isEnemyHit,
@@ -258,6 +250,10 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                         isBleeding: combatProvider.enemyBleeding,
                         isFrozen: combatProvider.enemyFrozen,
                         showInkEffect: combatProvider.ichibeJustUsedUlti,
+                        showSenjumaruEffect:
+                            combatProvider.senjumaruEffectActive,
+                        senjumaruAttackCount:
+                            combatProvider.senjumaruAttackCount,
                       ),
                       Spacer(),
                       CharacterDisplayWidget(
@@ -265,9 +261,10 @@ class _CombatScreenContentState extends State<_CombatScreenContent>
                             'lib/images/combatscreen_images/bleach_combat.png',
                         name: allyName,
                         health: combatProvider.aliatHealth,
-                        maxHealth: skins.aliat?.vidaMaxima ?? 1000,
+                        maxHealth: skins.aliat.vidaMaxima,
                         isHit: combatProvider.isAllyHit,
                         buffAmount: combatProvider.bonusAllyDamage,
+                        isImmune: combatProvider.playerImmune,
                       ),
                       SizedBox(height: 20),
                       CombatActionButtons(

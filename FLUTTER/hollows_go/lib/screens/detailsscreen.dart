@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:hollows_go/models/habilitat_llegendaria.dart';
 import 'package:hollows_go/providers/habilitat_provider.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import '../imports.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -77,7 +78,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
           ),
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: CustomLoadingIndicator())
               : _personatge == null
                   ? const Center(
                       child: Text('No s\'ha pogut carregar el personatge.'))

@@ -1,5 +1,11 @@
 import 'dart:ui';
-
+import 'package:flutter/material.dart';
+import 'package:flutter_volume_controller/flutter_volume_controller.dart';
+import 'package:hollows_go/service/audioservice.dart';
+import 'package:provider/provider.dart';
+import 'package:screen_brightness/screen_brightness.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import '../imports.dart'; // Inclou aquí el teu import general
 
 class SettingsScreen extends StatefulWidget {
@@ -17,6 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     _initBrightness();
     _initVolume();
+    AudioService.instance.playScreenMusic('settings');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final dialogueProvider =
@@ -87,141 +94,296 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    Navigator.of(context).pushReplacement(
+    AudioService.instance.playScreenMusic('prehome');
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => PreHomeScreen()),
+      (Route<dynamic> route) => false,
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text('Configuració'),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Stack(
-        children: [
-          // Fons d'imatge
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image:
-                    AssetImage('lib/images/settings_screen/fons_settings.jpg'),
-                fit: BoxFit.cover,
+  Future<void> _deleteAccount() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId');
+    final token = prefs.getString('token');
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(
+                      'https://i.pinimg.com/originals/6f/f0/56/6ff05693972aeb7556d8a76907ddf0c7.jpg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.7), BlendMode.darken),
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.orangeAccent,
+                  width: 3,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Eliminar compte',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange.shade300,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Estàs segur que vols eliminar el teu compte?\nPerdràs totes les dades.',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: const Text('No',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orangeAccent,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text('Sí'),
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
-          ),
+          ],
+        ),
+      ),
+    );
 
-          // Filtre glaçat (blur)
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-            child: Container(
-              color: Colors.black.withOpacity(0.2),
+    if (confirm == true && userId != null && token != null) {
+      final response = await http.delete(
+        Uri.parse('https://${Config.ip}/usuaris/$userId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        await prefs.clear();
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => PreHomeScreen()),
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al eliminar el compte')),
+        );
+      }
+    }
+  }
+
+  // ... (imports y declaración de clase permanecen iguales hasta el build)
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        AudioService.instance.playScreenMusic('perfil');
+        return true;
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: null,
+        body: Stack(
+          children: [
+            // Fondo con blur (se mantiene igual)
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'lib/images/settings_screen/fons_settings.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-          ),
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                color: Colors.black.withOpacity(0.2),
+              ),
+            ),
 
-          // Contingut
-          Column(
-            children: [
-              const SizedBox(height: 10),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20.0, 80, 20, 0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            // Barra superior (se mantiene igual)
+            Padding(
+              padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: Colors.white.withOpacity(0.3), width: 1),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          onPressed: () {
+                            AudioService.instance.playScreenMusic('perfil');
+                            Navigator.pop(context);
+                          },
+                        ),
                         Text(
-                          'Lluminositat de la pantalla',
+                          'Configuració',
                           style: TextStyle(
+                            color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Icon(Icons.brightness_low, color: Colors.white),
-                            Expanded(
-                              child: Slider(
-                                value: _currentBrightness,
-                                min: 0.0,
-                                max: 1.0,
-                                divisions: 10,
-                                onChanged: _setBrightness,
-                                activeColor: Colors.yellow,
-                                inactiveColor: Colors.grey[300],
-                              ),
-                            ),
-                            Icon(Icons.brightness_high, color: Colors.white),
-                          ],
-                        ),
-                        Center(
-                          child: Text(
-                            '${(_currentBrightness * 100).round()}%',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 40),
-                        Text(
-                          'Volum del dispositiu',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Icon(Icons.volume_down, color: Colors.white),
-                            Expanded(
-                              child: Slider(
-                                value: _volume,
-                                min: 0.0,
-                                max: 1.0,
-                                divisions: 100,
-                                onChanged: _setVolume,
-                                activeColor: Colors.yellow,
-                                inactiveColor: Colors.grey[300],
-                              ),
-                            ),
-                            Icon(Icons.volume_up, color: Colors.white),
-                          ],
-                        ),
+                        SizedBox(width: 48),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
 
-                        // 🔈 Botó Mutar / Desmutar
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(
-                                _isMuted ? Icons.volume_off : Icons.volume_up),
-                            label: Text(_isMuted ? 'Desmutar' : 'Mutar'),
-                            onPressed: _toggleMute,
+            // Contenido principal
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 100, 20, 0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Control de brillo (se mantiene igual)
+                    Text(
+                      'Lluminositat de la pantalla',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Icon(Icons.brightness_low, color: Colors.white),
+                        Expanded(
+                          child: Slider(
+                            value: _currentBrightness,
+                            min: 0.0,
+                            max: 1.0,
+                            divisions: 10,
+                            onChanged: _setBrightness,
+                            activeColor: Colors.yellow,
+                            inactiveColor: Colors.grey[300],
                           ),
                         ),
-                        SizedBox(height: 20),
+                        Icon(Icons.brightness_high, color: Colors.white),
+                      ],
+                    ),
+                    Center(
+                      child: Text(
+                        '${(_currentBrightness * 100).round()}%',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 40),
 
-                        // 🆕 Botó Tutorial
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(Icons.school),
-                            label: Text('Tutorial'),
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor: Colors.blueAccent,
+                    // Control de volumen (se mantiene igual)
+                    Text(
+                      'Volum del dispositiu',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.volume_down, color: Colors.white),
+                        Expanded(
+                          child: Slider(
+                            value: _volume,
+                            min: 0.0,
+                            max: 1.0,
+                            divisions: 100,
+                            onChanged: _setVolume,
+                            activeColor: Colors.yellow,
+                            inactiveColor: Colors.grey[300],
+                          ),
+                        ),
+                        Icon(Icons.volume_up, color: Colors.white),
+                      ],
+                    ),
+
+                    // Botón de mute (mejorado)
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: Icon(
+                          _isMuted ? Icons.volume_off : Icons.volume_up,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          _isMuted ? 'Desmutar' : 'Mutar',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onPressed: _toggleMute,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isMuted
+                              ? Colors.redAccent.withOpacity(0.8)
+                              : Colors.greenAccent.withOpacity(0.8),
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 1,
                             ),
+                          ),
+                          elevation: 5,
+                          shadowColor: Colors.black.withOpacity(0.5),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+
+                    // Fila con dos botones (Tutorial y Eliminar cuenta)
+                    Row(
+                      children: [
+                        // Botón de Tutorial
+                        Expanded(
+                          child: _buildGradientButton(
+                            icon: Icons.school,
+                            label: 'Tutorial',
+                            colors: [Colors.blueAccent, Colors.lightBlueAccent],
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -231,40 +393,100 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             },
                           ),
                         ),
-                        SizedBox(height: 20),
-
-                        // 🚪 Botó Logout
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            icon: Icon(Icons.logout),
-                            label: Text('Tancar Sessió'),
-                            style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              backgroundColor: Colors.red,
-                            ),
-                            onPressed: _logout,
+                        SizedBox(width: 10),
+                        // Botón de Eliminar cuenta
+                        Expanded(
+                          child: _buildGradientButton(
+                            icon: Icons.delete_forever,
+                            label: 'Eliminar Compte',
+                            colors: [Colors.deepOrange, Colors.redAccent],
+                            onPressed: _deleteAccount,
                           ),
                         ),
-                        SizedBox(height: 20),
                       ],
                     ),
-                  ),
-                ),
-              ),
+                    SizedBox(height: 20),
 
-              // 💬 Diàleg del personatge
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                child: DialogueWidget(
-                  characterName: 'Shinji Hirako',
-                  nameColor: const Color.fromARGB(255, 231, 213, 50),
-                  bubbleColor: Color.fromARGB(212, 238, 238, 238),
+                    // Botón de Cerrar sesión (centrado)
+                    Center(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        child: _buildGradientButton(
+                          icon: Icons.logout,
+                          label: 'Tancar Sessió',
+                          colors: [Colors.red, Colors.deepOrangeAccent],
+                          onPressed: _logout, 
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                  ],
                 ),
               ),
-            ],
+            ),
+
+            // Diálogo del personaje (se mantiene igual)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: DialogueWidget(
+                characterName: 'Shinji Hirako',
+                nameColor: const Color.fromARGB(255, 231, 213, 50),
+                bubbleColor: Color.fromARGB(212, 238, 238, 238),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+// Método auxiliar para crear botones con gradiente (se mantiene igual)
+  Widget _buildGradientButton({
+    required IconData icon,
+    required String label,
+    required List<Color> colors,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 6,
+            offset: Offset(0, 3),
           ),
         ],
+        gradient: LinearGradient(
+          colors: colors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: ElevatedButton.icon(
+        icon: Icon(icon, color: Colors.white),
+        label: Text(
+          label,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          padding: EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Colors.white.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+        ),
       ),
     );
   }

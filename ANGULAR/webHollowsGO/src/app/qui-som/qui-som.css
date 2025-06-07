@@ -1,0 +1,71 @@
+body.qui-som-background {
+  background-image: url('https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/cre3pjxh5xt44firil1k') !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-color: #1b0c04 !important;
+}
+
+@media (orientation: portrait) {
+  body.qui-som-background {
+    background-image: url('https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/WEB/e3wettuzovqwdicdhpmg') !important;
+  }
+}
+
+
+.qui-som-container {
+  max-width: 800px;
+  margin: 100px auto 0 auto;
+  padding: 40px 30px;
+  background: rgba(20, 20, 20, 0.85); /* fons fosc però menys transparent */
+  border: 1.5px solid #e88b39; /* taronja suau, menys brillant */
+  border-radius: 12px;
+  color: #f3e4cd; /* color crema suau, no massa fort */
+  box-shadow:
+    0 4px 8px rgba(232, 139, 57, 0.15); /* ombra taronja suau */
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.qui-som-container h1 {
+  color: #de8c27; /* taronja càlid, no fluorescente */
+  margin-bottom: 25px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  font-size: 2.2rem;
+}
+
+.qui-som-container p {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 1.4em;
+  color: #f0d8b3; /* taronja crema suau */
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-back {
+  display: inline-block;
+  margin-top: 25px;
+  background: #e88b39; /* taronja suau */
+  color: #1a1a1a; /* negre molt suau */
+  padding: 14px 32px;
+  border-radius: 28px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 6px rgba(232, 139, 57, 0.25);
+  transition: background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-back:hover,
+.btn-back:focus {
+  background: #d17e2c; /* taronja un pèl més fosc però sense brillar */
+  color: #2a2a2a; /* negre suau */
+  box-shadow: 0 5px 10px rgba(209, 126, 44, 0.3); /* ombra suau una mica més gran */
+  outline: none;
+}

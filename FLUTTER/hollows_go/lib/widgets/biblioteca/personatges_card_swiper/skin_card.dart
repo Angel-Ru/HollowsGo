@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-import '../../../models/skin.dart'; 
+import '../../../models/skin.dart';
 
 class SkinCard extends StatelessWidget {
   final Skin skin;
   final bool isSelected;
   final bool isFavorite;
-  final bool isEnemyMode;
   final VoidCallback? onTap;
   final VoidCallback? onDoubleTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onVialPressed;
+  final VoidCallback? toggleSkinFavorite;
   final Color activeColor;
   final Color borderColor;
 
@@ -20,11 +20,11 @@ class SkinCard extends StatelessWidget {
     required this.skin,
     required this.isSelected,
     required this.isFavorite,
-    required this.isEnemyMode,
     this.onTap,
     this.onDoubleTap,
     this.onLongPress,
     this.onVialPressed,
+    this.toggleSkinFavorite,
     this.activeColor = Colors.orangeAccent,
     this.borderColor = const Color.fromRGBO(255, 165, 0, 0.6),
   }) : super(key: key);
@@ -36,9 +36,9 @@ class SkinCard extends StatelessWidget {
     return FractionallySizedBox(
       widthFactor: 0.9,
       child: GestureDetector(
-        onTap: isEnemyMode ? null : onTap,
-        onDoubleTap: isEnemyMode ? null : onDoubleTap,
-        onLongPress: isEnemyMode ? null : onLongPress,
+        onTap: onTap,
+        onDoubleTap: onDoubleTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Container(
@@ -85,15 +85,19 @@ class SkinCard extends StatelessWidget {
                   Positioned(
                     top: 8,
                     left: 8,
-                    child: Icon(
-                      isFavorite ? Icons.star : Icons.star_border,
-                      color: isFavorite ? Colors.yellow : Colors.grey,
-                      size: 28,
-                      shadows: const [
-                        Shadow(blurRadius: 4, color: Colors.black),
-                      ],
+                    child: GestureDetector(
+                      onTap: toggleSkinFavorite,
+                      child: Icon(
+                        isFavorite ? Icons.star : Icons.star_border,
+                        color: isFavorite ? Colors.yellow : Colors.grey,
+                        size: 28,
+                        shadows: const [
+                          Shadow(blurRadius: 4, color: Colors.black),
+                        ],
+                      ),
                     ),
                   ),
+
                   // Check seleccionat
                   if (isSelected)
                     Positioned(
@@ -103,19 +107,19 @@ class SkinCard extends StatelessWidget {
                           color: activeColor, size: 28),
                     ),
                   // Botó vial
-                  if (!isEnemyMode)
-                    Positioned(
-                      bottom: 60,
-                      left: 8,
-                      child: GestureDetector(
-                        onTap: onVialPressed,
-                        child: const CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.green,
-                          child: Icon(Icons.healing, color: Colors.white),
-                        ),
+
+                  Positioned(
+                    bottom: 60,
+                    left: 8,
+                    child: GestureDetector(
+                      onTap: onVialPressed,
+                      child: const CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.green,
+                        child: Icon(Icons.healing, color: Colors.white),
                       ),
                     ),
+                  ),
                   // Nom i estrelles
                   Positioned(
                     bottom: 0,

@@ -9,12 +9,17 @@ const verificacioUsuari = require('../middlewares/verificacioUsuari'); // Verifi
 //Ruta per obtenir tots els personatges amb les seves skins de l'usuari
 router.get('/biblioteca/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuari);
 
+router.post('/skindia', verificacioUsuari.verifyToken, skinsController.skinDelDia)
+
+router.post('/skindia/comprar', verificacioUsuari.verifyToken, skinsController.comprarSkin)
+
 // Ruta per obtenir tots els quincys amb les seves skins de l'usuari
 router.get('/biblioteca/quincys/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariQuincy);
 
 //Ruta per obtenir tots els enemics amb les seves skins de l'usuari
 router.get('/biblioteca/enemics/:id', verificacioUsuari.verifyToken,skinsController.getPersonatgesAmbSkinsPerUsuariEnemics);
 
+router.get('/fragments/:nom', verificacioUsuari.verifyToken, skinsController.getFragmentsSkinsUsuari);
 
 //Ruta per obtenir una skin d'un enemic amb el seu mal de forma aleatoria
 router.get('/enemic/', verificacioUsuari.verifyToken,skinsController.seleccionarSkinAleatoria);

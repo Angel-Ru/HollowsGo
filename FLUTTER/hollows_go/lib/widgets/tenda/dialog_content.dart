@@ -161,7 +161,7 @@ class _DialogContentState extends State<DialogContent> {
             ),
             const SizedBox(height: 10),
             const Text(
-              'Ja tens aquesta skin.\nSe ha retornat el cost del gacha',
+              'Ja tens aquesta skin.\nSe ha retornat el cost del gacha i s\'han afegit 10 fragments de skin.',
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 16,
@@ -173,8 +173,7 @@ class _DialogContentState extends State<DialogContent> {
           TextButton(
             style: TextButton.styleFrom(
               backgroundColor: Colors.orangeAccent.shade200,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),

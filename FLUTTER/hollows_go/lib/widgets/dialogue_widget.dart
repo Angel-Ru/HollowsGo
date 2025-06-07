@@ -5,12 +5,14 @@ class DialogueWidget extends StatefulWidget {
   final String characterName;
   final Color nameColor;
   final Color bubbleColor;
+  final bool isTutorial; // AFEGIT
 
   const DialogueWidget({
     Key? key,
     required this.characterName,
     this.nameColor = Colors.green,
     this.bubbleColor = const Color.fromARGB(212, 238, 238, 238),
+    this.isTutorial = false, // AFEGIT
   }) : super(key: key);
 
   @override
@@ -119,8 +121,8 @@ class _DialogueWidgetState extends State<DialogueWidget>
         GestureDetector(
           onTap: _onTap,
           child: Container(
-            width: 150,
-            height: 250,
+            width: widget.isTutorial ? 100 : 150,
+            height: widget.isTutorial ? 180 : 250,
             child: FadeTransition(
               opacity: _animation,
               child: ClipRRect(
@@ -183,8 +185,10 @@ class _DialogueWidgetState extends State<DialogueWidget>
                   clipBehavior: Clip.none,
                   children: [
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: widget.isTutorial ? 24 : 20,
+                        vertical: widget.isTutorial ? 22 : 18,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.7),
                         borderRadius: BorderRadius.only(
@@ -215,7 +219,7 @@ class _DialogueWidgetState extends State<DialogueWidget>
                                   TypewriterAnimatedText(
                                     _currentDialogue,
                                     textStyle: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.white70,
                                       height: 1.3,
@@ -228,7 +232,7 @@ class _DialogueWidgetState extends State<DialogueWidget>
                                 _currentDialogue,
                                 key: ValueKey(_currentDialogue),
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white70,
                                   height: 1.3,

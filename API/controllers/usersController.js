@@ -106,6 +106,34 @@ exports.getPuntsUsuari = async (req, res) => {
     }
 };
 
+// Sumar punts que ha comprat l'usuari
+exports.sumarPuntsUsuari = async (req, res) => {
+    const punts = parseInt(req.params.punts, 10);
+    const id = parseInt(req.params.id, 10);
+
+    if (isNaN(punts) || isNaN(id)) {
+        return res.status(400).send("Els paràmetres 'punts' i 'id' han de ser números vàlids.");
+    }
+
+    try {
+        const connection = await connectDB();
+        const [result] = await connection.execute(
+            'UPDATE USUARIS SET punts_emmagatzemats = punts_emmagatzemats + ? WHERE id = ?;',
+            [punts, id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send("No s'ha trobat cap usuari amb aquest ID.");
+        }
+
+        res.send({ missatge: "Punts afegits correctament.", afectats: result.affectedRows });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Error amb la consulta');
+    }
+};
+
+
 /*
 exports.crearUsuariNormal = async (req, res) => {
     try {
@@ -180,13 +208,20 @@ exports.crearUsuariNormal = async (req, res) => {
 exports.borrarUsuari = async (req, res) => {
     try {
         const connection = await connectDB();
-        await connection.execute('DELETE FROM USUARIS WHERE id = ?', [req.params.id]);
+        const usuariId = req.params.id;  // <-- Aquí el paràmetre és 'id'
+        const [result] = await connection.execute('DELETE FROM USUARIS WHERE id = ?', [usuariId]);
+        
+        if (result.affectedRows === 0) {
+            return res.status(404).send('Usuari no trobat');
+        }
+        
         res.send('Usuari eliminat correctament');
     } catch (err) {
         console.error(err);
         res.status(500).send("Error alhora d'eliminar l'usuari");
     }
 };
+
 /**
  * @swagger
  * /usuaris/admin/:
@@ -412,8 +447,8 @@ exports.crearUsuariNormalToken = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(contrassenya, 10);
         const [result] = await connection.execute(
-            `INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo)
-             VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO USUARIS (nom, email, contrassenya, punts_emmagatzemats, tipo, imatgeperfil)
+             VALUES (?, ?, ?, ?, ?, 25)`,
             [nom, email, hashedPassword, 100, 0]
         );
 
@@ -426,16 +461,19 @@ exports.crearUsuariNormalToken = async (req, res) => {
 
         const token = jwt.sign({ id: newUserId, tipo: 0 }, process.env.JWT_SECRET);
 
-        res.status(201).json({
+        const responsePayload = {
             user: {
                 id: newUserId,
-                nom,
-                email,
+                nom: nom,
+                email: email,
                 punts_emmagatzemats: 100,
                 tipo: 0
             },
             token
-        });
+        };
+
+        res.status(201).json(responsePayload);
+
     } catch (err) {
         console.error(err);
         res.status(500).send("Error al crear l'usuari");
@@ -744,11 +782,11 @@ exports.mostrarDadesPerfil = async (req, res) => {
     }
 };
 
-// Obtenir la llista d'avatares
+// Obtenir la llista d'avatares excepte el que té id 25
 exports.llistarAvatars = async (req, res) => {
     try {
         const connection = await connectDB();
-        const [rows] = await connection.execute('SELECT * FROM AVATARS');
+        const [rows] = await connection.execute('SELECT * FROM AVATARS WHERE id != 25');
         res.json(rows);
     } catch (error) {
         console.error('Error al obtenir els avatars:', error);
@@ -812,26 +850,137 @@ exports.obtenirAmistats = async (req, res) => {
         const [amistats] = await connection.execute(`
             SELECT
                 CASE
+                    WHEN a.id_usuari = ? THEN u2.id
+                    ELSE u1.id
+                END AS id_usuari_amic,
+                CASE
                     WHEN a.id_usuari = ? THEN u2.nom
                     ELSE u1.nom
-                    END AS nom_amic,
+                END AS nom_amic,
                 CASE
                     WHEN a.id_usuari = ? THEN av2.url
                     ELSE av1.url
-                    END AS imatge_perfil_amic,
+                END AS imatge_perfil_amic,
                 a.estat
             FROM AMISTATS a
-                     JOIN USUARIS u1 ON a.id_usuari = u1.id
-                     JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
-                     LEFT JOIN AVATARS av1 ON u1.imatgeperfil = av1.id
-                     LEFT JOIN AVATARS av2 ON u2.imatgeperfil = av2.id
+                JOIN USUARIS u1 ON a.id_usuari = u1.id
+                JOIN USUARIS u2 ON a.id_usuari_amic = u2.id
+                LEFT JOIN AVATARS av1 ON u1.imatgeperfil = av1.id
+                LEFT JOIN AVATARS av2 ON u2.imatgeperfil = av2.id
             WHERE a.id_usuari = ? OR a.id_usuari_amic = ?
-        `, [userId, userId, userId, userId]);
-
+        `, [userId, userId, userId, userId, userId]);
 
         res.status(200).json(amistats);
     } catch (error) {
         console.error('Error obtenint amistats:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};
+
+// Obtenir dades de perfil d'un amic si són amistats
+/*
+exports.obtenirEstadistiquesAmic = async (req, res) => {
+    try {
+        const { id, idUsuariLoguejat } = req.params;
+
+        const connection = await connectDB();
+
+        // Comprovem si són amics
+        const [amistatRows] = await connection.execute(`
+            SELECT * FROM AMISTATS
+            WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
+            AND estat = 'acceptat'
+        `, [id, idUsuariLoguejat, idUsuariLoguejat, id]);
+
+        if (amistatRows.length === 0) {
+            return res.status(404).json({ missatge: 'No són amics o amistat no acceptada' });
+        }
+
+        // Si són amics, obtenim estadístiques
+        const [rows] = await connection.execute(`
+            SELECT 
+                pu.partides_jugades, 
+                pu.partides_guanyades,
+                COUNT(DISTINCT b.personatge_id) AS nombre_personatges,
+                SUM(
+                    CASE 
+                        WHEN b.skin_ids IS NULL OR b.skin_ids = '' THEN 0
+                        ELSE CHAR_LENGTH(b.skin_ids) - CHAR_LENGTH(REPLACE(b.skin_ids, ',', '')) + 1
+                    END
+                ) AS nombre_skins
+            FROM PERFIL_USUARI pu
+            JOIN USUARIS u ON u.id = pu.usuari
+            JOIN BIBLIOTECA b ON b.user_id = u.id
+            WHERE u.id = ?
+            GROUP BY pu.partides_jugades, pu.partides_guanyades
+        `, [idUsuariLoguejat]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ missatge: 'Perfil no trobat' });
+        }
+
+        res.status(200).json(rows[0]);
+       console.log('Resposta enviada:', rows[0]);
+    } catch (error) {
+        console.error('Error obtenint estadístiques d’ amic:', error);
+        res.status(500).json({ missatge: 'Error intern del servidor' });
+    }
+};*/
+exports.obtenirEstadistiquesAmic = async (req, res) => {
+    try {
+        const { id, idUsuariLoguejat } = req.params;
+
+        const connection = await connectDB();
+
+        // Comprovem si són amics
+        const [amistatRows] = await connection.execute(`
+            SELECT * FROM AMISTATS
+            WHERE ((id_usuari = ? AND id_usuari_amic = ?) OR (id_usuari = ? AND id_usuari_amic = ?))
+            AND estat = 'acceptat'
+        `, [id, idUsuariLoguejat, idUsuariLoguejat, id]);
+
+        if (amistatRows.length === 0) {
+            return res.status(404).json({ missatge: 'No són amics o amistat no acceptada' });
+        }
+
+        // Si són amics, obtenim estadístiques
+        const [rows] = await connection.execute(`
+           SELECT 
+    pu.partides_jugades, 
+    pu.partides_guanyades,
+    COUNT(DISTINCT b.personatge_id) AS nombre_personatges,
+    SUM(
+        CASE 
+            WHEN b.skin_ids IS NULL OR b.skin_ids = '' THEN 0
+            ELSE CHAR_LENGTH(b.skin_ids) - CHAR_LENGTH(REPLACE(b.skin_ids, ',', '')) + 1
+        END
+    ) AS nombre_skins,
+    pu.personatge_preferit,
+    per.nom AS nom_personatge_preferit,
+    pu.skin_preferida_id,
+    s.imatge AS imatge_skin_preferida,
+    u.nivell,
+    t.id AS titol_id,
+    t.nom_titol AS nom_titol
+FROM PERFIL_USUARI pu
+JOIN USUARIS u ON u.id = pu.usuari
+LEFT JOIN BIBLIOTECA b ON b.user_id = u.id
+LEFT JOIN PERSONATGES per ON per.id = pu.personatge_preferit
+LEFT JOIN SKINS s ON s.id = pu.skin_preferida_id
+LEFT JOIN TITOLS t ON t.id = pu.titol
+WHERE u.id = ?
+GROUP BY pu.partides_jugades, pu.partides_guanyades, pu.personatge_preferit, per.nom, pu.skin_preferida_id, s.imatge, u.nivell, t.id, t.nom_titol
+
+        `, [idUsuariLoguejat]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ missatge: 'Perfil no trobat' });
+        }
+
+        res.status(200).json(rows[0]);
+       console.log('Resposta enviada:', rows[0]);
+    } catch (error) {
+        console.error('Error obtenint estadístiques d’ amic:', error);
         res.status(500).json({ missatge: 'Error intern del servidor' });
     }
 };

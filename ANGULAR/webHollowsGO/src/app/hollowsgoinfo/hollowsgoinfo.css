@@ -1,0 +1,327 @@
+/* Scroll general */
+.scroll-container {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.section {
+  height: calc(100vh - 60px);
+  scroll-snap-align: start;
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+  overflow: hidden;
+
+}
+
+.section-video {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  height: 90vh;
+}
+
+/* Contenidor que combina text i carrusel */
+.carousel-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  gap: 3rem;
+  flex-wrap: wrap;
+  color: white;
+}
+
+/* Text justificat, centrat verticalment */
+.carousel-text {
+  flex: 1;
+  max-width: 500px;
+  text-align: justify;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.6;
+}
+
+/* Carrusel a la dreta */
+.carousel-wrapper {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Responsiu per mòbil */
+@media (max-width: 768px) {
+  .carousel-section {
+    flex-direction: column-reverse;
+    text-align: center;
+  }
+
+  .carousel-text {
+    max-width: 100%;
+    align-items: center;
+    text-align: justify;
+  }
+
+  .carousel-wrapper {
+    justify-content: center;
+  }
+}
+
+/* Contenedor principal del carrusel */
+.carousel-container {
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 9 / 16; /* Proporción vertical estilo móvil */
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Contenedor deslizante que aloja los slides */
+.carousel-slide {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transition: transform 0.5s ease-in-out;
+  transform: translateX(0%);
+}
+
+.slide-item {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.slide-item img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.4);
+  color: #111;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  user-select: none;
+  z-index: 10;
+  transition: background 0.3s;
+  box-shadow: none;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.carousel-arrow:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.carousel-arrow.left {
+  left: 8px;
+}
+
+.carousel-arrow.right {
+  right: 8px;
+}
+
+.video-wrapper {
+  flex-shrink: 0;
+  width: 50%;
+  max-width: 200px;
+  aspect-ratio: 9 / 16;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-player {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Responsiu: mostrar vídeo a sota del carrusel */
+@media (max-width: 1024px) {
+  .carousel-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .carousel-text,
+  .carousel-wrapper,
+  .video-wrapper {
+    max-width: 90%;
+  }
+}
+
+/* Controls personalitzats dins del vídeo */
+.video-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.video-btn {
+  position: absolute;
+  bottom: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.3s;
+}
+
+.video-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.play-pause {
+  left: 10px;
+}
+
+.mute {
+  right: 10px;
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* Barra de progrés dins del vídeo */
+.progress-bar-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  width: 0;
+  transition: width 0.1s linear;
+}
+
+/* Secció Bleach */
+.section-bleach {
+  background: rgba(20, 20, 20, 0.85);
+  color: #f3e4cd;
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  min-height: 80%;
+  padding: 0 40px;
+  box-sizing: border-box;
+  text-align: justify;
+  height: 100vh;
+}
+
+.section-bleach .text-content {
+  flex: 1 1 400px;
+  max-width: 600px;
+}
+
+.section-bleach .image-content {
+  flex: 1 1 300px;
+  max-width: 300px;
+}
+
+.section-bleach .image-content img.styled-image {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(232, 139, 57, 0.3);
+  object-fit: contain;
+}
+
+.section-bleach .title-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-bleach .title-image img.bleach-logo {
+  max-width: 280px;
+  height: auto;
+}
+
+/* Secció d'imatges de Bleach */
+.section-images {
+  background: #000;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.section-images img {
+  max-width: 45%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Secció Tite Kubo */
+.section-tite-kubo {
+  background: rgba(20, 20, 20, 0.85);
+  color: #f3e4cd;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 40px;
+  height: 100vh;
+  box-sizing: border-box;
+  text-align: justify;
+}
+
+.section-tite-kubo .text-content {
+  flex: 1 1 300px;
+  max-width: 500px;
+}
+
+.section-tite-kubo .image-content img.styled-image {
+  max-width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(232, 139, 57, 0.3);
+  object-fit: contain;
+}

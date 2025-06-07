@@ -1,3 +1,5 @@
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+
 import '../imports.dart';
 
 class GachaVideoPopup extends StatefulWidget {
@@ -10,8 +12,9 @@ class GachaVideoPopup extends StatefulWidget {
 }
 
 class _GachaVideoPopupState extends State<GachaVideoPopup> {
-  late VideoPlayerController _videoController;
-  late ChewieController _chewieController;
+  VideoPlayerController? _videoController;
+  ChewieController? _chewieController;
+  bool _isReady = false;
 
   @override
   void initState() {
@@ -20,72 +23,75 @@ class _GachaVideoPopupState extends State<GachaVideoPopup> {
   }
 
   Future<void> _initVideo() async {
-    _videoController =
-        VideoPlayerController.asset('lib/videos/animacion_gacha.mp4');
-    await _videoController.initialize();
-
-    _chewieController = ChewieController(
-      videoPlayerController: _videoController,
+    final result = await VideoService.initAssetVideo(
+      assetPath: 'lib/videos/animacion_gacha.mp4',
       autoPlay: true,
       looping: false,
       allowFullScreen: false,
       showControls: false,
-    );
-
-    _videoController.addListener(() {
-      if (_videoController.value.position >= _videoController.value.duration) {
+      onVideoEnd: () {
         Navigator.of(context).pop();
         widget.onVideoEnd();
-      }
-    });
+      },
+    );
 
-    setState(() {}); // rebuild to show chewie
+    if (result != null) {
+      _videoController = result.videoController;
+      _chewieController = result.chewieController;
+      setState(() {
+        _isReady = true;
+      });
+    }
   }
 
   @override
   void dispose() {
-    _videoController.dispose();
-    _chewieController.dispose();
+    VideoService.disposeControllers(
+      videoController: _videoController,
+      chewieController: _chewieController,
+    );
     super.dispose();
   }
 
   @override
-Widget build(BuildContext context) {
-  return Stack(
-    children: [
-      ModalBarrier(
-        color: Colors.black.withOpacity(0.7),
-        dismissible: false,
-      ),
-      Center(
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: (_videoController.value.isInitialized &&
-                    _chewieController != null)
-                ? Chewie(controller: _chewieController)
-                : Center(child: CircularProgressIndicator()),
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Stack(
+        children: [
+          ModalBarrier(
+            color: Colors.black.withOpacity(0.7),
+            dismissible: false,
           ),
-        ),
-      ),
-      Positioned(
-        top: 40,
-        right: 20,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black54,
-            foregroundColor: Colors.white,
+          Center(
+            child: Dialog(
+              backgroundColor: Colors.transparent,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: (_isReady && _chewieController != null)
+                    ? Chewie(controller: _chewieController!)
+                    : const Center(child: CustomLoadingIndicator()),
+              ),
+            ),
           ),
-          onPressed: () {
-            _videoController.pause();
-            Navigator.of(context).pop();
-            widget.onVideoEnd();
-          },
-          child: Text("SKIP"),
-        ),
+          Positioned(
+            top: 40,
+            right: 20,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black54,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                _videoController?.pause();
+                Navigator.of(context).pop();
+                widget.onVideoEnd();
+              },
+              child: const Text("SKIP"),
+            ),
+          ),
+        ],
       ),
-    ],
-  );
-}
+    );
+  }
 }

@@ -1,14 +1,16 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import 'package:video_player/video_player.dart';
+
 import 'dialog_content.dart';
 import 'dialog_animations.dart';
 import 'escritor_tinta.dart';
 import 'slash_clipper.dart';
 import 'special_animacio_service.dart';
+import '../../service/videoservice.dart';
 
 class SkinRewardDialog extends StatefulWidget {
   final Map<String, dynamic>? skin;
@@ -50,7 +52,6 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     super.initState();
 
     _isShinji = _detectIsShinji(widget.skin);
-
     _animations = DialogAnimationManager(vsync: this);
 
     _writeController = AnimationController(vsync: this);
@@ -104,22 +105,8 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     });
 
     await _fadeOutController.forward();
-
     await _initVideo();
-
     await _slashController.forward();
-
-    _videoController?.addListener(() {
-      if (_videoController!.value.position >=
-          _videoController!.value.duration) {
-        _videoFadeOutController.forward().then((_) {
-          setState(() {
-            _showDialogContent = true;
-          });
-          _animations.playEntryAnimation();
-        });
-      }
-    });
   }
 
   Future<void> _playBankaiAudioWithTyping() async {
@@ -160,27 +147,39 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     final String? videoPath = widget.skin?['video_especial'];
     if (videoPath == null || videoPath.isEmpty) return;
 
-    _videoController = VideoPlayerController.asset(videoPath);
-    await _videoController!.initialize();
-
-    _chewieController = ChewieController(
-      videoPlayerController: _videoController!,
+    final result = await VideoService.initAssetVideo(
+      assetPath: videoPath,
+      onVideoEnd: () {
+        _videoFadeOutController.forward().then((_) {
+          setState(() {
+            _showDialogContent = true;
+          });
+          _animations.playEntryAnimation();
+        });
+      },
       autoPlay: true,
       looping: false,
       showControls: false,
       allowFullScreen: false,
     );
 
-    setState(() {
-      _isVideoReady = true;
-    });
+    if (result != null) {
+      _videoController = result.videoController;
+      _chewieController = result.chewieController;
+
+      setState(() {
+        _isVideoReady = true;
+      });
+    }
   }
 
   @override
   void dispose() {
     _audioPlayer.dispose();
-    _videoController?.dispose();
-    _chewieController?.dispose();
+    VideoService.disposeControllers(
+      videoController: _videoController,
+      chewieController: _chewieController,
+    );
     _writeController.dispose();
     _fadeOutController.dispose();
     _slashController.dispose();
@@ -194,105 +193,105 @@ class _SkinRewardDialogState extends State<SkinRewardDialog>
     final double dialogWidth = 440;
     final double dialogHeight = dialogWidth * 9 / 16;
 
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(20),
-      child: SizedBox(
-        width: dialogWidth,
-        height: _showDialogContent ? null : dialogHeight,
-        child: _showDialogContent
-            ? FadeTransition(
-                opacity: _animations.fadeAnimation,
-                child: ScaleTransition(
-                  scale: _animations.scaleAnimation,
-                  child: DialogContent(
-                    skin: widget.skin,
-                    isDuplicate: widget.isDuplicate,
-                    animations: _animations,
+    return WillPopScope(
+      onWillPop: () async => false, // Això bloqueja el botó enrere
+      child: Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: SizedBox(
+          width: dialogWidth,
+          height: _showDialogContent ? null : dialogHeight,
+          child: _showDialogContent
+              ? FadeTransition(
+                  opacity: _animations.fadeAnimation,
+                  child: ScaleTransition(
+                    scale: _animations.scaleAnimation,
+                    child: DialogContent(
+                      skin: widget.skin,
+                      isDuplicate: widget.isDuplicate,
+                      animations: _animations,
+                    ),
                   ),
-                ),
-              )
-            : AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: _showBankaiScreen
-                    ? SizedBox(
-                        key: const ValueKey('bankai'),
-                        width: dialogWidth,
-                        height: dialogHeight,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.9),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            FadeTransition(
-                              opacity: Tween<double>(begin: 1, end: 0)
-                                  .animate(_fadeOutController),
-                              child: Center(
-                                child: AnimatedBuilder(
-                                  animation: _writeController,
-                                  builder: (context, child) {
-                                    return SizedBox(
-                                      width: dialogWidth,
-                                      height: dialogHeight,
-                                      child: CustomPaint(
-                                        painter: InkWritePainter(
-                                          text: _fullBankaiText,
-                                          progress: _writeController.value,
-                                          isShinji: _isShinji,
-                                          textStyle: const TextStyle(
-                                            fontSize: 64,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                            letterSpacing: 8,
-                                            fontFamily: 'Harukaze',
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
+                )
+              : AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 500),
+                  child: _showBankaiScreen
+                      ? SizedBox(
+                          key: const ValueKey('bankai'),
+                          width: dialogWidth,
+                          height: dialogHeight,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                            ),
-                            if (_isVideoReady)
-                              AnimatedBuilder(
-                                animation: _slashController,
-                                builder: (context, child) {
-                                  return ClipPath(
-                                    clipper:
-                                        SlashClipper(_slashController.value),
-                                    child: child,
-                                  );
-                                },
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(16),
-                                  child: AnimatedBuilder(
-                                    animation: _slashController,
-                                    builder: (context, child) {
-                                      return ClipPath(
-                                        clipper: SlashClipper(
-                                            _slashController.value),
-                                        child: child,
-                                      );
-                                    },
+
+                              // Si el vídeo no està preparat, mostrar el GIF de càrrega
+
+                              // Text Bankai només si vídeo no carregat i GIF no visible
+                              if (!_isVideoReady)
+                                FadeTransition(
+                                  opacity: Tween<double>(begin: 1, end: 0)
+                                      .animate(_fadeOutController),
+                                  child: Center(
+                                    child: AnimatedBuilder(
+                                      animation: _writeController,
+                                      builder: (context, child) {
+                                        return SizedBox(
+                                          width: dialogWidth,
+                                          height: dialogHeight,
+                                          child: CustomPaint(
+                                            painter: InkWritePainter(
+                                              text: _fullBankaiText,
+                                              progress: _writeController.value,
+                                              isShinji: _isShinji,
+                                              textStyle: const TextStyle(
+                                                fontSize: 64,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                letterSpacing: 8,
+                                                fontFamily: 'Harukaze',
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+
+                              // Mostrar el vídeo si ja està carregat
+                              if (_isVideoReady)
+                                AnimatedBuilder(
+                                  animation: _slashController,
+                                  builder: (context, child) {
+                                    return ClipPath(
+                                      clipper:
+                                          SlashClipper(_slashController.value),
+                                      child: child,
+                                    );
+                                  },
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(16),
                                     child: FadeTransition(
-                                      opacity: Tween<double>(
-                                              begin: 1.0, end: 0.0)
-                                          .animate(_videoFadeOutController),
+                                      opacity:
+                                          Tween<double>(begin: 1.0, end: 0.0)
+                                              .animate(_videoFadeOutController),
                                       child: Chewie(
                                           controller: _chewieController!),
                                     ),
                                   ),
                                 ),
-                              ),
-                          ],
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+                            ],
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+        ),
       ),
     );
   }
