@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 
 class NovetatsContainer extends StatefulWidget {
   final VoidCallback onTap;
@@ -74,7 +75,7 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: CustomLoadingIndicator());
                     },
                   ),
                 ),
