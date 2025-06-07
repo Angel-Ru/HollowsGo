@@ -1,3 +1,5 @@
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+
 import '../../../imports.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +45,7 @@ class PerfilHeader extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const SizedBox(
                     height: 100,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: CustomLoadingIndicator()),
                   );
                 } else if (snapshot.hasError) {
                   return Column(

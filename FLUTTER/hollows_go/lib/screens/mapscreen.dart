@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:hollows_go/providers/map_provider.dart';
 import 'package:hollows_go/service/audioservice.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
@@ -99,14 +100,16 @@ class _MapaScreenState extends State<Mapscreen> {
   void initState() {
     super.initState();
     AudioService.instance.playScreenMusic('mapa');
-     WidgetsBinding.instance.addPostFrameCallback((_) => _checkSkinSelection());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkSkinSelection());
     _initialize();
   }
 
   void _checkSkinSelection() {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    if (provider.selectedSkinAliat == null && provider.selectedSkinEnemic == null && provider.selectedSkinQuincy == null) {
+    if (provider.selectedSkinAliat == null &&
+        provider.selectedSkinEnemic == null &&
+        provider.selectedSkinQuincy == null) {
       PersonatgeNoSeleccionatDialog.mostrar(context);
     }
   }
@@ -189,7 +192,7 @@ class _MapaScreenState extends State<Mapscreen> {
     if (_currentLocation == null) {
       // Esperem només la posició
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: CustomLoadingIndicator()),
       );
     }
 

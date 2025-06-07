@@ -115,7 +115,7 @@ class DialegNoticies extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Image.asset(
-                    'assets/images/consell.jpg',
+                    'lib/images/amistats_noticia.png',
                     fit: BoxFit.cover,
                   ),
                   SizedBox(height: 12),
@@ -123,6 +123,10 @@ class DialegNoticies extends StatelessWidget {
                     title: '·Configuració·',
                     body:
                         'Nova pantalla de configuració on, podràs modificar el volum del teu dispositiu, l\'abrillantament, a més de poder veure el nou tutorial, fet per nous integrats.\n També podràs eliminar el teu compte d\'usuari si ho necessites, a més de l\'opció de tancar sessió',
+                  ),
+                  Image.asset(
+                    'lib/images/configuracio_noticia.png',
+                    fit: BoxFit.cover,
                   ),
                 ],
               ),

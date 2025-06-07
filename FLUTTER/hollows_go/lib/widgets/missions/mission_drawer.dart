@@ -1,4 +1,6 @@
 // Drawer complet
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+
 import '../../imports.dart';
 import '../../models/missionArma.dart';
 import '../../models/missionDiaria.dart';
@@ -20,10 +22,10 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
   @override
   void initState() {
     super.initState();
-    final missionsProvider = Provider.of<MissionsProvider>(context, listen: false);
-   
+    final missionsProvider =
+        Provider.of<MissionsProvider>(context, listen: false);
+
     _loadFutures = Future.wait([
-      
       missionsProvider.fetchMissions(widget.usuariId),
       missionsProvider.fetchMissioTitol(widget.usuariId),
       missionsProvider.fetchMissioArma(widget.usuariId)
@@ -45,7 +47,10 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
             ListTile(
               title: const Text(
                 'Missions',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
               trailing: IconButton(
                 icon: const Icon(Icons.close, color: Colors.white70),
@@ -53,13 +58,12 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
               ),
             ),
             Divider(color: Colors.grey[800]),
-
             Expanded(
               child: FutureBuilder(
                 future: _loadFutures,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: Colors.tealAccent));
+                    return const Center(child: CustomLoadingIndicator());
                   } else if (snapshot.hasError) {
                     return Center(
                       child: Text(
@@ -76,7 +80,8 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
                           children: [
                             // Missions Diaries
                             const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 14, vertical: 8),
                               child: Text(
                                 'Missions Diaries',
                                 style: TextStyle(
@@ -88,20 +93,24 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
                             ),
                             if (missions.isEmpty)
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 14),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 14),
                                 child: Text(
                                   'No hi ha missions diaries disponibles.',
                                   style: TextStyle(color: Colors.grey[400]),
                                 ),
                               )
                             else
-                              ...missions.map((missio) => _buildMissionCard(missio)).toList(),
+                              ...missions
+                                  .map((missio) => _buildMissionCard(missio))
+                                  .toList(),
 
                             const SizedBox(height: 24),
 
                             // Missió Títol
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 14),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 14),
                               child: Text(
                                 'Missió Títol',
                                 style: TextStyle(
@@ -114,7 +123,8 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
                             missioTitol != null
                                 ? _buildMissioTitolCard(missioTitol)
                                 : Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 8),
                                     child: Text(
                                       'No hi ha missió de títol activa.',
                                       style: TextStyle(color: Colors.grey[400]),
@@ -125,7 +135,8 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
 
                             // Missió Arma
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 14),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 14),
                               child: Text(
                                 'Missió Arma',
                                 style: TextStyle(
@@ -138,7 +149,8 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
                             missioArma != null
                                 ? _buildMissioArmaCard(missioArma)
                                 : Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 8),
                                     child: Text(
                                       'No hi ha missió d\'arma activa.',
                                       style: TextStyle(color: Colors.grey[400]),
@@ -200,7 +212,8 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: LinearProgressIndicator(
-              value: missio.objectiu > 0 ? missio.progress / missio.objectiu : 0,
+              value:
+                  missio.objectiu > 0 ? missio.progress / missio.objectiu : 0,
               minHeight: 10,
               backgroundColor: Colors.grey[800],
               color: Colors.orangeAccent[400],
@@ -288,7 +301,9 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: LinearProgressIndicator(
-              value: missioTitol.objectiu > 0 ? missioTitol.progres / missioTitol.objectiu : 0,
+              value: missioTitol.objectiu > 0
+                  ? missioTitol.progres / missioTitol.objectiu
+                  : 0,
               minHeight: 12,
               backgroundColor: Colors.grey[700],
               color: Colors.orangeAccent[100],
@@ -377,7 +392,9 @@ class _MissionsDrawerState extends State<MissionsDrawer> {
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: LinearProgressIndicator(
-              value: missioArma.objectiu > 0 ? missioArma.progres / missioArma.objectiu : 0,
+              value: missioArma.objectiu > 0
+                  ? missioArma.progres / missioArma.objectiu
+                  : 0,
               minHeight: 12,
               backgroundColor: Colors.blueGrey[700],
               color: Colors.cyanAccent,
