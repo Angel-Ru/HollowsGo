@@ -320,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen>
         case 1:
           return 'Shinigami';
         case 2:
-          return 'Hollow / Enemic';
+          return 'Hollow';
         default:
           return 'Desconegut';
       }
