@@ -12,6 +12,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
   static const String _userPuntsKey = 'userPunts';
   static const String _userNameKey = 'userName';
   static const String _userEmailKey = 'userEmail';
+  int? _userId;
 
   int _coinCount = 0;
   int _coinEnemies = 0;
@@ -47,6 +48,7 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _coinCount = prefs.getInt(_userPuntsKey) ?? 0;
     _username = prefs.getString(_userNameKey) ?? 'Usuari';
+    _userId = prefs.getInt('userId');
     notifyListeners();
   }
 
@@ -65,6 +67,9 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     if (allSkins.isEmpty) return;
     final random = Random();
     _selectedSkinAliat = allSkins[random.nextInt(allSkins.length)];
+    _selectedSkinEnemic = null; // Assegurem que no hi ha skin enemic seleccionada
+    _selectedSkinQuincy = null; // Assegurem que no hi ha skin quincy seleccionada
+    actualitzarSkinSeleccionada(_userId!, _selectedSkinAliat!.id);
     notifyListeners();
   }
 
@@ -74,6 +79,9 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     if (allSkins.isEmpty) return;
     final random = Random();
     _selectedSkinQuincy = allSkins[random.nextInt(allSkins.length)];
+    _selectedSkinEnemic = null; // Assegurem que no hi ha skin enemic seleccionada
+    _selectedSkinAliat = null; // Assegurem que no hi ha skin aliada seleccionada
+    actualitzarSkinSeleccionada(_userId!, _selectedSkinQuincy!.id);
     notifyListeners();
   }
 
@@ -83,6 +91,9 @@ class SkinsEnemicsPersonatgesProvider with ChangeNotifier {
     if (allSkins.isEmpty) return;
     final random = Random();
     _selectedSkinEnemic = allSkins[random.nextInt(allSkins.length)];
+    _selectedSkinAliat = null; // Assegurem que no hi ha skin aliada seleccionada
+    _selectedSkinQuincy = null; // Assegurem que no hi ha skin quincy seleccionada
+    actualitzarSkinSeleccionada(_userId!, _selectedSkinEnemic!.id);
     notifyListeners();
   }
 
