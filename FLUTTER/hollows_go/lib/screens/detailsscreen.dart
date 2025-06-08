@@ -151,21 +151,28 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _buildHabilitatsSection() {
-    return _buildContainer(
-      borderColor: Colors.yellow.withOpacity(0.5),
-      children: _habilitats
-          .map((habilitat) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStatItem('Habilitat', habilitat.nom),
-                  _buildStatItem('Descripció', habilitat.descripcio),
-                  _buildStatItem('Efecte', habilitat.efecte),
-                  const Divider(color: Colors.yellow, thickness: 0.5),
-                ],
-              ))
-          .toList(),
-    );
-  }
+  return _buildContainer(
+    borderColor: Colors.yellow.withOpacity(0.5),
+    children: List<Widget>.generate(_habilitats.length * 2 - 1, (index) {
+      if (index.isEven) {
+        // Índex parell: habilitat
+        final habilitat = _habilitats[index ~/ 2];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStatItem('Habilitat', habilitat.nom),
+            _buildStatItem('Descripció', habilitat.descripcio),
+            _buildStatItem('Efecte', habilitat.efecte),
+          ],
+        );
+      } else {
+        // Índex senar: divider (excepte després de l'última habilitat)
+        return const Divider(color: Colors.yellow, thickness: 0.5);
+      }
+    }),
+  );
+}
+
 
   Widget _buildContainer({required List<Widget> children, Color? borderColor}) {
     return Center(
