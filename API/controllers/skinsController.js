@@ -862,7 +862,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
     const connection = await connectDB();
     const userId = req.params.id;
 
-    // Obtenir els personatges de l'usuari de raça 1(Shinigamis)
+    // Obtenir els personatges de l'usuari de raça 1 (Shinigamis)
     const [personatgesResult] = await connection.execute(`
       SELECT DISTINCT p.id AS personatge_id,
                       p.nom AS personatge_nom,
@@ -892,7 +892,8 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
              ar.id AS arma_id,
              ar.nom AS arma_nom,
              b.personatge_id,
-             usa.vida_actual
+             usa.vida_actual,
+             usa.arma AS usuari_arma_id
       FROM SKINS s
       JOIN BIBLIOTECA b ON FIND_IN_SET(s.id, b.skin_ids) > 0
       LEFT JOIN USUARI_SKIN_ARMES usa ON usa.skin = s.id AND usa.usuari = ?
@@ -904,7 +905,6 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
     const skinIds = skinsResult.map(skin => skin.skin_id);
 
     if (skinIds.length > 0) {
-      // Crear placeholders dinàmics per la consulta IN
       const placeholders = skinIds.map(() => '?').join(',');
       const params = [userId, ...skinIds];
 
@@ -944,22 +944,27 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
 
     // Construir la resposta final
     const personatgesAmbSkins = personatgesResult.map(personatge => {
-      const skins = (skinsPerPersonatge[personatge.personatge_id] || []).map(skin => ({
-        id: skin.skin_id,
-        nom: skin.skin_nom,
-        imatge: skin.imatge,
-        raça: skin.raça,
-        categoria: skin.categoria,
-        mal_total: (personatge.mal_base || 0) + (skin.mal_arma || 0) + (skin.mal_atac || 0),
-        vida: skin.vida_actual !== null ? skin.vida_actual : personatge.vida_base,
-        vida_maxima: personatge.vida_base,
-        atac_nom: skin.atac_nom,
-        arma: {
-          id: skin.arma_id || null,
-          nom: skin.arma_nom || null,
-          buff_atac: skin.mal_arma || 0
-        }
-      }));
+      const skins = (skinsPerPersonatge[personatge.personatge_id] || []).map(skin => {
+        // Només sumar el mal de l'arma si la skin té una arma equipada
+        const mal_arma = skin.usuari_arma_id ? (skin.mal_arma || 0) : 0;
+
+        return {
+          id: skin.skin_id,
+          nom: skin.skin_nom,
+          imatge: skin.imatge,
+          raça: skin.raça,
+          categoria: skin.categoria,
+          mal_total: (personatge.mal_base || 0) + mal_arma + (skin.mal_atac || 0),
+          vida: skin.vida_actual !== null ? skin.vida_actual : personatge.vida_base,
+          vida_maxima: personatge.vida_base,
+          atac_nom: skin.atac_nom,
+          arma: {
+            id: skin.arma_id || null,
+            nom: skin.arma_nom || null,
+            buff_atac: mal_arma
+          }
+        };
+      });
 
       return {
         personatge: {
