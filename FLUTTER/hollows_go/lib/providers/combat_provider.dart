@@ -124,7 +124,6 @@ class CombatProvider with ChangeNotifier {
     _senjumaruEffectActive = true;
     _senjumaruAttackCount = 0;
 
-    // Aquí notifiquem el widget per mostrar la primera imatge (via listener o algun state)
     notifyListeners();
   }
 
@@ -265,7 +264,6 @@ class CombatProvider with ChangeNotifier {
       _isEnemyTurn = true;
       notifyListeners();
 
-      // Atac enemic
       await _performEnemyAttack(enemyDamage, skinId, onDefeat,
           onVictory: onVictory);
     }
@@ -299,7 +297,6 @@ class CombatProvider with ChangeNotifier {
     await Future.delayed(const Duration(milliseconds: 600));
     _isAllyHit = false;
 
-    // Process bleed tick només si enemic viu
     if (_enemyBleeding && _enemicHealth > 0) {
       processBleedTick(onEnemyDefeated: onVictory);
     }

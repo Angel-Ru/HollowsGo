@@ -122,8 +122,7 @@ class UltimateService {
           rotateScreen: false,
           onDamageApplied: (_) {
             combatProvider.setPlayerImmune(true);
-            debugPrint(
-                "🛡️ Escut de Yhwach activat! L'aliat ara és immune al pròxim atac.");
+            debugPrint("Escut de Yhwach activat!");
           },
           onEnemyDefeated: onEnemyDefeated,
         );
