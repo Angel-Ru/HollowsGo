@@ -2337,16 +2337,17 @@ exports.getSkinSeleccionada = async (req, res) => {
     
 
     // Obtenir l'arma equipada (pot no existir)
-    const [armaEquip] = await connection.execute(`
-      SELECT ar.buff_atac AS mal_arma
-      FROM USUARI_SKIN_ARMES usa
-      JOIN SKINS_ARMES sa ON usa.skin = sa.skin
-      JOIN ARMES ar ON sa.arma = ar.id
-      WHERE usa.usuari = ? AND usa.seleccionat = true
-      LIMIT 1
-    `, [userId]);
+    // Obtenir l'arma equipada (pot no existir)
+const [armaEquip] = await connection.execute(`
+  SELECT ar.buff_atac AS mal_arma
+  FROM USUARI_SKIN_ARMES usa
+  LEFT JOIN ARMES ar ON usa.arma = ar.id
+  WHERE usa.usuari = ? AND usa.seleccionat = true
+  LIMIT 1
+`, [userId]);
 
-    const malArma = armaEquip.length > 0 ? armaEquip[0].mal_arma : 0;
+const malArma = armaEquip.length > 0 && armaEquip[0].mal_arma !== null ? armaEquip[0].mal_arma : 0;
+
 
     // Calcula mal_total sumant mal_base_personatge, mal_arma (si hi ha) i mal_atac + buff
     const malTotal = (skinSeleccionada.mal_base_personatge || 0) +
