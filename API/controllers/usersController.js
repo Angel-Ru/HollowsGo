@@ -693,12 +693,13 @@ exports.modificarNomUsuari = async (req, res) => {
         const contrasenyaHash = userRows[0].contrassenya;
 
         // Verificar la contrasenya actual
+
         const contrasenyaCorrecta = await bcrypt.compare(contrasenyaActual, contrassenyaHash);
         if (!contrasenyaCorrecta) {
             return res.status(400).send('Contrasenya actual incorrecta.');
         }
 
-        // Actualitzar el nom
+
         const [updateResult] = await connection.execute(
             'UPDATE USUARIS SET nom = ? WHERE id = ?',
             [nouNom, id]

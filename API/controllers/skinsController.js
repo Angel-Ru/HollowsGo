@@ -879,16 +879,16 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
       return res.status(404).send('No s\'han trobat personatges per a aquest usuari');
     }
 
-    // Obtenir les skins amb l’arma equipada per l’usuari
+    // Obtenir les skins amb les dades correctes de l'arma i l'atac
     const [skinsResult] = await connection.execute(`
       SELECT s.id AS skin_id,
              s.nom AS skin_nom,
              s.categoria,
              s.imatge,
              s.raça,
-             a.mal AS mal_arma,
+             a.mal AS mal_atac,
              a.nom AS atac_nom,
-             ar.buff_atac AS atac,
+             ar.buff_atac AS mal_arma,
              ar.id AS arma_id,
              ar.nom AS arma_nom,
              b.personatge_id,
@@ -908,7 +908,6 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
       const placeholders = skinIds.map(() => '?').join(',');
       const params = [userId, ...skinIds];
 
-      // Consultar quins registres d'USUARI_SKIN_ARMES ja existeixen
       const [usuarisSkinsRecords] = await connection.execute(`
         SELECT skin, usuari, vida_actual FROM USUARI_SKIN_ARMES WHERE usuari = ? AND skin IN (${placeholders})
       `, params);
@@ -918,11 +917,8 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         usuariSkinMap.set(Number(rec.skin), rec.vida_actual);
       });
 
-      // Insertar o actualitzar segons calgui amb ON DUPLICATE KEY UPDATE
       for (const skin of skinsResult) {
         const vidaMaxima = (personatgesResult.find(p => p.personatge_id === skin.personatge_id)?.vida_base) || 100;
-
-        // Si no hi ha valor o és null, posem la vida màxima, si no, mantenim la que hi ha
         const vidaActual = (usuariSkinMap.has(Number(skin.skin_id)) && usuariSkinMap.get(Number(skin.skin_id)) !== null)
           ? usuariSkinMap.get(Number(skin.skin_id))
           : vidaMaxima;
@@ -954,14 +950,14 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
         imatge: skin.imatge,
         raça: skin.raça,
         categoria: skin.categoria,
-        mal_total: personatge.mal_base + (skin.mal_arma || 0) + (skin.atac || 0),
+        mal_total: (personatge.mal_base || 0) + (skin.mal_arma || 0) + (skin.mal_atac || 0),
         vida: skin.vida_actual !== null ? skin.vida_actual : personatge.vida_base,
         vida_maxima: personatge.vida_base,
         atac_nom: skin.atac_nom,
         arma: {
           id: skin.arma_id || null,
           nom: skin.arma_nom || null,
-          buff_atac: skin.atac || 0
+          buff_atac: skin.mal_arma || 0
         }
       }));
 

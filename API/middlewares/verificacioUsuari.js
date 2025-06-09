@@ -69,7 +69,7 @@ exports.verifyToken = (req, res, next) => {
         return res.status(403).json({message: 'Token no proporcionat'});
     }
 
-    const token = authHeader.split(' ')[1]; // 🔥 Agafa només el token sense "Bearer "
+    const token = authHeader.split(' ')[1]; 
 
     jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
