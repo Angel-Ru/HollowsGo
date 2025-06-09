@@ -54,6 +54,7 @@ dependencies:
   card_swiper: ^3.0.1
   flutter_paypal: ^0.2.1
   webview_flutter: ^4.4.2
+  collection: ^1.17.2
 
 dev_dependencies:
   flutter_launcher_icons: "^0.14.3"
@@ -61,9 +62,9 @@ dev_dependencies:
     sdk: flutter
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
-  image_path: "lib/images/logo.png"
+  image_path: "lib/images/others/icono_bo.png"
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

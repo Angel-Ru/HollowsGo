@@ -38,7 +38,7 @@ class GachaProvider extends ChangeNotifier {
       }
 
       final response = await http.post(
-        Uri.parse('https://${Config.ip}/skins/gacha/simulacio'),
+        Uri.parse('https://${Config.ip}/skins/gacha'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

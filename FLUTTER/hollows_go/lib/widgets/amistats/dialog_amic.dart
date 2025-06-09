@@ -1,3 +1,5 @@
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
+
 import '../../imports.dart';
 
 class AfegirAmicDialog extends StatefulWidget {
@@ -116,7 +118,7 @@ class _AfegirAmicDialogState extends State<AfegirAmicDialog> {
             ),
             const SizedBox(height: 16),
             if (_isLoading)
-              const Center(child: CircularProgressIndicator())
+              const Center(child: CustomLoadingIndicator())
             else
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,

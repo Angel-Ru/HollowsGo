@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:hollows_go/models/habilitat_llegendaria.dart';
 import 'package:hollows_go/providers/habilitat_provider.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import '../imports.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   Personatge? _personatge;
   List<Skin> _skins = [];
-  HabilitatLlegendaria? _habilitat;
+  List<HabilitatLlegendaria> _habilitats = [];
   bool _isLoading = true;
 
   @override
@@ -30,21 +31,28 @@ class _DetailScreenState extends State<DetailScreen> {
     final habilitatProvider =
         Provider.of<HabilitatProvider>(context, listen: false);
 
-    // Ejecuta todas las futuras en paralelo
-    final results = await Future.wait([
-      personatgeProvider.fetchPersonatgeById(widget.personatgeId),
-      personatgeProvider.fetchPersonatgeSkins(widget.personatgeId),
-      habilitatProvider.loadHabilitatPerPersonatgeId(widget.personatgeId),
-    ]);
+    try {
+      final results = await Future.wait([
+        personatgeProvider.fetchPersonatgeById(widget.personatgeId),
+        personatgeProvider.fetchPersonatgeSkins(widget.personatgeId),
+        habilitatProvider.loadHabilitatsPerPersonatgeId(widget.personatgeId),
+      ]);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      _personatge = results[0] as Personatge?;
-      _skins = results[1] as List<Skin>? ?? [];
-      _habilitat = habilitatProvider.habilitat;
-      _isLoading = false;
-    });
+      setState(() {
+        _personatge = results[0] as Personatge?;
+        _skins = results[1] as List<Skin>? ?? [];
+        _habilitats = results[2] as List<HabilitatLlegendaria>? ?? [];
+        _isLoading = false;
+      });
+    } catch (e) {
+      debugPrint('Error carregant dades: $e');
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   String _formatAniversari(DateTime? aniversari) => aniversari == null
@@ -67,7 +75,6 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
       body: Stack(
         children: [
-          // Fondo
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -77,7 +84,7 @@ class _DetailScreenState extends State<DetailScreen> {
             ),
           ),
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: CustomLoadingIndicator())
               : _personatge == null
                   ? const Center(
                       child: Text('No s\'ha pogut carregar el personatge.'))
@@ -112,9 +119,9 @@ class _DetailScreenState extends State<DetailScreen> {
                                   color: Colors.white)),
                           const SizedBox(height: 8),
                           _buildStatsSection(),
-                          if (_habilitat != null) ...[
+                          if (_habilitats.isNotEmpty) ...[
                             const SizedBox(height: 4),
-                            _buildHabilitatSection(),
+                            _buildHabilitatsSection(),
                           ],
                           const SizedBox(height: 24),
                           SkinsListWidget(skins: _skins),
@@ -143,16 +150,29 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  Widget _buildHabilitatSection() {
-    return _buildContainer(
-      borderColor: Colors.yellow.withOpacity(0.5),
-      children: [
-        _buildStatItem('Habilitat', _habilitat!.nom),
-        _buildStatItem('Descripció habilitat', _habilitat!.descripcio),
-        _buildStatItem('Efecte habilitat', _habilitat!.efecte),
-      ],
-    );
-  }
+  Widget _buildHabilitatsSection() {
+  return _buildContainer(
+    borderColor: Colors.yellow.withOpacity(0.5),
+    children: List<Widget>.generate(_habilitats.length * 2 - 1, (index) {
+      if (index.isEven) {
+        // Índex parell: habilitat
+        final habilitat = _habilitats[index ~/ 2];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildStatItem('Habilitat', habilitat.nom),
+            _buildStatItem('Descripció', habilitat.descripcio),
+            _buildStatItem('Efecte', habilitat.efecte),
+          ],
+        );
+      } else {
+        // Índex senar: divider (excepte després de l'última habilitat)
+        return const Divider(color: Colors.yellow, thickness: 0.5);
+      }
+    }),
+  );
+}
+
 
   Widget _buildContainer({required List<Widget> children, Color? borderColor}) {
     return Center(

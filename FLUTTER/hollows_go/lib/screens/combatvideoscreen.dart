@@ -18,17 +18,17 @@ class _CombatIntroVideoScreenState extends State<CombatIntroVideoScreen>
   bool _isVideoReady = false;
 
   final List<String> musiquesDies = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/DIA/l7lo9rvit62uevuq1kjh',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/DIA/pyz9ui8dwuabwxy8rhp5',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/DIA/i1mirsiqcplvyeu3rb3q',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/DIA/qmtewqyfdby1ixuo6ryh',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/DIA/COMBATSCREEN_AUDIO_DIA_l7lo9rvit62uevuq1kjh%20-%20copia.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/DIA/COMBATSCREEN_AUDIO_DIA_pyz9ui8dwuabwxy8rhp5%20-%20copia.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/DIA/COMBATSCREEN_AUDIO_DIA_i1mirsiqcplvyeu3rb3q%20-%20copia.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/DIA/qmtewqyfdby1ixuo6ryh.mp3',
   ];
 
   final List<String> musiquesNit = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/NIT/og5jzlnjqjk2tvsufb5r',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/NIT/b45dpkn1ubhvttgga0vc',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/NIT/xdyqf4ljifpgwplkc7os',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/COMBATSCREEN/AUDIO/NIT/lnw8xjdeu60lwfjdqhjo',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/NIT/COMBATSCREEN_AUDIO_NIT_og5jzlnjqjk2tvsufb5r%20-%20copia.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/NIT/COMBATSCREEN_AUDIO_NIT_b45dpkn1ubhvttgga0vc%20-%20copia.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/NIT/xdyqf4ljifpgwplkc7os.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Combat_Screen/NIT/lnw8xjdeu60lwfjdqhjo.mp3',
   ];
 
   @override

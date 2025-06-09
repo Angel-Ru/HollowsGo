@@ -29,53 +29,53 @@ class AudioService with WidgetsBindingObserver {
   double _volume = 1.0;
 
   final List<String> _prehomeMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/v1745996030/MUSICA/fkgjkz7ttdqxqakacqsd.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Musica/MUSICA_fkgjkz7ttdqxqakacqsd.mp3',
   ];
 
   final List<String> _homeMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/zsjzvaaz2naidgksavjn',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/HOMESCREEN/MUSICA/v75croefbl9pw2xum78x',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/HomeScreen/Musica/HOMESCREEN_MUSICA_zsjzvaaz2naidgksavjn.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/HomeScreen/Musica/HOMESCREEN_MUSICA_v75croefbl9pw2xum78x.mp3',
   ];
 
   final List<String> _tendaMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dq2skhigp8ml5kjysdl8',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/n47sbuwwhjntfd5tplpl',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/wqjoawsw8v7igikmuym4',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/nzvkinzhqcoor7hdb72n',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/TENDASCREEN/MUSICA/dtofpubrwmruyye4kajd',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Tenda/Musica/TENDASCREEN_MUSICA_dq2skhigp8ml5kjysdl8.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Tenda/Musica/TENDASCREEN_MUSICA_n47sbuwwhjntfd5tplpl.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Tenda/Musica/TENDASCREEN_MUSICA_wqjoawsw8v7igikmuym4.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Tenda/Musica/TENDASCREEN_MUSICA_nzvkinzhqcoor7hdb72n.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Tenda/Musica/TENDASCREEN_MUSICA_dtofpubrwmruyye4kajd.mp3',
   ];
 
   final List<String> _bibliotecaMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/kubs8yagdgzqrptb6qjv',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/wtj5tjwn4lziywibi7hs',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_kubs8yagdgzqrptb6qjv.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_wtj5tjwn4lziywibi7hs.mp3',
   ];
 
   final List<String> _perfilMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/PROFILE_MUSICA/dw9kzikmlmjr7lnin8cm',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/rvfjnxz13ep6axa8wucr',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_PROFILE_MUSICA_dw9kzikmlmjr7lnin8cm.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_rvfjnxz13ep6axa8wucr.mp3',
   ];
 
   final List<String> _mapaMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/q3nndud9xavtsimfry7v',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/yqruspp5kdqyhvpxehmm',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_q3nndud9xavtsimfry7v.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_yqruspp5kdqyhvpxehmm.mp3',
   ];
 
   final List<String> _settingsMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/SETTINGS_MUSICA/u8ao6m5yyrxkpybgsdnh',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/SETTINGS_MUSICA/zf5tmvaczuto07gjup4t',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_SETTINGS_MUSICA_u8ao6m5yyrxkpybgsdnh.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_SETTINGS_MUSICA_zf5tmvaczuto07gjup4t.mp3',
   ];
 
   final List<String> _amistatsMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/AMISTATS_MUSICA/tudeyopnovxc4khvlkoz',
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/TUTORIAL/w8ypnhjubsiytbjkdwmu',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_AMISTATS_MUSICA_tudeyopnovxc4khvlkoz.mp3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_TUTORIAL_w8ypnhjubsiytbjkdwmu.mp3',
   ];
 
   final List<String> _tutorialMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/TUTORIAL/gpubxi1cz98orj8muezc',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_TUTORIAL_gpubxi1cz98orj8muezc.mp3',
   ];
 
   final List<String> _editMusicUrls = [
-    'https://res.cloudinary.com/dkcgsfcky/video/upload/f_auto:video,q_auto/v1/CONFIGURATIONSCREEN/mgka7srvn6yvqkf0ook3',
+    'https://media.githubusercontent.com/media/MiquelSanso/Imatges-HollowsGO/refs/heads/main/Configuration_Screen/CONFIGURATIONSCREEN_mgka7srvn6yvqkf0ook3.mp3',
   ];
 
   final Random _random = Random();

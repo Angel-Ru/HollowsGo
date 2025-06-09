@@ -239,43 +239,44 @@ exports.borrarHabilitatId = async (req, res) => {
 
 // Cercar una habilitat pel personatge
 exports.getHabilitatPersonatge = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const connection = await connectDB();
+  try {
+    const { id } = req.params;
+    const connection = await connectDB();
 
-        const [rows] = await connection.execute(
-            `SELECT
-                 h.id,
-                 h.nom,
-                 h.descripcio,
-                 h.skin_personatge,
-                 h.efecte
-             FROM HABILITAT_LLEGENDARIA h
-                      JOIN SKINS s ON s.id = h.skin_personatge
-                      JOIN PERSONATGES p ON p.id = s.personatge
-             WHERE p.id = ?
-                 LIMIT 1`,
-            [id]
-        );
+    const [rows] = await connection.execute(
+      `SELECT
+          h.id,
+          h.nom,
+          h.descripcio,
+          h.skin_personatge,
+          h.efecte
+       FROM HABILITAT_LLEGENDARIA h
+                JOIN SKINS s ON s.id = h.skin_personatge
+                JOIN PERSONATGES p ON p.id = s.personatge
+       WHERE p.id = ?`,
+      [id]
+    );
 
-        if (rows.length === 0) {
-            return res.status(404).send('Cap habilitat llegendària trobada per aquest personatge');
-        }
-
-        const habilitat = rows[0];
-
-        res.json({
-            id: habilitat.id,
-            nom: habilitat.nom,
-            descripcio: habilitat.descripcio,
-            skin_personatge: habilitat.skin_personatge,
-            efecte: habilitat.efecte
-        });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error en la consulta');
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .send('Cap habilitat llegendària trobada per aquest personatge');
     }
+
+    // Preparem cada habilitat amb la mateixa estructura que tenies abans
+    const habilitats = rows.map((habilitat) => ({
+      id: habilitat.id,
+      nom: habilitat.nom,
+      descripcio: habilitat.descripcio,
+      skin_personatge: habilitat.skin_personatge,
+      efecte: habilitat.efecte,
+    }));
+
+    res.json(habilitats);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error en la consulta');
+  }
 };
 
 

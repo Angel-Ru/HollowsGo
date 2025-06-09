@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 
 class NovetatsContainer extends StatefulWidget {
   final VoidCallback onTap;
@@ -11,9 +12,9 @@ class NovetatsContainer extends StatefulWidget {
 
 class _NovetatsContainerState extends State<NovetatsContainer> {
   final List<String> _novetatsImages = [
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/HOMESCREEN/vlmjp3zogckd7ngaju8x',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/HOMESCREEN/yrfzks7quxo1gxkybluf',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/HOMESCREEN/vj87lcdmygthnw0ilfnj',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/HomeScreen/Novetats/HOMESCREEN_vlmjp3zogckd7ngaju8x.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/HomeScreen/Novetats/HOMESCREEN_yrfzks7quxo1gxkybluf.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/HomeScreen/Novetats/HOMESCREEN_vj87lcdmygthnw0ilfnj.png?raw=true',
   ];
 
   int _currentImageIndex = 0;
@@ -74,7 +75,7 @@ class _NovetatsContainerState extends State<NovetatsContainer> {
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: CustomLoadingIndicator());
                     },
                   ),
                 ),

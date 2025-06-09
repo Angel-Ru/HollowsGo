@@ -88,8 +88,12 @@ class _HomeScreenState extends State<HomeScreen>
       Provider.of<VialsProvider>(context, listen: false)
           .fetchVials(userProvider.userId);
 
-      Provider.of<DialogueProvider>(context, listen: false)
-          .loadDialogueFromJson("ichigo");
+      final dialogueProvider =
+          Provider.of<DialogueProvider>(context, listen: false);
+
+      if (!dialogueProvider.dialogueLoaded) {
+        dialogueProvider.loadDialogueFromJson("ichigo");
+      }
 
       await _controller.loadUserData();
       final selectedProvider =
@@ -316,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen>
         case 1:
           return 'Shinigami';
         case 2:
-          return 'Hollow / Enemic';
+          return 'Hollow';
         default:
           return 'Desconegut';
       }
@@ -348,6 +352,18 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
               ),
               Positioned(
+                top: -10,
+                right: -10,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.keyboard_arrow_up,
+                    color: Colors.yellow,
+                    size: 32,
+                  ),
+                  onPressed: _toggleExpand,
+                ),
+              ),
+              Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
@@ -376,18 +392,6 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.keyboard_arrow_up,
-                    color: Colors.yellow,
-                    size: 32,
-                  ),
-                  onPressed: _toggleExpand,
                 ),
               ),
             ],
@@ -437,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen>
                             style: TextStyle(
                               color: Colors.amberAccent,
                               fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                           Flexible(
@@ -446,7 +450,7 @@ class _HomeScreenState extends State<HomeScreen>
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                                fontSize: 14,
                               ),
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center,
@@ -464,7 +468,7 @@ class _HomeScreenState extends State<HomeScreen>
                               habilitat.efecte ?? '',
                               style: TextStyle(
                                 color: Colors.grey[300],
-                                fontSize: 14,
+                                fontSize: 12,
                               ),
                               textAlign: TextAlign.center,
                             ),

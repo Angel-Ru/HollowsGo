@@ -33,13 +33,13 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     _iconWithText(
                       imageUrl:
-                          'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745254176/OTHERS/yslqndyf4eri3f7mpl6i.png',
+                          'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/HomeScreen/OTHERS_yslqndyf4eri3f7mpl6i.png?raw=true',
                       value: userProvider.coinCount,
                     ),
                     SizedBox(width: 12),
                     _iconWithText(
                       imageUrl:
-                          'https://res.cloudinary.com/dkcgsfcky/image/upload/f_auto,q_auto/v1/VIAL/w9h0t4ugeq8pn84kc1pd',
+                          'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/HomeScreen/VIAL_w9h0t4ugeq8pn84kc1pd.png?raw=true',
                       value: vialsProvider.vials,
                     ),
                   ],

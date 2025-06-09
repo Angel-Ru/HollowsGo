@@ -266,7 +266,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
                       padding: const EdgeInsets.only(bottom: 20),
                       child: PersonatgesCardSwiper(
                         personatge: personatge,
-                        isEnemyMode: _currentMode == 2,
                         onSkinSelected: (skin) async {
                           final provider =
                               Provider.of<SkinsEnemicsPersonatgesProvider>(
@@ -292,12 +291,12 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
                           setState(() {
                             if (_currentMode == 0) {
-                              provider.setSelectedSkinAliat(skin);
+                              provider.getSkinSeleccionada(userId);
                               _randomSkinName = skin.nom;
                             } else if (_currentMode == 1) {
-                              provider.setSelectedSkinQuincy(skin);
-                            } else {
-                              provider.setSelectedSkinEnemic(skin);
+                              provider.getSkinSeleccionada(userId);
+                            } else if (_currentMode == 2) {
+                              provider.getSkinSeleccionada(userId);
                             }
                           });
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -330,12 +329,12 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
 
                           setState(() {
                             if (_currentMode == 0) {
-                              provider.unselectSkinAliat();
+                              provider.llevarkinSeleccionada(userId);
                               _randomSkinName = '';
                             } else if (_currentMode == 1) {
-                              provider.unselectSkinQuincy();
-                            } else {
-                              provider.unselectSkinEnemic();
+                              provider.llevarkinSeleccionada(userId);
+                            } else if (_currentMode == 2) {
+                              provider.llevarkinSeleccionada(userId);
                             }
                           });
 
@@ -422,9 +421,6 @@ class _BibliotecaScreenState extends State<BibliotecaScreen> {
     _randomSkinName = '';
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    provider.unselectSkinAliat();
-    provider.unselectSkinQuincy();
-    provider.unselectSkinEnemic();
 
     final dialogueProvider =
         Provider.of<DialogueProvider>(context, listen: false);

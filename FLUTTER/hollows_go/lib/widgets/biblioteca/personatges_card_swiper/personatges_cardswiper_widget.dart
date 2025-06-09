@@ -6,7 +6,6 @@ import 'skin_vida_controller.dart';
 
 class PersonatgesCardSwiper extends StatefulWidget {
   final Personatge personatge;
-  final bool isEnemyMode;
   final Function(Skin) onSkinSelected;
   final Function()? onSkinDeselected;
   final Skin? selectedSkin;
@@ -14,7 +13,6 @@ class PersonatgesCardSwiper extends StatefulWidget {
   const PersonatgesCardSwiper({
     Key? key,
     required this.personatge,
-    required this.isEnemyMode,
     required this.onSkinSelected,
     this.onSkinDeselected,
     this.selectedSkin,
@@ -40,7 +38,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
 
     _skinController = SkinInteractionController(
       context: context,
-      isEnemyMode: widget.isEnemyMode,
       usuariId: Provider.of<UserProvider>(context, listen: false).userId,
     );
 
@@ -67,6 +64,22 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
       );
     }
   }
+
+  @override
+void didUpdateWidget(covariant PersonatgesCardSwiper oldWidget) {
+  super.didUpdateWidget(oldWidget);
+
+  if (oldWidget.personatge.id != widget.personatge.id) {
+    // Reinicializa todo lo que haces en initState relacionado con el personaje
+    _currentPage = 0;
+    _skinHealthController.carregarVidaPerSkinsAroundPage(
+      widget.personatge.skins,
+      _currentPage,
+    );
+    // Si necesitas reinicializar otras cosas, hazlo aquí
+  }
+}
+
 
   @override
   void dispose() {
@@ -179,7 +192,6 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                         skin: skin,
                         isSelected: isSkinSelected,
                         isFavorite: isSkinFavorite,
-                        isEnemyMode: widget.isEnemyMode,
                         onTap: () {
                           widget.onSkinSelected(skin);
                         },
@@ -208,7 +220,8 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
                             });
                           }
                         },
-                        toggleSkinFavorite: () => _toggleFavoriteSkin(userProvider, skin),
+                        toggleSkinFavorite: () =>
+                            _toggleFavoriteSkin(userProvider, skin),
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -233,6 +246,7 @@ class _PersonatgesCardSwiperState extends State<PersonatgesCardSwiper>
   }
 
   Widget _buildBarraVida(int skinId) {
+    print( skinId);
     final vida = _skinHealthController.getVida(skinId);
     final Skin? skin = widget.personatge.skins.firstWhere(
       (s) => s.id == skinId,

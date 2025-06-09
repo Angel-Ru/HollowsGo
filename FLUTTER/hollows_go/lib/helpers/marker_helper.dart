@@ -6,14 +6,17 @@ import 'dart:ui' as ui;
 class MarkerHelper {
   static final Map<String, Uint8List> _iconCache = {};
 
-  static Future<Uint8List> getMarkerIconFromUrl(String imageUrl, {bool shouldRound = false}) async {
+  static Future<Uint8List> getMarkerIconFromUrl(String imageUrl,
+      {bool shouldRound = false}) async {
     if (_iconCache.containsKey(imageUrl)) return _iconCache[imageUrl]!;
 
     try {
       final response = await http.get(Uri.parse(imageUrl));
-      if (response.statusCode != 200) throw Exception("No es pot carregar la imatge");
+      if (response.statusCode != 200)
+        throw Exception("No es pot carregar la imatge");
 
-      final ui.Codec codec = await ui.instantiateImageCodec(response.bodyBytes, targetWidth: 100);
+      final ui.Codec codec =
+          await ui.instantiateImageCodec(response.bodyBytes, targetWidth: 100);
       final ui.FrameInfo frameInfo = await codec.getNextFrame();
 
       final iconBytes = await _processIcon(frameInfo.image, shouldRound);
@@ -25,7 +28,8 @@ class MarkerHelper {
     }
   }
 
-  static Future<Uint8List> _processIcon(ui.Image image, bool shouldRound) async {
+  static Future<Uint8List> _processIcon(
+      ui.Image image, bool shouldRound) async {
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     final size = Size(100, 100);
@@ -38,9 +42,15 @@ class MarkerHelper {
     final path = Path()..addOval(Rect.fromLTWH(0, 0, size.width, size.height));
     canvas.clipPath(path);
     final paint = Paint()..isAntiAlias = true;
-    canvas.drawImageRect(image, Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()), Rect.fromLTWH(0, 0, size.width, size.height), paint);
+    canvas.drawImageRect(
+        image,
+        Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble()),
+        Rect.fromLTWH(0, 0, size.width, size.height),
+        paint);
 
-    final img = await recorder.endRecording().toImage(size.width.toInt(), size.height.toInt());
+    final img = await recorder
+        .endRecording()
+        .toImage(size.width.toInt(), size.height.toInt());
     final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
     return byteData!.buffer.asUint8List();
   }
@@ -56,14 +66,16 @@ class MarkerHelper {
     final List<Future<Marker?>> futures = [];
 
     for (int i = 0; i < numPoints; i++) {
-      futures.add(_createEnemyMarker(i, currentLocation, radius, imagePaths, context));
+      futures.add(
+          _createEnemyMarker(i, currentLocation, radius, imagePaths, context));
     }
 
     final markers = await Future.wait(futures);
     return markers.whereType<Marker>().toSet();
   }
 
-  static Future<Marker?> _createEnemyMarker(int index, LatLng currentLocation, double radius, List<String> imagePaths, BuildContext context) async {
+  static Future<Marker?> _createEnemyMarker(int index, LatLng currentLocation,
+      double radius, List<String> imagePaths, BuildContext context) async {
     try {
       final Random random = Random();
       const double earthRadius = 6371000;
@@ -71,7 +83,9 @@ class MarkerHelper {
       double angle = random.nextDouble() * 2 * pi;
       double distance = sqrt(random.nextDouble()) * radius;
       double deltaLat = (distance / earthRadius) * (180 / pi);
-      double deltaLng = (distance / earthRadius) * (180 / pi) / cos(currentLocation.latitude * pi / 180);
+      double deltaLng = (distance / earthRadius) *
+          (180 / pi) /
+          cos(currentLocation.latitude * pi / 180);
 
       LatLng randomPoint = LatLng(
         currentLocation.latitude + deltaLat * cos(angle),
@@ -84,7 +98,7 @@ class MarkerHelper {
       return Marker(
         markerId: MarkerId('enemy_$index'),
         position: randomPoint,
-        infoWindow: InfoWindow(title: 'Punt Aleatori $index'),
+        infoWindow: InfoWindow(title: 'Enemic nº $index'),
         icon: BitmapDescriptor.fromBytes(iconBytes),
         onTap: () {
           Navigator.push(
@@ -103,7 +117,8 @@ class MarkerHelper {
     required LatLng location,
     required String profileImageUrl,
   }) async {
-    final Uint8List iconBytes = await getMarkerIconFromUrl(profileImageUrl, shouldRound: true);
+    final Uint8List iconBytes =
+        await getMarkerIconFromUrl(profileImageUrl, shouldRound: true);
     return Marker(
       markerId: MarkerId('currentLocation'),
       position: location,

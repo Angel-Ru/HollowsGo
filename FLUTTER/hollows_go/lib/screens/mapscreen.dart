@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:hollows_go/providers/map_provider.dart';
 import 'package:hollows_go/service/audioservice.dart';
+import 'package:hollows_go/widgets/custom_loading_indicator.dart';
 import '../imports.dart';
 
 class Mapscreen extends StatefulWidget {
@@ -14,7 +15,7 @@ class Mapscreen extends StatefulWidget {
 
 class _MapaScreenState extends State<Mapscreen> {
   final Completer<GoogleMapController> _controller = Completer();
-  MapType _currentMapType = MapType.normal; // Sempre normal
+  MapType _currentMapType = MapType.normal;
   LatLng? _currentLocation;
   bool _isLoading = true;
   Set<Marker> _markers = {};
@@ -22,78 +23,23 @@ class _MapaScreenState extends State<Mapscreen> {
   StreamSubscription<Position>? _positionStream;
 
   final List<String> imagePaths = [
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/miqna6lpshzrlfeewy1v.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rf9vbqlqbpza3inl5syo.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/au1f1y75qc1aguz4nzze.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/rr49g97fcsrzg6n7r2un.png',
-    'https://res.cloudinary.com/dkcgsfcky/image/upload/v1745249912/HOLLOWS_MAPA/omchti7wzjbcdlf98fcl.png',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/menos.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_rf9vbqlqbpza3inl5syo.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_au1f1y75qc1aguz4nzze.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_rr49g97fcsrzg6n7r2un.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/HOLLOWS_MAPA_omchti7wzjbcdlf98fcl.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/Hollows_generic1.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/Hollows_generic2.png?raw=true'
   ];
 
-  static const String _darkMapStyle = '''
-[
-  {
-    "elementType": "geometry",
-    "stylers": [{"color": "#0d0d0d"}]
-  },
-  {
-    "elementType": "labels.icon",
-    "stylers": [{"visibility": "off"}]
-  },
-  {
-    "elementType": "labels.text.fill",
-    "stylers": [{"color": "#e0e0e0"}]
-  },
-  {
-    "elementType": "labels.text.stroke",
-    "stylers": [{"color": "#121212"}]
-  },
-  {
-    "featureType": "administrative",
-    "elementType": "geometry",
-    "stylers": [{"color": "#1a1a1a"}]
-  },
-  {
-    "featureType": "poi",
-    "elementType": "labels.text.fill",
-    "stylers": [{"color": "#7a7a7a"}]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [{"color": "#101010"}]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry.fill",
-    "stylers": [{"color": "#151515"}]
-  },
-  {
-    "featureType": "road",
-    "elementType": "labels.text.fill",
-    "stylers": [{"color": "#a6a6a6"}]
-  },
-  {
-    "featureType": "road.arterial",
-    "elementType": "geometry",
-    "stylers": [{"color": "#222222"}]
-  },
-  {
-    "featureType": "road.highway",
-    "elementType": "geometry",
-    "stylers": [{"color": "#292929"}]
-  },
-  {
-    "featureType": "transit",
-    "elementType": "geometry",
-    "stylers": [{"color": "#1f1f1f"}]
-  },
-  {
-    "featureType": "water",
-    "elementType": "geometry",
-    "stylers": [{"color": "#0b0b0b"}]
-  }
-]
-''';
+  final List<String> imagePathsQuincy = [
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/Meninaswebp.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/giselle.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/pngegg.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/YhwachBaseForm.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/Bleach_Ury%203F_Ishida_Anime_Schutztaffel_Render.png?raw=true',
+    'https://github.com/MiquelSanso/Imatges-HollowsGO/blob/main/Mapa/Bleach_As_Nodt_Anime_Render.png?raw=true'
+  ];
 
   @override
   void initState() {
@@ -106,7 +52,9 @@ class _MapaScreenState extends State<Mapscreen> {
   void _checkSkinSelection() {
     final provider =
         Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-    if (provider.selectedSkinAliat == null) {
+    if (provider.selectedSkinAliat == null &&
+        provider.selectedSkinEnemic == null &&
+        provider.selectedSkinQuincy == null) {
       PersonatgeNoSeleccionatDialog.mostrar(context);
     }
   }
@@ -115,7 +63,6 @@ class _MapaScreenState extends State<Mapscreen> {
     final mapProvider = Provider.of<MapDataProvider>(context, listen: false);
 
     if (mapProvider.isReady && mapProvider.currentLocation != null) {
-      // Assignem la posició i mostrem el mapa ràpidament
       setState(() {
         _currentLocation = mapProvider.currentLocation;
         _isLoading = false;
@@ -123,11 +70,15 @@ class _MapaScreenState extends State<Mapscreen> {
 
       _startLocationUpdates();
 
-      // Carreguem els marcadors en background sense bloquejar UI
+      final hour = DateTime.now().hour;
+      final List<String> imagesToUse = (hour >= 7 && hour < 17)
+          ? imagePathsQuincy
+          : imagePaths;
+
       MarkerHelper.generateEnemyMarkers(
         currentLocation: _currentLocation!,
         context: context,
-        imagePaths: imagePaths,
+        imagePaths: imagesToUse,
         radius: _radiusInMeters,
       ).then((enemyMarkers) {
         setState(() {
@@ -187,9 +138,8 @@ class _MapaScreenState extends State<Mapscreen> {
   @override
   Widget build(BuildContext context) {
     if (_currentLocation == null) {
-      // Esperem només la posició
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: CustomLoadingIndicator()),
       );
     }
 
@@ -198,6 +148,75 @@ class _MapaScreenState extends State<Mapscreen> {
       zoom: 15,
       tilt: 50,
     );
+
+    final int hour = DateTime.now().hour;
+    final bool isNight = hour >= 17 || hour < 7;
+
+    final String _dynamicMapStyle = '''
+    [
+      {
+        "elementType": "geometry",
+        "stylers": [{"color": "${isNight ? '#0d0d0d' : '#ffffff'}"}]
+      },
+      {
+        "elementType": "labels.icon",
+        "stylers": [{"visibility": "off"}]
+      },
+      {
+        "elementType": "labels.text.fill",
+        "stylers": [{"color": "#e0e0e0"}]
+      },
+      {
+        "elementType": "labels.text.stroke",
+        "stylers": [{"color": "#121212"}]
+      },
+      {
+        "featureType": "administrative",
+        "elementType": "geometry",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "poi",
+        "elementType": "labels.text.fill",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "poi.park",
+        "elementType": "geometry",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "geometry.fill",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "road",
+        "elementType": "labels.text.fill",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "road.arterial",
+        "elementType": "geometry",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "road.highway",
+        "elementType": "geometry",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "transit",
+        "elementType": "geometry",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      },
+      {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [{"color": "${isNight ? '#292929' : '#f0f0f0'}"}]
+      }
+    ]
+    ''';
 
     return Scaffold(
       body: Stack(
@@ -210,10 +229,9 @@ class _MapaScreenState extends State<Mapscreen> {
             initialCameraPosition: _puntInicial,
             onMapCreated: (controller) {
               _controller.complete(controller);
-              controller.setMapStyle(_darkMapStyle);
+              controller.setMapStyle(_dynamicMapStyle);
             },
           ),
-          // Aquí pots posar botons o altres widgets, si vols
         ],
       ),
     );
