@@ -862,7 +862,7 @@ exports.getPersonatgesAmbSkinsPerUsuari = async (req, res) => {
     const connection = await connectDB();
     const userId = req.params.id;
 
-    // Obtenir els personatges de l'usuari de raça 1
+    // Obtenir els personatges de l'usuari de raça 1(Shinigamis)
     const [personatgesResult] = await connection.execute(`
       SELECT DISTINCT p.id AS personatge_id,
                       p.nom AS personatge_nom,
