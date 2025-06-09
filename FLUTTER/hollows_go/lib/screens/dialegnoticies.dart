@@ -67,7 +67,7 @@ class DialegNoticies extends StatelessWidget {
                   NoticiaText(
                     title: '·Combat·',
                     body:
-                        'Els combats ara són més frenètics que mai!\nAfegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\nCanvi d\'enemics entre dia i nit.\n(06:00 - 17:00 Quincies) (17:00 - 06:00 Hollows) \nHi ha conseqüències a l\'hora de fer un combat, en acabar-se el mateix es queda guardada la vida del teu personatge. Planteja bé les teves estratègies. \nEls personatges es poden curar amb els nous vials que es regeneren cada 5 hores del darrer ús.',
+                        'Els combats ara són més frenètics que mai!\nAfegides les noves Habilitats Llegendàries, només alguns personatges tenen el privilegi de tenir-les, les podràs emprar totes?\nCanvi d\'enemics entre dia i nit.\n(07:00 - 16:59 Quincies) (17:00 - 06:59 Hollows) \nHi ha conseqüències a l\'hora de fer un combat, en acabar-se el mateix es queda guardada la vida del teu personatge. Planteja bé les teves estratègies. \nEls personatges es poden curar amb els nous vials que es regeneren cada 5 hores del darrer ús.',
                   ),
                   SizedBox(height: 12),
                   Image.asset(

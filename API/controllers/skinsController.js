@@ -469,7 +469,7 @@ exports.gachaTirada = async (req, res) => {
             }
         });
 
-        // Pesos: 55% noves, 45% repetides
+        // Probabilitats: 55% noves, 45% repetides
         let finalPool = [];
 
         if (newSkins.length > 0 && ownedSkins.length > 0) {
@@ -489,7 +489,7 @@ exports.gachaTirada = async (req, res) => {
 
         const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-        // 🔥 Comprovar habilitat llegendària
+        //Comprovar habilitat llegendària
         const [habilitatResult] = await connection.execute(
             'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
             [randomSkin.id]
