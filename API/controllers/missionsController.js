@@ -516,7 +516,7 @@ exports.getMissionArma = async (req, res) => {
     const [armes] = await connection.execute(`
       SELECT DISTINCT a.id AS arma_id, a.nom AS nom_arma
       FROM SKINS_ARMES sa
-      JOIN ARMES a ON sa.arma_id = a.id
+      JOIN ARMES a ON sa.arma = a.id
       WHERE sa.skin IN (${placeholders})
     `, skinsIds);
 
