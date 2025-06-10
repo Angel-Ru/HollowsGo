@@ -13,7 +13,7 @@ Future<void> mostrarDialegArmesPredefinides({
 }) async {
   await armesProvider.fetchArmesPerSkin(skinId, usuariId);
   final provider = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
-
+  final skin = Provider.of<SkinsEnemicsPersonatgesProvider>(context, listen: false);
   showDialog(
     context: context,
     builder: (context) {
@@ -174,6 +174,7 @@ Future<void> mostrarDialegArmesPredefinides({
                                     );
                                     provider.fetchPersonatgesAmbSkins(usuariId.toString());
                                     if (ok) {
+                                      await skin.getSkinSeleccionada(usuariId);
                                       await MissionsLogic.completarMissioEquiparArma(context);
                                       Navigator.of(context).pop();
                                       ScaffoldMessenger.of(context).showSnackBar(
