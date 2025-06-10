@@ -95,7 +95,7 @@ exports.assignarMissionsDiaries = async (req, res) => {
     `, [usuariId, avui]);
 
     res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAssignades });
-
+    console.log(missionsAssignades);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error assignant missions' });
