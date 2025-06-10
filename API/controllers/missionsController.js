@@ -12,57 +12,95 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     // 0. Comprovar si ja té missions assignades avui
     const [missionsExistents] = await connection.execute(`
-      SELECT COUNT(*) AS count FROM MISSIONS_DIARIES
-      WHERE usuari = ? AND data_assig = ?
+      SELECT COUNT(*) AS count
+      FROM MISSIONS_DIARIES md
+      JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
+      WHERE um.usuari_id = ? AND DATE(md.data_assig) = ?
     `, [usuariId, avui]);
 
     if (missionsExistents[0].count === 0) {
-      // 1. Assignar missions fixes
       // 1. Assignar missions fixes de tipus 0
-const [fixes] = await connection.execute(`
-  SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus_missio = 0
-`);
+      const [fixes] = await connection.execute(`
+        SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus_missio = 0
+      `);
 
       for (const missio of fixes) {
+        // Crear entrada a USUARIS_MISSIONS si no existeix
+        const [umExists] = await connection.execute(`
+          SELECT id FROM USUARIS_MISSIONS
+          WHERE usuari_id = ? AND missio_id = ?
+        `, [usuariId, missio.id]);
+
+        let usuarisMissioId;
+        if (umExists.length === 0) {
+          const [insertResult] = await connection.execute(`
+            INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
+            VALUES (?, ?)
+          `, [usuariId, missio.id]);
+          usuarisMissioId = insertResult.insertId;
+        } else {
+          usuarisMissioId = umExists[0].id;
+        }
+
+        // Insertar a MISSIONS_DIARIES
         await connection.execute(`
-          INSERT INTO MISSIONS_DIARIES (usuari, missio, data_assig)
-          VALUES (?, ?, ?)
-        `, [usuariId, missio.id, avui]);
+          INSERT INTO MISSIONS_DIARIES (usuaris_missions_id, data_assig)
+          VALUES (?, ?)
+        `, [usuarisMissioId, avui]);
       }
 
       // 2. Assignar una variable del dia (rotativa)
       const [variables] = await connection.execute(`
-  SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus_missio = 0 ORDER BY id
-`);
+        SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus_missio = 0 ORDER BY id
+      `);
 
-      const dia = new Date();
-      const index = dia.getDate() % variables.length;
-      const variableDelDia = variables[index];
+      if (variables.length > 0) {
+        const dia = new Date();
+        const index = dia.getDate() % variables.length;
+        const variableDelDia = variables[index];
 
-      // 3. Assignar variable del dia
-      await connection.execute(`
-        INSERT INTO MISSIONS_DIARIES (usuari, missio, data_assig)
-        VALUES (?, ?, ?)
-      `, [usuariId, variableDelDia.id, avui]);
+        // Crear entrada a USUARIS_MISSIONS per la missió variable
+        const [umExistsVar] = await connection.execute(`
+          SELECT id FROM USUARIS_MISSIONS
+          WHERE usuari_id = ? AND missio_id = ?
+        `, [usuariId, variableDelDia.id]);
+
+        let usuarisMissioIdVar;
+        if (umExistsVar.length === 0) {
+          const [insertResultVar] = await connection.execute(`
+            INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
+            VALUES (?, ?)
+          `, [usuariId, variableDelDia.id]);
+          usuarisMissioIdVar = insertResultVar.insertId;
+        } else {
+          usuarisMissioIdVar = umExistsVar[0].id;
+        }
+
+        await connection.execute(`
+          INSERT INTO MISSIONS_DIARIES (usuaris_missions_id, data_assig)
+          VALUES (?, ?)
+        `, [usuarisMissioIdVar, avui]);
+      }
     }
 
-    // 4. Recuperar les missions assignades avui per l’usuari
+    // 3. Recuperar les missions assignades avui per l’usuari
     const [missionsAssignades] = await connection.execute(`
-      SELECT md.id, md.usuari, md.missio, md.data_assig, md.progress, m.nom_missio, m.descripcio, m.objectiu
-FROM MISSIONS_DIARIES md
-JOIN MISSIONS m ON md.missio = m.id
-WHERE md.usuari = ? AND md.data_assig = ?
-ORDER BY md.missio
-
+      SELECT md.id, um.usuari_id AS usuari, md.usuaris_missions_id, md.data_assig, md.progress, m.nom_missio, m.descripcio, m.objectiu
+      FROM MISSIONS_DIARIES md
+      JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
+      JOIN MISSIONS m ON um.missio_id = m.id
+      WHERE um.usuari_id = ? AND DATE(md.data_assig) = ?
+      ORDER BY m.id
     `, [usuariId, avui]);
 
     res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAssignades });
 
   } catch (err) {
-    console.error(err);
+    console.error('Error assignant missions:', err);
     res.status(500).json({ error: 'Error assignant missions' });
   }
 };
+
 
 exports.incrementarProgresMissio = async (req, res) => {
   const missioDiariaId = parseInt(req.params.id);
@@ -80,10 +118,12 @@ exports.incrementarProgresMissio = async (req, res) => {
 
     await connection.beginTransaction();
 
+    // Bloquejar la fila per evitar condicions de carrera
     const [rows] = await connection.execute(`
-      SELECT md.progress, m.objectiu, md.usuari, m.punts
+      SELECT md.progress, m.objectiu, um.usuari_id AS usuari, m.punts
       FROM MISSIONS_DIARIES md
-      JOIN MISSIONS m ON md.missio = m.id
+      JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
+      JOIN MISSIONS m ON um.missio_id = m.id
       WHERE md.id = ?
       FOR UPDATE
     `, [missioDiariaId]);
@@ -114,6 +154,7 @@ exports.incrementarProgresMissio = async (req, res) => {
       return res.status(404).json({ error: 'Missió no trobada' });
     }
 
+    // Si la missió s'ha completat ara, afegir punts a l'usuari
     if (progress + 1 >= objectiu && punts && !isNaN(punts)) {
       await connection.execute(`
         UPDATE USUARIS
@@ -132,10 +173,11 @@ exports.incrementarProgresMissio = async (req, res) => {
       await connection.rollback();
       connection.release();
     }
-    console.error(err);
+    console.error('Error incrementant el progrés de la missió:', err);
     res.status(500).json({ error: 'Error incrementant el progrés de la missió' });
   }
 };
+
 
 exports.assignarMissionsTitols = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
@@ -144,7 +186,7 @@ exports.assignarMissionsTitols = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    
+    // 1. Obtenir tots els títols de l'usuari a partir de la biblioteca i personatges
     const [titolsUsuari] = await connection.execute(`
       SELECT t.id AS titol_id
       FROM BIBLIOTECA b
@@ -153,35 +195,63 @@ exports.assignarMissionsTitols = async (req, res) => {
       WHERE b.user_id = ?
     `, [usuariId]);
 
+    if (titolsUsuari.length === 0) {
+      return res.status(404).json({ error: 'L\'usuari no té cap títol a la biblioteca' });
+    }
+
     // 2. Obtenir totes les missions de tipus 1 (de títol)
     const [missionsTipus1] = await connection.execute(`
       SELECT id FROM MISSIONS WHERE tipus_missio = 1
     `);
 
-    // 3. Per cada títol, assignar cada missió si no existeix
-    for (const { titol_id } of titolsUsuari) {
-      for (const { id: missio_id } of missionsTipus1) {
+    if (missionsTipus1.length === 0) {
+      return res.status(404).json({ error: 'No hi ha missions de tipus títol disponibles' });
+    }
+
+    // 3. Per cada missió, verificar o crear l'assignació a USUARIS_MISSIONS
+    //    I després, per cada títol, verificar o crear l'entrada a MISSIONS_TITOLS
+    for (const { id: missioId } of missionsTipus1) {
+      // Comprovar si ja existeix la assignació a USUARIS_MISSIONS per a aquest usuari i missió
+      const [usuarisMissionsRows] = await connection.execute(`
+        SELECT id FROM USUARIS_MISSIONS
+        WHERE usuari_id = ? AND missio_id = ?
+      `, [usuariId, missioId]);
+
+      let usuarisMissionsId;
+      if (usuarisMissionsRows.length === 0) {
+        // Crear la assignació a USUARIS_MISSIONS
+        const [result] = await connection.execute(`
+          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
+          VALUES (?, ?)
+        `, [usuariId, missioId]);
+        usuarisMissionsId = result.insertId;
+      } else {
+        usuarisMissionsId = usuarisMissionsRows[0].id;
+      }
+
+      // Per cada títol, verificar si ja existeix a MISSIONS_TITOLS
+      for (const { titol_id: titolId } of titolsUsuari) {
         const [existeix] = await connection.execute(`
           SELECT 1 FROM MISSIONS_TITOLS
-          WHERE titol = ? AND missio = ? AND usuari = ?
-        `, [titol_id, missio_id, usuariId]);
+          WHERE usuaris_missions_id = ? AND titol_id = ?
+        `, [usuarisMissionsId, titolId]);
 
         if (existeix.length === 0) {
           await connection.execute(`
-            INSERT INTO MISSIONS_TITOLS (titol, missio, usuari)
-            VALUES (?, ?, ?)
-          `, [titol_id, missio_id, usuariId]);
+            INSERT INTO MISSIONS_TITOLS (usuaris_missions_id, titol_id, progress)
+            VALUES (?, ?, 0)
+          `, [usuarisMissionsId, titolId]);
         }
       }
     }
 
     res.status(200).json({ missatge: 'Missions de títol assignades correctament!' });
-    console.log
   } catch (err) {
-    console.error(err);
+    console.error('Error assignant missions de títol:', err);
     res.status(500).json({ error: 'Error assignant missions de títol' });
   }
 };
+
 
 exports.getMissionTitol = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
@@ -193,13 +263,12 @@ exports.getMissionTitol = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // Log inicial
     console.log(`Buscant títol per usuari ${usuariId}`);
 
     const [titolsUsuari] = await connection.execute(`
       SELECT 
         t.id AS titol_id,
-        t.nom_titol AS nom_titol
+        t.nom_titol
       FROM USUARI_SKIN_ARMES usa
       JOIN SKINS s ON s.id = usa.skin
       JOIN TITOLS t ON t.personatge = s.personatge
@@ -217,18 +286,35 @@ exports.getMissionTitol = async (req, res) => {
 
     console.log(`Títol seleccionat: ID=${titolId}, Nom="${nomTitol}"`);
 
+    // Obtenir missions assignades a l'usuari
+    const [usuarisMissions] = await connection.execute(`
+      SELECT id
+      FROM USUARIS_MISSIONS
+      WHERE usuari_id = ?
+    `, [usuariId]);
+
+    if (usuarisMissions.length === 0) {
+      console.warn(`L'usuari ${usuariId} no té missions assignades`);
+      return res.status(404).json({ error: 'L\'usuari no té missions assignades' });
+    }
+
+    const usuarisMissionsIds = usuarisMissions.map(um => um.id);
+    const umPlaceholders = usuarisMissionsIds.map(() => '?').join(',');
+
+    // Obtenir la missió de títol
     const [missions] = await connection.execute(`
       SELECT 
         m.id,
         m.nom_missio,
         m.descripcio,
         m.objectiu,
-        mt.progres
+        mt.progress
       FROM MISSIONS_TITOLS mt
-      JOIN MISSIONS m ON m.id = mt.missio
-      WHERE mt.titol = ? AND mt.usuari = ? AND m.tipus_missio = 1
+      JOIN USUARIS_MISSIONS um ON mt.usuaris_missions_id = um.id
+      JOIN MISSIONS m ON m.id = um.missio_id
+      WHERE mt.titol_id = ? AND mt.usuaris_missions_id IN (${umPlaceholders}) AND m.tipus_missio = 1
       LIMIT 1
-    `, [titolId, usuariId]);
+    `, [titolId, ...usuarisMissionsIds]);
 
     console.log('Resultat missió:', missions);
 
@@ -255,6 +341,7 @@ exports.getMissionTitol = async (req, res) => {
   }
 };
 
+
 exports.incrementarProgresTitol = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
   if (!usuariId) {
@@ -264,7 +351,7 @@ exports.incrementarProgresTitol = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // Obtenim el titol seleccionat per l'usuari
+    // Obtenim el títol seleccionat per l'usuari
     const [titolsUsuari] = await connection.execute(`
       SELECT t.id AS titol_id
       FROM USUARI_SKIN_ARMES usa
@@ -279,41 +366,57 @@ exports.incrementarProgresTitol = async (req, res) => {
 
     const titolId = titolsUsuari[0].titol_id;
 
-    // Obtenim la missió activa del títol
+    // Obtenim les missions assignades a l'usuari (USUARIS_MISSIONS)
+    const [usuarisMissions] = await connection.execute(`
+      SELECT id, missio_id
+      FROM USUARIS_MISSIONS
+      WHERE usuari_id = ?
+    `, [usuariId]);
+
+    if (usuarisMissions.length === 0) {
+      return res.status(404).json({ error: 'L\'usuari no té missions assignades' });
+    }
+
+    const usuarisMissionsIds = usuarisMissions.map(um => um.id);
+    const umPlaceholders = usuarisMissionsIds.map(() => '?').join(',');
+
+    // Busquem la missió activa de tipus 1 per aquest títol i usuari
     const [missions] = await connection.execute(`
-      SELECT mt.missio, mt.progres, m.objectiu
+      SELECT mt.id, mt.progress, m.objectiu, um.missio_id
       FROM MISSIONS_TITOLS mt
-      JOIN MISSIONS m ON m.id = mt.missio
-      WHERE mt.titol = ? AND mt.usuari = ? AND m.tipus_missio = 1
+      JOIN USUARIS_MISSIONS um ON mt.usuaris_missions_id = um.id
+      JOIN MISSIONS m ON m.id = um.missio_id
+      WHERE mt.titol_id = ? AND mt.usuaris_missions_id IN (${umPlaceholders}) AND m.tipus_missio = 1
       LIMIT 1
-    `, [titolId, usuariId]);
+    `, [titolId, ...usuarisMissionsIds]);
 
     if (missions.length === 0) {
       return res.status(404).json({ error: 'No s\'ha trobat cap missió de títol per aquest usuari' });
     }
 
-    const { missio, progres, objectiu } = missions[0];
+    const { id: mtId, progress, objectiu } = missions[0];
 
-    if (progres >= objectiu) {
-      return res.status(200).json({ missatge: 'La missió ja està completada', progres });
+    if (progress >= objectiu) {
+      return res.status(200).json({ missatge: 'La missió ja està completada', progress });
     }
 
-    const nouProgres = progres + 1;
+    const nouProgres = progress + 1;
 
-    // Actualitzem el progres
+    // Actualitzem el progress
     await connection.execute(`
       UPDATE MISSIONS_TITOLS
-      SET progres = ?
-      WHERE titol = ? AND usuari = ? AND missio = ?
-    `, [nouProgres, titolId, usuariId, missio]);
+      SET progress = ?
+      WHERE id = ?
+    `, [nouProgres, mtId]);
 
-    res.status(200).json({ missatge: 'Progrés actualitzat correctament', progres: nouProgres });
+    res.status(200).json({ missatge: 'Progrés actualitzat correctament', progress: nouProgres });
 
   } catch (err) {
     console.error('Error incrementant el progres:', err.message);
     res.status(500).json({ error: 'Error al incrementar el progres de la missió' });
   }
 };
+
 
 exports.assignarMissionsArmes = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
@@ -373,7 +476,7 @@ exports.assignarMissionsArmes = async (req, res) => {
       missions[tipus] = result[0].id;
     }
 
-    // 5. Assignar missió segons categoria
+    // 5. Assignar missió i armes vinculant amb USUARIS_MISSIONS
     for (const { arma, categoria } of armesUsuari) {
       let tipus;
 
@@ -384,16 +487,32 @@ exports.assignarMissionsArmes = async (req, res) => {
 
       const missio_id = missions[tipus];
 
+      // Buscar o crear la assignació usuari-missió
+      const [usuarisMissions] = await connection.execute(`
+        SELECT id FROM USUARIS_MISSIONS WHERE usuari_id = ? AND missio_id = ?
+      `, [usuariId, missio_id]);
+
+      let usuarisMissionsId;
+
+      if (usuarisMissions.length === 0) {
+        const [insertResult] = await connection.execute(`
+          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id) VALUES (?, ?)
+        `, [usuariId, missio_id]);
+        usuarisMissionsId = insertResult.insertId;
+      } else {
+        usuarisMissionsId = usuarisMissions[0].id;
+      }
+
+      // Comprovar si ja existeix la arma per a aquesta assignació
       const [existeix] = await connection.execute(`
-        SELECT 1 FROM MISSIONS_ARMES
-        WHERE missio = ? AND arma = ? AND usuari = ?
-      `, [missio_id, arma, usuariId]);
+        SELECT 1 FROM MISSIONS_ARMES WHERE usuaris_missions_id = ? AND arma_id = ?
+      `, [usuarisMissionsId, arma]);
 
       if (existeix.length === 0) {
         await connection.execute(`
-          INSERT INTO MISSIONS_ARMES (missio, arma, usuari)
-          VALUES (?, ?, ?)
-        `, [missio_id, arma, usuariId]);
+          INSERT INTO MISSIONS_ARMES (usuaris_missions_id, arma_id)
+          VALUES (?, ?)
+        `, [usuarisMissionsId, arma]);
       }
     }
 
@@ -412,7 +531,7 @@ exports.getMissionArma = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // 1. Obtenir tots els skins seleccionats per l'usuari
+    // 1. Obtenir skins seleccionats per l'usuari
     const [skinsSeleccionats] = await connection.execute(`
       SELECT skin
       FROM USUARI_SKIN_ARMES
@@ -423,7 +542,7 @@ exports.getMissionArma = async (req, res) => {
       return res.status(200).json({ missatge: 'L\'usuari no té cap skin seleccionat. No hi ha missions disponibles.' });
     }
 
-    // 2. Obtenir totes les armes associades als skins seleccionats
+    // 2. Obtenir armes associades als skins seleccionats
     const skinsIds = skinsSeleccionats.map(s => s.skin);
     const placeholders = skinsIds.map(() => '?').join(',');
     const [armes] = await connection.execute(`
@@ -437,33 +556,61 @@ exports.getMissionArma = async (req, res) => {
       return res.status(200).json({ missatge: 'No s\'han trobat armes associades als skins seleccionats. No hi ha missions disponibles.' });
     }
 
-    // 3. Cercar la primera missió no completada per cada arma i tipus
+    // 3. Obtenir totes les assignacions USUARIS_MISSIONS de l’usuari
+    const [usuarisMissions] = await connection.execute(`
+      SELECT id, missio_id FROM USUARIS_MISSIONS WHERE usuari_id = ?
+    `, [usuariId]);
+
+    if (usuarisMissions.length === 0) {
+      return res.status(200).json({ missatge: 'No hi ha missions assignades a l\'usuari.' });
+    }
+
+    // 4. Cercar la primera missió no completada per cada arma i tipus
     const tipusMissioSeq = [2, 3, 4];
     let missioFinal = null;
 
     for (const { arma_id: armaId, nom_arma: nomArma } of armes) {
       for (const tipus of tipusMissioSeq) {
-        const [missions] = await connection.execute(`
-          SELECT 
-            m.id,
-            m.nom_missio,
-            m.descripcio,
-            m.objectiu,
-            ma.progres
-          FROM MISSIONS_ARMES ma
-          JOIN MISSIONS m ON m.id = ma.missio
-          WHERE ma.usuari = ? AND ma.arma = ? AND m.tipus_missio = ?
-        `, [usuariId, armaId, tipus]);
 
-        if (missions.length === 0) continue;
+        // Filtrar usuaris_missions per tipus
+        const umsFiltrades = usuarisMissions.filter(um => {
+          // Hauries de fer una consulta o tenir un mapa per tipus_missio,
+          // però per simplificar fem consulta després
+          return true;
+        });
 
-        const missioNoCompleta = missions.find(m => Number(m.progres) < Number(m.objectiu));
-        if (missioNoCompleta) {
-          missioFinal = { ...missioNoCompleta, armaId, nomArma, tipusMissio: tipus };
-          break;
+        for (const um of umsFiltrades) {
+          // Primer confirmar que la missió és del tipus que cerquem
+          const [missio] = await connection.execute(`
+            SELECT tipus_missio, objectiu FROM MISSIONS WHERE id = ?
+          `, [um.missio_id]);
+
+          if (missio.length === 0 || missio[0].tipus_missio !== tipus) continue;
+
+          // Ara cercar missió no completada
+          const [missions] = await connection.execute(`
+            SELECT ma.progress, m.id, m.nom_missio, m.descripcio, m.objectiu
+            FROM MISSIONS_ARMES ma
+            JOIN MISSIONS m ON m.id = ma.usuaris_missions_id
+            WHERE ma.usuaris_missions_id = ? AND ma.arma_id = ?
+          `, [um.id, armaId]);
+
+          if (missions.length === 0) continue;
+
+          const missioNoCompleta = missions.find(m => Number(m.progress) < Number(m.objectiu));
+          if (missioNoCompleta) {
+            missioFinal = {
+              ...missioNoCompleta,
+              armaId,
+              nomArma,
+              tipusMissio: tipus
+            };
+            break;
+          }
         }
-      }
 
+        if (missioFinal) break;
+      }
       if (missioFinal) break;
     }
 
@@ -471,7 +618,7 @@ exports.getMissionArma = async (req, res) => {
       return res.status(200).json({ missatge: 'Totes les missions estan completades per totes les armes associades als skins seleccionats' });
     }
 
-    // 4. Retornar la missió trobada amb l’arma associada
+    // 5. Retornar la missió trobada amb l’arma associada
     res.status(200).json({
       missatge: 'Missió d\'arma recuperada correctament',
       arma: missioFinal.nomArma,
@@ -480,18 +627,16 @@ exports.getMissionArma = async (req, res) => {
         nom_missio: missioFinal.nom_missio,
         descripcio: missioFinal.descripcio,
         objectiu: missioFinal.objectiu,
-        progres: missioFinal.progres,
+        progres: missioFinal.progress,
         tipus_missio: missioFinal.tipusMissio
       }
     });
-    console.log(res);
+
   } catch (err) {
     console.error('Error al recuperar la missió d\'arma:', err);
     res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
   }
 };
-
-
 
 
 
@@ -530,34 +675,50 @@ exports.incrementarProgresArma = async (req, res) => {
       return res.status(200).json({ missatge: 'Cap arma trobada per als skins seleccionats. No hi ha missions a incrementar.' });
     }
 
+    // 3. Obtenir les missions assignades a l'usuari (USUARIS_MISSIONS)
+    const [usuarisMissions] = await connection.execute(`
+      SELECT id
+      FROM USUARIS_MISSIONS
+      WHERE usuari_id = ?
+    `, [usuariId]);
+
+    if (usuarisMissions.length === 0) {
+      return res.status(200).json({ missatge: 'L\'usuari no té missions assignades.' });
+    }
+
+    const usuarisMissionsIds = usuarisMissions.map(um => um.id);
+    const umPlaceholders = usuarisMissionsIds.map(() => '?').join(',');
+
     const tipusMissioSeq = [2, 3, 4];
     let missioActualitzada = null;
 
     for (const { arma_id: armaId, nom_arma: nomArma } of armes) {
       for (const tipus of tipusMissioSeq) {
+        // 4. Buscar missions armes que estiguin relacionades amb missions assignades i de tipus concret
         const [missions] = await connection.execute(`
-          SELECT ma.missio, ma.progres, m.objectiu
+          SELECT ma.id, ma.progress, m.objectiu, ma.usuaris_missions_id, m.id AS missio_id
           FROM MISSIONS_ARMES ma
-          JOIN MISSIONS m ON m.id = ma.missio
-          WHERE ma.arma = ? AND ma.usuari = ? AND m.tipus_missio = ?
+          JOIN USUARIS_MISSIONS um ON ma.usuaris_missions_id = um.id
+          JOIN MISSIONS m ON m.id = um.missio_id
+          WHERE ma.arma_id = ? AND um.usuari_id = ? AND m.tipus_missio = ?
         `, [armaId, usuariId, tipus]);
 
         if (missions.length === 0) continue;
 
-        const missioNoCompleta = missions.find(m => Number(m.progres) < Number(m.objectiu));
+        const missioNoCompleta = missions.find(m => Number(m.progress) < Number(m.objectiu));
         if (missioNoCompleta) {
-          const { missio, progres, objectiu } = missioNoCompleta;
-          const nouProgres = progres + 1;
+          const { id: maId, progress, objectiu } = missioNoCompleta;
+          const nouProgres = progress + 1;
 
           await connection.execute(`
             UPDATE MISSIONS_ARMES
-            SET progres = ?
-            WHERE arma = ? AND usuari = ? AND missio = ?
-          `, [nouProgres, armaId, usuariId, missio]);
+            SET progress = ?
+            WHERE id = ?
+          `, [nouProgres, maId]);
 
           missioActualitzada = {
-            missatge: `Progrés incrementat per a la missió ${missio} (tipus ${tipus}) de l'arma ${nomArma}`,
-            missio,
+            missatge: `Progrés incrementat per a la missió ${missioNoCompleta.missio_id} (tipus ${tipus}) de l'arma ${nomArma}`,
+            missio: missioNoCompleta.missio_id,
             progres: nouProgres,
             tipus,
             arma: nomArma
@@ -565,7 +726,6 @@ exports.incrementarProgresArma = async (req, res) => {
           break;
         }
       }
-
       if (missioActualitzada) break;
     }
 
@@ -580,6 +740,7 @@ exports.incrementarProgresArma = async (req, res) => {
     res.status(500).json({ error: 'Error al incrementar el progrés de la missió d\'arma' });
   }
 };
+
 
 
 
