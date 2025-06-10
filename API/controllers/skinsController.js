@@ -491,13 +491,19 @@ exports.gachaTirada = async (req, res) => {
         [randomSkin.personatge]
       );
       if (personatgeResult.length > 0) {
-        const carpeta = personatgeResult[0].nom
-          .toLowerCase()
-          .replace(/[^\w]/g, '_')
-          .replace(/_+/g, '_')
-          .replace(/^_+|_+$/g, '');
-        randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
-      }
+        let carpeta = '';
+            if (personatgeNom.toLowerCase() === 'kenpachi') {
+                carpeta = getCarpetaKenpachi(randomSkin.nom, nomHabilitat);
+            } else {
+                carpeta = personatgeNom
+                    .toLowerCase()
+                    .replace(/[^\w]/g, '_')   // substitueix espais i símbols
+                    .replace(/_+/g, '_')       // agrupa múltiples guions baixos
+                    .replace(/^_+|_+$/g, '');  // elimina guions al principi/final
+            }
+
+            randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
+        }
     }
 
     // Si ja la té, donar fragments en lloc de descomptar monedes
