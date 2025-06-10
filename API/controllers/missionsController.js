@@ -85,27 +85,28 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     // 3. Recuperar les missions assignades avui per l’usuari (MISSIONS_DIARIES + MISSIONS)
     const [missionsAssignades] = await connection.execute(`
-      SELECT md.id, md.missio_id as missio, md.usuaris_missions_id, md.data_entry as data_assig, m.descripcio, 
-             m.nom_missio, m.objectiu, um.progres as progress
-      FROM MISSIONS_DIARIES md
-      JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
-      JOIN MISSIONS m ON md.missio_id = m.id
-      WHERE um.usuari_id = ? AND DATE(md.data_entry) = ?
-      ORDER BY md.missio_id
-    `, [usuariId, avui]);
-      
-    const missionsAdaptades = missionsAssignades.map(m => ({
-    id: m.id,
-    missio: m.missio,
-    usuari: usuariId,
-    dataAssig: m.data_assig,            // pots deixar l'ISO tal qual i parsejar a Dart
-    descripcio: m.descripcio,
-    nomMissio: m.nom_missio,
-    objectiu: m.objectiu,
-    progress: m.progress,
-  }));
+  SELECT md.id, md.missio_id as missio, md.usuaris_missions_id, md.data_entry as data_assig, m.descripcio, 
+         m.nom_missio, m.objectiu, um.progres as progress
+  FROM MISSIONS_DIARIES md
+  JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
+  JOIN MISSIONS m ON md.missio_id = m.id
+  WHERE um.usuari_id = ? AND DATE(md.data_entry) = ?
+  ORDER BY md.missio_id
+`, [usuariId, avui]);
 
-    res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAdaptades });
+const missionsAdaptades = missionsAssignades.map(m => ({
+  id: m.id,
+  usuari: usuariId,           // usuari
+  missio: m.missio,
+  data_assig: m.data_assig,   // dataAssign al model, aquí manté aquest nom
+  nom_missio: m.nom_missio,   // nom al model, aquí manté aquest nom
+  descripcio: m.descripcio,
+  progress: m.progress,
+  objectiu: m.objectiu,
+}));
+
+res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAdaptades });
+
     console.log(missionsAssignades);
   } catch (err) {
     console.error(err);
