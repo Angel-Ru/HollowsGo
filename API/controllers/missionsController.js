@@ -97,7 +97,6 @@ exports.assignarMissionsDiaries = async (req, res) => {
     const missionsAdaptades = missionsAssignades.map(m => ({
   id: m.id,
   missio: m.missio,
-  usuarisMissionsId: m.usuaris_missions_id,
   dataAssig: m.data_assig,            // pots deixar l'ISO tal qual i parsejar a Dart
   descripcio: m.descripcio,
   nomMissio: m.nom_missio,
