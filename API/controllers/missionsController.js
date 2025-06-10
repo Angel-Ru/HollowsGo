@@ -134,7 +134,7 @@ exports.incrementarProgresMissio = async (req, res) => {
     // 1. Agafar dades bloquejant fila (FOR UPDATE)
     // Ara md.usuaris_missions_id referencia progress a USUARIS_MISSIONS
     const [rows] = await connection.execute(`
-      SELECT um.progress, m.objectiu, um.usuari_id, m.punts
+      SELECT um.progres, m.objectiu, um.usuari_id, m.punts
       FROM MISSIONS_DIARIES md
       JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
       JOIN MISSIONS m ON um.missio_id = m.id
