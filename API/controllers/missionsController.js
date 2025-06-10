@@ -413,7 +413,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     // 3. Obtenir armes amb categoria
     const placeholdersSkins = skinsUsuari.map(() => '?').join(',');
     const [armesUsuari] = await connection.execute(`
-      SELECT DISTINCT sa.arma_id, a.categoria
+      SELECT DISTINCT sa.arma, a.categoria
       FROM SKINS_ARMES sa
       JOIN ARMES a ON sa.arma = a.id
       WHERE sa.skin IN (${placeholdersSkins})
