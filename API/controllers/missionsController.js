@@ -86,7 +86,7 @@ exports.assignarMissionsDiaries = async (req, res) => {
     // 3. Recuperar les missions assignades avui per l’usuari (MISSIONS_DIARIES + MISSIONS)
     const [missionsAssignades] = await connection.execute(`
       SELECT md.id, md.missio_id as missio, md.usuaris_missions_id, md.data_entry, m.descripcio, 
-             m.nom_missio, m.descripcio AS descripcio_missio, m.objectiu, um.progres
+             m.nom_missio, m.descripcio AS descripcio_missio, m.objectiu, um.progres as progress
       FROM MISSIONS_DIARIES md
       JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
       JOIN MISSIONS m ON md.missio_id = m.id
