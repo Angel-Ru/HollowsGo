@@ -405,10 +405,11 @@ exports.assignarMissionsArmes = async (req, res) => {
         skinsUsuari = skinsUsuari.concat(skinsArray);
       }
     }
+    skinsUsuari = skinsUsuari.map(Number).filter(n => !isNaN(n));
+
     if (skinsUsuari.length === 0) {
       return res.status(404).json({ error: 'No s\'han trobat skins a la biblioteca' });
     }
-    skinsUsuari = skinsUsuari.map(Number).filter(n => !isNaN(n));
 
     // 3. Obtenir armes amb categoria
     const placeholdersSkins = skinsUsuari.map(() => '?').join(',');
@@ -440,7 +441,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     }
 
     // 5. Assignar missió segons categoria
-    for (const { arma_id, categoria } of armesUsuari) {
+    for (const { arma, categoria } of armesUsuari) {
       let tipus;
 
       if (categoria === 0) tipus = 2;
@@ -473,13 +474,13 @@ exports.assignarMissionsArmes = async (req, res) => {
       const [existeix] = await connection.execute(`
         SELECT 1 FROM MISSIONS_ARMES
         WHERE missio_id = ? AND arma_id = ? AND usuaris_missions_id = ?
-      `, [missio_id, arma_id, usuaris_missions_id]);
+      `, [missio_id, arma, usuaris_missions_id]);
 
       if (existeix.length === 0) {
         await connection.execute(`
           INSERT INTO MISSIONS_ARMES (missio_id, arma_id, usuaris_missions_id)
           VALUES (?, ?, ?)
-        `, [missio_id, arma_id, usuaris_missions_id]);
+        `, [missio_id, arma, usuaris_missions_id]);
       }
     }
 
@@ -490,6 +491,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     res.status(500).json({ error: 'Error assignant missions d’armes' });
   }
 };
+
 
 
 exports.getMissionArma = async (req, res) => {
@@ -538,7 +540,7 @@ exports.getMissionArma = async (req, res) => {
             m.nom_missio,
             m.descripcio,
             m.objectiu,
-            ma.progres
+            um.progres
           FROM MISSIONS_ARMES ma
           JOIN USUARIS_MISSIONS um ON um.id = ma.usuaris_missions_id
           JOIN MISSIONS m ON m.id = um.missio_id
