@@ -609,7 +609,7 @@ exports.incrementarProgresArma = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // 1. Obtenir els skins seleccionats per l'usuari
+    // 1. Obtenir els skins seleccionats
     const [skinsSeleccionats] = await connection.execute(`
       SELECT skin
       FROM USUARI_SKIN_ARMES
@@ -623,7 +623,7 @@ exports.incrementarProgresArma = async (req, res) => {
     const skinsIds = skinsSeleccionats.map(s => s.skin);
     const placeholders = skinsIds.map(() => '?').join(',');
 
-    // 2. Obtenir les armes associades a aquests skins
+    // 2. Obtenir les armes associades
     const [armes] = await connection.execute(`
       SELECT DISTINCT a.id AS arma_id, a.nom AS nom_arma
       FROM SKINS_ARMES sa
@@ -635,43 +635,45 @@ exports.incrementarProgresArma = async (req, res) => {
       return res.status(200).json({ missatge: 'Cap arma trobada per als skins seleccionats. No hi ha missions a incrementar.' });
     }
 
-    const tipusMissioSeq = [2, 3, 4];
     let missioActualitzada = null;
 
     for (const { arma_id: armaId, nom_arma: nomArma } of armes) {
-      for (const tipus of tipusMissioSeq) {
-        const [missions] = await connection.execute(`
-          SELECT ma.missio, ma.progres, m.objectiu
-          FROM MISSIONS_ARMES ma
-          JOIN MISSIONS m ON m.id = ma.missio
-          WHERE ma.arma = ? AND ma.usuari = ? AND m.tipus_missio = ?
-        `, [armaId, usuariId, tipus]);
+      // 3. Buscar MISSIONS_ARMES per a l’usuari i arma
+      const [missioArma] = await connection.execute(`
+        SELECT ma.id, ma.missio_id, ma.usuaris_missions_id, um.progres, m.objectiu, m.nom_missio, m.descripcio
+        FROM MISSIONS_ARMES ma
+        JOIN USUARIS_MISSIONS um ON ma.usuaris_missions_id = um.id
+        JOIN MISSIONS m ON ma.missio_id = m.id
+        WHERE ma.arma_id = ? AND um.usuari_id = ?
+        ORDER BY ma.id
+      `, [armaId, usuariId]);
 
-        if (missions.length === 0) continue;
+      if (missioArma.length === 0) continue;
 
-        const missioNoCompleta = missions.find(m => Number(m.progres) < Number(m.objectiu));
-        if (missioNoCompleta) {
-          const { missio, progres, objectiu } = missioNoCompleta;
-          const nouProgres = progres + 1;
+      const noCompletada = missioArma.find(m => m.progres < m.objectiu);
+      if (noCompletada) {
+        const nouProgres = noCompletada.progres + 1;
 
-          await connection.execute(`
-            UPDATE MISSIONS_ARMES
-            SET progres = ?
-            WHERE arma = ? AND usuari = ? AND missio = ?
-          `, [nouProgres, armaId, usuariId, missio]);
+        // 4. Actualitzar progrés a USUARIS_MISSIONS
+        await connection.execute(`
+          UPDATE USUARIS_MISSIONS
+          SET progres = ?
+          WHERE id = ?
+        `, [nouProgres, noCompletada.usuaris_missions_id]);
 
-          missioActualitzada = {
-            missatge: `Progrés incrementat per a la missió ${missio} (tipus ${tipus}) de l'arma ${nomArma}`,
-            missio,
-            progres: nouProgres,
-            tipus,
-            arma: nomArma
-          };
-          break;
-        }
+        // 5. Retornar amb l'estructura del nou model
+        missioActualitzada = {
+          arma: nomArma,
+          missio: {
+            id: noCompletada.id,
+            nom_missio: noCompletada.nom_missio,
+            descripcio: noCompletada.descripcio,
+            objectiu: noCompletada.objectiu,
+            progres: nouProgres
+          }
+        };
+        break;
       }
-
-      if (missioActualitzada) break;
     }
 
     if (!missioActualitzada) {
@@ -681,10 +683,11 @@ exports.incrementarProgresArma = async (req, res) => {
     res.status(200).json(missioActualitzada);
 
   } catch (err) {
-    console.error('Error incrementant el progrés de la missió d\'arma:', err.message);
-    res.status(500).json({ error: 'Error al incrementar el progrés de la missió d\'arma' });
+    console.error('Error incrementant el progrés:', err.message);
+    res.status(500).json({ error: 'Error al incrementar el progrés de la missió' });
   }
 };
+
 
 
 
