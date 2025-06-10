@@ -251,7 +251,7 @@ exports.getTitolUsuari = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // Obtenim el titol_id de PERFIL_USUARI
+    // 🔎 Obtenir el titol_id de la taula PERFIL_USUARI
     const [rows] = await connection.execute(`
       SELECT titol
       FROM PERFIL_USUARI
@@ -265,12 +265,15 @@ exports.getTitolUsuari = async (req, res) => {
     const titolId = rows[0].titol;
 
     if (!titolId) {
-      return res.status(200).json({ missatge: 'L’usuari no té cap títol assignat' });
+      return res.status(200).json({
+        missatge: 'L’usuari no té cap títol assignat',
+        titol: null
+      });
     }
 
-    // Opcional: obtenir més info del títol, per exemple el nom
+    // 🔎 Obtenir més informació del títol
     const [titolData] = await connection.execute(`
-      SELECT id as titol_id, nom_titol
+      SELECT id AS titol_id, nom_titol
       FROM TITOLS
       WHERE id = ?
     `, [titolId]);
@@ -279,6 +282,7 @@ exports.getTitolUsuari = async (req, res) => {
       return res.status(404).json({ error: 'Títol no trobat' });
     }
 
+    // ✅ Resposta
     res.status(200).json({
       missatge: 'Títol de l’usuari recuperat correctament',
       titol: titolData[0]
@@ -289,6 +293,7 @@ exports.getTitolUsuari = async (req, res) => {
     res.status(500).json({ error: 'Error intern del servidor' });
   }
 };
+
   
 exports.actualitzarTitolUsuari = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
