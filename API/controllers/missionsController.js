@@ -95,14 +95,15 @@ exports.assignarMissionsDiaries = async (req, res) => {
     `, [usuariId, avui]);
       
     const missionsAdaptades = missionsAssignades.map(m => ({
-  id: m.id,
-  missio: m.missio,
-  dataAssig: m.data_assig,            // pots deixar l'ISO tal qual i parsejar a Dart
-  descripcio: m.descripcio,
-  nomMissio: m.nom_missio,
-  objectiu: m.objectiu,
-  progress: m.progress,
-}));
+    id: m.id,
+    missio: m.missio,
+    usuari: usuariId,
+    dataAssig: m.data_assig,            // pots deixar l'ISO tal qual i parsejar a Dart
+    descripcio: m.descripcio,
+    nomMissio: m.nom_missio,
+    objectiu: m.objectiu,
+    progress: m.progress,
+  }));
 
     res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAdaptades });
     console.log(missionsAssignades);
