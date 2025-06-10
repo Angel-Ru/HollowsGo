@@ -246,9 +246,9 @@ exports.assignarMissionsTitols = async (req, res) => {
 
         if (existeix.length === 0) {
           await connection.execute(`
-            INSERT INTO MISSIONS_TITOLS (usuaris_missions_id, titol_id)
-            VALUES (?, ?)
-          `, [usuarisMissionsId, titolId]);
+  INSERT INTO MISSIONS_TITOLS (usuaris_missions_id, titol_id, missio_id)
+  VALUES (?, ?, ?)
+`, [usuarisMissionsId, titolId, missioId]);
         }
       }
     }
