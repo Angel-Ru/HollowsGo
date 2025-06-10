@@ -214,21 +214,25 @@ exports.getTitolsComplets = async (req, res) => {
   try {
     const connection = await connectDB();
 
-    // Obtenim tots els títols on l’usuari ha completat missions de tipus 1
+    // 🔎 Obtenim tots els títols amb missions completades de tipus 1 per l’usuari
     const [titolsCompletats] = await connection.execute(`
       SELECT DISTINCT
         t.id AS titol_id,
         t.nom_titol
       FROM MISSIONS_TITOLS mt
-      JOIN MISSIONS m ON mt.missio = m.id
-      JOIN TITOLS t ON mt.titol = t.id
-      WHERE mt.usuari = ? 
-        AND m.tipus_missio = 1 
-        AND mt.progres >= m.objectiu
+      JOIN USUARIS_MISSIONS um ON mt.usuaris_missions_id = um.id
+      JOIN MISSIONS m ON mt.missio_id = m.id
+      JOIN TITOLS t ON mt.titol_id = t.id
+      WHERE um.usuari_id = ?
+        AND m.tipus_missio = 1
+        AND um.progres >= m.objectiu
     `, [usuariId]);
 
     if (titolsCompletats.length === 0) {
-      return res.status(200).json({ missatge: 'No hi ha títols amb missions completades per aquest usuari.' });
+      return res.status(200).json({
+        missatge: 'No hi ha títols amb missions completades per aquest usuari.',
+        titols: []
+      });
     }
 
     res.status(200).json({
@@ -241,6 +245,7 @@ exports.getTitolsComplets = async (req, res) => {
     res.status(500).json({ error: 'Error intern del servidor' });
   }
 };
+
 
 exports.getTitolUsuari = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
