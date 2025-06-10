@@ -476,6 +476,19 @@ exports.gachaTirada = async (req, res) => {
       finalPool = ownedSkins;
     }
 
+    // Funció especial per Kenpachi
+    function getCarpetaKenpachi(nomSkin, nomHabilitat) {
+      const s = (str) => str.toLowerCase();
+      if ((nomSkin && s(nomSkin).includes('tybw')) || (nomHabilitat && s(nomHabilitat).includes('tybw'))) {
+        return 'kenpachi_tybw';
+      }
+      if ((nomSkin && s(nomSkin).includes('aura')) || (nomHabilitat && s(nomHabilitat).includes('aura'))) {
+        return 'kenpachi_ull';
+      }
+      // fallback si cal
+      return 'kenpachi';
+    }
+
     // Triar skin final
     const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
 
@@ -491,19 +504,19 @@ exports.gachaTirada = async (req, res) => {
         [randomSkin.personatge]
       );
       if (personatgeResult.length > 0) {
+        const personatgeNom = personatgeResult[0].nom; // 🟢 Definim aquí!
         let carpeta = '';
-            if (personatgeNom.toLowerCase() === 'kenpachi') {
-                carpeta = getCarpetaKenpachi(randomSkin.nom, nomHabilitat);
-            } else {
-                carpeta = personatgeNom
-                    .toLowerCase()
-                    .replace(/[^\w]/g, '_')   // substitueix espais i símbols
-                    .replace(/_+/g, '_')       // agrupa múltiples guions baixos
-                    .replace(/^_+|_+$/g, '');  // elimina guions al principi/final
-            }
-
-            randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
+        if (personatgeNom.toLowerCase() === 'kenpachi') {
+          carpeta = getCarpetaKenpachi(randomSkin.nom, randomSkin.habilitat_llegendaria.nom);
+        } else {
+          carpeta = personatgeNom
+            .toLowerCase()
+            .replace(/[^\w]/g, '_')
+            .replace(/_+/g, '_')
+            .replace(/^_+|_+$/g, '');
         }
+        randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
+      }
     }
 
     // Si ja la té, donar fragments en lloc de descomptar monedes
@@ -549,7 +562,7 @@ exports.gachaTirada = async (req, res) => {
       [newBalance, userId]
     );
 
-    // 1️⃣3️⃣ Resposta final
+    // Resposta final
     res.status(200).send({
       message: '¡Tirada gacha realitzada amb èxit!',
       skin: randomSkin,
@@ -561,6 +574,7 @@ exports.gachaTirada = async (req, res) => {
     res.status(500).send('Error en la tirada de gacha');
   }
 };
+
 
 
 
