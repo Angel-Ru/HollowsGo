@@ -415,7 +415,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     const [armesUsuari] = await connection.execute(`
       SELECT DISTINCT sa.arma_id, a.categoria
       FROM SKINS_ARMES sa
-      JOIN ARMES a ON sa.arma_id = a.id
+      JOIN ARMES a ON sa.arma = a.id
       WHERE sa.skin IN (${placeholdersSkins})
     `, skinsUsuari);
 
