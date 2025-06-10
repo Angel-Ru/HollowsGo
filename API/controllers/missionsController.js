@@ -249,72 +249,49 @@ exports.assignarMissionsTitols = async (req, res) => {
 exports.getMissionTitol = async (req, res) => {
   const usuariId = parseInt(req.params.usuariId);
   if (!usuariId) {
-    console.warn('Usuari ID invàlid:', req.params.usuariId);
     return res.status(400).json({ error: 'Usuari invàlid' });
   }
 
   try {
     const connection = await connectDB();
 
-    console.log(`Buscant títol per usuari ${usuariId}`);
-
-    // 1. Obtenir títols per l'usuari via skins seleccionats
-    const [titolsUsuari] = await connection.execute(`
-      SELECT 
-        t.id AS titol_id,
-        t.nom_titol AS nom_titol
-      FROM USUARI_SKIN_ARMES usa
-      JOIN SKINS s ON s.id = usa.skin
-      JOIN TITOLS t ON t.personatge = s.personatge
-      WHERE usa.usuari = ? AND usa.seleccionat = 1
-    `, [usuariId]);
-
-    if (titolsUsuari.length === 0) {
-      console.warn(`Cap títol trobat per usuari ${usuariId}`);
-      return res.status(404).json({ error: 'No s\'ha trobat cap títol del personatge seleccionat per aquest usuari' });
-    }
-
-    const { titol_id: titolId, nom_titol: nomTitol } = titolsUsuari[0];
-
-    console.log(`Títol seleccionat: ID=${titolId}, Nom="${nomTitol}"`);
-
-    // 2. Buscar missió i progrés per títol i usuari (via usuaris_missions)
     const [missions] = await connection.execute(`
       SELECT 
         m.id,
         m.nom_missio,
         m.descripcio,
         m.objectiu,
-        um.progres
+        um.progres,
+        t.id AS titol_id,
+        t.nom_titol
       FROM MISSIONS_TITOLS mt
-      JOIN MISSIONS m ON m.id = mt.missio_id
-      JOIN USUARIS_MISSIONS um ON um.id = mt.usuaris_missions_id
-      WHERE mt.titol_id = ? AND um.usuari_id = ? AND m.tipus_missio = 1
+      JOIN MISSIONS m ON m.id = mt.missio_id AND m.tipus_missio = 1
+      JOIN USUARIS_MISSIONS um ON um.id = mt.usuaris_missions_id AND um.usuari_id = ?
+      JOIN TITOLS t ON t.id = mt.titol_id
+      JOIN SKINS s ON s.personatge = t.personatge
+      JOIN USUARI_SKIN_ARMES usa ON usa.skin = s.id AND usa.usuari = ? AND usa.seleccionat = 1
       LIMIT 1
-    `, [titolId, usuariId]);
+    `, [usuariId, usuariId]);
 
     if (missions.length === 0) {
-      console.warn(`No s'ha trobat cap missió pel títol ${titolId} i usuari ${usuariId}`);
-      return res.status(404).json({ error: 'No s\'ha trobat cap missió associada a aquest títol' });
+      return res.status(404).json({ error: 'No s\'ha trobat cap missió associada al títol i skin seleccionada' });
     }
 
     const missio = missions[0];
 
-    console.log('Missió retornada:', missio);
-
     res.status(200).json({
       missatge: 'Missió de títol recuperada correctament',
-      titol_id: titolId,
-      nom_titol: nomTitol,
+      titol_id: missio.titol_id,
+      nom_titol: missio.nom_titol,
       missio
     });
 
   } catch (err) {
-    console.error('Error al recuperar la missió de títol:', err.message);
-    console.error(err.stack);
+    console.error('Error al recuperar la missió de títol:', err);
     res.status(500).json({ error: 'Error recuperant la missió de títol' });
   }
 };
+
 
 
 exports.incrementarProgresTitol = async (req, res) => {
