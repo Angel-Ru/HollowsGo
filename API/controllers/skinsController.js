@@ -362,7 +362,7 @@ exports.borrarSkinId = async (req, res) => {
  *       500:
  *         description: Error en realitzar la tirada de gacha.
  */
-exports.gachaSimulacio = async (req, res) => {
+exports.gachaTirada = async (req, res) => {
   try {
     const email = req.body.email;
     if (!email) {
@@ -579,7 +579,7 @@ exports.gachaSimulacio = async (req, res) => {
 
 
 
-exports.gachaTirada = async (req, res) => {
+exports.gachaSimulacio = async (req, res) => {
     try {
         const email = req.body.email;
 
