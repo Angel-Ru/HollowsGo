@@ -1562,20 +1562,15 @@ exports.gachaTiradaEnemics = async (req, res) => {
         userSkinIds.push(String(finalSkin.id));
         const updatedSkinIds = userSkinIds.join(',');
 
-        if (userSkinRows.length === 0) {
-            await connection.execute(
-                `INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
-                 VALUES (?, ?, NOW(), ?)`,
-                [user.id, finalSkin.personatge, updatedSkinIds]
-            );
-        } else {
-            await connection.execute(
-                `UPDATE BIBLIOTECA
-                 SET skin_ids = ?
-                 WHERE user_id = ? AND personatge_id = ?`,
-                [updatedSkinIds, user.id, finalSkin.personatge]
-            );
-        }
+        await connection.execute(
+    `INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
+     VALUES (?, ?, NOW(), ?)
+     ON DUPLICATE KEY UPDATE
+     skin_ids = VALUES(skin_ids),
+     data_obtencio = NOW()`,
+    [user.id, finalSkin.personatge, updatedSkinIds]
+);
+
 
         res.status(200).send({
             message: '¡Tirada gacha realitzada amb èxit!',
