@@ -556,51 +556,50 @@ exports.getMissionArma = async (req, res) => {
       return res.status(200).json({ missatge: 'No s\'han trobat armes associades als skins seleccionats. No hi ha missions disponibles.' });
     }
 
-    // 3. Obtenir totes les assignacions USUARIS_MISSIONS de l’usuari
+    // 3. Obtenir missions assignades a l'usuari amb dades de missió
     const [usuarisMissions] = await connection.execute(`
-      SELECT id, missio_id FROM USUARIS_MISSIONS WHERE usuari_id = ?
+      SELECT um.id AS usuaris_missions_id, m.id AS missio_id, m.nom_missio, m.descripcio, m.objectiu, m.tipus_missio
+      FROM USUARIS_MISSIONS um
+      JOIN MISSIONS m ON um.missio_id = m.id
+      WHERE um.usuari_id = ?
     `, [usuariId]);
 
     if (usuarisMissions.length === 0) {
       return res.status(200).json({ missatge: 'No hi ha missions assignades a l\'usuari.' });
     }
 
-    // 4. Cercar la primera missió no completada per cada arma i tipus
+    // 4. Tipus de missió que volem buscar (ordre)
     const tipusMissioSeq = [2, 3, 4];
     let missioFinal = null;
 
+    // 5. Cercar primera missió no completada per arma i tipus
     for (const { arma_id: armaId, nom_arma: nomArma } of armes) {
       for (const tipus of tipusMissioSeq) {
 
-        // Filtrar usuaris_missions per tipus
-        const umsFiltrades = usuarisMissions.filter(um => {
-          // Hauries de fer una consulta o tenir un mapa per tipus_missio,
-          // però per simplificar fem consulta després
-          return true;
-        });
+        // Filtrar missions assignades per tipus
+        const missionsFiltrades = usuarisMissions.filter(um => um.tipus_missio === tipus);
 
-        for (const um of umsFiltrades) {
-          // Primer confirmar que la missió és del tipus que cerquem
-          const [missio] = await connection.execute(`
-            SELECT tipus_missio, objectiu FROM MISSIONS WHERE id = ?
-          `, [um.missio_id]);
+        for (const um of missionsFiltrades) {
+          // Consultar progrés específic per arma dins la missió assignada
+          const [missionsArmesProgress] = await connection.execute(`
+            SELECT progress
+            FROM MISSIONS_ARMES
+            WHERE usuaris_missions_id = ? AND arma_id = ?
+          `, [um.usuaris_missions_id, armaId]);
 
-          if (missio.length === 0 || missio[0].tipus_missio !== tipus) continue;
+          if (missionsArmesProgress.length === 0) continue;
 
-          // Ara cercar missió no completada
-          const [missions] = await connection.execute(`
-            SELECT ma.progress, m.id, m.nom_missio, m.descripcio, m.objectiu
-            FROM MISSIONS_ARMES ma
-            JOIN MISSIONS m ON m.id = ma.usuaris_missions_id
-            WHERE ma.usuaris_missions_id = ? AND ma.arma_id = ?
-          `, [um.id, armaId]);
+          const progress = Number(missionsArmesProgress[0].progress);
+          const objectiu = Number(um.objectiu);
 
-          if (missions.length === 0) continue;
-
-          const missioNoCompleta = missions.find(m => Number(m.progress) < Number(m.objectiu));
-          if (missioNoCompleta) {
+          if (progress < objectiu) {
+            // Missió no completada trobada
             missioFinal = {
-              ...missioNoCompleta,
+              id: um.missio_id,
+              nom_missio: um.nom_missio,
+              descripcio: um.descripcio,
+              objectiu: um.objectiu,
+              progress,
               armaId,
               nomArma,
               tipusMissio: tipus
@@ -615,11 +614,11 @@ exports.getMissionArma = async (req, res) => {
     }
 
     if (!missioFinal) {
-      return res.status(200).json({ missatge: 'Totes les missions estan completades per totes les armes associades als skins seleccionats' });
+      return res.status(200).json({ missatge: 'Totes les missions estan completades per totes les armes associades als skins seleccionats.' });
     }
 
-    // 5. Retornar la missió trobada amb l’arma associada
-    res.status(200).json({
+    // 6. Retornar la missió trobada amb l’arma associada
+    return res.status(200).json({
       missatge: 'Missió d\'arma recuperada correctament',
       arma: missioFinal.nomArma,
       missio: {
@@ -627,16 +626,17 @@ exports.getMissionArma = async (req, res) => {
         nom_missio: missioFinal.nom_missio,
         descripcio: missioFinal.descripcio,
         objectiu: missioFinal.objectiu,
-        progres: missioFinal.progress,
+        progress: missioFinal.progress,
         tipus_missio: missioFinal.tipusMissio
       }
     });
 
   } catch (err) {
     console.error('Error al recuperar la missió d\'arma:', err);
-    res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
+    return res.status(500).json({ error: 'Error recuperant la missió d\'arma' });
   }
 };
+
 
 
 
