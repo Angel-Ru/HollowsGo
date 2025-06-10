@@ -446,7 +446,7 @@ exports.gachaTirada = async (req, res) => {
         // Consultar quines té ja
         const [userSkins] = await connection.execute(
             'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? and personatge_id = ?',
-            [userId]
+            [userId, randomSkin.personatge]
         );
 
         let userSkinIds = [];
@@ -1195,7 +1195,7 @@ exports.gachaTiradaQuincy = async (req, res) => {
         // Obtenir skins del jugador (totes)
         const [allUserSkins] = await connection.execute(
             'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? and personatge_id = ?',
-            [user.id]
+            [user.id, randomSkin.personatge]
         );
 
         let userSkinIds = allUserSkins
@@ -1491,7 +1491,7 @@ exports.gachaTiradaEnemics = async (req, res) => {
         // Obtenir totes les skins del jugador
         const [allUserSkins] = await connection.execute(
             'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? and and personatge_id = ?',
-            [user.id]
+            [user.id, randomSkin.personatge]
         );
 
         let userSkinIds = allUserSkins
