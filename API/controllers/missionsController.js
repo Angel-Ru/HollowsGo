@@ -217,37 +217,22 @@ exports.assignarMissionsTitols = async (req, res) => {
       SELECT id FROM MISSIONS WHERE tipus_missio = 1
     `);
 
-    // 3. Per cada títol i missió, comprovar i inserir a MISSIONS_TITOLS
+    // 3. Per cada títol i missió, crear un USUARIS_MISSIONS NOU i vincular-lo a MISSIONS_TITOLS
     for (const { titol_id } of titolsUsuari) {
       for (const { id: missio_id } of missionsTipus1) {
-        // Primer buscar o crear la relació a USUARIS_MISSIONS
-        const [relacio] = await connection.execute(`
-          SELECT id FROM USUARIS_MISSIONS WHERE usuari_id = ? AND missio_id = ?
+        // Crear un nou USUARIS_MISSIONS per aquesta combinació
+        const [result] = await connection.execute(`
+          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
+          VALUES (?, ?)
         `, [usuariId, missio_id]);
 
-        let usuarisMissionsId;
-        if (relacio.length === 0) {
-          const [result] = await connection.execute(`
-            INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
-            VALUES (?, ?)
-          `, [usuariId, missio_id]);
-          usuarisMissionsId = result.insertId;
-        } else {
-          usuarisMissionsId = relacio[0].id;
-        }
+        const usuarisMissionsId = result.insertId;
 
-        // Comprovar si ja existeix el títol assignat per aquesta missió i usuari
-        const [existeix] = await connection.execute(`
-          SELECT 1 FROM MISSIONS_TITOLS
-          WHERE titol_id = ? AND missio_id = ? AND usuaris_missions_id = ?
+        // Insertar a MISSIONS_TITOLS
+        await connection.execute(`
+          INSERT INTO MISSIONS_TITOLS (titol_id, missio_id, usuaris_missions_id)
+          VALUES (?, ?, ?)
         `, [titol_id, missio_id, usuarisMissionsId]);
-
-        if (existeix.length === 0) {
-          await connection.execute(`
-            INSERT INTO MISSIONS_TITOLS (titol_id, missio_id, usuaris_missions_id)
-            VALUES (?, ?, ?)
-          `, [titol_id, missio_id, usuarisMissionsId]);
-        }
       }
     }
 
@@ -258,6 +243,7 @@ exports.assignarMissionsTitols = async (req, res) => {
     res.status(500).json({ error: 'Error assignant missions de títol' });
   }
 };
+
 
 
 exports.getMissionTitol = async (req, res) => {
