@@ -371,7 +371,7 @@ exports.gachaTirada = async (req, res) => {
 
     const connection = await connectDB();
 
-    // 1️⃣ Obtenir usuari
+    // Obtenir usuari
     const [userRecord] = await connection.execute(
       'SELECT id, punts_emmagatzemats FROM USUARIS WHERE email = ?',
       [email]
@@ -385,7 +385,7 @@ exports.gachaTirada = async (req, res) => {
       return res.status(400).send('No tens prou monedes per fer la tirada.');
     }
 
-    // 2️⃣ Obtenir les skins disponibles
+    // Obtenir les skins disponibles
     const [availableSkins] = await connection.execute(`
       SELECT *
       FROM SKINS s
@@ -403,7 +403,7 @@ exports.gachaTirada = async (req, res) => {
       return res.status(400).send('No hi ha skins disponibles.');
     }
 
-    // 3️⃣ Classificar per categoria
+    // Classificar per categoria
     const starGroups = { 1: [], 2: [], 3: [], 4: [] };
     availableSkins.forEach(skin => {
       if (starGroups[skin.categoria]) {
@@ -411,7 +411,7 @@ exports.gachaTirada = async (req, res) => {
       }
     });
 
-    // 4️⃣ Escollir nombre d’estrelles
+    // Escollir nombre d’estrelles
     const probabilities = [
       { stars: 1, threshold: 0.40 },
       { stars: 2, threshold: 0.70 },
@@ -436,7 +436,7 @@ exports.gachaTirada = async (req, res) => {
       return res.status(400).send('No hi ha skins disponibles en aquesta categoria.');
     }
 
-    // 5️⃣ Obtenir quines skins té L'USUARI (TOTES)
+    // Obtenir quines skins té L'USUARI (TOTES)
     const [userSkinsTotal] = await connection.execute(
       'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ?',
       [userId]
@@ -449,7 +449,7 @@ exports.gachaTirada = async (req, res) => {
         .flatMap(ids => ids.split(','));
     }
 
-    // 6️⃣ Separar noves i repetides
+    // Separar noves i repetides
     const newSkins = [];
     const ownedSkins = [];
     selectedGroup.forEach(skin => {
@@ -460,7 +460,7 @@ exports.gachaTirada = async (req, res) => {
       }
     });
 
-    // 7️⃣ Crear final pool segons probabilitats
+    // Crear final pool segons probabilitats
     let finalPool = [];
     if (newSkins.length > 0 && ownedSkins.length > 0) {
       const newWeight = 0.55;
@@ -476,10 +476,10 @@ exports.gachaTirada = async (req, res) => {
       finalPool = ownedSkins;
     }
 
-    // 8️⃣ Triar skin final
+    // Triar skin final
     const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-    // 9️⃣ Comprovar habilitat llegendària
+    // Comprovar habilitat llegendària
     const [habilitatResult] = await connection.execute(
       'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
       [randomSkin.id]
@@ -500,7 +500,7 @@ exports.gachaTirada = async (req, res) => {
       }
     }
 
-    // 1️⃣0️⃣ Si ja la té, donar fragments en lloc de descomptar monedes
+    // Si ja la té, donar fragments en lloc de descomptar monedes
     if (userSkinIds.includes(String(randomSkin.id))) {
       await connection.execute(
         'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
@@ -513,7 +513,7 @@ exports.gachaTirada = async (req, res) => {
       });
     }
 
-    // 1️⃣1️⃣ Actualitzar BIBLIOTECA per aquell personatge
+    // Actualitzar BIBLIOTECA per aquell personatge
     const [recordForChar] = await connection.execute(
       'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
       [userId, randomSkin.personatge]
@@ -536,7 +536,7 @@ exports.gachaTirada = async (req, res) => {
       );
     }
 
-    // 1️⃣2️⃣ Actualitzar monedes
+    // Actualitzar monedes
     const newBalance = currentBalance - 100;
     await connection.execute(
       'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
