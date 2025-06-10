@@ -1114,7 +1114,7 @@ exports.gachaTiradaQuincy = async (req, res) => {
         const email = req.body.email;
 
         if (!email) {
-            return res.status(400).send('Email no proporcionado.');
+            return res.status(400).send('Email no proporcionat.');
         }
 
         const connection = await connectDB();
@@ -1125,16 +1125,17 @@ exports.gachaTiradaQuincy = async (req, res) => {
         );
 
         if (userRecord.length === 0) {
-            return res.status(400).send('No se encuentra un usuario con ese correo electrónico.');
+            return res.status(400).send('No es troba cap usuari amb aquest correu electrònic.');
         }
 
-        const user = userRecord[0];
+        const userId = userRecord[0].id;
+        const currentBalance = userRecord[0].punts_emmagatzemats;
 
-        if (user.punts_emmagatzemats < 100) {
-            return res.status(400).send('No tienes suficientes monedas para hacer el tiro.');
+        if (currentBalance < 100) {
+            return res.status(400).send('No tens prou monedes per fer la tirada.');
         }
 
-        // Obtenir totes les skins disponibles (raça=0), excloent enemics
+        // Obtenir skins disponibles (raça = 0) excloent enemics
         const [availableSkins] = await connection.execute(`
             SELECT *
             FROM SKINS s
@@ -1178,17 +1179,26 @@ exports.gachaTiradaQuincy = async (req, res) => {
         }
 
         const selectedGroup = starGroups[chosenStars];
+        if (selectedGroup.length === 0) {
+            return res.status(400).send('No hi ha skins disponibles en aquesta categoria.');
+        }
 
-        // Obtenir skins del jugador (totes)
-        const [allUserSkins] = await connection.execute(
+        // Seleccionar un personatge de forma aleatòria
+        const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
+
+        // Comprovar les skins que ja té d'aquest personatge
+        const [userSkins] = await connection.execute(
             'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? and personatge_id = ?',
-            [user.id, randomSkin.personatge]
+            [userId, randomSkin.personatge]
         );
 
-        let userSkinIds = allUserSkins
-            .map(row => row.skin_ids)
-            .filter(Boolean)
-            .flatMap(ids => ids.split(','));
+        let userSkinIds = [];
+        if (userSkins.length > 0) {
+            userSkinIds = userSkins
+                .map(row => row.skin_ids)
+                .filter(Boolean)
+                .flatMap(ids => ids.split(','));
+        }
 
         // Separar en noves i repetides
         const newSkins = [];
@@ -1212,7 +1222,7 @@ exports.gachaTiradaQuincy = async (req, res) => {
 
             finalPool = [
                 ...Array(Math.floor(newWeight * totalSamples)).fill().map(() => newSkins[Math.floor(Math.random() * newSkins.length)]),
-                ...Array(Math.floor(ownedWeight * totalSamples)).fill().map(() => ownedSkins[Math.floor(Math.random() * ownedSkins.length)])
+                ...Array(Math.floor(ownedWeight * totalSamples)).fill().map(() => ownedSkins[Math.floor(Math.random() * ownedSkins.length)]),
             ];
         } else if (newSkins.length > 0) {
             finalPool = newSkins;
@@ -1220,56 +1230,56 @@ exports.gachaTiradaQuincy = async (req, res) => {
             finalPool = ownedSkins;
         }
 
-        const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
+        const finalSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-        // Si ja té la skin → donar fragments i no descomptar monedes
-        if (userSkinIds.includes(String(randomSkin.id))) {
+        // Si ja la té, afegir 10 fragments_skins i no descomptar monedes
+        if (userSkinIds.includes(String(finalSkin.id))) {
             await connection.execute(
                 'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
-                [user.id]
+                [userId]
             );
 
             return res.status(200).send({
                 message: "Ja tens aquesta skin. Has rebut 10 fragments de skin!",
-                skin: randomSkin,
-                remainingCoins: user.punts_emmagatzemats,
+                skin: finalSkin,
+                remainingCoins: currentBalance,
             });
         }
 
         // Descomptar 100 monedes
-        const newBalance = user.punts_emmagatzemats - 100;
+        const newBalance = currentBalance - 100;
         await connection.execute(
             'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
-            [newBalance, user.id]
+            [newBalance, userId]
         );
 
-        // Registrar nova skin
-        userSkinIds.push(String(randomSkin.id));
+        // Registrar la nova skin
+        userSkinIds.push(String(finalSkin.id));
         const updatedSkinIds = userSkinIds.join(',');
 
         const [existingRecord] = await connection.execute(
             'SELECT * FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
-            [user.id, randomSkin.personatge]
+            [userId, finalSkin.personatge]
         );
 
         if (existingRecord.length === 0) {
             await connection.execute(
                 `INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
                  VALUES (?, ?, NOW(), ?)`,
-                [user.id, randomSkin.personatge, updatedSkinIds]
+                [userId, finalSkin.personatge, updatedSkinIds]
             );
         } else {
             await connection.execute(
                 `UPDATE BIBLIOTECA
                  SET skin_ids = ?
                  WHERE user_id = ? AND personatge_id = ?`,
-                [updatedSkinIds, user.id, randomSkin.personatge]
+                [updatedSkinIds, userId, finalSkin.personatge]
             );
         }
 
         res.status(200).send({
             message: '¡Tirada gacha realitzada amb èxit!',
-            skin: randomSkin,
+            skin: finalSkin,
             remainingCoins: newBalance,
         });
 
@@ -1278,6 +1288,7 @@ exports.gachaTiradaQuincy = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 
@@ -1461,7 +1472,6 @@ exports.gachaTiradaEnemics = async (req, res) => {
 
         const rand = Math.random();
         let chosenStars = 1;
-
         for (const prob of probabilities) {
             if (rand <= prob.threshold) {
                 chosenStars = prob.stars;
@@ -1474,17 +1484,23 @@ exports.gachaTiradaEnemics = async (req, res) => {
         }
 
         const selectedGroup = starGroups[chosenStars];
+        if (selectedGroup.length === 0) {
+            return res.status(400).send('No hi ha skins disponibles en aquesta categoria.');
+        }
 
-        // Obtenir totes les skins del jugador
-        const [allUserSkins] = await connection.execute(
-            'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? and and personatge_id = ?',
+        // Seleccionar una skin aleatòria del grup triat
+        const randomSkin = selectedGroup[Math.floor(Math.random() * selectedGroup.length)];
+
+        // Obtenir les skins que té el jugador per aquell personatge
+        const [userSkinRows] = await connection.execute(
+            'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
             [user.id, randomSkin.personatge]
         );
 
-        let userSkinIds = allUserSkins
-            .map(row => row.skin_ids)
-            .filter(Boolean)
-            .flatMap(ids => ids.split(','));
+        let userSkinIds = [];
+        if (userSkinRows.length > 0 && userSkinRows[0].skin_ids) {
+            userSkinIds = userSkinRows[0].skin_ids.split(',');
+        }
 
         // Separar en noves i repetides
         const newSkins = [];
@@ -1498,7 +1514,7 @@ exports.gachaTiradaEnemics = async (req, res) => {
             }
         });
 
-        // Crear el pool segons els pesos
+        // Crear el pool segons els pesos (55% noves, 45% repetides)
         let finalPool = [];
 
         if (newSkins.length > 0 && ownedSkins.length > 0) {
@@ -1508,7 +1524,7 @@ exports.gachaTiradaEnemics = async (req, res) => {
 
             finalPool = [
                 ...Array(Math.floor(newWeight * totalSamples)).fill().map(() => newSkins[Math.floor(Math.random() * newSkins.length)]),
-                ...Array(Math.floor(ownedWeight * totalSamples)).fill().map(() => ownedSkins[Math.floor(Math.random() * ownedSkins.length)])
+                ...Array(Math.floor(ownedWeight * totalSamples)).fill().map(() => ownedSkins[Math.floor(Math.random() * ownedSkins.length)]),
             ];
         } else if (newSkins.length > 0) {
             finalPool = newSkins;
@@ -1516,20 +1532,10 @@ exports.gachaTiradaEnemics = async (req, res) => {
             finalPool = ownedSkins;
         }
 
-        const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
+        const finalSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
 
-        // Comprovar si ja té la skin
-        const [userSkinRows] = await connection.execute(
-            'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
-            [user.id, randomSkin.personatge]
-        );
-
-        let existingSkinIds = [];
-        if (userSkinRows.length > 0 && userSkinRows[0].skin_ids) {
-            existingSkinIds = userSkinRows[0].skin_ids.split(',');
-        }
-
-        const alreadyOwned = existingSkinIds.includes(String(randomSkin.id));
+        // Comprovar si ja la té
+        const alreadyOwned = userSkinIds.includes(String(finalSkin.id));
 
         if (alreadyOwned) {
             // Donar 10 fragments
@@ -1540,37 +1546,40 @@ exports.gachaTiradaEnemics = async (req, res) => {
 
             return res.status(200).send({
                 message: 'Ja tens aquesta skin. Has rebut 10 fragments de skin!',
-                skin: randomSkin,
+                skin: finalSkin,
                 remainingCoins: user.punts_emmagatzemats,
             });
         }
 
-        // Descomptar monedes
+        // Descomptar 100 monedes
         const newBalance = user.punts_emmagatzemats - 100;
         await connection.execute(
             'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
             [newBalance, user.id]
         );
 
-        // Afegir skin
-        existingSkinIds.push(String(randomSkin.id));
-        const updatedSkinIds = existingSkinIds.join(',');
+        // Afegir skin a la BIBLIOTECA
+        userSkinIds.push(String(finalSkin.id));
+        const updatedSkinIds = userSkinIds.join(',');
 
         if (userSkinRows.length === 0) {
             await connection.execute(
-                'INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids) VALUES (?, ?, NOW(), ?)',
-                [user.id, randomSkin.personatge, updatedSkinIds]
+                `INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
+                 VALUES (?, ?, NOW(), ?)`,
+                [user.id, finalSkin.personatge, updatedSkinIds]
             );
         } else {
             await connection.execute(
-                'UPDATE BIBLIOTECA SET skin_ids = ? WHERE user_id = ? AND personatge_id = ?',
-                [updatedSkinIds, user.id, randomSkin.personatge]
+                `UPDATE BIBLIOTECA
+                 SET skin_ids = ?
+                 WHERE user_id = ? AND personatge_id = ?`,
+                [updatedSkinIds, user.id, finalSkin.personatge]
             );
         }
 
         res.status(200).send({
             message: '¡Tirada gacha realitzada amb èxit!',
-            skin: randomSkin,
+            skin: finalSkin,
             remainingCoins: newBalance,
         });
 
@@ -1579,6 +1588,7 @@ exports.gachaTiradaEnemics = async (req, res) => {
         res.status(500).send('Error en la tirada de gacha');
     }
 };
+
 
 
 
