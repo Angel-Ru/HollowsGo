@@ -217,13 +217,28 @@ exports.assignarMissionsTitols = async (req, res) => {
       SELECT id FROM MISSIONS WHERE tipus_missio = 1
     `);
 
-    // 3. Per cada títol i missió, crear un USUARIS_MISSIONS NOU i vincular-lo a MISSIONS_TITOLS
+    // 3. Per cada títol i missió, crear un USUARIS_MISSIONS NOU només si no existeix ja
     for (const { titol_id } of titolsUsuari) {
       for (const { id: missio_id } of missionsTipus1) {
-        // Crear un nou USUARIS_MISSIONS per aquesta combinació
+        
+        // Comprovar si ja existeix la missió per aquest usuari, títol i missió
+        const [existeix] = await connection.execute(`
+          SELECT mt.usuaris_missions_id
+          FROM MISSIONS_TITOLS mt
+          JOIN USUARIS_MISSIONS um ON um.id = mt.usuaris_missions_id
+          WHERE um.usuari_id = ? AND mt.titol_id = ? AND mt.missio_id = ?
+          LIMIT 1
+        `, [usuariId, titol_id, missio_id]);
+
+        if (existeix.length > 0) {
+          // Ja existeix, saltem la inserció
+          continue;
+        }
+
+        // Insertar nou USUARIS_MISSIONS
         const [result] = await connection.execute(`
-          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
-          VALUES (?, ?)
+          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id, progres)
+          VALUES (?, ?, 0)
         `, [usuariId, missio_id]);
 
         const usuarisMissionsId = result.insertId;
@@ -415,7 +430,7 @@ exports.assignarMissionsArmes = async (req, res) => {
       missions[tipus] = result[0].id;
     }
 
-    // 5. Assignar missió segons categoria
+    // 5. Assignar missió segons categoria, només si no existeix ja
     for (const { arma, categoria } of armesUsuari) {
       let tipus;
 
@@ -426,7 +441,21 @@ exports.assignarMissionsArmes = async (req, res) => {
 
       const missio_id = missions[tipus];
 
-      // **Crear SEMPRE un nou USUARIS_MISSIONS per cada arma i missió**
+      // Comprovar si ja existeix missió per usuari + missio + arma
+      const [existeix] = await connection.execute(`
+        SELECT ma.usuaris_missions_id
+        FROM MISSIONS_ARMES ma
+        JOIN USUARIS_MISSIONS um ON um.id = ma.usuaris_missions_id
+        WHERE um.usuari_id = ? AND um.missio_id = ? AND ma.arma_id = ?
+        LIMIT 1
+      `, [usuariId, missio_id, arma]);
+
+      if (existeix.length > 0) {
+        // Ja existeix, saltem aquesta inserció
+        continue;
+      }
+
+      // Insertar nova missió per usuari
       const [insertResult] = await connection.execute(`
         INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id, progres)
         VALUES (?, ?, 0)
@@ -434,7 +463,7 @@ exports.assignarMissionsArmes = async (req, res) => {
 
       const usuaris_missions_id = insertResult.insertId;
 
-      // Insertar a MISSIONS_ARMES sense comprovar existència (per evitar duplicats pots fer un control addicional si vols)
+      // Insertar a MISSIONS_ARMES
       await connection.execute(`
         INSERT INTO MISSIONS_ARMES (missio_id, arma_id, usuaris_missions_id)
         VALUES (?, ?, ?)
