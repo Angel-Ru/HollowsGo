@@ -626,7 +626,7 @@ exports.getMissionArma = async (req, res) => {
         nom_missio: missioFinal.nom_missio,
         descripcio: missioFinal.descripcio,
         objectiu: missioFinal.objectiu,
-        progress: missioFinal.progress,
+        progres: missioFinal.progress,
         tipus_missio: missioFinal.tipusMissio
       }
     });
