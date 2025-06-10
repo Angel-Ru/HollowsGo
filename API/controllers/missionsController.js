@@ -449,37 +449,19 @@ exports.assignarMissionsArmes = async (req, res) => {
 
       const missio_id = missions[tipus];
 
-      // Buscar o crear l'entrada a USUARIS_MISSIONS
-      const [usuarisMissions] = await connection.execute(`
-        SELECT id FROM USUARIS_MISSIONS
-        WHERE usuari_id = ? AND missio_id = ?
+      // **Crear SEMPRE un nou USUARIS_MISSIONS per cada arma i missió**
+      const [insertResult] = await connection.execute(`
+        INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id, progres)
+        VALUES (?, ?, 0)
       `, [usuariId, missio_id]);
 
-      let usuaris_missions_id;
+      const usuaris_missions_id = insertResult.insertId;
 
-      if (usuarisMissions.length === 0) {
-        const [insertResult] = await connection.execute(`
-          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id, progres)
-          VALUES (?, ?, 0)
-        `, [usuariId, missio_id]);
-
-        usuaris_missions_id = insertResult.insertId;
-      } else {
-        usuaris_missions_id = usuarisMissions[0].id;
-      }
-
-      // Comprovar si ja existeix la missió arma per a aquest usuaris_missions_id i arma
-      const [existeix] = await connection.execute(`
-        SELECT 1 FROM MISSIONS_ARMES
-        WHERE missio_id = ? AND arma_id = ? AND usuaris_missions_id = ?
+      // Insertar a MISSIONS_ARMES sense comprovar existència (per evitar duplicats pots fer un control addicional si vols)
+      await connection.execute(`
+        INSERT INTO MISSIONS_ARMES (missio_id, arma_id, usuaris_missions_id)
+        VALUES (?, ?, ?)
       `, [missio_id, arma, usuaris_missions_id]);
-
-      if (existeix.length === 0) {
-        await connection.execute(`
-          INSERT INTO MISSIONS_ARMES (missio_id, arma_id, usuaris_missions_id)
-          VALUES (?, ?, ?)
-        `, [missio_id, arma, usuaris_missions_id]);
-      }
     }
 
     res.status(200).json({ missatge: 'Missions d’armes assignades correctament!' });
@@ -489,6 +471,7 @@ exports.assignarMissionsArmes = async (req, res) => {
     res.status(500).json({ error: 'Error assignant missions d’armes' });
   }
 };
+
 
 
 
