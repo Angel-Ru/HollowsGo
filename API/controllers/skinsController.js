@@ -363,212 +363,199 @@ exports.borrarSkinId = async (req, res) => {
  *         description: Error en realitzar la tirada de gacha.
  */
 exports.gachaTirada = async (req, res) => {
-    try {
-        const email = req.body.email;
-
-        if (!email) {
-            return res.status(400).send('Email no proporcionat.');
-        }
-
-        const connection = await connectDB();
-
-        const [userRecord] = await connection.execute(
-            'SELECT id, punts_emmagatzemats FROM USUARIS WHERE email = ?',
-            [email]
-        );
-
-        if (userRecord.length === 0) {
-            return res.status(400).send('No es troba cap usuari amb aquest correu electrònic.');
-        }
-
-        const userId = userRecord[0].id;
-        const currentBalance = userRecord[0].punts_emmagatzemats;
-
-        if (currentBalance < 100) {
-            return res.status(400).send('No tens prou monedes per fer la tirada.');
-        }
-
-        // Obtenir les skins disponibles
-        const [availableSkins] = await connection.execute(`
-            SELECT *
-            FROM SKINS s
-            WHERE s.raça = 1
-              AND (
-                  NOT EXISTS (
-                      SELECT 1
-                      FROM ENEMICS e
-                      WHERE e.personatge_id = s.personatge
-                  )
-                  OR s.nom LIKE '%bo%'
-              )
-        `);
-
-        if (availableSkins.length === 0) {
-            return res.status(400).send('No hi ha skins disponibles.');
-        }
-
-        // Classificar per categoria
-        const starGroups = { 1: [], 2: [], 3: [], 4: [] };
-        availableSkins.forEach(skin => {
-            if (starGroups[skin.categoria]) {
-                starGroups[skin.categoria].push(skin);
-            }
-        });
-
-        // Probabilitats acumulatives
-        const probabilities = [
-            { stars: 1, threshold: 0.40 },
-            { stars: 2, threshold: 0.70 },
-            { stars: 3, threshold: 0.90 },
-            { stars: 4, threshold: 1.00 }
-        ];
-
-        const rand = Math.random();
-        let chosenStars = 1;
-        for (const prob of probabilities) {
-            if (rand <= prob.threshold) {
-                chosenStars = prob.stars;
-                break;
-            }
-        }
-
-        // Si no hi ha skins en aquesta categoria, buscar cap avall
-        while (starGroups[chosenStars].length === 0 && chosenStars > 1) {
-            chosenStars--;
-        }
-
-        const selectedGroup = starGroups[chosenStars];
-
-        if (selectedGroup.length === 0) {
-            return res.status(400).send('No hi ha skins disponibles en aquesta categoria.');
-        }
-
-        // Consultar quines té ja
-        const [userSkins] = await connection.execute(
-            'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? and personatge_id = ?',
-            [userId, randomSkin.personatge]
-        );
-
-        let userSkinIds = [];
-        if (userSkins.length > 0) {
-            userSkinIds = userSkins
-                .map(row => row.skin_ids)
-                .filter(Boolean)
-                .flatMap(ids => ids.split(','));
-        }
-
-        // Separar noves i repetides
-        const newSkins = [];
-        const ownedSkins = [];
-
-        selectedGroup.forEach(skin => {
-            if (userSkinIds.includes(String(skin.id))) {
-                ownedSkins.push(skin);
-            } else {
-                newSkins.push(skin);
-            }
-        });
-
-        // Probabilitats: 55% noves, 45% repetides
-        let finalPool = [];
-
-        if (newSkins.length > 0 && ownedSkins.length > 0) {
-            const newWeight = 0.55;
-            const ownedWeight = 0.45;
-
-            const totalSamples = 100;
-            finalPool = [
-                ...Array(Math.floor(newWeight * totalSamples)).fill().map(() => newSkins[Math.floor(Math.random() * newSkins.length)]),
-                ...Array(Math.floor(ownedWeight * totalSamples)).fill().map(() => ownedSkins[Math.floor(Math.random() * ownedSkins.length)])
-            ];
-        } else if (newSkins.length > 0) {
-            finalPool = newSkins;
-        } else {
-            finalPool = ownedSkins;
-        }
-
-        const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
-
-        //Comprovar habilitat llegendària
-        const [habilitatResult] = await connection.execute(
-            'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
-            [randomSkin.id]
-        );
-
-        if (habilitatResult.length > 0) {
-            randomSkin.habilitat_llegendaria = habilitatResult[0];
-
-            const [personatgeResult] = await connection.execute(
-                'SELECT nom FROM PERSONATGES WHERE id = ?',
-                [randomSkin.personatge]
-            );
-
-            if (personatgeResult.length > 0) {
-                const carpeta = personatgeResult[0].nom
-                    .toLowerCase()
-                    .replace(/[^\w]/g, '_')
-                    .replace(/_+/g, '_')
-                    .replace(/^_+|_+$/g, '');
-
-                randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
-            }
-        }
-
-        // Si ja la té, afegir 10 fragments_skins en lloc de restar monedes
-        if (userSkinIds.includes(String(randomSkin.id))) {
-            await connection.execute(
-                'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
-                [userId]
-            );
-
-            return res.status(200).send({
-                message: "Ja tens aquesta skin. Has rebut 10 fragments de skin!",
-                skin: randomSkin,
-                remainingCoins: currentBalance,
-            });
-        }
-
-        // Registrar la nova skin i restar monedes
-        const newBalance = currentBalance - 100;
-        await connection.execute(
-            'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
-            [newBalance, userId]
-        );
-
-        userSkinIds.push(String(randomSkin.id));
-        const updatedSkinIds = userSkinIds.join(',');
-
-        const [existingRecord] = await connection.execute(
-            'SELECT * FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
-            [userId, randomSkin.personatge]
-        );
-
-        if (existingRecord.length === 0) {
-            await connection.execute(
-                `INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids)
-                 VALUES (?, ?, NOW(), ?)`,
-                [userId, randomSkin.personatge, updatedSkinIds]
-            );
-        } else {
-            await connection.execute(
-                `UPDATE BIBLIOTECA
-                 SET skin_ids = ?
-                 WHERE user_id = ? AND personatge_id = ?`,
-                [updatedSkinIds, userId, randomSkin.personatge]
-            );
-        }
-
-        res.status(200).send({
-            message: '¡Tirada gacha realitzada amb èxit!',
-            skin: randomSkin,
-            remainingCoins: newBalance,
-        });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error en la tirada de gacha');
+  try {
+    const email = req.body.email;
+    if (!email) {
+      return res.status(400).send('Email no proporcionat.');
     }
+
+    const connection = await connectDB();
+
+    // 1️⃣ Obtenir usuari
+    const [userRecord] = await connection.execute(
+      'SELECT id, punts_emmagatzemats FROM USUARIS WHERE email = ?',
+      [email]
+    );
+    if (userRecord.length === 0) {
+      return res.status(400).send('No es troba cap usuari amb aquest correu electrònic.');
+    }
+    const userId = userRecord[0].id;
+    const currentBalance = userRecord[0].punts_emmagatzemats;
+    if (currentBalance < 100) {
+      return res.status(400).send('No tens prou monedes per fer la tirada.');
+    }
+
+    // 2️⃣ Obtenir les skins disponibles
+    const [availableSkins] = await connection.execute(`
+      SELECT *
+      FROM SKINS s
+      WHERE s.raça = 1
+        AND (
+          NOT EXISTS (
+            SELECT 1
+            FROM ENEMICS e
+            WHERE e.personatge_id = s.personatge
+          )
+          OR s.nom LIKE '%bo%'
+        )
+    `);
+    if (availableSkins.length === 0) {
+      return res.status(400).send('No hi ha skins disponibles.');
+    }
+
+    // 3️⃣ Classificar per categoria
+    const starGroups = { 1: [], 2: [], 3: [], 4: [] };
+    availableSkins.forEach(skin => {
+      if (starGroups[skin.categoria]) {
+        starGroups[skin.categoria].push(skin);
+      }
+    });
+
+    // 4️⃣ Escollir nombre d’estrelles
+    const probabilities = [
+      { stars: 1, threshold: 0.40 },
+      { stars: 2, threshold: 0.70 },
+      { stars: 3, threshold: 0.90 },
+      { stars: 4, threshold: 1.00 }
+    ];
+    const rand = Math.random();
+    let chosenStars = 1;
+    for (const prob of probabilities) {
+      if (rand <= prob.threshold) {
+        chosenStars = prob.stars;
+        break;
+      }
+    }
+
+    // Si no hi ha en aquesta categoria, baixar
+    while (starGroups[chosenStars].length === 0 && chosenStars > 1) {
+      chosenStars--;
+    }
+    const selectedGroup = starGroups[chosenStars];
+    if (selectedGroup.length === 0) {
+      return res.status(400).send('No hi ha skins disponibles en aquesta categoria.');
+    }
+
+    // 5️⃣ Obtenir quines skins té L'USUARI (TOTES)
+    const [userSkinsTotal] = await connection.execute(
+      'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ?',
+      [userId]
+    );
+    let userSkinIds = [];
+    if (userSkinsTotal.length > 0) {
+      userSkinIds = userSkinsTotal
+        .map(row => row.skin_ids)
+        .filter(Boolean)
+        .flatMap(ids => ids.split(','));
+    }
+
+    // 6️⃣ Separar noves i repetides
+    const newSkins = [];
+    const ownedSkins = [];
+    selectedGroup.forEach(skin => {
+      if (userSkinIds.includes(String(skin.id))) {
+        ownedSkins.push(skin);
+      } else {
+        newSkins.push(skin);
+      }
+    });
+
+    // 7️⃣ Crear final pool segons probabilitats
+    let finalPool = [];
+    if (newSkins.length > 0 && ownedSkins.length > 0) {
+      const newWeight = 0.55;
+      const ownedWeight = 0.45;
+      const totalSamples = 100;
+      finalPool = [
+        ...Array(Math.floor(newWeight * totalSamples)).fill().map(() => newSkins[Math.floor(Math.random() * newSkins.length)]),
+        ...Array(Math.floor(ownedWeight * totalSamples)).fill().map(() => ownedSkins[Math.floor(Math.random() * ownedSkins.length)])
+      ];
+    } else if (newSkins.length > 0) {
+      finalPool = newSkins;
+    } else {
+      finalPool = ownedSkins;
+    }
+
+    // 8️⃣ Triar skin final
+    const randomSkin = finalPool[Math.floor(Math.random() * finalPool.length)];
+
+    // 9️⃣ Comprovar habilitat llegendària
+    const [habilitatResult] = await connection.execute(
+      'SELECT * FROM HABILITAT_LLEGENDARIA WHERE skin_personatge = ?',
+      [randomSkin.id]
+    );
+    if (habilitatResult.length > 0) {
+      randomSkin.habilitat_llegendaria = habilitatResult[0];
+      const [personatgeResult] = await connection.execute(
+        'SELECT nom FROM PERSONATGES WHERE id = ?',
+        [randomSkin.personatge]
+      );
+      if (personatgeResult.length > 0) {
+        const carpeta = personatgeResult[0].nom
+          .toLowerCase()
+          .replace(/[^\w]/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_+|_+$/g, '');
+        randomSkin.video_especial = `assets/special_attack/${carpeta}/${carpeta}_gacha.mp4`;
+      }
+    }
+
+    // 1️⃣0️⃣ Si ja la té, donar fragments en lloc de descomptar monedes
+    if (userSkinIds.includes(String(randomSkin.id))) {
+      await connection.execute(
+        'UPDATE USUARIS SET fragments_skins = fragments_skins + 10 WHERE id = ?',
+        [userId]
+      );
+      return res.status(200).send({
+        message: "Ja tens aquesta skin. Has rebut 10 fragments de skin!",
+        skin: randomSkin,
+        remainingCoins: currentBalance,
+      });
+    }
+
+    // 1️⃣1️⃣ Actualitzar BIBLIOTECA per aquell personatge
+    const [recordForChar] = await connection.execute(
+      'SELECT skin_ids FROM BIBLIOTECA WHERE user_id = ? AND personatge_id = ?',
+      [userId, randomSkin.personatge]
+    );
+
+    let updatedSkinIds;
+    if (recordForChar.length === 0) {
+      updatedSkinIds = String(randomSkin.id);
+      await connection.execute(
+        'INSERT INTO BIBLIOTECA (user_id, personatge_id, data_obtencio, skin_ids) VALUES (?, ?, NOW(), ?)',
+        [userId, randomSkin.personatge, updatedSkinIds]
+      );
+    } else {
+      const currentIds = recordForChar[0].skin_ids ? recordForChar[0].skin_ids.split(',') : [];
+      currentIds.push(String(randomSkin.id));
+      updatedSkinIds = [...new Set(currentIds)].join(',');
+      await connection.execute(
+        'UPDATE BIBLIOTECA SET skin_ids = ? WHERE user_id = ? AND personatge_id = ?',
+        [updatedSkinIds, userId, randomSkin.personatge]
+      );
+    }
+
+    // 1️⃣2️⃣ Actualitzar monedes
+    const newBalance = currentBalance - 100;
+    await connection.execute(
+      'UPDATE USUARIS SET punts_emmagatzemats = ? WHERE id = ?',
+      [newBalance, userId]
+    );
+
+    // 1️⃣3️⃣ Resposta final
+    res.status(200).send({
+      message: '¡Tirada gacha realitzada amb èxit!',
+      skin: randomSkin,
+      remainingCoins: newBalance,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error en la tirada de gacha');
+  }
 };
+
 
 
 
