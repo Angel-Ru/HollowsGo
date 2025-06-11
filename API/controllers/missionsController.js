@@ -100,6 +100,7 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
 
 
+
 exports.incrementarProgresMissio = async (req, res) => {
   const missioDiariaId = parseInt(req.params.id);
 
