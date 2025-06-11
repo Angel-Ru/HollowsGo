@@ -18,10 +18,9 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
     if (missionsExistents[0].count === 0) {
       // 1. Assignar missions fixes
-      // 1. Assignar missions fixes de tipus 0
-const [fixes] = await connection.execute(`
-  SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus_missio = 0
-`);
+      const [fixes] = await connection.execute(`
+        SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus_missio = 0
+      `);
 
       for (const missio of fixes) {
         await connection.execute(`
@@ -32,8 +31,8 @@ const [fixes] = await connection.execute(`
 
       // 2. Assignar una variable del dia (rotativa)
       const [variables] = await connection.execute(`
-  SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus_missio = 0 ORDER BY id
-`);
+        SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus_missio = 0 ORDER BY id
+      `);
 
       const dia = new Date();
       const index = dia.getDate() % variables.length;
@@ -49,20 +48,23 @@ const [fixes] = await connection.execute(`
     // 4. Recuperar les missions assignades avui per l’usuari
     const [missionsAssignades] = await connection.execute(`
       SELECT md.id, md.usuari, md.missio, md.data_assig, md.progress, m.nom_missio, m.descripcio, m.objectiu
-FROM MISSIONS_DIARIES md
-JOIN MISSIONS m ON md.missio = m.id
-WHERE md.usuari = ? AND md.data_assig = ?
-ORDER BY md.missio
-
+      FROM MISSIONS_DIARIES md
+      JOIN MISSIONS m ON md.missio = m.id
+      WHERE md.usuari = ? AND md.data_assig = ?
+      ORDER BY md.missio
     `, [usuariId, avui]);
 
-    res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAssignades });
+    res.status(200).json({
+      missatge: 'Missions assignades correctament!',
+      missions: missionsAssignades
+    });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error assignant missions' });
   }
 };
+
 
 exports.incrementarProgresMissio = async (req, res) => {
   const missioDiariaId = parseInt(req.params.id);
