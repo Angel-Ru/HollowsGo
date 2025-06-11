@@ -19,37 +19,27 @@ exports.assignarMissionsDiaries = async (req, res) => {
     `, [usuariId, avui]);
 
     if (missionsExistents[0].count === 0) {
-      // 1. Assignar missions fixes de tipus 0 (crear relació a USUARIS_MISSIONS si no existeix)
+      // 1. Assignar missions fixes de tipus 0 (crear relació nova a USUARIS_MISSIONS per avui)
       const [fixes] = await connection.execute(`
         SELECT id FROM MISSIONS WHERE fixa = TRUE AND tipus_missio = 0
       `);
 
       for (const missio of fixes) {
-        // Comprovar si ja existeix la relació usuari-missió
-        const [relacio] = await connection.execute(`
-          SELECT id FROM USUARIS_MISSIONS WHERE usuari_id = ? AND missio_id = ?
+        // Crear sempre un nou registre a USUARIS_MISSIONS per avui
+        const [result] = await connection.execute(`
+          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
+          VALUES (?, ?)
         `, [usuariId, missio.id]);
+        const usuarisMissionsId = result.insertId;
 
-        let usuarisMissionsId;
-        if (relacio.length === 0) {
-          // Crear la relació
-          const [result] = await connection.execute(`
-            INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
-            VALUES (?, ?)
-          `, [usuariId, missio.id]);
-          usuarisMissionsId = result.insertId;
-        } else {
-          usuarisMissionsId = relacio[0].id;
-        }
-
-        // Crear una entrada a MISSIONS_DIARIES per avui (progress inicial pot ser 0)
+        // Crear una entrada a MISSIONS_DIARIES per avui
         await connection.execute(`
           INSERT INTO MISSIONS_DIARIES (missio_id, usuaris_missions_id, data_entry)
           VALUES (?, ?, ?)
         `, [missio.id, usuarisMissionsId, avui]);
       }
 
-      // 2. Assignar una variable del dia (rotativa)
+      // 2. Assignar la variable rotativa del dia
       const [variables] = await connection.execute(`
         SELECT id FROM MISSIONS WHERE fixa = FALSE AND tipus_missio = 0 ORDER BY id
       `);
@@ -59,23 +49,14 @@ exports.assignarMissionsDiaries = async (req, res) => {
         const index = dia.getDate() % variables.length;
         const variableDelDia = variables[index];
 
-        // Igual que abans, crear relació si no existeix
-        const [relacioVar] = await connection.execute(`
-          SELECT id FROM USUARIS_MISSIONS WHERE usuari_id = ? AND missio_id = ?
+        // Crear sempre un nou registre a USUARIS_MISSIONS per avui
+        const [resultVar] = await connection.execute(`
+          INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
+          VALUES (?, ?)
         `, [usuariId, variableDelDia.id]);
+        const usuarisMissionsIdVar = resultVar.insertId;
 
-        let usuarisMissionsIdVar;
-        if (relacioVar.length === 0) {
-          const [resultVar] = await connection.execute(`
-            INSERT INTO USUARIS_MISSIONS (usuari_id, missio_id)
-            VALUES (?, ?)
-          `, [usuariId, variableDelDia.id]);
-          usuarisMissionsIdVar = resultVar.insertId;
-        } else {
-          usuarisMissionsIdVar = relacioVar[0].id;
-        }
-
-        // Assignar la variable del dia a MISSIONS_DIARIES
+        // Crear una entrada a MISSIONS_DIARIES
         await connection.execute(`
           INSERT INTO MISSIONS_DIARIES (missio_id, usuaris_missions_id, data_entry)
           VALUES (?, ?, ?)
@@ -83,29 +64,32 @@ exports.assignarMissionsDiaries = async (req, res) => {
       }
     }
 
-    // 3. Recuperar les missions assignades avui per l’usuari (MISSIONS_DIARIES + MISSIONS)
+    // 3. Recuperar les missions assignades avui per l’usuari
     const [missionsAssignades] = await connection.execute(`
-  SELECT md.id, md.missio_id as missio, md.usuaris_missions_id, md.data_entry as data_assig, m.descripcio, 
-         m.nom_missio, m.objectiu, um.progres as progress
-  FROM MISSIONS_DIARIES md
-  JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
-  JOIN MISSIONS m ON md.missio_id = m.id
-  WHERE um.usuari_id = ? AND DATE(md.data_entry) = ?
-  ORDER BY md.missio_id
-`, [usuariId, avui]);
+      SELECT md.id, md.missio_id as missio, md.usuaris_missions_id, md.data_entry as data_assig,
+             m.descripcio, m.nom_missio, m.objectiu, um.progres as progress
+      FROM MISSIONS_DIARIES md
+      JOIN USUARIS_MISSIONS um ON md.usuaris_missions_id = um.id
+      JOIN MISSIONS m ON md.missio_id = m.id
+      WHERE um.usuari_id = ? AND DATE(md.data_entry) = ?
+      ORDER BY md.missio_id
+    `, [usuariId, avui]);
 
-const missionsAdaptades = missionsAssignades.map(m => ({
-  id: m.id,
-  usuari: usuariId,           // usuari
-  missio: m.missio,
-  data_assig: m.data_assig,   // dataAssign al model, aquí manté aquest nom
-  nom_missio: m.nom_missio,   // nom al model, aquí manté aquest nom
-  descripcio: m.descripcio,
-  progress: m.progress,
-  objectiu: m.objectiu,
-}));
+    const missionsAdaptades = missionsAssignades.map(m => ({
+      id: m.id,
+      usuari: usuariId,
+      missio: m.missio,
+      data_assig: m.data_assig,
+      nom_missio: m.nom_missio,
+      descripcio: m.descripcio,
+      progress: m.progress,
+      objectiu: m.objectiu,
+    }));
 
-res.status(200).json({ missatge: 'Missions assignades correctament!', missions: missionsAdaptades });
+    res.status(200).json({
+      missatge: 'Missions assignades correctament!',
+      missions: missionsAdaptades
+    });
 
     console.log(missionsAssignades);
   } catch (err) {
@@ -113,6 +97,7 @@ res.status(200).json({ missatge: 'Missions assignades correctament!', missions: 
     res.status(500).json({ error: 'Error assignant missions' });
   }
 };
+
 
 
 exports.incrementarProgresMissio = async (req, res) => {
