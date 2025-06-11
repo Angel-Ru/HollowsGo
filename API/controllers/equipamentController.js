@@ -6,53 +6,55 @@ exports.getArmesPredefinidesPerSkin = async (req, res) => {
     const { skin_id, usuari_id } = req.params;
     const connection = await connectDB();
 
-    // Obtenim les armes associades a la skin
-    const [armesTotals] = await connection.execute(
-      `SELECT a.id, a.nom, a.categoria, a.buff_atac
-       FROM SKINS_ARMES sa
-       JOIN ARMES a ON sa.arma = a.id
-       WHERE sa.skin = ?`,
-      [skin_id]
-    );
+    // 1️⃣ Obtenir les armes associades a la skin
+    const [armesTotals] = await connection.execute(`
+      SELECT a.id, a.nom, a.categoria, a.buff_atac
+      FROM SKINS_ARMES sa
+      JOIN ARMES a ON sa.arma = a.id
+      WHERE sa.skin = ?
+    `, [skin_id]);
 
     if (armesTotals.length === 0) {
       return res.status(404).send('No s’han trobat armes per a aquesta skin.');
     }
 
-    // Filtrar les armes que tenen TOTES les missions completades
+    // 2️⃣ Filtrar les armes amb TOTES les missions completades
     const armesCompletades = [];
 
     for (const arma of armesTotals) {
-      const [missions] = await connection.execute(
-        `SELECT ma.progres, m.objectiu
-         FROM MISSIONS_ARMES ma
-         JOIN MISSIONS m ON ma.missio = m.id
-         WHERE ma.usuari = ? AND ma.arma = ?`,
-        [usuari_id, arma.id]
-      );
+      const [missions] = await connection.execute(`
+        SELECT um.progres, m.objectiu
+        FROM MISSIONS_ARMES ma
+        JOIN USUARIS_MISSIONS um ON ma.usuaris_missions_id = um.id
+        JOIN MISSIONS m ON um.missio_id = m.id
+        WHERE um.usuari_id = ? AND ma.arma_id = ?
+      `, [usuari_id, arma.id]);
 
-      // Comprovem que totes les missions estiguin completades
-      const totesCompletades = missions.length > 0 && missions.every(m => Number(m.progres) >= Number(m.objectiu));
+      // Totes les missions estan completades?
+      const totesCompletades = missions.length > 0 &&
+        missions.every(m => Number(m.progres) >= Number(m.objectiu));
+
       if (totesCompletades) {
         armesCompletades.push(arma);
       }
     }
 
-    // Obtenim l'arma equipada (si n'hi ha) per l'usuari i la skin
-    const [armaEquipadaRows] = await connection.execute(
-      `SELECT a.id, a.nom, a.categoria, a.buff_atac
-       FROM USUARI_SKIN_ARMES ae
-       JOIN ARMES a ON ae.arma = a.id
-       WHERE ae.usuari = ? AND ae.skin = ?`,
-      [usuari_id, skin_id]
-    );
+    // 3️⃣ Obtenir l’arma equipada per l’usuari i la skin
+    const [armaEquipadaRows] = await connection.execute(`
+      SELECT a.id, a.nom, a.categoria, a.buff_atac
+      FROM USUARI_SKIN_ARMES usa
+      JOIN ARMES a ON usa.arma = a.id
+      WHERE usa.usuari = ? AND usa.skin = ? AND usa.seleccionat = 1
+    `, [usuari_id, skin_id]);
 
     const armaEquipada = armaEquipadaRows.length > 0 ? armaEquipadaRows[0] : null;
 
+    // 4️⃣ Retornar resposta
     return res.status(200).json({
       armesPredefinides: armesCompletades,
       armaEquipada,
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Error en obtenir les armes predefinides.");
