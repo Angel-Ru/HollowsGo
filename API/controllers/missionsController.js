@@ -77,8 +77,8 @@ exports.assignarMissionsDiaries = async (req, res) => {
 
         // Assignar la variable del dia a MISSIONS_DIARIES
         await connection.execute(`
-          INSERT INTO MISSIONS_DIARIES (missio_id, usuaris_missions_id, descripcio, data_entry)
-          VALUES (?, ?, NULL, ?)
+          INSERT INTO MISSIONS_DIARIES (missio_id, usuaris_missions_id, data_entry)
+          VALUES (?, ?, ?)
         `, [variableDelDia.id, usuarisMissionsIdVar, avui]);
       }
     }
