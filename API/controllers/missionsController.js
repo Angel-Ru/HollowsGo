@@ -134,9 +134,9 @@ exports.incrementarProgresMissio = async (req, res) => {
       return res.status(404).json({ error: 'Missió no trobada' });
     }
 
-    const { progress, objectiu, usuari_id, punts } = rows[0];
+    const { progres, objectiu, usuari_id, punts } = rows[0];
 
-    if (progress >= objectiu) {
+    if (progres >= objectiu) {
       await connection.rollback();
       connection.release();
       return res.status(200).json({ missatge: 'Missió ja completada' });
@@ -158,7 +158,7 @@ exports.incrementarProgresMissio = async (req, res) => {
     }
 
     // 3. Si s'ha completat la missió ara, afegir punts a l'usuari
-    if (progress + 1 >= objectiu && punts && !isNaN(punts)) {
+    if (progres + 1 >= objectiu && punts && !isNaN(punts)) {
       await connection.execute(`
         UPDATE USUARIS
         SET punts_emmagatzemats = punts_emmagatzemats + ?

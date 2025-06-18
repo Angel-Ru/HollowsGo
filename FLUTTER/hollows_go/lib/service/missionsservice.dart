@@ -17,7 +17,7 @@ class MissionsLogic {
     orElse: () => throw Exception('Missió Jugar no trobada'),
   );
 
-  if (missioJugar.progress < missioJugar.objectiu) {
+  if (missioJugar.progress <= missioJugar.objectiu) {
     await missionsProvider.incrementProgress(missioJugar.id);
   }
 
@@ -25,7 +25,7 @@ class MissionsLogic {
   try {
     final missio5 = missionsProvider.missions.firstWhere((m) => m.missio == 5);
     if (aliatSkin != null && aliatSkin.raca == 1) {
-      if (missio5.progress < missio5.objectiu) {
+      if (missio5.progress <= missio5.objectiu) {
         await missionsProvider.incrementProgress(missio5.id);
       }
     }
@@ -37,7 +37,7 @@ class MissionsLogic {
   try {
     final missio6 = missionsProvider.missions.firstWhere((m) => m.missio == 6);
     if (aliatSkin != null && aliatSkin.raca == 0) {
-      if (missio6.progress < missio6.objectiu) {
+      if (missio6.progress <= missio6.objectiu) {
         await missionsProvider.incrementProgress(missio6.id);
       }
     }
@@ -61,7 +61,7 @@ class MissionsLogic {
       orElse: () => throw Exception('Missió Guanyar no trobada'),
     );
 
-    if (missioGuanyar.progress < missioGuanyar.objectiu) {
+    if (missioGuanyar.progress <= missioGuanyar.objectiu) {
       await missionsProvider.incrementProgress(missioGuanyar.id);
       await missionsProvider.fetchMissions(userProvider.userId);
     }
