@@ -21,11 +21,11 @@ Created by **[Miquel Sansó](https://github.com/MiquelSanso)** · **[Àngel Rubi
 
 ## 🎮 Links & Project Overview
 
-- 🌐 **Official Website:** [HollowsGoRemastered Web](https://angel-ru.github.io/WebHollowsGo/)
+- 🌐 **Official Website:** [HollowsGoRemastered Web](https://angel-ru.github.io/WebHollowsGo/) > 📱 **Android Note:** You can download the APK for Android devices on the official website.
+
 - 💻 **Web Repository:** [GitHub - WebHollowsGo](https://github.com/Angel-Ru/WebHollowsGo)
 - 📄 **Game Design Document (CAT):** [View GDD (PDF)](https://github.com/Angel-Ru/HollowsGo/blob/main/Documentaci%C3%B3%20Treball%20Final%20Miquel%20Sans%C3%B3.pdf)
 
-> 📱 **Android Note:** You can download the APK for Android devices on the official website.
 
 ---
 ## 📦 Asset Credits🎵
